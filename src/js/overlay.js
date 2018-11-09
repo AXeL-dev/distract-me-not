@@ -4,11 +4,11 @@ var isActive = false;
 
     function disableKeyboard(e) {
         if (!isActive) {
-            return true
+            return true;
         }
         e.preventDefault();
         e.stopImmediatePropagation();
-        return false
+        return false;
     }
 
     function disableOverlay() {
@@ -18,7 +18,7 @@ var isActive = false;
             overlayContainer.className = overlayContainer.className + " distract-overlay-fadeout";
             window.setTimeout(function() {
                 overlayContainer.parentNode.removeChild(overlayContainer);
-                document.body.className = document.body.className.replace(/distract-body/g, " ")
+                document.body.className = document.body.className.replace(/distract-body/g, " ");
             }, 300)
         }
     }
@@ -28,34 +28,34 @@ var isActive = false;
             return
         }
         if (document.body.className.indexOf("distract-body") < 0) {
-            document.body.className = document.body.className + " distract-body "
+            document.body.className = document.body.className + " distract-body ";
         }
         var overlayContainer = document.getElementById("distract-overlay-container");
         if (typeof overlayContainer == "undefined" || overlayContainer === null) {
             overlayContainer = document.createElement("div");
             overlayContainer.id = "distract-overlay-container";
-            document.body.appendChild(overlayContainer)
+            document.body.appendChild(overlayContainer);
         }
         overlayContainer.className = "distract-cursor distract-select distract-overlay-container";
         var overlay = document.getElementById("distract-overlay");
         if (typeof overlay == "undefined" || overlay === null) {
             overlay = document.createElement("div");
             overlay.id = "distract-overlay";
-            overlayContainer.appendChild(overlay)
+            overlayContainer.appendChild(overlay);
         }
         overlay.className = "distract-cursor distract-select distract-overlay";
         var infoContainer = document.getElementById("distract-info-container");
         if (typeof infoContainer == "undefined" || infoContainer === null) {
             infoContainer = document.createElement("div");
             infoContainer.id = "distract-info-container";
-            overlay.appendChild(infoContainer)
+            overlay.appendChild(infoContainer);
         }
         infoContainer.className = "distract-cursor distract-select distract-info-container";
         var overlayTopText = document.getElementById("distract-overlay-top-text");
         if (typeof overlayTopText == "undefined" || overlayTopText === null) {
             overlayTopText = document.createElement("span");
             overlayTopText.id = "distract-overlay-top-text";
-            infoContainer.appendChild(overlayTopText)
+            infoContainer.appendChild(overlayTopText);
         }
         overlayTopText.textContent = browser.i18n.getMessage("overlay_message");
         overlayTopText.className = "distract-cursor distract-select distract-overlay-top-text";
@@ -63,7 +63,7 @@ var isActive = false;
         if (typeof overlayImg == "undefined" || overlayImg === null) {
             overlayImg = document.createElement("div");
             overlayImg.id = "distract-overlay-img";
-            infoContainer.appendChild(overlayImg)
+            infoContainer.appendChild(overlayImg);
         }
         overlayImg.className = "distract-cursor distract-select distract-overlay-img";
     }
@@ -77,7 +77,7 @@ var isActive = false;
             overlay(m.type);
             isActive = true;
         } else {
-            disableOverlay()
+            disableOverlay();
         }
     })
 })();

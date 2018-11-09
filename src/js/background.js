@@ -11,16 +11,24 @@ function getDefaultBlacklist() {
     return ["facebook.com", "twitter.com", "youtube.com"]
 }
 
+function isTab(tab) {
+    return typeof tab.url == "undefined" || tab.url.startsWith("about:") || tab.url.startsWith("moz-extension://") ? false : true;
+}
+
 function block(tab) {
-    browser.tabs.sendMessage(tab.id, {
-        type: "block"
-    }, {}, function() {});
+    if (isTab(tab)) {
+        browser.tabs.sendMessage(tab.id, {
+            type: "block"
+        }, {}, function() {});
+    }
 }
 
 function unblock(tab) {
-    browser.tabs.sendMessage(tab.id, {
-        type: "unblock"
-    }, {}, function() {});
+    if (isTab(tab)) {
+        browser.tabs.sendMessage(tab.id, {
+            type: "unblock"
+        }, {}, function() {});
+    }
 }
 
 function checkForBlacklistAccess(tabId, changeInfo, tab) {
@@ -54,29 +62,29 @@ function onReplacedHandler(addedTabId, removedTabId) {
 
 function isBlacklisted(tab) {
     if (typeof tab.url == "undefined") {
-        return false
+        return false;
     }
     for (var index in blacklist) {
         if (tab.url.indexOf(blacklist[index]) >= 0) {
-            return true
+            return true;
         }
     }
-    return false
+    return false;
 }
 
 function isWhitelisted(tab) {
     if (typeof tab.url == "undefined") {
-        return true
+        return true;
     }
     if (tab.url.startsWith("chrome://newtab")) {
-        return true
+        return true;
     }
     for (var index in whitelist) {
         if (tab.url.indexOf(whitelist[index]) >= 0) {
-            return true
+            return true;
         }
     }
-    return false
+    return false;
 }
 
 function setWhitelistMode(isWLMode) {

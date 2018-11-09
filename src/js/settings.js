@@ -84,7 +84,7 @@
         var v = t.value.trim();
         if (v.length >= 0) {
             addToList("blacklist", v);
-            saveList("blacklist")
+            saveList("blacklist");
         }
         t.value = "";
     };
@@ -94,7 +94,7 @@
         var v = t.value.trim();
         if (v.length >= 0) {
             addToList("whitelist", v);
-            saveList("whitelist")
+            saveList("whitelist");
         }
         t.value = "";
     };
@@ -107,12 +107,12 @@
             addClass(wlist, "disappear");
             removeClass(blist, "disappear");
             addClass(document.getElementById("settings-whitelist-description"), "disappear");
-            removeClass(document.getElementById("settings-blacklist-description"), "disappear")
+            removeClass(document.getElementById("settings-blacklist-description"), "disappear");
         } else if (t.id == "whitelist-toggle") {
             addClass(blist, "disappear");
             removeClass(wlist, "disappear");
             removeClass(document.getElementById("settings-whitelist-description"), "disappear");
-            addClass(document.getElementById("settings-blacklist-description"), "disappear")
+            addClass(document.getElementById("settings-blacklist-description"), "disappear");
         }
         var inputs = document.getElementsByTagName("INPUT");
         var isWhitelistMode = t.id === "whitelist-toggle" ? true : false;
@@ -133,19 +133,19 @@
             var bChilds;
             bChilds = blacklistElement.children;
             while (blacklistElement.lastChild.id !== "new-black") {
-                blacklistElement.removeChild(blacklistElement.lastChild)
+                blacklistElement.removeChild(blacklistElement.lastChild);
             }
             for (var bIndex in blacklist) {
-                addToList("blacklist", blacklist[blacklist.length - bIndex - 1])
+                addToList("blacklist", blacklist[blacklist.length - bIndex - 1]);
             }
             var whitelist = items.whiteList;
             var whitelistElement = document.getElementById("whitelist");
             bChilds = whitelistElement.children;
             while (whitelistElement.lastChild.id !== "new-white") {
-                whitelistElement.removeChild(whitelistElement.lastChild)
+                whitelistElement.removeChild(whitelistElement.lastChild);
             }
             for (var wIndex in whitelist) {
-                addToList("whitelist", whitelist[whitelist.length - wIndex - 1])
+                addToList("whitelist", whitelist[whitelist.length - wIndex - 1]);
             }
         });
     }
@@ -156,34 +156,34 @@
             if (hasClass(t, "x")) {
                 var listType = t.parentNode.parentNode.id;
                 t.parentNode.parentNode.removeChild(t.parentNode);
-                saveList(listType)
+                saveList(listType);
             }
             if (hasClass(t, "choose-mode")) {
-                chooseMode(event)
+                chooseMode(event);
             }
         }, false);
         window.addEventListener("contextmenu", function(event) {
             event.preventDefault();
-            return false
+            return false;
         }, true);
         document.getElementById("new-black-box").addEventListener("keypress", function(e) {
             if (!e) {
-                e = window.event
+                e = window.event;
             }
             var keyCode = e.keyCode || e.which;
             if (keyCode === 13) {
                 addBlacklist();
-                document.getElementById("new-black-box").blur()
+                document.getElementById("new-black-box").blur();
             }
         }, false);
         document.getElementById("new-white-box").addEventListener("keypress", function(e) {
             if (!e) {
-                e = window.event
+                e = window.event;
             }
             var keyCode = e.keyCode || e.which;
             if (keyCode === 13) {
                 addWhitelist();
-                document.getElementById("new-white-box").blur()
+                document.getElementById("new-white-box").blur();
             }
         }, false);
         initList();
@@ -191,9 +191,9 @@
             isWhitelistMode: false
         }, function(items) {
             if (items.isWhitelistMode) {
-                document.getElementById("whitelist-toggle").click()
+                document.getElementById("whitelist-toggle").click();
             } else {
-                document.getElementById("blacklist-toggle").click()
+                document.getElementById("blacklist-toggle").click();
             }
         });
         setText("settings_blacklist_title", browser.i18n.getMessage("settings_blacklist_title"));
