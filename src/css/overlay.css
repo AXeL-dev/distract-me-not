@@ -1,0 +1,73 @@
+@font-face {
+  font-family: OpenSansFont;
+  src: url('/fonts/OpenSans-Light.ttf');
+}
+@font-face {
+  font-family: LatoFont;
+  src: url('/fonts/Lato-Light.ttf');
+}
+.distract-cursor {
+  cursor: default;
+}
+.distract-select {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+}
+.distract-disappear {
+  display: none;
+}
+.distract-body {
+  overflow: hidden !important;
+  height: 100%;
+}
+.distract-overlay-container {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 2147483647;
+}
+.distract-overlay {
+  z-index: 2147483647;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);;
+  text-align: center !important;
+  display: inline-block;
+  margin: 0;
+}
+.distract-overlay-fadeout {
+  opacity: 0.0;
+  transition: opacity 0.3s;
+}
+.distract-info-container {
+  text-align: center !important;
+  position: absolute;
+  top: calc(50% - 200px);
+  height: 400px;
+  width: 100%;
+}
+.distract-overlay-top-text {
+  font-family: OpenSansFont !important;
+  vertical-align: middle;
+  color: white !important;
+  font-size: 32px;
+  line-height: 32px;
+  cursor: default;
+  -webkit-user-select: none;
+  position: absolute;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
+  top: 10px;
+}
+.distract-overlay-img {
+  margin: 0 auto;
+  margin-top: 100px;
+  width: 128px;
+  height: 128px;
+  background-image: url(/icons/magnet-256.png);
+  background-size: contain;
+}

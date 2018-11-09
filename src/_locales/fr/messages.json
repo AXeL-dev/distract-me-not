@@ -1,0 +1,33 @@
+{
+    "appName": {
+        "message": "Distract Me Not"
+    }
+    ,
+    "appDesc": {
+        "message": "Restez concentré dans un monde rempli de distractions."
+    }
+    ,
+    "settings_blacklist_title": {
+        "message": "Liste noire"
+    }
+    ,
+    "settings_whitelist_title": {
+        "message": "Liste blanche"
+    }
+    ,
+    "settings_whitelist_description": {
+        "message": "Vous pouvez uniquement visiter les sites web suivants"
+    }
+    ,
+    "settings_blacklist_description": {
+        "message": "Vous ne pouvez pas visiter les sites web suivants"
+    }
+    ,
+    "settings_newblackbox_placeholder": {
+        "message": "Veuillez entrer l'URL du site içi"
+    }
+    ,
+    "overlay_message": {
+        "message": "Où est-ce que vous allez..."
+    }
+}
