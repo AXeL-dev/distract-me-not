@@ -96,11 +96,16 @@
         return false;
     };
 
+    var isUrl = function(url) {
+        var regex = /(^|\s)((https?:\/\/)?[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi;
+        return url.match(regex);
+    };
+
     var addBlacklist = function(event) {
         var t = document.getElementById("new-black-box");
-        var v = t.value.trim();
-        if (v.length >= 0 && !inList("blacklist", v)) {
-            addToList("blacklist", v);
+        var url = t.value.trim();
+        if (url.length >= 0 && isUrl(url) && !inList("blacklist", url)) {
+            addToList("blacklist", url);
             saveList("blacklist");
         }
         t.value = "";
@@ -108,9 +113,9 @@
 
     var addWhitelist = function(event) {
         var t = document.getElementById("new-white-box");
-        var v = t.value.trim();
-        if (v.length >= 0 && !inList("whitelist", v)) {
-            addToList("whitelist", v);
+        var url = t.value.trim();
+        if (url.length >= 0 && isUrl(url) && !inList("whitelist", url)) {
+            addToList("whitelist", url);
             saveList("whitelist");
         }
         t.value = "";
