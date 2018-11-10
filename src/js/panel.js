@@ -118,6 +118,7 @@
             browser.storage.local.set({
                 isWhitelistMode: isWhitelistMode
             }, function() {});
+            setText("main_add_blacklist_tooltip", isWhitelistMode ? browser.i18n.getMessage("main_add_whitelist_tooltip") : browser.i18n.getMessage("main_add_blacklist_tooltip"));
         }
     }, false);
 
