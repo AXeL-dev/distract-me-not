@@ -68,16 +68,15 @@ var isActive = false;
         overlayImg.className = "distract-cursor distract-select distract-overlay-img";
     }
 
-    function dummy() {}
     window.addEventListener("keydown", disableKeyboard, true);
     window.addEventListener("keypress", disableKeyboard, true);
     window.addEventListener("keyup", disableKeyboard, true);
-    browser.runtime.onMessage.addListener(function(message, sender, dummy) {
+    browser.runtime.onMessage.addListener(function(message) {
         if (message === "block") {
             overlay();
             isActive = true;
         } else {
             disableOverlay();
         }
-    })
+    });
 })();

@@ -79,10 +79,29 @@
         list.insertBefore(newLi, newBox.nextElementSibling);
     };
 
+    var inList = function(listType, url) {
+        var list;
+        switch (listType) {
+            case "blacklist":
+                list = bgpage.getBlacklist();
+                break;
+            case "whitelist":
+                list = bgpage.getWhitelist();
+                break;
+            default:
+        }
+        for (var index in list) {
+            if (list[index].toLowerCase() === url.toLowerCase()) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     var addBlacklist = function(event) {
         var t = document.getElementById("new-black-box");
         var v = t.value.trim();
-        if (v.length >= 0) {
+        if (v.length >= 0 && !inList("blacklist", v)) {
             addToList("blacklist", v);
             saveList("blacklist");
         }
@@ -92,7 +111,7 @@
     var addWhitelist = function(event) {
         var t = document.getElementById("new-white-box");
         var v = t.value.trim();
-        if (v.length >= 0) {
+        if (v.length >= 0 && !inList("whitelist", v)) {
             addToList("whitelist", v);
             saveList("whitelist");
         }

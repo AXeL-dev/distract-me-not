@@ -17,13 +17,13 @@ function isTab(tab) {
 
 function block(tab) {
     if (isTab(tab)) {
-        browser.tabs.sendMessage(tab.id, "block", {}, function() {});
+        browser.tabs.sendMessage(tab.id, "block");
     }
 }
 
 function unblock(tab) {
     if (isTab(tab)) {
-        browser.tabs.sendMessage(tab.id, "unblock", {}, function() {});
+        browser.tabs.sendMessage(tab.id, "unblock");
     }
 }
 
@@ -97,10 +97,18 @@ function setBlacklist(blist) {
     blacklist.push.apply(blacklist, blist);
 }
 
+function getBlacklist() {
+    return blacklist;
+}
+
 function setWhitelist(wlist) {
     //whitelist = wlist; // this causes "can't access dead object" error
     whitelist.length = 0;
     whitelist.push.apply(whitelist, wlist);
+}
+
+function getWhitelist() {
+    return whitelist;
 }
 
 function enable() {
