@@ -12,49 +12,44 @@ function getDefaultBlacklist() {
     return ["facebook.com", "twitter.com", "youtube.com"]
 }
 
-function canAccessTab(tab) {
+function isAccessible(tab) {
     return typeof tab.url == "undefined" || tab.url.startsWith("about:") || tab.url.startsWith("moz-extension://") || tab.url.startsWith("chrome://") ? false : true;
 }
 
-function block(tab) {
-    if (canAccessTab(tab)) {
+function blockTab(tab) {
+    if (isAccessible(tab)) {
         browser.tabs.sendMessage(tab.id, "block");
     }
 }
 
-function unblock(tab) {
-    if (canAccessTab(tab)) {
+function unblockTab(tab) {
+    if (isAccessible(tab)) {
         browser.tabs.sendMessage(tab.id, "unblock");
     }
 }
 
-function checkForBlacklistAccess(tabId, changeInfo, tab) {
-    if (!isWhitelistMode) {
-        if (isBlacklisted(tab)) {
-            block(tab);
-        } else {
-            unblock(tab);
-        }
+function isDistracting(tab) {
+    return (isWhitelistMode && !isWhitelisted(tab)) || (!isWhitelistMode && isBlacklisted(tab));
+}
+
+function checkTab(tab) {
+    if (isDistracting(tab)) {
+        blockTab(tab);
+    } else {
+        unblockTab(tab);
     }
 }
 
-function checkForWhitelistAccess(tabId, changeInfo, tab) {
-    if (isWhitelistMode) {
-        if (!isWhitelisted(tab)) {
-            block(tab);
-        } else {
-            unblock(tab);
-        }
-    }
+function onUpdatedHandler(tabId, changeInfo, tab) {
+    checkTab(tab);
 }
 
 function onReplacedHandler(addedTabId, removedTabId) {
     browser.tabs.get(addedTabId, function(tab) {
         if (tab !== null) {
-            checkForBlacklistAccess(tab.id, null, tab);
-            checkForWhitelistAccess(tab.id, null, tab);
+            checkTab(tab);
         }
-    })
+    });
 }
 
 function isBlacklisted(tab) {
@@ -126,14 +121,32 @@ function getWhitelist() {
 }
 
 function enable() {
-    browser.tabs.onUpdated.addListener(checkForBlacklistAccess);
-    browser.tabs.onUpdated.addListener(checkForWhitelistAccess);
+    browser.tabs.onUpdated.addListener(onUpdatedHandler);
     browser.tabs.onReplaced.addListener(onReplacedHandler);
+    browser.tabs.query({}, function(tabs) {
+        if (tabs.length > 0) {
+            for (var index in tabs) {
+                var tab = tabs[index];
+                if (isDistracting(tab)) {
+                    blockTab(tab);
+                }
+            }
+        }
+    });
 }
 
 function disable() {
-    browser.tabs.onUpdated.removeListener(checkForBlacklistAccess);
-    browser.tabs.onUpdated.removeListener(checkForWhitelistAccess);
+    browser.tabs.query({}, function(tabs) {
+        if (tabs.length > 0) {
+            for (var index in tabs) {
+                var tab = tabs[index];
+                if (isDistracting(tab)) {
+                    unblockTab(tab);
+                }
+            }
+        }
+    });
+    browser.tabs.onUpdated.removeListener(onUpdatedHandler);
     browser.tabs.onReplaced.removeListener(onReplacedHandler);
 }
 

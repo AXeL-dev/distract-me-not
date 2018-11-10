@@ -27,7 +27,7 @@
         }, function(tabs) {
             var tab = tabs[0];
             var isWhitelistMode = bgpage.getIsWhitelistMode();
-            if (!bgpage.canAccessTab(tab) || (!isWhitelistMode && bgpage.isBlacklisted(tab)) || (isWhitelistMode && bgpage.isWhitelisted(tab))) {
+            if (!bgpage.isAccessible(tab) || (!isWhitelistMode && bgpage.isBlacklisted(tab)) || (isWhitelistMode && bgpage.isWhitelisted(tab))) {
                 addClass(document.getElementById("add-to-blacklist-icon"), "hidden");
             }
         });
