@@ -11,18 +11,18 @@ function getDefaultBlacklist() {
     return ["facebook.com", "twitter.com", "youtube.com"]
 }
 
-function isTab(tab) {
-    return typeof tab.url == "undefined" || tab.url.startsWith("about:") || tab.url.startsWith("moz-extension://") ? false : true;
+function canAccessTab(tab) {
+    return typeof tab.url == "undefined" || tab.url.startsWith("about:") || tab.url.startsWith("moz-extension://") || tab.url.startsWith("chrome://") ? false : true;
 }
 
 function block(tab) {
-    if (isTab(tab)) {
+    if (canAccessTab(tab)) {
         browser.tabs.sendMessage(tab.id, "block");
     }
 }
 
 function unblock(tab) {
-    if (isTab(tab)) {
+    if (canAccessTab(tab)) {
         browser.tabs.sendMessage(tab.id, "unblock");
     }
 }
