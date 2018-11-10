@@ -10,6 +10,17 @@
         setText("main_mode", browser.i18n.getMessage("main_mode"));
         setText("mode_blacklist_title", browser.i18n.getMessage("settings_blacklist_title"));
         setText("mode_whitelist_title", browser.i18n.getMessage("settings_whitelist_title"));
+        var statusSwitch = document.getElementById("status-switch");
+        statusSwitch.checked = bgpage.getIsEnabled() ? true : false;
+        var blacklistSwitch = document.getElementById("blacklist-switch");
+        var whitelistSwitch = document.getElementById("whitelist-switch");
+        if (bgpage.getIsWhitelistMode()) {
+            blacklistSwitch.checked = false;
+            whitelistSwitch.checked = true;
+        } else {
+            blacklistSwitch.checked = true;
+            whitelistSwitch.checked = false;
+        }
         browser.tabs.query({
             active: true,
             lastFocusedWindow: true
@@ -88,11 +99,25 @@
                 }, 200)
             }, 100);
         }
-        if (t.id == "setting-icon") {
+        else if (t.id == "setting-icon") {
             setTimeout(function() {
                 browser.runtime.openOptionsPage(null);
                 window.close();
             }, 100);
+        }
+        else if (t.id == "status-switch") {
+            var value = t.checked;
+            bgpage.setIsEnabled(value);
+            browser.storage.local.set({
+                isEnabled: value
+            }, function() {});
+        }
+        else if (t.id == "blacklist-switch" || t.id == "whitelist-switch") {
+            var isWhitelistMode = t.id == "blacklist-switch" && t.checked ? false : true;
+            bgpage.setIsWhitelistMode(isWhitelistMode);
+            browser.storage.local.set({
+                isWhitelistMode: isWhitelistMode
+            }, function() {});
         }
     }, false);
 

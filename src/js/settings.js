@@ -133,7 +133,7 @@
         }
         var inputs = document.getElementsByTagName("INPUT");
         var isWhitelistMode = t.id === "whitelist-toggle" ? true : false;
-        bgpage.setWhitelistMode(isWhitelistMode);
+        bgpage.setIsWhitelistMode(isWhitelistMode);
         browser.storage.local.set({
             isWhitelistMode: isWhitelistMode
         }, function() {});

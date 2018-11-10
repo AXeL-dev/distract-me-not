@@ -2,6 +2,7 @@
 var blacklist;
 var whitelist;
 var isWhitelistMode = false;
+var isEnabled = false;
 
 function getDefaultWhitelist() {
     return ["wikipedia.org"]
@@ -83,12 +84,25 @@ function isWhitelisted(tab) {
     return false;
 }
 
-function setWhitelistMode(isWLMode) {
-    isWhitelistMode = isWLMode;
+function setIsWhitelistMode(value) {
+    isWhitelistMode = value;
 }
 
 function getIsWhitelistMode() {
     return isWhitelistMode;
+}
+
+function setIsEnabled(value) {
+    isEnabled = value;
+    if (isEnabled) {
+        enable();
+    } else {
+        disable();
+    }
+}
+
+function getIsEnabled() {
+    return isEnabled;
 }
 
 function setBlacklist(blist) {
@@ -128,7 +142,8 @@ function init() {
         blackList: getDefaultBlacklist(),
         whiteList: getDefaultWhitelist(),
         whitelist: null,
-        isWhitelistMode: false
+        isWhitelistMode: false,
+        isEnabled: false
     }, function(items) {
         blacklist = items.blackList;
         whitelist = items.whiteList;
@@ -141,7 +156,10 @@ function init() {
             }, function(items) {});
         }
         isWhitelistMode = items.isWhitelistMode;
-        enable();
+        isEnabled = items.isEnabled;
+        if (isEnabled) {
+            enable();
+        }
     });
 }
 
