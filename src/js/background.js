@@ -17,17 +17,13 @@ function isTab(tab) {
 
 function block(tab) {
     if (isTab(tab)) {
-        browser.tabs.sendMessage(tab.id, {
-            type: "block"
-        }, {}, function() {});
+        browser.tabs.sendMessage(tab.id, "block", {}, function() {});
     }
 }
 
 function unblock(tab) {
     if (isTab(tab)) {
-        browser.tabs.sendMessage(tab.id, {
-            type: "unblock"
-        }, {}, function() {});
+        browser.tabs.sendMessage(tab.id, "unblock", {}, function() {});
     }
 }
 
@@ -65,7 +61,7 @@ function isBlacklisted(tab) {
         return false;
     }
     for (var index in blacklist) {
-        if (tab.url.indexOf(blacklist[index]) >= 0) {
+        if (tab.url.indexOf(blacklist[index].toLowerCase()) >= 0) {
             return true;
         }
     }
@@ -80,7 +76,7 @@ function isWhitelisted(tab) {
         return true;
     }
     for (var index in whitelist) {
-        if (tab.url.indexOf(whitelist[index]) >= 0) {
+        if (tab.url.indexOf(whitelist[index].toLowerCase()) >= 0) {
             return true;
         }
     }

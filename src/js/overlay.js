@@ -23,9 +23,9 @@ var isActive = false;
         }
     }
 
-    function overlay(type) {
+    function overlay() {
         if (typeof document.body == "undefined" || document.body === null) {
-            return
+            return;
         }
         if (document.body.className.indexOf("distract-body") < 0) {
             document.body.className = document.body.className + " distract-body ";
@@ -72,9 +72,9 @@ var isActive = false;
     window.addEventListener("keydown", disableKeyboard, true);
     window.addEventListener("keypress", disableKeyboard, true);
     window.addEventListener("keyup", disableKeyboard, true);
-    browser.runtime.onMessage.addListener(function(m, sender, dummy) {
-        if (m.type === "block") {
-            overlay(m.type);
+    browser.runtime.onMessage.addListener(function(message, sender, dummy) {
+        if (message === "block") {
+            overlay();
             isActive = true;
         } else {
             disableOverlay();
