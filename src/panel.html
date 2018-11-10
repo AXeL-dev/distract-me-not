@@ -6,11 +6,49 @@
     <title>Distract Me Not</title>
     <link href="css/common.css" media="screen" rel="stylesheet" />
     <link href="css/panel.css" media="screen" rel="stylesheet" />
+    <link href="css/tooltip.css" media="screen" rel="stylesheet" />
+    <link href="css/switch.css" media="screen" rel="stylesheet" />
     <script type="text/javascript" src="js/common.js"></script>
     <script type="text/javascript" src="js/panel.js"></script>
 </head>
 
 <body>
+    <div id="main-view">
+        <div id="main-container">
+            <div id="logo">
+                <a href="https://github.com/AXeL-dev/distract-me-not">
+                    <img id="main-icon" src="icons/magnet-256.png" />
+                    <span id="app_name" data-l10n-id="appName"></span>
+                </a>
+            </div>
+            <div id="options-container">
+                <div class="option">
+                    <span id="main_status" data-l10n-id="main_status">Status</span>
+                    <label id="status_switch" class="switch pull-right">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="option">
+                    <span id="main_mode" data-l10n-id="main_mode">Mode</span>
+                    <span class="switch-field pull-right">
+                        <input type="radio" id="blacklist-toggle" name="choose-mode" checked>
+                        <label id="mode_blacklist_title" data-l10n-id="settings_blacklist_title" for="blacklist-toggle"> Blacklist </label>
+                        <input type="radio" id="whitelist-toggle" name="choose-mode">
+                        <label id="mode_whitelist_title" data-l10n-id="settings_whitelist_title" for="whitelist-toggle"> Whitelist </label>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div id="setting-container" class="tooltip-container">
+            <div id="setting-icon" class="buttons tt-right"></div>
+            <span id="main_settings_tooltip" data-l10n-id="main_settings_tooltip"></span>
+        </div>
+        <div id="blacklist-container" class="tooltip-container">
+            <div id="add-to-blacklist-icon" class="buttons tt-left"></div>
+            <span id="main_add_blacklist_tooltip" data-l10n-id="main_add_blacklist_tooltip"></span>
+        </div>
+    </div>
 </body>
 
 </html>

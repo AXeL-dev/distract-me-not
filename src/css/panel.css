@@ -1,0 +1,92 @@
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+}
+
+body {
+    width: 300px;
+    height: 230px;
+    overflow: hidden;
+}
+
+#main-view {
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    width: 290px;
+    height: 220px;
+    border-radius: 3px;
+}
+
+#main-container #logo {
+    text-align: center;
+    padding: 15px 0 20px;
+    border-bottom: 1px solid #eee;
+}
+
+#main-container a {
+    text-decoration: none;
+    outline: none;
+}
+
+#main-container a span {
+    font-family: ArialBoldFont !important;
+    font-size: 20px;
+    color: #333;
+    margin-left: 5px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+#main-icon {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+#options-container {
+    padding: 10px;
+}
+
+#options-container .option {
+    padding: 10px 0;
+}
+
+#options-container .option span {
+    font-family: LatoFont !important;
+    font-size: 16px;
+    vertical-align: middle;
+}
+
+#setting-icon {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    width: 25px;
+    height: 25px;
+    background-image: url(../icons/settings.png);
+    background-size: contain;
+}
+
+#add-to-blacklist-icon {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 25px;
+    height: 25px;
+    background-image: url(../icons/add.png);
+    background-size: contain;
+    transition: transform 0.2s;
+}
+
+.convergeToPoint {
+    transform: scale(0);
+}
+
+.checked {
+    background-image: url(../icons/check-mark.png) !important;
+}

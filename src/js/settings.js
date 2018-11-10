@@ -62,8 +62,7 @@
         x.className = "x buttons";
         x.alt = "X";
         newLi.appendChild(x);
-        newLi.appendChild(document.createTextNode(" "));
-        newLi.appendChild(document.createTextNode(" "));
+        newLi.appendChild(document.createTextNode("  "));
         var fav = document.createElement("IMG");
         fav.src = "http://" + url + "/favicon.ico";
         fav.className = "favicon";
@@ -71,8 +70,7 @@
             this.src = "icons/favicon.png"
         }, false);
         newLi.appendChild(fav);
-        newLi.appendChild(document.createTextNode(" "));
-        newLi.appendChild(document.createTextNode(" "));
+        newLi.appendChild(document.createTextNode("  "));
         var domain = document.createElement("SPAN");
         domain.textContent = url;
         newLi.appendChild(domain);

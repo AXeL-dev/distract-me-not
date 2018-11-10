@@ -1,9 +1,4 @@
 body {
-    /*
-    font: 14px/1.4 Verdana, Arial, Helvetica, sans-serif;
-    background-color: #51a387;
-    background-color: #F2F2F2;
-    */
     background-color: rgba(255, 255, 255, 0);
     font-size: 14px;
     font-weight: bold;
@@ -81,7 +76,7 @@ ul {
     -moz-border-radius: 100px / 100px;
     border-radius: 100px / 100px;
     height: auto;
-    width: 180px;
+    min-width: 280px;
     float: left;
 }
 
@@ -114,7 +109,7 @@ ul {
 }
 
 .choose-slider {
-    background-color: rgba(30, 170, 255, 1);
+    background-color: rgba(33, 150, 243, 1);
     z-index: -1;
     left: 2%;
     width: 48%;
@@ -133,7 +128,7 @@ ul {
 }
 
 #blacklist-toggle:checked ~ .choose-slider {
-    background: rgba(30, 170, 255, 1);
+    background: rgba(33, 150, 243, 1);
     left: 3%;
 }
 
@@ -146,7 +141,7 @@ ul {
 }
 
 #whitelist-toggle:checked ~ .choose-slider {
-    background: rgba(30, 170, 255, 1);
+    background: rgba(33, 150, 243, 1);
     left: 46%;
 }
 

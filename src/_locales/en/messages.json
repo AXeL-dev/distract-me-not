@@ -30,4 +30,24 @@
     "overlay_message": {
         "message": "Where are you going..."
     }
+    ,
+    "main_settings_tooltip": {
+        "message": "Settings"
+    }
+    ,
+    "main_add_blacklist_tooltip": {
+        "message": "Add current website to Blacklist"
+    }
+    ,
+    "main_add_whitelist_tooltip": {
+        "message": "Add current website to Whitelist"
+    }
+    ,
+    "main_status": {
+        "message": "Status"
+    }
+    ,
+    "main_mode": {
+        "message": "Mode"
+    }
 }
