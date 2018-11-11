@@ -121,25 +121,21 @@
         t.value = "";
     };
 
-    var toggleMode = function(targetId) {
+    var chooseMode = function(event) {
+        var t = event.target;
         var blist = document.getElementById("blacklist");
         var wlist = document.getElementById("whitelist");
-        if (targetId == "blacklist-toggle") {
+        if (t.id == "blacklist-toggle") {
             addClass(wlist, "disappear");
             removeClass(blist, "disappear");
             addClass(document.getElementById("settings-whitelist-description"), "disappear");
             removeClass(document.getElementById("settings-blacklist-description"), "disappear");
-        } else if (targetId == "whitelist-toggle") {
+        } else if (t.id == "whitelist-toggle") {
             addClass(blist, "disappear");
             removeClass(wlist, "disappear");
             removeClass(document.getElementById("settings-whitelist-description"), "disappear");
             addClass(document.getElementById("settings-blacklist-description"), "disappear");
         }
-    };
-
-    var chooseMode = function(event) {
-        var t = event.target;
-        toggleMode(t.id);
         var isWhitelistMode = t.id === "whitelist-toggle" ? true : false;
         bgpage.setIsWhitelistMode(isWhitelistMode);
         browser.storage.local.set({
@@ -216,9 +212,9 @@
             isWhitelistMode: false
         }, function(items) {
             if (items.isWhitelistMode) {
-                toggleMode("whitelist-toggle");
+                document.getElementById("whitelist-toggle").click();
             } else {
-                toggleMode("blacklist-toggle");
+                document.getElementById("blacklist-toggle").click();
             }
         });
         setText("settings_blacklist_title", browser.i18n.getMessage("settings_blacklist_title"));
