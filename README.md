@@ -9,7 +9,7 @@ Distract Me Not is a lightweight website blocker with a user friendly interface.
 
 ## Installation
 
-You can install the extension from [Firefox Add-ons](https://addons.mozilla.org/fr/firefox/addon/distract-me-not/).
+You can install the extension from [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/distract-me-not/).
 
 ## License
 
