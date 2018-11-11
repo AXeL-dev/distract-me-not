@@ -2,6 +2,20 @@
     "use strict";
     var bgpage = browser.extension.getBackgroundPage();
 
+    function toggleAddIcon(isWhitelistMode) {
+        browser.tabs.query({
+            active: true,
+            lastFocusedWindow: true
+        }, function(tabs) {
+            var tab = tabs[0];
+            if (!bgpage.isAccessible(tab) || (!isWhitelistMode && bgpage.isBlacklisted(tab)) || (isWhitelistMode && bgpage.isWhitelisted(tab))) {
+                addClass(document.getElementById("add-to-blacklist-icon"), "hidden");
+            } else {
+                removeClass(document.getElementById("add-to-blacklist-icon"), "hidden");
+            }
+        });
+    }
+
     function init() {
         var isWhitelistMode = bgpage.getIsWhitelistMode();
         setText("app_name", browser.i18n.getMessage("appName"));
@@ -22,15 +36,7 @@
             blacklistSwitch.checked = true;
             whitelistSwitch.checked = false;
         }
-        browser.tabs.query({
-            active: true,
-            lastFocusedWindow: true
-        }, function(tabs) {
-            var tab = tabs[0];
-            if (!bgpage.isAccessible(tab) || (!isWhitelistMode && bgpage.isBlacklisted(tab)) || (isWhitelistMode && bgpage.isWhitelisted(tab))) {
-                addClass(document.getElementById("add-to-blacklist-icon"), "hidden");
-            }
-        });
+        toggleAddIcon(isWhitelistMode);
     }
 
     window.addEventListener("click", function(event) {
@@ -118,6 +124,7 @@
             browser.storage.local.set({
                 isWhitelistMode: isWhitelistMode
             }, function() {});
+            toggleAddIcon(isWhitelistMode);
             setText("main_add_blacklist_tooltip", isWhitelistMode ? browser.i18n.getMessage("main_add_whitelist_tooltip") : browser.i18n.getMessage("main_add_blacklist_tooltip"));
         }
     }, false);
