@@ -19,7 +19,7 @@ var isActive = false;
             window.setTimeout(function() {
                 overlayContainer.parentNode.removeChild(overlayContainer);
                 document.body.className = document.body.className.replace(/distract-body/g, " ");
-            }, 300)
+            }, 300);
         }
     }
 

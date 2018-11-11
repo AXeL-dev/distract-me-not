@@ -32,22 +32,33 @@ function isDistracting(tab) {
     return (isWhitelistMode && !isWhitelisted(tab)) || (!isWhitelistMode && isBlacklisted(tab));
 }
 
-function checkTab(tab) {
+function checkTab(tab, unblockingAllowed) {
     if (isDistracting(tab)) {
         blockTab(tab);
-    } else {
+    } else if (unblockingAllowed) {
         unblockTab(tab);
     }
 }
 
+function updateAllTabs() {
+    browser.tabs.query({}, function(tabs) {
+        if (tabs.length > 0) {
+            for (var index in tabs) {
+                var tab = tabs[index];
+                checkTab(tab, true);
+            }
+        }
+    });
+}
+
 function onUpdatedHandler(tabId, changeInfo, tab) {
-    checkTab(tab);
+    checkTab(tab, false);
 }
 
 function onReplacedHandler(addedTabId, removedTabId) {
     browser.tabs.get(addedTabId, function(tab) {
         if (tab !== null) {
-            checkTab(tab);
+            checkTab(tab, false);
         }
     });
 }
@@ -81,6 +92,7 @@ function isWhitelisted(tab) {
 
 function setIsWhitelistMode(value) {
     isWhitelistMode = value;
+    updateAllTabs();
 }
 
 function getIsWhitelistMode() {
@@ -104,6 +116,7 @@ function setBlacklist(blist) {
     //blacklist = blist; // this causes "can't access dead object" error
     blacklist.length = 0;
     blacklist.push.apply(blacklist, blist);
+    updateAllTabs();
 }
 
 function getBlacklist() {
@@ -114,6 +127,7 @@ function setWhitelist(wlist) {
     //whitelist = wlist; // this causes "can't access dead object" error
     whitelist.length = 0;
     whitelist.push.apply(whitelist, wlist);
+    updateAllTabs();
 }
 
 function getWhitelist() {
