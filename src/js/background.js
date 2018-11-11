@@ -32,11 +32,9 @@ function isDistracting(tab) {
     return (isWhitelistMode && !isWhitelisted(tab)) || (!isWhitelistMode && isBlacklisted(tab));
 }
 
-function checkTab(tab, unblockingAllowed) {
+function checkTab(tab) {
     if (isDistracting(tab)) {
         blockTab(tab);
-    } else if (unblockingAllowed) {
-        unblockTab(tab);
     }
 }
 
@@ -45,20 +43,24 @@ function updateAllTabs() {
         if (tabs.length > 0) {
             for (var index in tabs) {
                 var tab = tabs[index];
-                checkTab(tab, true);
+                if (isDistracting(tab)) {
+                    blockTab(tab);
+                } else {
+                    unblockTab(tab);
+                }
             }
         }
     });
 }
 
 function onUpdatedHandler(tabId, changeInfo, tab) {
-    checkTab(tab, false);
+    checkTab(tab);
 }
 
 function onReplacedHandler(addedTabId, removedTabId) {
     browser.tabs.get(addedTabId, function(tab) {
         if (tab !== null) {
-            checkTab(tab, false);
+            checkTab(tab);
         }
     });
 }
