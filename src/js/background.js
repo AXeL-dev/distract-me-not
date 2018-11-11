@@ -39,18 +39,20 @@ function checkTab(tab) {
 }
 
 function updateAllTabs() {
-    browser.tabs.query({}, function(tabs) {
-        if (tabs.length > 0) {
-            for (var index in tabs) {
-                var tab = tabs[index];
-                if (isDistracting(tab)) {
-                    blockTab(tab);
-                } else {
-                    unblockTab(tab);
+    if (isEnabled) {
+        browser.tabs.query({}, function(tabs) {
+            if (tabs.length > 0) {
+                for (var index in tabs) {
+                    var tab = tabs[index];
+                    if (isDistracting(tab)) {
+                        blockTab(tab);
+                    } else {
+                        unblockTab(tab);
+                    }
                 }
             }
-        }
-    });
+        });
+    }
 }
 
 function onUpdatedHandler(tabId, changeInfo, tab) {
