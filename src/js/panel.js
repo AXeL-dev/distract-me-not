@@ -3,9 +3,10 @@
     var bgpage = browser.extension.getBackgroundPage();
 
     function init() {
+        var isWhitelistMode = bgpage.getIsWhitelistMode();
         setText("app_name", browser.i18n.getMessage("appName"));
         setText("main_settings_tooltip", browser.i18n.getMessage("main_settings_tooltip"));
-        setText("main_add_blacklist_tooltip", bgpage.getIsWhitelistMode() ? browser.i18n.getMessage("main_add_whitelist_tooltip") : browser.i18n.getMessage("main_add_blacklist_tooltip"));
+        setText("main_add_blacklist_tooltip", isWhitelistMode ? browser.i18n.getMessage("main_add_whitelist_tooltip") : browser.i18n.getMessage("main_add_blacklist_tooltip"));
         setText("main_status", browser.i18n.getMessage("main_status"));
         setText("main_mode", browser.i18n.getMessage("main_mode"));
         setText("mode_blacklist_title", browser.i18n.getMessage("settings_blacklist_title"));
@@ -14,7 +15,7 @@
         statusSwitch.checked = bgpage.getIsEnabled() ? true : false;
         var blacklistSwitch = document.getElementById("blacklist-switch");
         var whitelistSwitch = document.getElementById("whitelist-switch");
-        if (bgpage.getIsWhitelistMode()) {
+        if (isWhitelistMode) {
             blacklistSwitch.checked = false;
             whitelistSwitch.checked = true;
         } else {
@@ -26,7 +27,6 @@
             lastFocusedWindow: true
         }, function(tabs) {
             var tab = tabs[0];
-            var isWhitelistMode = bgpage.getIsWhitelistMode();
             if (!bgpage.isAccessible(tab) || (!isWhitelistMode && bgpage.isBlacklisted(tab)) || (isWhitelistMode && bgpage.isWhitelisted(tab))) {
                 addClass(document.getElementById("add-to-blacklist-icon"), "hidden");
             }
@@ -112,7 +112,7 @@
                 isEnabled: value
             }, function() {});
         }
-        else if (t.id == "blacklist-switch" || t.id == "whitelist-switch") {
+        else if ((t.id == "blacklist-switch" && bgpage.getIsWhitelistMode()) || (t.id == "whitelist-switch" && !bgpage.getIsWhitelistMode())) {
             var isWhitelistMode = t.id == "blacklist-switch" && t.checked ? false : true;
             bgpage.setIsWhitelistMode(isWhitelistMode);
             browser.storage.local.set({
