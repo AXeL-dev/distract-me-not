@@ -72,7 +72,7 @@ var isActive = false;
     window.addEventListener("keypress", disableKeyboard, true);
     window.addEventListener("keyup", disableKeyboard, true);
     browser.runtime.onMessage.addListener(function(message) {
-        if (message === "block") {
+        if (message.request === "block") {
             overlay();
             isActive = true;
         } else {

@@ -18,13 +18,17 @@ function isAccessible(tab) {
 
 function blockTab(tab) {
     if (isAccessible(tab)) {
-        browser.tabs.sendMessage(tab.id, "block");
+        browser.tabs.sendMessage(tab.id, {
+            request: "block"
+        });
     }
 }
 
 function unblockTab(tab) {
     if (isAccessible(tab)) {
-        browser.tabs.sendMessage(tab.id, "unblock");
+        browser.tabs.sendMessage(tab.id, {
+            request: "unblock"
+        });
     }
 }
 
