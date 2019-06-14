@@ -1,4 +1,5 @@
 "use strict";
+var browser = browser || chrome;
 var blacklist;
 var whitelist;
 var isWhitelistMode = false;

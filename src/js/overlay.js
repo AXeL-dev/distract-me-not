@@ -1,6 +1,7 @@
-var isActive = false;
 (function() {
     "use strict";
+    var browser = browser || chrome;
+    var isActive = false;
 
     function disableKeyboard(e) {
         if (!isActive) {

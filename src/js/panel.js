@@ -1,5 +1,6 @@
 (function() {
     "use strict";
+    var browser = browser || chrome;
     var bgpage = browser.extension.getBackgroundPage();
 
     function toggleAddIcon(isWhitelistMode) {
