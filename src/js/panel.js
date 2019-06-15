@@ -18,26 +18,37 @@
     }
 
     function init() {
-        var isWhitelistMode = bgpage.getIsWhitelistMode();
         setText("app_name", browser.i18n.getMessage("appName"));
         setText("main_settings_tooltip", browser.i18n.getMessage("main_settings_tooltip"));
-        setText("main_add_blacklist_tooltip", isWhitelistMode ? browser.i18n.getMessage("main_add_whitelist_tooltip") : browser.i18n.getMessage("main_add_blacklist_tooltip"));
-        setText("main_status", browser.i18n.getMessage("main_status"));
-        setText("main_mode", browser.i18n.getMessage("main_mode"));
-        setText("mode_blacklist_title", browser.i18n.getMessage("settings_blacklist_title"));
-        setText("mode_whitelist_title", browser.i18n.getMessage("settings_whitelist_title"));
-        var statusSwitch = document.getElementById("status-switch");
-        statusSwitch.checked = bgpage.getIsEnabled() ? true : false;
-        var blacklistSwitch = document.getElementById("blacklist-switch");
-        var whitelistSwitch = document.getElementById("whitelist-switch");
-        if (isWhitelistMode) {
-            blacklistSwitch.checked = false;
-            whitelistSwitch.checked = true;
-        } else {
-            blacklistSwitch.checked = true;
-            whitelistSwitch.checked = false;
+        if (bgpage != null)
+        {
+            var isWhitelistMode = bgpage.getIsWhitelistMode();
+            setText("main_add_blacklist_tooltip", isWhitelistMode ? browser.i18n.getMessage("main_add_whitelist_tooltip") : browser.i18n.getMessage("main_add_blacklist_tooltip"));
+            setText("main_status", browser.i18n.getMessage("main_status"));
+            setText("main_mode", browser.i18n.getMessage("main_mode"));
+            setText("mode_blacklist_title", browser.i18n.getMessage("settings_blacklist_title"));
+            setText("mode_whitelist_title", browser.i18n.getMessage("settings_whitelist_title"));
+            var statusSwitch = document.getElementById("status-switch");
+            statusSwitch.checked = bgpage.getIsEnabled() ? true : false;
+            var blacklistSwitch = document.getElementById("blacklist-switch");
+            var whitelistSwitch = document.getElementById("whitelist-switch");
+            if (isWhitelistMode) {
+                blacklistSwitch.checked = false;
+                whitelistSwitch.checked = true;
+            } else {
+                blacklistSwitch.checked = true;
+                whitelistSwitch.checked = false;
+            }
+            toggleAddIcon(isWhitelistMode);
         }
-        toggleAddIcon(isWhitelistMode);
+        else
+        {
+            var optionsContainer = document.getElementById("options-container");
+            var blacklistContainer = document.getElementById("blacklist-container");
+
+            optionsContainer.innerHTML = browser.extension.inIncognitoContext ? browser.i18n.getMessage("private_mode") : browser.i18n.getMessage("panel_issue");
+            blacklistContainer.parentNode.removeChild(blacklistContainer);
+        }
     }
 
     window.addEventListener("click", function(event) {

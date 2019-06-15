@@ -50,4 +50,12 @@
     "main_mode": {
         "message": "Mode"
     }
+    ,
+    "private_mode": {
+        "message": "Pour des raisons de compatibilité avec le navigateur, cette fenêtre ne peut pas être exploitée en mode navigation privée."
+    }
+    ,
+    "panel_issue": {
+        "message": "Cette fenêtre n'est pas accessible pour le moment."
+    }
 }
