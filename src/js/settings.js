@@ -180,7 +180,7 @@
                 t.parentNode.parentNode.removeChild(t.parentNode);
                 saveList(listType);
             }
-            if (hasClass(t, "choose-mode")) {
+            else if (hasClass(t, "choose-mode")) {
                 chooseMode(event);
             }
         }, false);
@@ -208,14 +208,26 @@
                 document.getElementById("new-white-box").blur();
             }
         }, false);
+        document.getElementById("custom-error-message").addEventListener("keyup", function(e) {
+            browser.storage.local.set({
+                customErrorMessage: this.value
+            }, function() {});
+        }, false);
         initList();
         browser.storage.local.get({
-            isWhitelistMode: false
+            isWhitelistMode: false,
+            customErrorMessage: ''
         }, function(items) {
             if (items.isWhitelistMode) {
                 document.getElementById("whitelist-toggle").click();
             } else {
                 document.getElementById("blacklist-toggle").click();
+            }
+
+            if (items.customErrorMessage != '') {
+                document.getElementById("custom-error-message").value = items.customErrorMessage;
+            } else {
+                document.getElementById("custom-error-message").value = browser.i18n.getMessage("overlay_message");
             }
         });
         setText("settings_blacklist_title", browser.i18n.getMessage("settings_blacklist_title"));
@@ -224,5 +236,7 @@
         document.getElementById("new-white-box").placeholder = browser.i18n.getMessage("settings_newblackbox_placeholder");
         setText("settings-whitelist-description", browser.i18n.getMessage("settings_whitelist_description"));
         setText("settings-blacklist-description", browser.i18n.getMessage("settings_blacklist_description"));
+        setText("custom_error_message", browser.i18n.getMessage("custom_error_message"));
+        document.getElementById("custom-error-message").placeholder = browser.i18n.getMessage("overlay_message");
     }
 })();

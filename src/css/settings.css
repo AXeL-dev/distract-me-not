@@ -225,3 +225,11 @@ li:hover .x {
     vertical-align: middle;
     font-size: 15px;
 }
+
+#options-container .option {
+    padding: 10px 0;
+}
+
+#options-container .option span {
+    vertical-align: middle;
+}

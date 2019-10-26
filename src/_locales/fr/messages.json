@@ -57,5 +57,8 @@
     ,
     "panel_issue": {
         "message": "Cette fenêtre n'est pas accessible pour le moment."
+    },
+    "custom_error_message": {
+        "message": "Message d'erreur personnalisé"
     }
 }

@@ -57,5 +57,8 @@
     ,
     "panel_issue": {
         "message": "Panel is not accessible at the current time."
+    },
+    "custom_error_message": {
+        "message": "Custom error message"
     }
 }

@@ -58,7 +58,15 @@
             overlayTopText.id = "distract-overlay-top-text";
             infoContainer.appendChild(overlayTopText);
         }
-        overlayTopText.textContent = browser.i18n.getMessage("overlay_message");
+        browser.storage.local.get({
+            customErrorMessage: ''
+        }, function(items) {
+            if (items.customErrorMessage != '') {
+                overlayTopText.textContent = items.customErrorMessage;
+            } else {
+                overlayTopText.textContent = browser.i18n.getMessage("overlay_message");
+            }
+        });
         overlayTopText.className = "distract-cursor distract-select distract-overlay-top-text";
         var overlayImg = document.getElementById("distract-overlay-img");
         if (typeof overlayImg == "undefined" || overlayImg === null) {
