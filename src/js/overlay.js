@@ -59,10 +59,10 @@
             infoContainer.appendChild(overlayTopText);
         }
         browser.storage.local.get({
-            customErrorMessage: ''
+            errorMessage: ''
         }, function(items) {
-            if (items.customErrorMessage != '') {
-                overlayTopText.textContent = items.customErrorMessage;
+            if (items.errorMessage != '') {
+                overlayTopText.textContent = items.errorMessage;
             } else {
                 overlayTopText.textContent = browser.i18n.getMessage("overlay_message");
             }

@@ -49,11 +49,26 @@
                 </ul>
             </div>
             <div id="options-container" class="section">
+                <div class="option" id="action_to_take" data-l10n-id="action_to_take">
+                    Which action to take for those websites?
+                </div>
                 <div class="option">
-                    <span id="custom_error_message" data-l10n-id="custom_error_message">Custom error message</span>
+                    <input id="blockTab" type="radio" name="action" checked>
+                    <label for="blockTab" id="display_error_message" data-l10n-id="display_error_message">Display error message</label>
                     <div class="option">
-                        <input id="custom-error-message" class="new-list-box" type="text" value="" />
+                        <input id="error-message" class="new-list-box" type="text" value="" />
                     </div>
+                </div>
+                <div class="option">
+                    <input id="redirectToUrl" type="radio" name="action">
+                    <label for="redirectToUrl" id="redirect_to_url" data-l10n-id="redirect_to_url">Redirect to url</label>
+                    <div class="option">
+                        <input id="redirect-url" class="new-list-box" type="text" value="" />
+                    </div>
+                </div>
+                <div class="option">
+                    <input id="closeTab" type="radio" name="action">
+                    <label for="closeTab" id="close_tab" data-l10n-id="close_tab">Close tab</label>
                 </div>
             </div>
         </div>

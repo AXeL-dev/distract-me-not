@@ -58,7 +58,19 @@
     "panel_issue": {
         "message": "Cette fenêtre n'est pas accessible pour le moment."
     },
-    "custom_error_message": {
-        "message": "Message d'erreur personnalisé"
+    "action_to_take": {
+        "message": "Quelle action entreprendre pour ces sites web?"
+    },
+    "display_error_message": {
+        "message": "Afficher un message d'erreur"
+    },
+    "redirect_to_url": {
+        "message": "Rediriger vers l'URL suivante"
+    },
+    "redirect_to_url_example": {
+        "message": "exemple: about:blank, https://www.google.com, ..."
+    },
+    "close_tab": {
+        "message": "Fermer l'onglet"
     }
 }

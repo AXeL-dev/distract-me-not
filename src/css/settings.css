@@ -230,6 +230,7 @@ li:hover .x {
     padding: 10px 0;
 }
 
-#options-container .option span {
+#options-container .option input, #options-container .option label {
     vertical-align: middle;
+    margin: 0;
 }

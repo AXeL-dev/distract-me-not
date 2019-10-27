@@ -58,7 +58,19 @@
     "panel_issue": {
         "message": "Panel is not accessible at the current time."
     },
-    "custom_error_message": {
-        "message": "Custom error message"
+    "action_to_take": {
+        "message": "Which action to take for those websites?"
+    },
+    "display_error_message": {
+        "message": "Display error message"
+    },
+    "redirect_to_url": {
+        "message": "Redirect to url"
+    },
+    "redirect_to_url_example": {
+        "message": "example: about:blank, https://www.google.com, ..."
+    },
+    "close_tab": {
+        "message": "Close tab"
     }
 }

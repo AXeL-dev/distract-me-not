@@ -4,6 +4,8 @@ var blacklist;
 var whitelist;
 var isWhitelistMode = false;
 var isEnabled = false;
+var action;
+var redirectUrl;
 
 function getDefaultWhitelist() {
     return ["wikipedia.org"]
@@ -39,12 +41,31 @@ function isDistracting(tab) {
 
 function checkTab(tab) {
     if (isDistracting(tab)) {
-        blockTab(tab);
+        //console.log(action);
+        //console.log(redirectUrl);
+        if (action == 'redirectToUrl' && redirectUrl != '') {
+            if (! redirectUrl.startsWith("about:") && ! redirectUrl.startsWith("http://") &&  ! redirectUrl.startsWith("https://")) {
+                redirectUrl = "https://" + redirectUrl;
+            }
+            disableHandlers();
+            browser.tabs.update(tab.id, {
+                url: redirectUrl,
+                loadReplace: true
+            }).then(function(tab) {
+                enableHandlers();
+            }, function(error) {
+                enableHandlers();
+            });
+        } else if (action == 'closeTab') {
+            browser.tabs.remove(tab.id);
+        } else if (action == 'blockTab') {
+            blockTab(tab);
+        }
     }
 }
 
 function updateAllTabs() {
-    if (isEnabled) {
+    if (isEnabled && action == 'blockTab') {
         browser.tabs.query({}, function(tabs) {
             if (tabs.length > 0) {
                 for (var index in tabs) {
@@ -143,34 +164,62 @@ function getWhitelist() {
     return whitelist;
 }
 
-function enable() {
+function setAction(value) {
+    action = value;
+}
+
+function getAction() {
+    return action;
+}
+
+function setRedirectUrl(url) {
+    redirectUrl = url;
+}
+
+function getRedirectUrl() {
+    return redirectUrl;
+}
+
+function enableHandlers() {
     browser.tabs.onUpdated.addListener(onUpdatedHandler);
     browser.tabs.onReplaced.addListener(onReplacedHandler);
-    browser.tabs.query({}, function(tabs) {
-        if (tabs.length > 0) {
-            for (var index in tabs) {
-                var tab = tabs[index];
-                if (isDistracting(tab)) {
-                    blockTab(tab);
+}
+
+function disableHandlers() {
+    browser.tabs.onUpdated.removeListener(onUpdatedHandler);
+    browser.tabs.onReplaced.removeListener(onReplacedHandler);
+}
+
+function enable() {
+    enableHandlers();
+    if (action == 'blockTab') {
+        browser.tabs.query({}, function(tabs) {
+            if (tabs.length > 0) {
+                for (var index in tabs) {
+                    var tab = tabs[index];
+                    if (isDistracting(tab)) {
+                        blockTab(tab);
+                    }
                 }
             }
-        }
-    });
+        });
+    }
 }
 
 function disable() {
-    browser.tabs.query({}, function(tabs) {
-        if (tabs.length > 0) {
-            for (var index in tabs) {
-                var tab = tabs[index];
-                if (isDistracting(tab)) {
-                    unblockTab(tab);
+    disableHandlers();
+    if (action == 'blockTab') {
+        browser.tabs.query({}, function(tabs) {
+            if (tabs.length > 0) {
+                for (var index in tabs) {
+                    var tab = tabs[index];
+                    if (isDistracting(tab)) {
+                        unblockTab(tab);
+                    }
                 }
             }
-        }
-    });
-    browser.tabs.onUpdated.removeListener(onUpdatedHandler);
-    browser.tabs.onReplaced.removeListener(onReplacedHandler);
+        });
+    }
 }
 
 function init() {
@@ -179,10 +228,14 @@ function init() {
         whiteList: getDefaultWhitelist(),
         whitelist: null,
         isWhitelistMode: false,
-        isEnabled: false
+        isEnabled: false,
+        action: 'blockTab',
+        redirectUrl: ''
     }, function(items) {
         blacklist = items.blackList;
         whitelist = items.whiteList;
+        action = items.action;
+        redirectUrl = items.redirectUrl;
         if (items.whitelist != null) {
             var old_whitelist = items.whitelist;
             browser.storage.remove("whitelist", function(items) {});

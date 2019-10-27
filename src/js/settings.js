@@ -208,15 +208,31 @@
                 document.getElementById("new-white-box").blur();
             }
         }, false);
-        document.getElementById("custom-error-message").addEventListener("keyup", function(e) {
+        document.getElementsByName("action").forEach(function(element) {
+            element.addEventListener("change", function(e) {
+                bgpage.setAction(this.id);
+                browser.storage.local.set({
+                    action: this.id
+                }, function() {});
+            }, false);
+        });
+        document.getElementById("error-message").addEventListener("keyup", function(e) {
             browser.storage.local.set({
-                customErrorMessage: this.value
+                errorMessage: this.value
+            }, function() {});
+        }, false);
+        document.getElementById("redirect-url").addEventListener("keyup", function(e) {
+            bgpage.setRedirectUrl(this.value);
+            browser.storage.local.set({
+                redirectUrl: this.value
             }, function() {});
         }, false);
         initList();
         browser.storage.local.get({
             isWhitelistMode: false,
-            customErrorMessage: ''
+            action: '',
+            errorMessage: '',
+            redirectUrl: ''
         }, function(items) {
             if (items.isWhitelistMode) {
                 document.getElementById("whitelist-toggle").click();
@@ -224,10 +240,16 @@
                 document.getElementById("blacklist-toggle").click();
             }
 
-            if (items.customErrorMessage != '') {
-                document.getElementById("custom-error-message").value = items.customErrorMessage;
-            } else {
-                document.getElementById("custom-error-message").value = browser.i18n.getMessage("overlay_message");
+            if (items.action != '') {
+                document.getElementById(items.action).checked = true;
+            }
+
+            if (items.errorMessage != '') {
+                document.getElementById("error-message").value = items.errorMessage;
+            }
+
+            if (items.redirectUrl != '') {
+                document.getElementById("redirect-url").value = items.redirectUrl;
             }
         });
         setText("settings_blacklist_title", browser.i18n.getMessage("settings_blacklist_title"));
@@ -236,7 +258,11 @@
         document.getElementById("new-white-box").placeholder = browser.i18n.getMessage("settings_newblackbox_placeholder");
         setText("settings-whitelist-description", browser.i18n.getMessage("settings_whitelist_description"));
         setText("settings-blacklist-description", browser.i18n.getMessage("settings_blacklist_description"));
-        setText("custom_error_message", browser.i18n.getMessage("custom_error_message"));
-        document.getElementById("custom-error-message").placeholder = browser.i18n.getMessage("overlay_message");
+        setText("action_to_take", browser.i18n.getMessage("action_to_take"));
+        setText("display_error_message", browser.i18n.getMessage("display_error_message"));
+        document.getElementById("error-message").placeholder = browser.i18n.getMessage("overlay_message");
+        setText("redirect_to_url", browser.i18n.getMessage("redirect_to_url"));
+        document.getElementById("redirect-url").placeholder = browser.i18n.getMessage("redirect_to_url_example");
+        setText("close_tab", browser.i18n.getMessage("close_tab"));
     }
 })();
