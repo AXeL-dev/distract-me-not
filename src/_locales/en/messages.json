@@ -59,7 +59,7 @@
         "message": "Panel is not accessible at the current time."
     },
     "action_to_take": {
-        "message": "Which action to take for those websites?"
+        "message": "Choose an action to take for these websites:"
     },
     "display_error_message": {
         "message": "Display error message"
@@ -68,7 +68,7 @@
         "message": "Redirect to url"
     },
     "redirect_to_url_example": {
-        "message": "example: about:blank, https://www.google.com, ..."
+        "message": "Example: about:blank, https://www.google.com, ..."
     },
     "close_tab": {
         "message": "Close tab"

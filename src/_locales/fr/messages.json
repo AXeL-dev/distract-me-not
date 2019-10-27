@@ -59,7 +59,7 @@
         "message": "Cette fenêtre n'est pas accessible pour le moment."
     },
     "action_to_take": {
-        "message": "Quelle action entreprendre pour ces sites web?"
+        "message": "Choisissez une action à entreprendre pour ces sites web:"
     },
     "display_error_message": {
         "message": "Afficher un message d'erreur"
@@ -68,7 +68,7 @@
         "message": "Rediriger vers l'URL suivante"
     },
     "redirect_to_url_example": {
-        "message": "exemple: about:blank, https://www.google.com, ..."
+        "message": "Exemple: about:blank, https://www.google.com, ..."
     },
     "close_tab": {
         "message": "Fermer l'onglet"
