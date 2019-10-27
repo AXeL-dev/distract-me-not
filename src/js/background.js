@@ -98,7 +98,7 @@ function isBlacklisted(tab) {
         return false;
     }
     for (var index in blacklist) {
-        if (tab.url.indexOf(blacklist[index].toLowerCase()) >= 0) {
+        if (tab.url.toLowerCase().indexOf(blacklist[index].toLowerCase()) >= 0) {
             return true;
         }
     }
@@ -113,7 +113,7 @@ function isWhitelisted(tab) {
         return true;
     }
     for (var index in whitelist) {
-        if (tab.url.indexOf(whitelist[index].toLowerCase()) >= 0) {
+        if (tab.url.toLowerCase().indexOf(whitelist[index].toLowerCase()) >= 0) {
             return true;
         }
     }
