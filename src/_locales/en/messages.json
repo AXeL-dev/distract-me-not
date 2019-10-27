@@ -61,6 +61,9 @@
     "action_to_take": {
         "message": "Choose an action to take for these websites:"
     },
+    "action_to_take_for_the_rest": {
+        "message": "Choose an action to take for the rest of websites:"
+    },
     "display_error_message": {
         "message": "Display error message"
     },

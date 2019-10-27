@@ -131,11 +131,13 @@
             removeClass(blist, "disappear");
             addClass(document.getElementById("settings-whitelist-description"), "disappear");
             removeClass(document.getElementById("settings-blacklist-description"), "disappear");
+            setText("action_to_take", browser.i18n.getMessage("action_to_take"));
         } else if (t.id == "whitelist-toggle") {
             addClass(blist, "disappear");
             removeClass(wlist, "disappear");
             removeClass(document.getElementById("settings-whitelist-description"), "disappear");
             addClass(document.getElementById("settings-blacklist-description"), "disappear");
+            setText("action_to_take", browser.i18n.getMessage("action_to_take_for_the_rest"));
         }
         var isWhitelistMode = t.id === "whitelist-toggle" ? true : false;
         bgpage.setIsWhitelistMode(isWhitelistMode);

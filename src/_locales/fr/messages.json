@@ -61,6 +61,9 @@
     "action_to_take": {
         "message": "Choisissez une action à entreprendre pour ces sites web:"
     },
+    "action_to_take_for_the_rest": {
+        "message": "Choisissez une action à entreprendre pour les autres sites web:"
+    },
     "display_error_message": {
         "message": "Afficher un message d'erreur"
     },
