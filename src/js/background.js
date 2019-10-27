@@ -47,14 +47,14 @@ function checkTab(tab) {
             if (! redirectUrl.startsWith("about:") && ! redirectUrl.startsWith("http://") &&  ! redirectUrl.startsWith("https://")) {
                 redirectUrl = "https://" + redirectUrl;
             }
-            disableHandlers();
+            disableEventHandlers();
             browser.tabs.update(tab.id, {
                 url: redirectUrl,
                 loadReplace: true
             }).then(function(tab) {
-                enableHandlers();
+                enableEventHandlers();
             }, function(error) {
-                enableHandlers();
+                enableEventHandlers();
             });
         } else if (action == 'closeTab') {
             browser.tabs.remove(tab.id);
@@ -180,18 +180,18 @@ function getRedirectUrl() {
     return redirectUrl;
 }
 
-function enableHandlers() {
+function enableEventHandlers() {
     browser.tabs.onUpdated.addListener(onUpdatedHandler);
     browser.tabs.onReplaced.addListener(onReplacedHandler);
 }
 
-function disableHandlers() {
+function disableEventHandlers() {
     browser.tabs.onUpdated.removeListener(onUpdatedHandler);
     browser.tabs.onReplaced.removeListener(onReplacedHandler);
 }
 
 function enable() {
-    enableHandlers();
+    enableEventHandlers();
     if (action == 'blockTab') {
         browser.tabs.query({}, function(tabs) {
             if (tabs.length > 0) {
@@ -207,7 +207,7 @@ function enable() {
 }
 
 function disable() {
-    disableHandlers();
+    disableEventHandlers();
     if (action == 'blockTab') {
         browser.tabs.query({}, function(tabs) {
             if (tabs.length > 0) {
