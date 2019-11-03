@@ -9,6 +9,14 @@
 
 Distract Me Not is a lightweight website blocker with a user friendly interface.
 
+## Features
+
+- Prevent access to a range of websites.
+- Whitelist & blacklist mode.
+- Custom page redirection.
+- Display your custom message on blocked pages.
+- Immediate closing of blocked tabs.
+
 ## Installation
 
 [![Get it for Firefox!](https://addons.cdn.mozilla.net/static/img/addons-buttons/AMO-button_1.png)](https://addons.mozilla.org/firefox/addon/distract-me-not/?src=external-github-download)
