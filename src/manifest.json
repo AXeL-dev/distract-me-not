@@ -26,7 +26,6 @@
 
   "options_ui":{
     "page": "settings.html",
-    "browser_style": false,
     "open_in_tab": false
   },
 
