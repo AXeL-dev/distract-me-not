@@ -35,6 +35,30 @@ function unblockTab(tab) {
     }
 }
 
+function redirectTab(tab) {
+    //console.log(redirectUrl);
+    if (redirectUrl != '' && isAccessible(tab)) {
+        if (! redirectUrl.startsWith("about:") && ! redirectUrl.startsWith("http://") &&  ! redirectUrl.startsWith("https://")) {
+            redirectUrl = "https://" + redirectUrl;
+        }
+        disableEventHandlers();
+        browser.tabs.update(tab.id, {
+            url: redirectUrl,
+            loadReplace: true
+        }).then(function(tab) {
+            enableEventHandlers();
+        }, function(error) {
+            enableEventHandlers();
+        });
+    }
+}
+
+function closeTab(tab) {
+    if (isAccessible(tab)) {
+        browser.tabs.remove(tab.id);
+    }
+}
+
 function isDistracting(tab) {
     return (isWhitelistMode && !isWhitelisted(tab)) || (!isWhitelistMode && isBlacklisted(tab));
 }
@@ -42,22 +66,10 @@ function isDistracting(tab) {
 function checkTab(tab) {
     if (isDistracting(tab)) {
         //console.log(action);
-        //console.log(redirectUrl);
-        if (action == 'redirectToUrl' && redirectUrl != '') {
-            if (! redirectUrl.startsWith("about:") && ! redirectUrl.startsWith("http://") &&  ! redirectUrl.startsWith("https://")) {
-                redirectUrl = "https://" + redirectUrl;
-            }
-            disableEventHandlers();
-            browser.tabs.update(tab.id, {
-                url: redirectUrl,
-                loadReplace: true
-            }).then(function(tab) {
-                enableEventHandlers();
-            }, function(error) {
-                enableEventHandlers();
-            });
+        if (action == 'redirectToUrl') {
+            redirectTab(tab);
         } else if (action == 'closeTab') {
-            browser.tabs.remove(tab.id);
+            closeTab(tab);
         } else if (action == 'blockTab') {
             blockTab(tab);
         }
