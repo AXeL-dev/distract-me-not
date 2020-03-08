@@ -37,7 +37,7 @@ function unblockTab(tab) {
 
 function redirectTab(tab) {
     //console.log(redirectUrl);
-    if (redirectUrl != '' && isAccessible(tab)) {
+    if (isAccessible(tab) && redirectUrl != '' && !tab.url.startsWith(redirectUrl)) {
         if (! redirectUrl.startsWith("about:") && ! redirectUrl.startsWith("http://") &&  ! redirectUrl.startsWith("https://")) {
             redirectUrl = "https://" + redirectUrl;
         }
@@ -64,6 +64,7 @@ function isDistracting(tab) {
 }
 
 function checkTab(tab) {
+    //console.log('checking tab', tab);
     if (isDistracting(tab)) {
         //console.log(action);
         if (action == 'redirectToUrl') {
