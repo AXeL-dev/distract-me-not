@@ -16,7 +16,7 @@ function getDefaultBlacklist() {
 }
 
 function isAccessible(tab) {
-    return typeof tab.url == "undefined" || tab.url.startsWith("about:") || tab.url.startsWith("moz-extension://") || tab.url.startsWith("chrome://") ? false : true;
+    return typeof tab.url == "undefined" || tab.url.startsWith("about:") || tab.url.startsWith("file://") || tab.url.startsWith("moz-extension://") || tab.url.startsWith("chrome://") ? false : true;
 }
 
 function blockTab(tab) {
