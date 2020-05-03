@@ -42,14 +42,22 @@ function redirectTab(tab) {
             redirectUrl = "https://" + redirectUrl;
         }
         disableEventHandlers();
-        browser.tabs.update(tab.id, {
-            url: redirectUrl,
-            loadReplace: true
-        }).then(function(tab) {
-            enableEventHandlers();
-        }, function(error) {
-            enableEventHandlers();
-        });
+        if (chrome) {
+            browser.tabs.update(tab.id, {
+                url: redirectUrl
+            }, function() {
+                enableEventHandlers();
+            });
+        } else {
+            browser.tabs.update(tab.id, {
+                url: redirectUrl,
+                loadReplace: true
+            }).then(function(tab) {
+                enableEventHandlers();
+            }, function(error) {
+                enableEventHandlers();
+            });
+        }
     }
 }
 
