@@ -38,7 +38,7 @@ function unblockTab(tab) {
 function redirectTab(tab) {
     //console.log(redirectUrl);
     if (isAccessible(tab) && redirectUrl != '' && !tab.url.startsWith(redirectUrl)) {
-        if (! redirectUrl.startsWith("about:") && ! redirectUrl.startsWith("http://") &&  ! redirectUrl.startsWith("https://")) {
+        if (!redirectUrl.startsWith("about:") && !redirectUrl.startsWith("file://") && !redirectUrl.startsWith("http://") && !redirectUrl.startsWith("https://")) {
             redirectUrl = "https://" + redirectUrl;
         }
         disableEventHandlers();
