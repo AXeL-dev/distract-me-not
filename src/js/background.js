@@ -247,8 +247,7 @@ function onBrowserStartup() {
     browser.storage.local.get({
         enableOnBrowserStartup: false
     }, function(items) {
-        if (items.enableOnBrowserStartup && !isEnabled) {
-            isEnabled = true;
+        if (items.enableOnBrowserStartup) {
             enable();
         }
     });
@@ -278,7 +277,7 @@ function init() {
             }, function(items) {});
         }
         isWhitelistMode = items.isWhitelistMode;
-        isEnabled = items.isEnabled;
+        isEnabled = items.enableOnBrowserStartup ? true : items.isEnabled;
         if (!items.enableOnBrowserStartup && isEnabled) {
             enable();
         }
