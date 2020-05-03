@@ -234,3 +234,8 @@ li:hover .x {
     vertical-align: middle;
     margin: 0;
 }
+
+.separator {
+    padding: 10px 0;
+    border-top: 1px solid #eee;
+}

@@ -75,5 +75,8 @@
     },
     "close_tab": {
         "message": "Fermer l'onglet"
+    },
+    "enable_on_browser_startup": {
+        "message": "Toujours activer au démarrage du navigateur"
     }
 }

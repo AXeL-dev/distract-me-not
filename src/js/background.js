@@ -235,12 +235,24 @@ function disable() {
     }
 }
 
+function onBrowserStartup() {
+    browser.storage.local.get({
+        enableOnBrowserStartup: false
+    }, function(items) {
+        if (items.enableOnBrowserStartup && !isEnabled) {
+            isEnabled = true;
+            enable();
+        }
+    });
+}
+
 function init() {
     browser.storage.local.get({
         blackList: getDefaultBlacklist(),
         whiteList: getDefaultWhitelist(),
         whitelist: null,
         isWhitelistMode: false,
+        enableOnBrowserStartup: false,
         isEnabled: false,
         action: 'blockTab',
         redirectUrl: ''
@@ -259,10 +271,11 @@ function init() {
         }
         isWhitelistMode = items.isWhitelistMode;
         isEnabled = items.isEnabled;
-        if (isEnabled) {
+        if (!items.enableOnBrowserStartup && isEnabled) {
             enable();
         }
     });
+    browser.runtime.onStartup.addListener(onBrowserStartup);
 }
 
 init();

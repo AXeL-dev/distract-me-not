@@ -185,6 +185,12 @@
             else if (hasClass(t, "choose-mode")) {
                 chooseMode(event);
             }
+            else if (t.id == "enable-on-browser-startup-switch") {
+                var value = t.checked;
+                browser.storage.local.set({
+                    enableOnBrowserStartup: value
+                }, function() {});
+            }
         }, false);
         window.addEventListener("contextmenu", function(event) {
             event.preventDefault();
@@ -232,6 +238,7 @@
         initList();
         browser.storage.local.get({
             isWhitelistMode: false,
+            enableOnBrowserStartup: false,
             action: '',
             errorMessage: '',
             redirectUrl: ''
@@ -253,6 +260,10 @@
             if (items.redirectUrl != '') {
                 document.getElementById("redirect-url").value = items.redirectUrl;
             }
+
+            if (items.enableOnBrowserStartup) {
+                document.getElementById("enable-on-browser-startup-switch").checked = items.enableOnBrowserStartup;
+            }
         });
         setText("settings_blacklist_title", browser.i18n.getMessage("settings_blacklist_title"));
         setText("settings_whitelist_title", browser.i18n.getMessage("settings_whitelist_title"));
@@ -266,5 +277,6 @@
         setText("redirect_to_url", browser.i18n.getMessage("redirect_to_url"));
         document.getElementById("redirect-url").placeholder = browser.i18n.getMessage("redirect_to_url_example");
         setText("close_tab", browser.i18n.getMessage("close_tab"));
+        setText("enable_on_browser_startup", browser.i18n.getMessage("enable_on_browser_startup"));
     }
 })();

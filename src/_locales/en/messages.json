@@ -75,5 +75,8 @@
     },
     "close_tab": {
         "message": "Close tab"
+    },
+    "enable_on_browser_startup": {
+        "message": "Enable on browser startup"
     }
 }
