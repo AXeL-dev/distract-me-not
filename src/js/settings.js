@@ -152,7 +152,7 @@
             whiteList: bgpage.getDefaultWhitelist(),
             isWhitelistMode: false
         }, function(items) {
-            var blacklist = items.blackList;
+            var blacklist = items.blackList.sort();
             var blacklistElement = document.getElementById("blacklist");
             var bChilds;
             bChilds = blacklistElement.children;
@@ -162,7 +162,7 @@
             for (var bIndex in blacklist) {
                 addToList("blacklist", blacklist[blacklist.length - bIndex - 1]);
             }
-            var whitelist = items.whiteList;
+            var whitelist = items.whiteList.sort();
             var whitelistElement = document.getElementById("whitelist");
             bChilds = whitelistElement.children;
             while (whitelistElement.lastChild.id !== "new-white") {
