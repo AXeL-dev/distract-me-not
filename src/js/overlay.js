@@ -2,9 +2,10 @@
     "use strict";
     var browser = browser || chrome;
     var isActive = false;
+    var disableKeyboard = false;
 
-    function disableKeyboard(e) {
-        if (!isActive) {
+    function onKeyboardEvent(e) {
+        if (!isActive || !disableKeyboard) {
             return true;
         }
         e.preventDefault();
@@ -77,15 +78,17 @@
         overlayImg.className = "distract-cursor distract-select distract-overlay-img";
     }
 
-    window.addEventListener("keydown", disableKeyboard, true);
-    window.addEventListener("keypress", disableKeyboard, true);
-    window.addEventListener("keyup", disableKeyboard, true);
+    window.addEventListener("keydown", onKeyboardEvent, true);
+    window.addEventListener("keypress", onKeyboardEvent, true);
+    window.addEventListener("keyup", onKeyboardEvent, true);
     browser.runtime.onMessage.addListener(function(message) {
         if (message.request === "block") {
             overlay();
             isActive = true;
+            disableKeyboard = message.disableKeyboard;
         } else {
             disableOverlay();
+            disableKeyboard = false;
         }
     });
 })();

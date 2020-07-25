@@ -78,5 +78,8 @@
     },
     "enable_on_browser_startup": {
         "message": "Toujours activer au démarrage du navigateur"
+    },
+    "disable_keyboard_when_error_message_is_displayed": {
+        "message": "Désactiver le clavier lorsque le message d'erreur s'affiche"
     }
 }

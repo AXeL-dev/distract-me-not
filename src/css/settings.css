@@ -239,3 +239,7 @@ li:hover .x {
     padding: 10px 0;
     border-top: 1px solid #eee;
 }
+
+.mb-20 {
+    margin-bottom: 20px;
+}

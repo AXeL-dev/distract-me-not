@@ -191,6 +191,13 @@
                     enableOnBrowserStartup: value
                 }, function() {});
             }
+            else if (t.id == "disable-keyboard-when-error-message-is-displayed-switch") {
+                var value = t.checked;
+                bgpage.setDisableKeyboardWhenErrorMessageIsDisplayed(value);
+                browser.storage.local.set({
+                    disableKeyboardWhenErrorMessageIsDisplayed: value
+                }, function() {});
+            }
         }, false);
         window.addEventListener("contextmenu", function(event) {
             event.preventDefault();
@@ -239,6 +246,7 @@
         browser.storage.local.get({
             isWhitelistMode: false,
             enableOnBrowserStartup: false,
+            disableKeyboardWhenErrorMessageIsDisplayed: false,
             action: '',
             errorMessage: '',
             redirectUrl: ''
@@ -264,6 +272,10 @@
             if (items.enableOnBrowserStartup) {
                 document.getElementById("enable-on-browser-startup-switch").checked = items.enableOnBrowserStartup;
             }
+
+            if (items.disableKeyboardWhenErrorMessageIsDisplayed) {
+                document.getElementById("disable-keyboard-when-error-message-is-displayed-switch").checked = items.disableKeyboardWhenErrorMessageIsDisplayed;
+            }
         });
         setText("settings_blacklist_title", browser.i18n.getMessage("settings_blacklist_title"));
         setText("settings_whitelist_title", browser.i18n.getMessage("settings_whitelist_title"));
@@ -278,5 +290,6 @@
         document.getElementById("redirect-url").placeholder = browser.i18n.getMessage("redirect_to_url_example");
         setText("close_tab", browser.i18n.getMessage("close_tab"));
         setText("enable_on_browser_startup", browser.i18n.getMessage("enable_on_browser_startup"));
+        setText("disable_keyboard_when_error_message_is_displayed", browser.i18n.getMessage("disable_keyboard_when_error_message_is_displayed"));
     }
 })();

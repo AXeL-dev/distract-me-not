@@ -4,6 +4,7 @@ var blacklist;
 var whitelist;
 var isWhitelistMode = false;
 var isEnabled = false;
+var disableKeyboardWhenErrorMessageIsDisplayed = false;
 var action;
 var redirectUrl;
 
@@ -22,7 +23,8 @@ function isAccessible(tab) {
 function blockTab(tab) {
     if (isAccessible(tab)) {
         browser.tabs.sendMessage(tab.id, {
-            request: "block"
+            request: "block",
+            disableKeyboard: disableKeyboardWhenErrorMessageIsDisplayed
         });
     }
 }
@@ -201,6 +203,14 @@ function getRedirectUrl() {
     return redirectUrl;
 }
 
+function setDisableKeyboardWhenErrorMessageIsDisplayed(value) {
+    disableKeyboardWhenErrorMessageIsDisplayed = value;
+}
+
+function getDisableKeyboardWhenErrorMessageIsDisplayed() {
+    return disableKeyboardWhenErrorMessageIsDisplayed;
+}
+
 function enableEventHandlers() {
     browser.tabs.onUpdated.addListener(onUpdatedHandler);
     browser.tabs.onReplaced.addListener(onReplacedHandler);
@@ -260,6 +270,7 @@ function init() {
         whitelist: null,
         isWhitelistMode: false,
         enableOnBrowserStartup: false,
+        disableKeyboardWhenErrorMessageIsDisplayed: false,
         isEnabled: false,
         action: 'blockTab',
         redirectUrl: ''
@@ -277,6 +288,7 @@ function init() {
             }, function(items) {});
         }
         isWhitelistMode = items.isWhitelistMode;
+        disableKeyboardWhenErrorMessageIsDisplayed = items.disableKeyboardWhenErrorMessageIsDisplayed;
         isEnabled = items.enableOnBrowserStartup ? true : items.isEnabled;
         if (!items.enableOnBrowserStartup && isEnabled) {
             enable();

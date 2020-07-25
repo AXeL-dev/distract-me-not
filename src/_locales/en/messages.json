@@ -78,5 +78,8 @@
     },
     "enable_on_browser_startup": {
         "message": "Enable on browser startup"
+    },
+    "disable_keyboard_when_error_message_is_displayed": {
+        "message": "Disable keyboard when error message is displayed"
     }
 }
