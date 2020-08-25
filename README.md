@@ -16,6 +16,7 @@ Distract Me Not is a lightweight website blocker with a user friendly interface.
 - Custom page redirection.
 - Display your custom message on blocked pages.
 - Immediate closing of blocked tabs.
+- Export/Import websites lists.
 
 ## Installation
 
