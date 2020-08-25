@@ -16,11 +16,11 @@
     }
     ,
     "settings_whitelist_description": {
-        "message": "Vous pouvez uniquement visiter les sites web suivants"
+        "message": "Vous pouvez uniquement visiter les sites web suivants:"
     }
     ,
     "settings_blacklist_description": {
-        "message": "Vous ne pouvez pas visiter les sites web suivants"
+        "message": "Vous ne pouvez pas visiter les sites web suivants:"
     }
     ,
     "settings_newblackbox_placeholder": {
@@ -68,7 +68,7 @@
         "message": "Afficher un message d'erreur"
     },
     "redirect_to_url": {
-        "message": "Rediriger vers l'URL suivante"
+        "message": "Rediriger vers une URL"
     },
     "redirect_to_url_example": {
         "message": "Exemple: about:blank, https://www.google.com, ..."
