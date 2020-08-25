@@ -95,7 +95,7 @@ ul {
     color: black;
     /*z-index: 0;*/
     display: inline-block;
-    width: 48%;
+    width: 50%;
     height: 100%;
     -webkit-border-radius: 100px/100px;
     text-decoration: none;
@@ -112,7 +112,7 @@ ul {
     background-color: rgba(33, 150, 243, 1);
     z-index: -1;
     left: 2%;
-    width: 48%;
+    width: 50%;
     height: 100%;
     position: absolute;
     top: 0px;
@@ -129,7 +129,7 @@ ul {
 
 #blacklist-toggle:checked ~ .choose-slider {
     background: rgba(33, 150, 243, 1);
-    left: 3%;
+    left: 1%;
 }
 
 #blacklist-toggle:checked ~ #settings_blacklist_title {
@@ -142,7 +142,7 @@ ul {
 
 #whitelist-toggle:checked ~ .choose-slider {
     background: rgba(33, 150, 243, 1);
-    left: 46%;
+    left: 48%;
 }
 
 .section {
