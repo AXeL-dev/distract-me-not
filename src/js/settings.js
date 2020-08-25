@@ -152,26 +152,35 @@
             whiteList: bgpage.getDefaultWhitelist(),
             isWhitelistMode: false
         }, function(items) {
-            var blacklist = items.blackList.sort();
-            var blacklistElement = document.getElementById("blacklist");
-            var bChilds;
-            bChilds = blacklistElement.children;
-            while (blacklistElement.lastChild.id !== "new-black") {
-                blacklistElement.removeChild(blacklistElement.lastChild);
-            }
-            for (var bIndex in blacklist) {
-                addToList("blacklist", blacklist[blacklist.length - bIndex - 1]);
-            }
-            var whitelist = items.whiteList.sort();
-            var whitelistElement = document.getElementById("whitelist");
-            bChilds = whitelistElement.children;
-            while (whitelistElement.lastChild.id !== "new-white") {
-                whitelistElement.removeChild(whitelistElement.lastChild);
-            }
-            for (var wIndex in whitelist) {
-                addToList("whitelist", whitelist[whitelist.length - wIndex - 1]);
-            }
+            initBlackList(items.blackList);
+            initWhiteList(items.whiteList);
         });
+    }
+
+    function initBlackList(list) {
+        var blacklist = list.sort();
+        var blacklistElement = document.getElementById("blacklist");
+        var bChilds;
+        bChilds = blacklistElement.children;
+        while (blacklistElement.lastChild.id !== "new-black") {
+            blacklistElement.removeChild(blacklistElement.lastChild);
+        }
+        for (var bIndex in blacklist) {
+            addToList("blacklist", blacklist[blacklist.length - bIndex - 1]);
+        }
+    }
+
+    function initWhiteList(list) {
+        var whitelist = list.sort();
+        var whitelistElement = document.getElementById("whitelist");
+        var bChilds;
+        bChilds = whitelistElement.children;
+        while (whitelistElement.lastChild.id !== "new-white") {
+            whitelistElement.removeChild(whitelistElement.lastChild);
+        }
+        for (var wIndex in whitelist) {
+            addToList("whitelist", whitelist[whitelist.length - wIndex - 1]);
+        }
     }
 
     window.onload = function() {
@@ -222,6 +231,38 @@
                 addWhitelist();
                 document.getElementById("new-white-box").blur();
             }
+        }, false);
+        document.getElementById("importFileInput").addEventListener("click", function(e) {
+            e.target.value = '';
+        }, false);
+        document.getElementById("importFileInput").addEventListener("change", function(e) {
+            var file = event.target.files[0];
+            readFile(file).then(function(content) {
+                var list = content && content.length ? content.split("\n") : [];
+                console.log(list, content);
+                if (list.length) {
+                    var isWhitelistMode = bgpage.getIsWhitelistMode();
+                    if (isWhitelistMode) {
+                        initWhiteList(list);
+                        bgpage.setWhitelist(list);
+                        browser.storage.local.set({
+                            whiteList: list
+                        }, function() {});
+                    } else {
+                        initBlackList(list);
+                        bgpage.setBlacklist(list);
+                        browser.storage.local.set({
+                            blackList: list
+                        }, function() {});
+                    }
+                }
+            });
+        }, false);
+        document.getElementById("export").addEventListener("click", function(e) {
+            var isWhitelistMode = bgpage.getIsWhitelistMode();
+            var data = isWhitelistMode ? bgpage.getWhitelist() : bgpage.getBlacklist();
+            var blob = new Blob([data.join("\n")], {type: 'text/plain'});
+            download(blob, isWhitelistMode ? 'whitelist.txt' : 'blacklist.txt');
         }, false);
         document.getElementsByName("action").forEach(function(element) {
             element.addEventListener("change", function(e) {
@@ -291,5 +332,7 @@
         setText("close_tab", browser.i18n.getMessage("close_tab"));
         setText("enable_on_browser_startup", browser.i18n.getMessage("enable_on_browser_startup"));
         setText("disable_keyboard_when_error_message_is_displayed", browser.i18n.getMessage("disable_keyboard_when_error_message_is_displayed"));
+        setText("import", browser.i18n.getMessage("import"));
+        setText("export", browser.i18n.getMessage("export"));
     }
 })();

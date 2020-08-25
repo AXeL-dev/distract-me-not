@@ -81,5 +81,11 @@
     },
     "disable_keyboard_when_error_message_is_displayed": {
         "message": "Désactiver le clavier lorsque le message d'erreur s'affiche"
+    },
+    "import": {
+        "message": "Importer"
+    },
+    "export": {
+        "message": "Exporter"
     }
 }

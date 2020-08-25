@@ -81,5 +81,11 @@
     },
     "disable_keyboard_when_error_message_is_displayed": {
         "message": "Disable keyboard when error message is displayed"
+    },
+    "import": {
+        "message": "Import"
+    },
+    "export": {
+        "message": "Export"
     }
 }
