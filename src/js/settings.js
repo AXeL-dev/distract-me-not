@@ -239,7 +239,6 @@
             var file = event.target.files[0];
             readFile(file).then(function(content) {
                 var list = content && content.length ? content.split("\n") : [];
-                console.log(list, content);
                 if (list.length) {
                     var isWhitelistMode = bgpage.getIsWhitelistMode();
                     if (isWhitelistMode) {
