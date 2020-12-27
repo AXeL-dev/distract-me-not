@@ -19,7 +19,7 @@ function Panel() {
       {({ state, setState }) => (
         <Fragment>
           <Pane display="flex" alignItems="center" justifyContent="center" height={64} borderBottom>
-            <img class="logo" src="icons/magnet-256.png" />
+            <img className="logo" src="icons/magnet-256.png" />
             <Heading size={600} className="bold">Distract Me Not</Heading>
           </Pane>
           <Pane display="flex" padding={16}>
