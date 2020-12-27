@@ -21,12 +21,12 @@
 
   "browser_action": {
     "default_icon": "icons/magnet-256.png",
-    "default_popup": "panel.html"
+    "default_popup": "index.html"
   },
 
   "options_ui":{
-    "page": "settings.html",
-    "open_in_tab": false
+    "page": "index.html#settings",
+    "open_in_tab": true
   },
 
   "background": {
