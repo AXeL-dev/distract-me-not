@@ -33,19 +33,19 @@ function Panel() {
             <img className="logo" src="icons/magnet-256.png" />
             <Heading size={600} className="bold">{i18n.appName}</Heading>
           </Pane>
-          <Pane display="flex" padding={16}>
+          <Pane display="flex" paddingX={16} paddingY={20}>
             <Pane flex={1} alignItems="center" display="flex">
               <Text>{i18n.status}</Text>
             </Pane>
             <Pane>
               <Switch
-                height={22}
+                height={24}
                 checked={state.status}
                 onChange={event => setState({ status: event.target.checked })}
               />
             </Pane>
           </Pane>
-          <Pane display="flex" padding={16} style={{ minWidth: 320 }}>
+          <Pane display="flex" paddingX={16} paddingBottom={20} style={{ minWidth: 320 }}>
             <Pane flex={1} alignItems="center" display="flex">
               <Text>{i18n.mode}</Text>
             </Pane>
@@ -60,15 +60,15 @@ function Panel() {
               />
             </Pane>
           </Pane>
-          <Pane display="flex" paddingX={16} paddingY={12} justifyContent="space-between" borderTop>
+          <Pane display="flex" paddingX={16} paddingY={12} alignItems="center" justifyContent="space-between" borderTop>
             <Pane>
               <Tooltip content={i18n.settings} position={Position.RIGHT} showDelay={200}>
-                <CogIcon className="cursor-pointer grow" size={24} />
+                <CogIcon className="icon-button fill-grey grow" size={22} />
               </Tooltip>
             </Pane>
             <Pane>
               <Tooltip content={i18n.addToList} position={Position.LEFT} showDelay={200}>
-                <PlusIcon className="cursor-pointer grow" size={28} color="success" />
+                <PlusIcon className="icon-button grow" size={26} color="success" />
               </Tooltip>
             </Pane>
           </Pane>

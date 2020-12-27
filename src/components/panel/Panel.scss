@@ -7,7 +7,7 @@
 }
 
 .bold {
-  font-weight: bold;
+  font-weight: bold !important;
 }
 
 .custom-segmented-control {
@@ -20,8 +20,12 @@
   }
 }
 
-.cursor-pointer {
+.icon-button {
   cursor: pointer;
+  vertical-align: middle;
+  &.fill-grey {
+    fill: #4E4E50 !important;
+  }
 }
 
 .grow {
