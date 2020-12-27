@@ -51,13 +51,13 @@ function Panel() {
           </Pane>
           <Pane display="flex" padding={16} justifyContent="space-between" borderTop>
             <Pane>
-              <Tooltip content="Settings" position={Position.RIGHT}>
-                <CogIcon size={24} />
+              <Tooltip content="Settings" position={Position.RIGHT} showDelay={200}>
+                <CogIcon className="cursor-pointer grow" size={24} />
               </Tooltip>
             </Pane>
             <Pane>
-              <Tooltip content="Add" position={Position.LEFT}>
-                <PlusIcon size={24} color="success" />
+              <Tooltip content="Add" position={Position.LEFT} showDelay={200}>
+                <PlusIcon className="cursor-pointer grow" size={28} color="success" />
               </Tooltip>
             </Pane>
           </Pane>
