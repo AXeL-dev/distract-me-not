@@ -1,4 +1,4 @@
-import './Settings.css';
+import './Settings.scss';
 
 function Settings() {
   return (

@@ -1,0 +1,21 @@
+
+.logo {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  margin: 0 15px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.custom-segmented-control {
+  > :not([disabled="true"]):not([data-disabled="true"])[data-active="true"] {
+    background-color: #3d8bd4;
+    box-shadow: none;
+    > label {
+      color: #fff;
+    }
+  }
+}
