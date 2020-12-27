@@ -1,0 +1,79 @@
+@font-face {
+    font-family: OpenSansFont;
+    src: url(../fonts/OpenSans-Light.ttf);
+}
+
+@font-face {
+    font-family: OpenSansRegularFont;
+    src: url(../fonts/OpenSans-Regular.ttf);
+}
+
+@font-face {
+    font-family: LatoFont;
+    src: url(../fonts/Lato-Light.ttf);
+}
+
+@font-face {
+    font-family: ArialBoldFont;
+    src: url(../fonts/Arial-Rounded-MT-Bold.ttf);
+}
+
+* {
+    cursor: default;
+    font-family: OpenSansFont;
+}
+
+div,
+h1,
+h2,
+p {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+
+input {
+    cursor: text;
+}
+
+a {
+    cursor: pointer;
+}
+
+input[type=checkbox],
+label {
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+input[type=checkbox] {
+    margin-right: 3px;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.disappear {
+    display: none !important;
+}
+
+.buttons {
+    transition: transform 0.1s;
+    cursor: pointer;
+}
+
+.buttons:active {
+    opacity: 0.5;
+}
+
+.buttons:hover {
+    transform: scale(1.1);
+}
+
+.pull-left {
+    float: left;
+}
+
+.pull-right {
+    float: right;
+}

@@ -1,25 +1,46 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "manifest_version": 2,
+
+  "name": "__MSG_appName__",
+  "version": "2.0.0",
+
+  "default_locale": "en",
+  "description": "__MSG_appDesc__",
+  "icons": {
+    "128": "icons/magnet-256.png"
+  },
+
+  "content_scripts": [{
+    "matches" : ["<all_urls>"],
+    "js": ["js/overlay.js"],
+    "css": ["css/overlay.css"],
+    "run_at": "document_start"
+  }],
+
+  "web_accessible_resources":["icons/*.png", "fonts/*.ttf"],
+
+  "browser_action": {
+    "default_icon": "icons/magnet-256.png",
+    "default_popup": "panel.html"
+  },
+
+  "options_ui":{
+    "page": "settings.html",
+    "open_in_tab": false
+  },
+
+  "background": {
+    "scripts": ["js/background.js"]
+  },
+
+  "author": "AXeL-dev",
+  "homepage_url": "https://github.com/AXeL-dev/distract-me-not",
+
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs",
+    "https://*/*",
+    "<all_urls>"
+  ]
 }
