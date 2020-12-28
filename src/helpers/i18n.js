@@ -1,5 +1,5 @@
 
-export function getTextTranslation(key, defaultValue) {
+export function translate(key, defaultValue) {
   try {
     return browser.i18n.getMessage(key);
   } catch(error) {
