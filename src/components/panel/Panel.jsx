@@ -1,8 +1,9 @@
-import { Component, Fragment } from 'react';
-import { Pane, Text, Heading, Switch, SegmentedControl, Tooltip, Position, IconButton } from 'evergreen-ui';
-import { CogIcon, PlusIcon } from 'evergreen-ui';
+import { Component } from 'react';
+import { Pane, Heading, Tooltip, Position, IconButton, CogIcon, PlusIcon } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
 import { isWebExtension, openOptionsPage } from '../../helpers/webext';
+import SwitchField from '../shared/switch-field/SwitchField';
+import SegmentedControlField from '../shared/segmented-control-field/SegmentedControlField';
 import './Panel.scss';
 
 class Panel extends Component {
@@ -43,38 +44,29 @@ class Panel extends Component {
 
   render() {
     return (
-      <Fragment>
+      <Pane minWidth={320}>
         <Pane display="flex" alignItems="center" justifyContent="center" height={64} borderBottom>
           <img className="logo" src="icons/magnet-256.png" />
-          <Heading size={600} className="bold">{translate('appName') || 'Distract Me Not'}</Heading>
+          <Heading size={600} fontWeight="bold">{translate('appName') || 'Distract Me Not'}</Heading>
         </Pane>
-        <Pane display="flex" paddingX={16} paddingY={20}>
-          <Pane flex={1} alignItems="center" display="flex">
-            <Text>{translate('main_status') || 'Status'}</Text>
-          </Pane>
-          <Pane>
-            <Switch
-              height={24}
-              checked={this.state.status}
-              onChange={event => this.toggleStatus(event.target.checked)}
-            />
-          </Pane>
-        </Pane>
-        <Pane display="flex" paddingX={16} paddingBottom={20} style={{ minWidth: 320 }}>
-          <Pane flex={1} alignItems="center" display="flex">
-            <Text>{translate('main_mode') || 'Mode'}</Text>
-          </Pane>
-          <Pane>
-            <SegmentedControl
-              name="mode"
-              className="custom-segmented-control"
-              width={200}
-              options={this.state.modes}
-              value={this.state.mode}
-              onChange={value => this.changeMode(value)}
-            />
-          </Pane>
-        </Pane>
+        <SwitchField
+          label={translate('main_status') || 'Status'}
+          checked={this.state.status}
+          onChange={event => this.toggleStatus(event.target.checked)}
+          height={24}
+          paddingX={16}
+          paddingY={20}
+        />
+        <SegmentedControlField
+          name="mode"
+          label={translate('main_mode') || 'Mode'}
+          options={this.state.modes}
+          value={this.state.mode}
+          onChange={value => this.changeMode(value)}
+          width={200}
+          paddingX={16}
+          paddingBottom={20}
+        />
         <Pane display="flex" paddingX={16} paddingY={12} alignItems="center" justifyContent="space-between" borderTop>
           <Pane>
             <Tooltip content={translate('main_settings_tooltip') || 'Settings'} position={Position.RIGHT}>
@@ -98,7 +90,7 @@ class Panel extends Component {
             </Tooltip>
           </Pane>
         </Pane>
-      </Fragment>
+      </Pane>
     );
   }
 

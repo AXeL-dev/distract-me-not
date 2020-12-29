@@ -1,0 +1,10 @@
+
+.custom-segmented-control {
+  > :not([disabled="true"]):not([data-disabled="true"])[data-active="true"] {
+    background-color: #3d8bd4 !important;
+    box-shadow: none !important;
+    > label {
+      color: #fff;
+    }
+  }
+}
