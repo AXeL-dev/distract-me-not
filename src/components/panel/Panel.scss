@@ -20,17 +20,23 @@
   }
 }
 
-.icon-button {
-  cursor: pointer;
-  vertical-align: middle;
+.custom-icon-button {
+  box-shadow: none !important;
   &.fill-grey {
-    fill: #4E4E50 !important;
+    svg {
+      fill: #4E4E50 !important;
+    }
+  }
+  &.fill-green {
+    svg {
+      fill: #47b881 !important;
+    }
   }
 }
 
-.grow {
-  transition: all .2s ease-in-out;
-  &:hover {
-    transform: scale(1.1);
-  }
-}
+// .grow {
+//   transition: all .2s ease-in-out;
+//   &:hover {
+//     transform: scale(1.1);
+//   }
+// }

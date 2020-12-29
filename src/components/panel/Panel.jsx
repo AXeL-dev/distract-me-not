@@ -1,5 +1,5 @@
 import { Component, Fragment } from 'react';
-import { Pane, Text, Heading, Switch, SegmentedControl, Tooltip, Position } from 'evergreen-ui';
+import { Pane, Text, Heading, Switch, SegmentedControl, Tooltip, Position, IconButton } from 'evergreen-ui';
 import { CogIcon, PlusIcon } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
 import { isWebExtension, openOptionsPage } from '../../helpers/webext';
@@ -77,13 +77,24 @@ class Panel extends Component {
         </Pane>
         <Pane display="flex" paddingX={16} paddingY={12} alignItems="center" justifyContent="space-between" borderTop>
           <Pane>
-            <Tooltip content={translate('main_settings_tooltip') || 'Settings'} position={Position.RIGHT} showDelay={200}>
-              <CogIcon className="icon-button fill-grey grow" size={22} onClick={() => this.goToSettings()} />
+            <Tooltip content={translate('main_settings_tooltip') || 'Settings'} position={Position.RIGHT}>
+              <IconButton
+                className="custom-icon-button fill-grey"
+                appearance="minimal"
+                icon={CogIcon}
+                iconSize={22}
+                onClick={() => this.goToSettings()}
+              />
             </Tooltip>
           </Pane>
           <Pane>
-            <Tooltip content={translate('main_add_blacklist_tooltip') || 'Add website to list'} position={Position.LEFT} showDelay={200}>
-              <PlusIcon className="icon-button grow" size={26} color="success" />
+            <Tooltip content={translate('main_add_blacklist_tooltip') || 'Add website to list'} position={Position.LEFT}>
+              <IconButton
+                className="custom-icon-button fill-green"
+                appearance="minimal"
+                icon={PlusIcon}
+                iconSize={26}
+              />
             </Tooltip>
           </Pane>
         </Pane>
