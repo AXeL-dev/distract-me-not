@@ -2,6 +2,7 @@ import { Component, Fragment } from 'react';
 import { Pane, Text, Heading, Switch, SegmentedControl, Tooltip, Position } from 'evergreen-ui';
 import { CogIcon, PlusIcon } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
+import { isWebExtension, openOptionsPage } from '../../helpers/webext';
 import './Panel.scss';
 
 class Panel extends Component {
@@ -24,6 +25,14 @@ class Panel extends Component {
 
   changeMode(newMode) {
     this.setState({ mode: newMode });
+  }
+
+  goToSettings() {
+    if (isWebExtension()) {
+      openOptionsPage();
+    } else {
+      this.props.history.push('/settings');
+    }
   }
 
   render() {
@@ -63,7 +72,7 @@ class Panel extends Component {
         <Pane display="flex" paddingX={16} paddingY={12} alignItems="center" justifyContent="space-between" borderTop>
           <Pane>
             <Tooltip content={translate('main_settings_tooltip', 'Settings')} position={Position.RIGHT} showDelay={200}>
-              <CogIcon className="icon-button fill-grey grow" size={22} />
+              <CogIcon className="icon-button fill-grey grow" size={22} onClick={() => this.goToSettings()} />
             </Tooltip>
           </Pane>
           <Pane>
