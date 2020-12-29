@@ -8,6 +8,6 @@ export function isWebExtension() {
 }
 
 export function openOptionsPage() {
-  browser.runtime.openOptionsPage(null);
+  browser.runtime.openOptionsPage();
   window.close();
 }
