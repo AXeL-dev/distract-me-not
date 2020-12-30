@@ -1,4 +1,4 @@
-import { Pane, Text, Switch } from 'evergreen-ui';
+import { Pane, Text, Switch, Position } from 'evergreen-ui';
 
 export default function SwitchField(props) {
   return (
@@ -18,11 +18,12 @@ export default function SwitchField(props) {
       marginBottom={props.marginBottom || props.marginY}
       marginLeft={props.marginLeft || props.marginX}
       marginRight={props.marginRight || props.marginX}
+      flexDirection={props.position === Position.LEFT ? 'row-reverse' : 'inherit'}
     >
       <Pane display="flex" alignItems="center" flex={1}>
         <Text>{props.label}</Text>
       </Pane>
-      <Pane display="flex" alignItems="center">
+      <Pane display="flex" alignItems="center" marginRight={props.position === Position.LEFT ? 12 : 0}>
         <Switch
           height={props.height || 18}
           checked={props.checked}
