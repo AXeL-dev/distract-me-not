@@ -1,3 +1,4 @@
+import translations from '../../public/_locales/en/messages';
 
 export function translate(messageName, substitutions = null) {
   try {
@@ -6,5 +7,5 @@ export function translate(messageName, substitutions = null) {
     //console.error(error);
   }
 
-  return messageName;
+  return translations[messageName] ? translations[messageName].message : messageName;
 }
