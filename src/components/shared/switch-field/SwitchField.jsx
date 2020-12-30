@@ -1,6 +1,6 @@
 import { Pane, Text, Switch } from 'evergreen-ui';
 
-function SwitchField(props) {
+export default function SwitchField(props) {
   return (
     <Pane
       display="flex"
@@ -32,5 +32,3 @@ function SwitchField(props) {
     </Pane>
   );
 }
-
-export default SwitchField;

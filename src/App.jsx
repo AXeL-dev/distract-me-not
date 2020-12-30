@@ -3,7 +3,7 @@ import Panel from './components/panel/Panel';
 import Settings from './components/settings/Settings';
 import './App.css';
 
-function App() {
+export default function App() {
   return (
     <Router>
       <Switch>
@@ -13,5 +13,3 @@ function App() {
     </Router>
   );
 }
-
-export default App;

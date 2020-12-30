@@ -6,7 +6,7 @@ import SwitchField from '../shared/switch-field/SwitchField';
 import SegmentedControlField from '../shared/segmented-control-field/SegmentedControlField';
 import './Panel.scss';
 
-class Panel extends Component {
+export default class Panel extends Component {
 
   constructor(props) {
     super(props);
@@ -95,5 +95,3 @@ class Panel extends Component {
   }
 
 }
-
-export default Panel;

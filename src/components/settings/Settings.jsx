@@ -4,7 +4,7 @@ import { translate } from '../../helpers/i18n';
 import SwitchField from '../shared/switch-field/SwitchField';
 import './Settings.scss';
 
-class Settings extends Component {
+export default class Settings extends Component {
 
   constructor(props) {
     super(props);
@@ -160,5 +160,3 @@ class Settings extends Component {
     );
   }
 }
-
-export default Settings;
