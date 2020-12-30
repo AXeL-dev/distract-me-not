@@ -6,5 +6,5 @@ export function translate(messageName, substitutions = null) {
     //console.error(error);
   }
 
-  return undefined;
+  return messageName;
 }

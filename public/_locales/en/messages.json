@@ -1,85 +1,71 @@
 {
     "appName": {
         "message": "Distract Me Not"
-    }
-    ,
+    },
     "appDesc": {
         "message": "Stay focused in a world full of distractions."
-    }
-    ,
-    "settings_blacklist_title": {
+    },
+    "blacklist": {
         "message": "Blacklist"
-    }
-    ,
-    "settings_whitelist_title": {
+    },
+    "whitelist": {
         "message": "Whitelist"
-    }
-    ,
-    "settings_whitelist_description": {
+    },
+    "whitelistDescription": {
         "message": "You can only visit the following websites:"
-    }
-    ,
-    "settings_blacklist_description": {
+    },
+    "blacklistDescription": {
         "message": "You cannot visit the following websites:"
-    }
-    ,
-    "settings_newblackbox_placeholder": {
+    },
+    "websiteUrlPlaceholder": {
         "message": "Please enter the URL of the website here"
-    }
-    ,
-    "overlay_message": {
+    },
+    "overlayMessage": {
         "message": "Where are you going..."
-    }
-    ,
-    "main_settings_tooltip": {
+    },
+    "settings": {
         "message": "Settings"
-    }
-    ,
-    "main_add_blacklist_tooltip": {
+    },
+    "addToBlacklist": {
         "message": "Add current website to Blacklist"
-    }
-    ,
-    "main_add_whitelist_tooltip": {
+    },
+    "addToWhitelist": {
         "message": "Add current website to Whitelist"
-    }
-    ,
-    "main_status": {
+    },
+    "status": {
         "message": "Status"
-    }
-    ,
-    "main_mode": {
+    },
+    "mode": {
         "message": "Mode"
-    }
-    ,
-    "private_mode": {
+    },
+    "privateModeWarning": {
         "message": "For some browser compatibility reasons, the panel may not work on private mode. Please use the settings page to whitelist or blacklist websites."
-    }
-    ,
-    "panel_issue": {
+    },
+    "panelNotAccessible": {
         "message": "Panel is not accessible at the current time."
     },
-    "action_to_take": {
+    "actionToTake": {
         "message": "Choose an action to take for these websites:"
     },
-    "action_to_take_for_the_rest": {
+    "actionToTakeForTheRest": {
         "message": "Choose an action to take for the rest of websites:"
     },
-    "display_error_message": {
+    "displayErrorMessage": {
         "message": "Display error message"
     },
-    "redirect_to_url": {
+    "redirectToUrl": {
         "message": "Redirect to url"
     },
-    "redirect_to_url_example": {
+    "redirectToUrlExample": {
         "message": "Example: about:blank, https://www.google.com, ..."
     },
-    "close_tab": {
+    "closeTab": {
         "message": "Close tab"
     },
-    "enable_on_browser_startup": {
+    "enableOnBrowserStartup": {
         "message": "Enable on browser startup"
     },
-    "disable_keyboard_when_error_message_is_displayed": {
+    "disableKeyboardWhenErrorMessageIsDisplayed": {
         "message": "Disable keyboard when error message is displayed"
     },
     "import": {

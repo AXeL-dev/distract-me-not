@@ -1,85 +1,71 @@
 {
     "appName": {
         "message": "Distract Me Not"
-    }
-    ,
+    },
     "appDesc": {
         "message": "Restez concentré dans un monde rempli de distractions."
-    }
-    ,
-    "settings_blacklist_title": {
+    },
+    "blacklist": {
         "message": "Liste noire"
-    }
-    ,
-    "settings_whitelist_title": {
+    },
+    "whitelist": {
         "message": "Liste blanche"
-    }
-    ,
-    "settings_whitelist_description": {
+    },
+    "whitelistDescription": {
         "message": "Vous pouvez uniquement visiter les sites web suivants:"
-    }
-    ,
-    "settings_blacklist_description": {
+    },
+    "blacklistDescription": {
         "message": "Vous ne pouvez pas visiter les sites web suivants:"
-    }
-    ,
-    "settings_newblackbox_placeholder": {
+    },
+    "websiteUrlPlaceholder": {
         "message": "Veuillez entrer l'URL du site içi"
-    }
-    ,
-    "overlay_message": {
+    },
+    "overlayMessage": {
         "message": "Où est-ce que vous allez..."
-    }
-    ,
-    "main_settings_tooltip": {
+    },
+    "settings": {
         "message": "Réglages"
-    }
-    ,
-    "main_add_blacklist_tooltip": {
+    },
+    "addToBlacklist": {
         "message": "Ajouter le site web actuel à la liste noire"
-    }
-    ,
-    "main_add_whitelist_tooltip": {
+    },
+    "addToWhitelist": {
         "message": "Ajouter le site web actuel à la liste blanche"
-    }
-    ,
-    "main_status": {
+    },
+    "status": {
         "message": "Statut"
-    }
-    ,
-    "main_mode": {
+    },
+    "mode": {
         "message": "Mode"
-    }
-    ,
-    "private_mode": {
+    },
+    "privateModeWarning": {
         "message": "Pour des raisons de compatibilité avec le navigateur, cette fenêtre ne peut pas être exploitée en mode navigation privée."
-    }
-    ,
-    "panel_issue": {
+    },
+    "panelNotAccessible": {
         "message": "Cette fenêtre n'est pas accessible pour le moment."
     },
-    "action_to_take": {
+    "actionToTake": {
         "message": "Choisissez une action à entreprendre pour ces sites web:"
     },
-    "action_to_take_for_the_rest": {
+    "actionToTakeForTheRest": {
         "message": "Choisissez une action à entreprendre pour les autres sites web:"
     },
-    "display_error_message": {
+    "displayErrorMessage": {
         "message": "Afficher un message d'erreur"
     },
-    "redirect_to_url": {
+    "redirectToUrl": {
         "message": "Rediriger vers une URL"
     },
-    "redirect_to_url_example": {
+    "redirectToUrlExample": {
         "message": "Exemple: about:blank, https://www.google.com, ..."
     },
-    "close_tab": {
+    "closeTab": {
         "message": "Fermer l'onglet"
     },
-    "enable_on_browser_startup": {
+    "enableOnBrowserStartup": {
         "message": "Toujours activer au démarrage du navigateur"
     },
-    "disable_keyboard_when_error_message_is_displayed": {
+    "disableKeyboardWhenErrorMessageIsDisplayed": {
         "message": "Désactiver le clavier lorsque le message d'erreur s'affiche"
     },
     "import": {

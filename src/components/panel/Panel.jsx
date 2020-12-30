@@ -13,14 +13,8 @@ export default class Panel extends Component {
     this.state = {
       status: true,
       modes: [
-        {
-          label: translate('settings_blacklist_title') || 'Blacklist',
-          value: 'blacklist'
-        },
-        {
-          label: translate('settings_whitelist_title') || 'Whitelist',
-          value: 'whitelist'
-        },
+        { label: translate('blacklist'), value: 'blacklist' },
+        { label: translate('whitelist'), value: 'whitelist' },
       ],
       mode: 'blacklist'
     };
@@ -50,7 +44,7 @@ export default class Panel extends Component {
           <Heading size={600} fontWeight="bold">{translate('appName') || 'Distract Me Not'}</Heading>
         </Pane>
         <SwitchField
-          label={translate('main_status') || 'Status'}
+          label={translate('status')}
           checked={this.state.status}
           onChange={event => this.toggleStatus(event.target.checked)}
           height={24}
@@ -59,7 +53,7 @@ export default class Panel extends Component {
         />
         <SegmentedControlField
           name="mode"
-          label={translate('main_mode') || 'Mode'}
+          label={translate('mode')}
           options={this.state.modes}
           value={this.state.mode}
           onChange={value => this.changeMode(value)}
@@ -69,7 +63,10 @@ export default class Panel extends Component {
         />
         <Pane display="flex" paddingX={16} paddingY={12} alignItems="center" justifyContent="space-between" borderTop>
           <Pane>
-            <Tooltip content={translate('main_settings_tooltip') || 'Settings'} position={Position.RIGHT}>
+            <Tooltip
+              content={translate('settings')}
+              position={Position.RIGHT}
+            >
               <IconButton
                 className="custom-icon-button fill-grey"
                 appearance="minimal"
@@ -80,7 +77,10 @@ export default class Panel extends Component {
             </Tooltip>
           </Pane>
           <Pane>
-            <Tooltip content={translate('main_add_blacklist_tooltip') || 'Add website to list'} position={Position.LEFT}>
+            <Tooltip
+              content={this.state.mode === 'blacklist' ? translate('addToBlacklist') : translate('addToWhitelist')}
+              position={Position.LEFT}
+            >
               <IconButton
                 className="custom-icon-button fill-green"
                 appearance="minimal"
