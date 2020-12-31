@@ -20,15 +20,15 @@ export default class Panel extends Component {
     };
   }
 
-  toggleStatus(newStatus) {
-    this.setState({ status: newStatus });
+  toggleStatus = (value) => {
+    this.setState({ status: value });
   }
 
-  changeMode(newMode) {
-    this.setState({ mode: newMode });
+  changeMode = (value) => {
+    this.setState({ mode: value });
   }
 
-  goToSettings() {
+  goToSettings = () => {
     if (isWebExtension()) {
       openOptionsPage();
     } else {
@@ -56,31 +56,25 @@ export default class Panel extends Component {
           label={translate('mode')}
           options={this.state.modes}
           value={this.state.mode}
-          onChange={value => this.changeMode(value)}
+          onChange={this.changeMode}
           width={200}
           paddingX={16}
           paddingBottom={20}
         />
         <Pane display="flex" paddingX={16} paddingY={12} alignItems="center" justifyContent="space-between" borderTop>
           <Pane>
-            <Tooltip
-              content={translate('settings')}
-              position={Position.RIGHT}
-            >
+            <Tooltip content={translate('settings')} position={Position.RIGHT}>
               <IconButton
                 className="custom-icon-button fill-grey"
                 appearance="minimal"
                 icon={CogIcon}
                 iconSize={22}
-                onClick={() => this.goToSettings()}
+                onClick={this.goToSettings}
               />
             </Tooltip>
           </Pane>
           <Pane>
-            <Tooltip
-              content={this.state.mode === 'blacklist' ? translate('addToBlacklist') : translate('addToWhitelist')}
-              position={Position.LEFT}
-            >
+            <Tooltip content={this.state.mode === 'blacklist' ? translate('addToBlacklist') : translate('addToWhitelist')} position={Position.LEFT}>
               <IconButton
                 className="custom-icon-button fill-green"
                 appearance="minimal"
