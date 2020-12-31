@@ -12,15 +12,18 @@
         "message": "Liste blanche"
     },
     "whitelistDescription": {
-        "message": "Vous pouvez uniquement visiter les sites web suivants:"
+        "message": "Quand le mode liste blanche est actif, vous pouvez uniquement visiter les sites web suivants:"
     },
     "blacklistDescription": {
-        "message": "Vous ne pouvez pas visiter les sites web suivants:"
+        "message": "Quand le mode liste noire est actif, vous ne pouvez pas visiter les sites web suivants:"
     },
     "websiteUrlPlaceholder": {
         "message": "Veuillez entrer l'URL du site içi"
     },
-    "overlayMessage": {
+    "errorMessage": {
+        "message": "Message d'erreur"
+    },
+    "defaultErrorMessage": {
         "message": "Où est-ce que vous allez..."
     },
     "settings": {
@@ -44,11 +47,11 @@
     "panelNotAccessible": {
         "message": "Cette fenêtre n'est pas accessible pour le moment."
     },
-    "actionToTake": {
-        "message": "Choisissez une action à entreprendre pour ces sites web:"
+    "defaultAction": {
+        "message": "Action par défaut"
     },
-    "actionToTakeForTheRest": {
-        "message": "Choisissez une action à entreprendre pour les autres sites web:"
+    "defaultActionHint": {
+        "message": "Choisissez une action à entreprendre pour les sites web blacklistés"
     },
     "displayErrorMessage": {
         "message": "Afficher un message d'erreur"
@@ -56,8 +59,14 @@
     "redirectToUrl": {
         "message": "Rediriger vers une URL"
     },
-    "redirectToUrlExample": {
+    "url": {
+        "message": "Url"
+    },
+    "redirectUrlExample": {
         "message": "Exemple: about:blank, https://www.google.com, ..."
+    },
+    "urlExample": {
+        "message": "Exemple: www.facebook.com, www.youtube.com, ..."
     },
     "closeTab": {
         "message": "Fermer l'onglet"
@@ -73,5 +82,68 @@
     },
     "export": {
         "message": "Exporter"
+    },
+    "blocking": {
+        "message": "Blocage"
+    },
+    "schedule": {
+        "message": "Planning"
+    },
+    "scheduleDescription": {
+        "message": "Planifier le temps de blocage:"
+    },
+    "miscellaneous": {
+        "message": "Divers"
+    },
+    "password": {
+        "message": "Mot de passe"
+    },
+    "enable": {
+        "message": "Activer"
+    },
+    "timeFrom": {
+        "message": "De:"
+    },
+    "timeTo": {
+        "message": "Jusqu'à:"
+    },
+    "addWebsite": {
+        "message": "Ajouter un site web"
+    },
+    "addWebsiteHint": {
+        "message": "Vous pouvez aussi utiliser des caractères génériques ou des expressions régulières pour sélectionner des sous-domaines ou des sous-pages, par exemple: \n<b>*.example.com</b>, <b>example.com/blog/*</b>"
+    },
+    "add": {
+        "message": "Ajouter"
+    },
+    "save": {
+        "message": "Sauvegarder"
+    },
+    "settingsSaved": {
+        "message": "Paramètres sauvegardés!"
+    },
+    "copy": {
+        "message": "Copier"
+    },
+    "edit": {
+        "message": "Modifier"
+    },
+    "duplicate": {
+        "message": "Dupliquer"
+    },
+    "delete": {
+        "message": "Supprimer"
+    },
+    "order": {
+        "message": "Ordre"
+    },
+    "ascending": {
+        "message": "Ascendant"
+    },
+    "descending": {
+        "message": "Descendant"
+    },
+    "show": {
+        "message": "Afficher"
     }
 }

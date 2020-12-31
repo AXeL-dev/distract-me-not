@@ -1,0 +1,14 @@
+
+nav[role=menu] {
+  > div.ub-pt_8px.ub-pb_8px {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    > h2 {
+      margin-top: 6px !important;
+      margin-bottom: 6px !important;
+    }
+    div[role=menuitemradio], div[role=menuitem] {
+      height: 34px !important;
+    }
+  }
+}

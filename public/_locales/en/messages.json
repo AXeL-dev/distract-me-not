@@ -12,15 +12,18 @@
         "message": "Whitelist"
     },
     "whitelistDescription": {
-        "message": "You can only visit the following websites:"
+        "message": "When mode is set to whitelist, you can only visit the following websites:"
     },
     "blacklistDescription": {
-        "message": "You cannot visit the following websites:"
+        "message": "When mode is set to blacklist, you cannot visit the following websites:"
     },
     "websiteUrlPlaceholder": {
         "message": "Please enter the URL of the website here"
     },
-    "overlayMessage": {
+    "errorMessage": {
+        "message": "Error message"
+    },
+    "defaultErrorMessage": {
         "message": "Where are you going..."
     },
     "settings": {
@@ -44,20 +47,26 @@
     "panelNotAccessible": {
         "message": "Panel is not accessible at the current time."
     },
-    "actionToTake": {
-        "message": "Choose an action to take for these websites:"
+    "defaultAction": {
+        "message": "Default action"
     },
-    "actionToTakeForTheRest": {
-        "message": "Choose an action to take for the rest of websites:"
+    "defaultActionHint": {
+        "message": "Choose an action to take for the blacklisted websites"
     },
     "displayErrorMessage": {
-        "message": "Display error message"
+        "message": "Display an error message"
     },
     "redirectToUrl": {
         "message": "Redirect to url"
     },
-    "redirectToUrlExample": {
+    "url": {
+        "message": "Url"
+    },
+    "redirectUrlExample": {
         "message": "Example: about:blank, https://www.google.com, ..."
+    },
+    "urlExample": {
+        "message": "Example: www.facebook.com, www.youtube.com, ..."
     },
     "closeTab": {
         "message": "Close tab"
@@ -73,5 +82,68 @@
     },
     "export": {
         "message": "Export"
+    },
+    "blocking": {
+        "message": "Blocking"
+    },
+    "schedule": {
+        "message": "Schedule"
+    },
+    "scheduleDescription": {
+        "message": "Schedule blocking time:"
+    },
+    "miscellaneous": {
+        "message": "Miscellaneous"
+    },
+    "password": {
+        "message": "Password"
+    },
+    "enable": {
+        "message": "Enable"
+    },
+    "timeFrom": {
+        "message": "From:"
+    },
+    "timeTo": {
+        "message": "To:"
+    },
+    "addWebsite": {
+        "message": "Add a website"
+    },
+    "addWebsiteHint": {
+        "message": "Use wildcard or regular expression matching to select subdomains or subpages, e.g.: \n<b>*.example.com</b>, <b>example.com/blog/*</b>"
+    },
+    "add": {
+        "message": "Add"
+    },
+    "save": {
+        "message": "Save"
+    },
+    "settingsSaved": {
+        "message": "Settings saved!"
+    },
+    "copy": {
+        "message": "Copy"
+    },
+    "edit": {
+        "message": "Edit"
+    },
+    "duplicate": {
+        "message": "Duplicate"
+    },
+    "delete": {
+        "message": "Delete"
+    },
+    "order": {
+        "message": "Order"
+    },
+    "ascending": {
+        "message": "Ascending"
+    },
+    "descending": {
+        "message": "Descending"
+    },
+    "show": {
+        "message": "Show"
     }
 }

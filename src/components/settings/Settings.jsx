@@ -1,7 +1,10 @@
 import { Component, Fragment } from 'react';
-import { Pane, Tablist, Tab, SelectField, TextInputField, Button, TickIcon } from 'evergreen-ui';
+import { Pane, Tablist, Tab, SelectField, Checkbox, TextInputField, Button, TickIcon, Paragraph, toaster } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
 import SwitchField from '../shared/switch-field/SwitchField';
+import TimeField from '../shared/time-field/TimeField';
+import ButtonTextField from '../shared/button-text-field/ButtonTexField';
+import WebsiteList from '../shared/website-list/WebsiteList';
 import './Settings.scss';
 
 export default class Settings extends Component {
@@ -11,12 +14,19 @@ export default class Settings extends Component {
     this.state = {
       selectedTabIndex: 0,
       tabs: [
-        translate('options') || 'Options',
-        translate('settings_blacklist_title') || 'Blacklist',
-        translate('settings_whitelist_title') || 'Whitelist'
+        { label: translate('blocking'), id: 'blocking' },
+        { label: translate('schedule'), id: 'schedule' },
+        { label: translate('blacklist'), id: 'blacklist' },
+        { label: translate('whitelist'), id: 'whitelist' },
+        { label: translate('miscellaneous'), id: 'misc' },
+        //{ label: translate('password'), id: 'password' },
+      ],
+      actions: [
+        { label: translate('displayErrorMessage'), value: 'blockTab' },
+        { label: translate('redirectToUrl'), value: 'redirectToUrl' },
+        { label: translate('closeTab'), value: 'closeTab' },
       ],
       options: {
-        enableOnBrowserStartup: false,
         action: 'blockTab',
         blockTab: {
           errorMessage: '',
@@ -25,6 +35,16 @@ export default class Settings extends Component {
         redirectToUrl: {
           url: ''
         },
+        schedule: {
+          isEnabled: false,
+          from: '',
+          to: ''
+        },
+        blacklist: [],
+        whitelist: [],
+        misc: {
+          enableOnBrowserStartup: false,
+        }
       }
     };
   }
@@ -36,7 +56,7 @@ export default class Settings extends Component {
    * 
    * @param  {...any} params 
    */
-  setOption(...params) {
+  setOption = (...params) => {
     if (params.length === 2) {
       this.setState({
         options: {
@@ -59,104 +79,155 @@ export default class Settings extends Component {
     }
   }
 
+  addWebsiteToBlacklist = (website) => {
+    console.log('website:', website);
+  }
+
+  save = () => {
+    console.log('save:', this.state.options);
+    toaster.success(translate('settingsSaved'), { id: 'toaster' });
+  }
+
   render() {
     return (
-      <Fragment>
-        <Pane padding={16}>
-          <Tablist marginBottom={16}>
-            {this.state.tabs.map((tab, index) => (
-              <Tab
-                key={tab}
-                id={tab}
-                onSelect={() => this.setState({ selectedTabIndex: index })}
-                isSelected={index === this.state.selectedTabIndex}
-                aria-controls={`panel-${tab}`}
-                fontSize={14}
-              >
-                {tab}
-              </Tab>
-            ))}
-          </Tablist>
-          <Pane padding={16} background="tint1" border="muted" flex="1">
-            {this.state.tabs.map((tab, index) => (
-              <Pane
-                key={tab}
-                id={`panel-${tab}`}
-                role="tabpanel"
-                aria-labelledby={tab}
-                aria-hidden={index !== this.state.selectedTabIndex}
-                display={index === this.state.selectedTabIndex ? 'block' : 'none'}
-                //maxWidth={500}
-              >
-                {index === 0 &&
-                  <Fragment>
-                    <SwitchField
-                      label={translate('enable_on_browser_startup') || 'Enable on browser startup'}
-                      checked={this.state.options.enableOnBrowserStartup}
-                      onChange={event => this.setOption({ enableOnBrowserStartup: event.target.checked })}
+      <Pane padding={16} minWidth={580}>
+        <Tablist marginBottom={16}>
+          {this.state.tabs.map((tab, index) => (
+            <Tab
+              key={tab.id}
+              id={tab.id}
+              onSelect={() => this.setState({ selectedTabIndex: index })}
+              isSelected={index === this.state.selectedTabIndex}
+              aria-controls={`panel-${tab.id}`}
+              fontSize={14}
+            >
+              {tab.label}
+            </Tab>
+          ))}
+        </Tablist>
+        <Pane padding={16} border="muted" flex="1">
+          {this.state.tabs.map((tab, index) => (
+            <Pane
+              key={tab.id}
+              id={`panel-${tab.id}`}
+              role="tabpanel"
+              aria-labelledby={tab.label}
+              aria-hidden={index !== this.state.selectedTabIndex}
+              display={index === this.state.selectedTabIndex ? 'block' : 'none'}
+              //maxWidth={500}
+            >
+              {tab.id === 'blocking' &&
+                <Fragment>
+                  <SelectField
+                    label={translate('defaultAction')}
+                    hint={translate('defaultActionHint')}
+                    value={this.state.options.action}
+                    onChange={event => this.setOption({ action: event.target.value })}
+                    marginBottom={16}
+                  >
+                    {this.state.actions.map(action => (
+                      <option key={action.value} value={action.value}>{action.label}</option>
+                    ))}
+                  </SelectField>
+                  {this.state.options.action === 'blockTab' &&
+                    <Fragment>
+                      <TextInputField
+                        label={translate('errorMessage')}
+                        placeholder={translate('defaultErrorMessage')}
+                        value={this.state.options.blockTab.errorMessage}
+                        onChange={event => this.setOption('blockTab', { errorMessage: event.target.value })}
+                        marginBottom={16}
+                      />
+                      <Checkbox
+                        label={translate('disableKeyboardWhenErrorMessageIsDisplayed')}
+                        checked={this.state.options.blockTab.disableKeyboard}
+                        onChange={event => this.setOption('blockTab', { disableKeyboard: event.target.checked })}
+                      />
+                    </Fragment>
+                  }
+                  {this.state.options.action === 'redirectToUrl' &&
+                    <TextInputField
+                      label={translate('url')}
+                      placeholder={translate('redirectUrlExample')}
+                      value={this.state.options.redirectToUrl.url}
+                      onChange={event => this.setOption('redirectToUrl', { url: event.target.value })}
                       marginBottom={16}
                     />
-                    <SelectField
-                      label={translate('default_action') || 'Default action'}
-                      hint={translate('action_to_take') || 'Choose an action to take for the blacklisted / whitelisted websites'}
-                      value={this.state.options.action}
-                      onChange={event => this.setOption({ action: event.target.value })}
-                      marginBottom={16}
-                    >
-                      <option value="blockTab">{translate('display_error_message') || 'Display an error message'}</option>
-                      <option value="redirectToUrl">{translate('redirect_to_url') || 'Redirect to url'}</option>
-                      <option value="closeTab">{translate('close_tab') || 'Close tab'}</option>
-                    </SelectField>
-                    {this.state.options.action === 'blockTab' &&
-                      <Fragment>
-                        <TextInputField
-                          label={translate('error_message') || 'Error message'}
-                          placeholder={translate('overlay_message') || 'Where are you going...'}
-                          value={this.state.options.blockTab.errorMessage}
-                          onChange={event => this.setOption('blockTab', { errorMessage: event.target.value })}
-                        />
-                        <SwitchField
-                          label={translate('disable_keyboard_when_error_message_is_displayed') || 'Disable keyboard when error message is displayed'}
-                          checked={this.state.options.blockTab.disableKeyboard}
-                          onChange={event => this.setOption('blockTab', { disableKeyboard: event.target.checked })}
-                          marginBottom={16}
-                        />
-                      </Fragment>
-                    }
-                    {this.state.options.action === 'redirectToUrl' &&
-                      <TextInputField
-                        label={translate('url') || 'Url'}
-                        placeholder={translate('redirect_to_url_example') || 'url'}
-                        value={this.state.options.redirectToUrl.url}
-                        onChange={event => this.setOption('redirectToUrl', { url: event.target.value })}
-                      />
-                    }
-                  </Fragment>
-                }
-                {index === 1 &&
-                  <Fragment>
-
-                  </Fragment>
-                }
-                {index === 2 &&
-                  <Fragment>
-
-                  </Fragment>
-                }
-              </Pane>
-            ))}
-          </Pane>
+                  }
+                </Fragment>
+              }
+              {tab.id === 'schedule' &&
+                <Fragment>
+                  <SwitchField
+                    label={translate('scheduleDescription')}
+                    labelSize={300}
+                    labelColor="muted"
+                    checked={this.state.options.schedule.isEnabled}
+                    onChange={event => this.setOption('schedule', { isEnabled: event.target.checked })}
+                    marginBottom={16}
+                  />
+                  <TimeField
+                    label={translate('timeFrom')}
+                    value={this.state.options.schedule.from}
+                    onChange={event => this.setOption('schedule', { from: event.target.value })}
+                    disabled={!this.state.options.schedule.isEnabled}
+                    marginBottom={16}
+                  />
+                  <TimeField
+                    label={translate('timeTo')}
+                    value={this.state.options.schedule.to}
+                    onChange={event => this.setOption('schedule', { to: event.target.value })}
+                    disabled={!this.state.options.schedule.isEnabled}
+                  />
+                </Fragment>
+              }
+              {tab.id === 'blacklist' &&
+                <Fragment>
+                  <Paragraph size={300} color="muted" marginBottom={16}>{translate('blacklistDescription')}</Paragraph>
+                  <WebsiteList list={[
+                    'www.facebook.com',
+                    'www.youtube.com',
+                    'www.twitter.com'
+                  ] || this.state.options.blacklist} />
+                  <ButtonTextField
+                    placeholder={translate('urlExample')}
+                    buttonLabel={translate('add')}
+                    hint={translate('addWebsiteHint')}
+                    onSubmit={this.addWebsiteToBlacklist}
+                    marginTop={16}
+                    required
+                  />
+                </Fragment>
+              }
+              {tab.id === 'whitelist' &&
+                <Fragment>
+                  <Paragraph size={300} color="muted" marginBottom={16}>{translate('whitelistDescription')}</Paragraph>
+                </Fragment>
+              }
+              {tab.id === 'misc' &&
+                <Fragment>
+                  <SwitchField
+                    label={translate('enableOnBrowserStartup')}
+                    checked={this.state.options.misc.enableOnBrowserStartup}
+                    onChange={event => this.setOption('misc', { enableOnBrowserStartup: event.target.checked })}
+                    //marginBottom={16}
+                  />
+                </Fragment>
+              }
+            </Pane>
+          ))}
         </Pane>
-        <Pane display="flex" alignItems="center" justifyContent="center">
+        <Pane display="flex" alignItems="center" justifyContent="center" marginTop={16}>
           <Button
             height={32}
             appearance="primary"
             iconBefore={TickIcon}
+            onClick={this.save}
           >
-            Save
+            {translate('save')}
           </Button>
         </Pane>
-      </Fragment>
+      </Pane>
     );
   }
 }

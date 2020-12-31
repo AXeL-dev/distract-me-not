@@ -1,6 +1,6 @@
-import { Pane, Text, Switch, Position } from 'evergreen-ui';
+import { Pane, Text } from 'evergreen-ui';
 
-export default function SwitchField(props) {
+export default function TimeField(props) {
   return (
     <Pane
       display="flex"
@@ -18,18 +18,16 @@ export default function SwitchField(props) {
       marginBottom={props.marginBottom || props.marginY}
       marginLeft={props.marginLeft || props.marginX}
       marginRight={props.marginRight || props.marginX}
-      flexDirection={props.position === Position.LEFT ? 'row-reverse' : 'inherit'}
     >
       <Pane display="flex" alignItems="center" flex={1}>
-        <Text size={props.labelSize} color={props.labelColor}>
-          {props.label}
-        </Text>
+        <Text>{props.label}</Text>
       </Pane>
-      <Pane display="flex" alignItems="center" marginRight={props.position === Position.LEFT ? 12 : 0}>
-        <Switch
-          height={props.height || 18}
-          checked={props.checked}
+      <Pane display="flex" alignItems="center">
+        <input
+          type="time"
+          value={props.value}
           onChange={props.onChange}
+          disabled={props.disabled}
         />
       </Pane>
     </Pane>
