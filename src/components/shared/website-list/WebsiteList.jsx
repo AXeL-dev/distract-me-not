@@ -229,7 +229,7 @@ export default class WebsiteList extends Component {
 
   copyToClipboard = (text) => {
     if (copy(text)) {
-      toaster.success(translate('copiedToClipboard'), { id: 'success-toaster' });
+      toaster.success(translate('copiedToClipboard'), { id: 'settings-toaster' });
     }
   }
 
