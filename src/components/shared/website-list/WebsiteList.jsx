@@ -40,21 +40,25 @@ export default class WebsiteList extends Component {
     super(props);
 
     this.state = {
-      list: props.list || [],
+      list: this.getOrderedList(props.list), // [{ id, url }]
       favicons: {}, // { hostName: faviconUrl }
       searchQuery: '',
       orderedColumn: 1,
       ordering: Order.NONE,
       editDialog: {
         isShown: false,
-        value2Edit: '',
-        editedValue: '',
+        row: null,
+        value: '',
       },
     };
 
-    for (let url of this.state.list) {
-      this.getFavicon(url);
+    for (let item of this.state.list) {
+      this.getFavicon(item.url);
     }
+  }
+
+  getOrderedList = (list) => {
+    return list ? list.map((url, index) => ({ id: index + 1, url: url })) : [];
   }
 
   getFavicon = (url) => {
@@ -89,9 +93,13 @@ export default class WebsiteList extends Component {
     // Return if there's no ordering.
     if (ordering === Order.NONE) return items;
 
+    // Get the property to sort each item on.
+    // By default use the `url` property.
+    let propKey = 'url';
+
     return items.sort((a, b) => {
-      let aValue = a;
-      let bValue = b;
+      let aValue = a[propKey];
+      let bValue = b[propKey];
 
       // Parse money as a number.
       const isMoney = aValue.indexOf('$') === 0;
@@ -122,8 +130,8 @@ export default class WebsiteList extends Component {
     if (searchQuery.length === 0) return items;
 
     return items.filter(item => {
-      // Use the filter from fuzzaldrin-plus to filter by filterColumn.
-      const result = filter([item], searchQuery);
+      // Use the filter from fuzzaldrin-plus to filter by url.
+      const result = filter([item.url], searchQuery);
       return result.length === 1;
     })
   }
@@ -147,13 +155,13 @@ export default class WebsiteList extends Component {
     debug.log('add to list:', url);
     if (!isUrl(url)) {
       toaster.danger(translate('urlIsNotValid'), { id: 'settings-toaster' });
-    } else if (this.state.list.find(item => item === url)) {
+    } else if (this.state.list.find(item => item.url === url)) {
       toaster.danger(translate('urlAlreadyExists'), { id: 'settings-toaster' });
     } else {
       // Add url
       const list = [
         ...this.state.list,
-        url
+        { id: this.state.list.length + 1, url: url }
       ];
       this.setState({ list: list });
       // Get favicon
@@ -168,31 +176,31 @@ export default class WebsiteList extends Component {
   submitChanges = (list) => {
     // Call onChange prop
     if (this.props.onChange) {
-      this.props.onChange(list);
+      this.props.onChange(list.map(item => item.url));
     }
   }
 
-  delete = (url) => {
-    debug.log('delete:', url);
-    // Remove url
-    const list = this.state.list.filter(item => item !== url);
+  delete = (row) => {
+    debug.log('delete:', row);
+    // Remove item
+    const list = this.state.list.filter(item => item.id !== row.id);
     this.setState({ list: list });
     // Submit changes
     this.submitChanges(list);
   }
 
-  edit = ({ url, newUrl }) => {
-    debug.log('edit:', { url: url, replacement: newUrl });
-    if (!isUrl(newUrl)) {
+  edit = ({ row, value }) => {
+    debug.log('edit:', { row: row, value: value });
+    if (!isUrl(value)) {
       toaster.danger(translate('urlIsNotValid'), { id: 'settings-toaster' });
-    } else if (this.state.list.find(item => item === newUrl)) {
+    } else if (this.state.list.find(item => item.url === value)) {
       toaster.danger(translate('urlAlreadyExists'), { id: 'settings-toaster' });
     } else {
       // Edit url
-      const list = this.state.list.map(item => item === url ? newUrl : item);
+      const list = this.state.list.map(item => (item.id === row.id ? { id: item.id, url: value } : item));
       this.setState({ list: list });
       // Get favicon
-      this.getFavicon(newUrl);
+      this.getFavicon(value);
       // Close edit dialog
       this.closeEditDialog();
       // Submit changes
@@ -200,12 +208,11 @@ export default class WebsiteList extends Component {
     }
   }
 
-  openEditDialog = ({ url }) => {
+  openEditDialog = (row) => {
     this.setState({
       editDialog: {
-        ...this.state.editDialog,
-        value2Edit: url,
-        editedValue: url,
+        row: row,
+        value: row.url,
         isShown: true
       }
     });
@@ -293,7 +300,7 @@ export default class WebsiteList extends Component {
           <Menu.Item
             icon={EditIcon}
             onSelect={() => {
-              this.openEditDialog({ url: row });
+              this.openEditDialog(row);
               close();
             }}
           >
@@ -302,7 +309,7 @@ export default class WebsiteList extends Component {
           <Menu.Item
             icon={ClipboardIcon}
             onSelect={() => {
-              this.copyToClipboard(row);
+              this.copyToClipboard(row.url);
               close();
             }}
           >
@@ -326,11 +333,11 @@ export default class WebsiteList extends Component {
     )
   }
 
-  renderRow = ({ row, index }) => {
-    const hostName = getHostName(row);
+  renderRow = ({ row }) => {
+    const hostName = getHostName(row.url);
 
     return (
-      <Table.Row key={index}>
+      <Table.Row key={row.id}>
         <Table.Cell display="flex" alignItems="center">
           {this.state.favicons[hostName] ? (
             <Avatar
@@ -348,7 +355,7 @@ export default class WebsiteList extends Component {
             />
           )}
           <Text marginLeft={8} size={300} fontWeight={500}>
-            {row}
+            {row.url}
           </Text>
         </Table.Cell>
         <Table.Cell width={48} flex="none">
@@ -390,7 +397,7 @@ export default class WebsiteList extends Component {
             </Table.HeaderCell>
           </Table.Head>
           <Table.VirtualBody height={240}>
-            {items.map((item, index) => this.renderRow({ row: item, index: index }))}
+            {items.map(item => this.renderRow({ row: item }))}
           </Table.VirtualBody>
         </Table>
         <TextField
@@ -408,8 +415,8 @@ export default class WebsiteList extends Component {
           cancelLabel={translate('cancel')}
           confirmLabel={translate('edit')}
           onConfirm={() => this.edit({
-            url: this.state.editDialog.value2Edit,
-            newUrl: this.state.editDialog.editedValue
+            row: this.state.editDialog.row,
+            value: this.state.editDialog.value
           })}
           hasHeader={false}
           topOffset="24vmin"
@@ -418,8 +425,8 @@ export default class WebsiteList extends Component {
           <TextField
             placeholder={translate('urlExample')}
             hint={translate('addWebsiteHint')}
-            value={this.state.editDialog.value2Edit}
-            onChange={event => this.setState({ editDialog: { ...this.state.editDialog, editedValue: event.target.value } })}
+            value={this.state.editDialog.value}
+            onChange={event => this.setState({ editDialog: { ...this.state.editDialog, value: event.target.value } })}
           />
         </Dialog>
       </Fragment>
