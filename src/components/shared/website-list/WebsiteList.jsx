@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component, Fragment } from 'react';
 import { filter } from 'fuzzaldrin-plus';
 import {
   Table,
@@ -17,10 +17,15 @@ import {
   TrashIcon,
   ImportIcon,
   ExportIcon,
-  TextDropdownButton
+  TextDropdownButton,
+  toaster,
+  Dialog
 } from 'evergreen-ui';
+import copy from 'copy-to-clipboard';
+import TextField from '../text-field/TextField';
 import { translate } from '../../../helpers/i18n';
-import { getHostName, getFaviconLink, checkFaviconLink } from '../../../helpers/url';
+import { debug } from '../../../helpers/debug';
+import { getHostName, getFaviconLink, checkFaviconLink, isUrl } from '../../../helpers/url';
 import './WebsiteList.scss';
 
 const Order = {
@@ -40,33 +45,43 @@ export default class WebsiteList extends Component {
       searchQuery: '',
       orderedColumn: 1,
       ordering: Order.NONE,
+      editDialog: {
+        isShown: false,
+        value2Edit: '',
+        editedValue: '',
+      },
     };
 
-    // Get favicons by hostname
     for (let url of this.state.list) {
-      const hostName = getHostName(url);
-      if (this.state.favicons[hostName] !== undefined) {
-        continue;
-      } else {
-        this.setState({
-          favicons: {
-            ...this.state.favicons,
-            ...{ [hostName]: null }
-          }
-        });
-      }
-      const faviconLink = getFaviconLink(url);
-      checkFaviconLink(faviconLink).then(result => {
-        if (result) {
-          this.setState({
-            favicons: {
-              ...this.state.favicons,
-              ...{ [hostName]: faviconLink }
-            }
-          });
+      this.getFavicon(url);
+    }
+  }
+
+  getFavicon = (url) => {
+    // Get favicon by hostname
+    const hostName = getHostName(url);
+    if (this.state.favicons[hostName] !== undefined) {
+      return;
+    } else {
+      this.setState({
+        favicons: {
+          ...this.state.favicons,
+          ...{ [hostName]: null }
         }
       });
     }
+    const faviconLink = getFaviconLink(url);
+    checkFaviconLink(faviconLink).then(result => {
+      if (result) {
+        debug.log('favicon:', faviconLink);
+        this.setState({
+          favicons: {
+            ...this.state.favicons,
+            ...{ [hostName]: faviconLink }
+          }
+        });
+      }
+    });
   }
 
   sort = items => {
@@ -128,6 +143,89 @@ export default class WebsiteList extends Component {
     this.setState({ searchQuery: value });
   }
 
+  addToList = (url, setTextFieldValue) => {
+    debug.log('add to list:', url);
+    if (!isUrl(url)) {
+      toaster.danger(translate('urlIsNotValid'), { id: 'settings-toaster' });
+    } else if (this.state.list.find(item => item === url)) {
+      toaster.danger(translate('urlAlreadyExists'), { id: 'settings-toaster' });
+    } else {
+      // Add url
+      const list = [
+        ...this.state.list,
+        url
+      ];
+      this.setState({ list: list });
+      // Get favicon
+      this.getFavicon(url);
+      // Empty text field
+      setTextFieldValue('');
+      // Submit changes
+      this.submitChanges(list);
+    }
+  }
+
+  submitChanges = (list) => {
+    // Call onChange prop
+    if (this.props.onChange) {
+      this.props.onChange(list);
+    }
+  }
+
+  delete = (url) => {
+    debug.log('delete:', url);
+    // Remove url
+    const list = this.state.list.filter(item => item !== url);
+    this.setState({ list: list });
+    // Submit changes
+    this.submitChanges(list);
+  }
+
+  edit = ({ url, newUrl }) => {
+    debug.log('edit:', { url: url, replacement: newUrl });
+    if (!isUrl(newUrl)) {
+      toaster.danger(translate('urlIsNotValid'), { id: 'settings-toaster' });
+    } else if (this.state.list.find(item => item === newUrl)) {
+      toaster.danger(translate('urlAlreadyExists'), { id: 'settings-toaster' });
+    } else {
+      // Edit url
+      const list = this.state.list.map(item => item === url ? newUrl : item);
+      this.setState({ list: list });
+      // Get favicon
+      this.getFavicon(newUrl);
+      // Close edit dialog
+      this.closeEditDialog();
+      // Submit changes
+      this.submitChanges(list);
+    }
+  }
+
+  openEditDialog = ({ url }) => {
+    this.setState({
+      editDialog: {
+        ...this.state.editDialog,
+        value2Edit: url,
+        editedValue: url,
+        isShown: true
+      }
+    });
+  }
+
+  closeEditDialog = () => {
+    this.setState({
+      editDialog: {
+        ...this.state.editDialog,
+        isShown: false
+      }
+    });
+  }
+
+  copyToClipboard = (text) => {
+    if (copy(text)) {
+      toaster.success(translate('copiedToClipboard'), { id: 'success-toaster' });
+    }
+  }
+
   renderColumnSortButton = ({ order, label }) => {
     return (
       <Popover
@@ -177,7 +275,7 @@ export default class WebsiteList extends Component {
     )
   }
 
-  renderHeaderMenu = () => {
+  renderHeaderMenu = ({ close }) => {
     return (
       <Menu>
         <Menu.Group>
@@ -188,16 +286,41 @@ export default class WebsiteList extends Component {
     )
   }
 
-  renderRowMenu = () => {
+  renderRowMenu = ({ row, close }) => {
     return (
       <Menu>
         <Menu.Group>
-          <Menu.Item icon={EditIcon}>{translate('edit')}</Menu.Item>
-          <Menu.Item icon={ClipboardIcon}>{translate('copy')}</Menu.Item>
+          <Menu.Item
+            icon={EditIcon}
+            onSelect={() => {
+              this.openEditDialog({ url: row });
+              close();
+            }}
+          >
+            {translate('edit')}
+          </Menu.Item>
+          <Menu.Item
+            icon={ClipboardIcon}
+            onSelect={() => {
+              this.copyToClipboard(row);
+              close();
+            }}
+          >
+            {translate('copy')}
+          </Menu.Item>
         </Menu.Group>
         <Menu.Divider />
         <Menu.Group>
-          <Menu.Item icon={TrashIcon} intent="danger">{translate('delete')}</Menu.Item>
+          <Menu.Item
+            icon={TrashIcon}
+            intent="danger"
+            onSelect={() => {
+              this.delete(row);
+              close();
+            }}
+          >
+            {translate('delete')}
+          </Menu.Item>
         </Menu.Group>
       </Menu>
     )
@@ -230,7 +353,7 @@ export default class WebsiteList extends Component {
         </Table.Cell>
         <Table.Cell width={48} flex="none">
           <Popover
-            content={this.renderRowMenu}
+            content={({ close }) => this.renderRowMenu({ row: row, close: close })}
             position={Position.BOTTOM_RIGHT}
             minWidth={160}
           >
@@ -245,29 +368,61 @@ export default class WebsiteList extends Component {
     const items = this.filter(this.sort(this.state.list));
 
     return (
-      <Table border>
-        <Table.Head>
-          <Table.SearchHeaderCell
-            onChange={this.handleFilterChange}
-            value={this.state.searchQuery}
+      <Fragment>
+        <Table border>
+          <Table.Head>
+            <Table.SearchHeaderCell
+              onChange={this.handleFilterChange}
+              value={this.state.searchQuery}
+              placeholder={translate('filter') + '...'}
+            />
+            <Table.HeaderCell flex="none">
+              {this.renderColumnSortButton({ order: 1 })}
+            </Table.HeaderCell>
+            <Table.HeaderCell width={48} flex="none">
+              <Popover
+                content={({ close }) => this.renderHeaderMenu({ close: close })}
+                position={Position.BOTTOM_RIGHT}
+                minWidth={160}
+              >
+                <IconButton icon={MoreIcon} height={24} appearance="minimal" />
+              </Popover>
+            </Table.HeaderCell>
+          </Table.Head>
+          <Table.VirtualBody height={240}>
+            {items.map((item, index) => this.renderRow({ row: item, index: index }))}
+          </Table.VirtualBody>
+        </Table>
+        <TextField
+          placeholder={translate('urlExample')}
+          hint={translate('addWebsiteHint')}
+          hasButton={true}
+          buttonLabel={translate('add')}
+          onSubmit={this.addToList}
+          marginTop={16}
+          required
+        />
+        <Dialog
+          isShown={this.state.editDialog.isShown}
+          onCloseComplete={() => this.closeEditDialog()}
+          cancelLabel={translate('cancel')}
+          confirmLabel={translate('edit')}
+          onConfirm={() => this.edit({
+            url: this.state.editDialog.value2Edit,
+            newUrl: this.state.editDialog.editedValue
+          })}
+          hasHeader={false}
+          topOffset="24vmin"
+          shouldCloseOnOverlayClick={false}
+        >
+          <TextField
+            placeholder={translate('urlExample')}
+            hint={translate('addWebsiteHint')}
+            value={this.state.editDialog.value2Edit}
+            onChange={event => this.setState({ editDialog: { ...this.state.editDialog, editedValue: event.target.value } })}
           />
-          <Table.HeaderCell flex="none">
-            {this.renderColumnSortButton({ order: 1 })}
-          </Table.HeaderCell>
-          <Table.HeaderCell width={48} flex="none">
-            <Popover
-              content={this.renderHeaderMenu}
-              position={Position.BOTTOM_RIGHT}
-              minWidth={160}
-            >
-              <IconButton icon={MoreIcon} height={24} appearance="minimal" />
-            </Popover>
-          </Table.HeaderCell>
-        </Table.Head>
-        <Table.VirtualBody height={240}>
-          {items.map((item, index) => this.renderRow({ row: item, index: index }))}
-        </Table.VirtualBody>
-      </Table>
+        </Dialog>
+      </Fragment>
     )
   }
 }

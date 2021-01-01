@@ -68,6 +68,15 @@
     "urlExample": {
         "message": "Exemple: www.facebook.com, www.youtube.com, ..."
     },
+    "urlIsNotValid": {
+        "message": "L'url n'est pas valide"
+    },
+    "urlAlreadyExists": {
+        "message": "L'url existe déjà!"
+    },
+    "copiedToClipboard": {
+        "message": "Copié dans le presse-papier!"
+    },
     "closeTab": {
         "message": "Fermer l'onglet"
     },
@@ -145,5 +154,14 @@
     },
     "show": {
         "message": "Afficher"
+    },
+    "filter": {
+        "message": "Filtrer"
+    },
+    "close": {
+        "message": "Fermer"
+    },
+    "cancel": {
+        "message": "Annuler"
     }
 }

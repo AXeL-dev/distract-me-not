@@ -1,11 +1,22 @@
 import { Component, Fragment } from 'react';
 import { Pane, Tablist, Tab, SelectField, Checkbox, TextInputField, Button, TickIcon, Paragraph, toaster } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
+import { debug, isDevEnv } from '../../helpers/debug';
 import SwitchField from '../shared/switch-field/SwitchField';
 import TimeField from '../shared/time-field/TimeField';
-import ButtonTextField from '../shared/button-text-field/ButtonTexField';
 import WebsiteList from '../shared/website-list/WebsiteList';
 import './Settings.scss';
+
+const blacklistExample = [
+  'www.facebook.com',
+  'www.youtube.com',
+  'www.twitter.com'
+];
+
+const whitelistExample = [
+  'www.google.com',
+  'www.wikipedia.com'
+];
 
 export default class Settings extends Component {
 
@@ -40,8 +51,8 @@ export default class Settings extends Component {
           from: '',
           to: ''
         },
-        blacklist: [],
-        whitelist: [],
+        blacklist: isDevEnv ? blacklistExample : [],
+        whitelist: isDevEnv ? whitelistExample : [],
         misc: {
           enableOnBrowserStartup: false,
         }
@@ -79,13 +90,9 @@ export default class Settings extends Component {
     }
   }
 
-  addWebsiteToBlacklist = (website) => {
-    console.log('website:', website);
-  }
-
   save = () => {
-    console.log('save:', this.state.options);
-    toaster.success(translate('settingsSaved'), { id: 'toaster' });
+    debug.log('save:', this.state.options);
+    toaster.success(translate('settingsSaved'), { id: 'settings-toaster' });
   }
 
   render() {
@@ -184,24 +191,19 @@ export default class Settings extends Component {
               {tab.id === 'blacklist' &&
                 <Fragment>
                   <Paragraph size={300} color="muted" marginBottom={16}>{translate('blacklistDescription')}</Paragraph>
-                  <WebsiteList list={[
-                    'www.facebook.com',
-                    'www.youtube.com',
-                    'www.twitter.com'
-                  ] || this.state.options.blacklist} />
-                  <ButtonTextField
-                    placeholder={translate('urlExample')}
-                    buttonLabel={translate('add')}
-                    hint={translate('addWebsiteHint')}
-                    onSubmit={this.addWebsiteToBlacklist}
-                    marginTop={16}
-                    required
+                  <WebsiteList
+                    list={this.state.options.blacklist}
+                    onChange={list => this.setOption({ blacklist: list })}
                   />
                 </Fragment>
               }
               {tab.id === 'whitelist' &&
                 <Fragment>
                   <Paragraph size={300} color="muted" marginBottom={16}>{translate('whitelistDescription')}</Paragraph>
+                  <WebsiteList
+                    list={this.state.options.whitelist}
+                    onChange={list => this.setOption({ whitelist: list })}
+                  />
                 </Fragment>
               }
               {tab.id === 'misc' &&

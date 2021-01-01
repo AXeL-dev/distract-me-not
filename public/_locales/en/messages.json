@@ -68,6 +68,15 @@
     "urlExample": {
         "message": "Example: www.facebook.com, www.youtube.com, ..."
     },
+    "urlIsNotValid": {
+        "message": "Url is not valid"
+    },
+    "urlAlreadyExists": {
+        "message": "Url already exists!"
+    },
+    "copiedToClipboard": {
+        "message": "Copied to clipboard!"
+    },
     "closeTab": {
         "message": "Close tab"
     },
@@ -145,5 +154,14 @@
     },
     "show": {
         "message": "Show"
+    },
+    "filter": {
+        "message": "Filter"
+    },
+    "close": {
+        "message": "Close"
+    },
+    "cancel": {
+        "message": "Cancel"
     }
 }
