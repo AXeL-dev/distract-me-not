@@ -2,7 +2,7 @@ import { Component, Fragment } from 'react';
 import { Pane, TextInput, Button, Paragraph } from 'evergreen-ui';
 import RawHTML from '../raw-html/RawHTML';
 
-export default class ButtonTextField extends Component {
+export default class TextField extends Component {
 
   constructor(props) {
     super(props);
@@ -66,16 +66,18 @@ export default class ButtonTextField extends Component {
               borderBottomRightRadius={0}
             />
           </Pane>
-          <Pane display="flex" alignItems="center" marginLeft={-1}>
-            <Button
-              appearance={this.props.buttonAppearance || 'primary'}
-              borderTopLeftRadius={0}
-              borderBottomLeftRadius={0}
-              onClick={this.handleButtonClick}
-            >
-              {this.props.buttonLabel || '+'}
-            </Button>
-          </Pane>
+          {this.props.hasButton &&
+            <Pane display="flex" alignItems="center" marginLeft={-1}>
+              <Button
+                appearance={this.props.buttonAppearance || 'primary'}
+                borderTopLeftRadius={0}
+                borderBottomLeftRadius={0}
+                onClick={this.handleButtonClick}
+              >
+                {this.props.buttonLabel || '+'}
+              </Button>
+            </Pane>
+          }
         </Pane>
         {this.props.hint &&
           <Paragraph size={300} color="muted" marginTop={6}>
