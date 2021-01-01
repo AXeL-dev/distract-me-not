@@ -20,12 +20,17 @@ export default class ButtonTextField extends Component {
 
   handleKeyPress = (event) => {
     if (event.key === 'Enter') {
-      this.props.onSubmit(event.target.value);
+      this.submit();
     }
   }
 
   handleButtonClick = () => {
-    this.props.onSubmit(this.state.value);
+    this.submit();
+  }
+
+  submit = () => {
+    const callback = (value) => this.setState({ value: value });
+    this.props.onSubmit(this.state.value, callback);
   }
 
   render() {
