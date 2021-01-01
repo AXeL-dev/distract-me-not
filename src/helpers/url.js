@@ -1,6 +1,6 @@
 
 export function isUrl(url) {
-  return url.match(/(^|\s)((https?:\/\/)?[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi);
+  return url.match(/(^|\s)((https?:\/\/)?(\*?|[\w-]+)(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi);
 }
 
 export function getHostName(url) {
@@ -13,7 +13,7 @@ export function getDomainName(url) {
 }
 
 export function getFaviconLink(url) {
-  return `https://${getDomainName(url)}/favicon.ico`;
+  return `https://${getHostName(url)}/favicon.ico`;
 }
 
 export function checkFaviconLink(faviconLink) {
