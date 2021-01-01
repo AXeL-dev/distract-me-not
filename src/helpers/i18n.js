@@ -1,6 +1,6 @@
-import isDevEnv from './env';
+import { isDevEnv } from './debug';
 
-const translations = isDevEnv() ? require('../../public/_locales/en/messages') : {};
+const translations = isDevEnv ? require('../../public/_locales/en/messages') : {};
 
 export function translate(messageName, substitutions = null) {
   try {
