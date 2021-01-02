@@ -25,6 +25,7 @@ import copy from 'copy-to-clipboard';
 import TextField from '../text-field/TextField';
 import { translate } from '../../../helpers/i18n';
 import { debug } from '../../../helpers/debug';
+import { download, readFile } from '../../../helpers/file';
 import { getHostName, getFaviconLink, checkFaviconLink, isUrl } from '../../../helpers/url';
 import './WebsiteList.scss';
 
@@ -235,6 +236,28 @@ export default class WebsiteList extends Component {
     }
   }
 
+  export = () => {
+    const list = this.state.list.map(item => item.url),
+          blob = new Blob([list.join("\n")], {type: 'text/plain'});
+    download(blob, this.props.exportFilename || 'export.txt');
+  }
+
+  import = (file) => {
+    readFile(file).then(content => {
+      const list = content && content.length ? content.split("\n") : [];
+      if (list.length) {
+        // Update state
+        this.setState({ list: this.getOrderedList(list) });
+        // Get new favicons
+        for (let url of list) {
+          this.getFavicon(url);
+        }
+        // Submit changes
+        this.submitChanges(list, false);
+      }
+    });
+  }
+
   renderColumnSortButton = ({ order, label }) => {
     return (
       <Popover
@@ -291,9 +314,7 @@ export default class WebsiteList extends Component {
           <Menu.Item
             icon={ExportIcon}
             onSelect={() => {
-              if (this.props.onExportClick) {
-                this.props.onExportClick(this.state.list.map(item => item.url));
-              }
+              this.export();
               close();
             }}
           >
@@ -453,26 +474,12 @@ export default class WebsiteList extends Component {
         <input
           ref={this.importFileInputRef}
           type="file"
-          className="import-file-input"
+          className="hidden"
           accept=".txt"
-          onClick={event => {
-            event.target.value = '';
-          }}
+          onClick={event => event.target.value = ''}
           onChange={event => {
-            if (this.props.onImportClick) {
-              const file = event.target.files[0];
-              const setListCallback = list => {
-                // Update state
-                this.setState({ list: this.getOrderedList(list) });
-                // Get new favicons
-                for (let url of list) {
-                  this.getFavicon(url);
-                }
-                // Submit changes
-                this.submitChanges(list, false);
-              };
-              this.props.onImportClick(file, setListCallback);
-            }
+            const file = event.target.files[0];
+            this.import(file);
           }}
         />
       </Fragment>
