@@ -3,11 +3,15 @@
   width: 24px;
   height: 24px;
   vertical-align: middle;
-  margin: 0 15px;
+  margin: 0 10px;
 }
 
 .custom-icon-button {
   box-shadow: none !important;
+  transition: transform 0.2s;
+  &.scale-0 {
+    transform: scale(0);
+  }
   &.fill-grey {
     svg {
       fill: #4E4E50 !important;

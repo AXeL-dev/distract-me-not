@@ -41,12 +41,6 @@
     "mode": {
         "message": "Mode"
     },
-    "privateModeWarning": {
-        "message": "Pour des raisons de compatibilité avec le navigateur, cette fenêtre ne peut pas être exploitée en mode navigation privée."
-    },
-    "panelNotAccessible": {
-        "message": "Cette fenêtre n'est pas accessible pour le moment."
-    },
     "defaultAction": {
         "message": "Action par défaut"
     },

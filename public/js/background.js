@@ -4,27 +4,27 @@ var blacklist;
 var whitelist;
 var isWhitelistMode = false;
 var isEnabled = false;
-var disableKeyboardWhenErrorMessageIsDisplayed = false;
+var disableKeyboard = false;
 var action;
 var redirectUrl;
 
 function getDefaultWhitelist() {
-    return ["wikipedia.org"]
+    return ["wikipedia.org"];
 }
 
 function getDefaultBlacklist() {
-    return ["facebook.com", "twitter.com", "youtube.com"]
+    return ["facebook.com", "twitter.com", "youtube.com"];
 }
 
 function isAccessible(tab) {
-    return typeof tab.url == "undefined" || tab.url.startsWith("about:") || tab.url.startsWith("file://") || tab.url.startsWith("moz-extension://") || tab.url.startsWith("chrome://") ? false : true;
+    return typeof tab.url != "undefined" && !tab.url.startsWith("about:") && !tab.url.startsWith("file://") && !tab.url.startsWith("moz-extension://") && !tab.url.startsWith("chrome://");
 }
 
 function blockTab(tab) {
     if (isAccessible(tab)) {
         browser.tabs.sendMessage(tab.id, {
             request: "block",
-            disableKeyboard: disableKeyboardWhenErrorMessageIsDisplayed
+            disableKeyboard: disableKeyboard
         });
     }
 }
@@ -203,12 +203,12 @@ function getRedirectUrl() {
     return redirectUrl;
 }
 
-function setDisableKeyboardWhenErrorMessageIsDisplayed(value) {
-    disableKeyboardWhenErrorMessageIsDisplayed = value;
+function setDisableKeyboard(value) {
+    disableKeyboard = value;
 }
 
-function getDisableKeyboardWhenErrorMessageIsDisplayed() {
-    return disableKeyboardWhenErrorMessageIsDisplayed;
+function getDisableKeyboard() {
+    return disableKeyboard;
 }
 
 function enableEventHandlers() {
@@ -263,14 +263,33 @@ function onBrowserStartup() {
     });
 }
 
+function executeFunction(functionName, ...params) {
+    if (params) {
+        return window[functionName](...params);
+    } else {
+        return window[functionName]();
+    }
+}
+
+function isFunction(functionName) {
+    return window[functionName] && typeof window[functionName] === 'function';
+}
+
+function handleMessage(request, sender, sendResponse) {
+    //console.log("Handle message:", request);
+    sendResponse({
+        response: isFunction(request.message) ? executeFunction(request.message, ...request.params) : window[request.message]
+    });
+}
+
 function init() {
     browser.storage.local.get({
         blackList: getDefaultBlacklist(),
         whiteList: getDefaultWhitelist(),
-        whitelist: null,
+        whitelist: null, // for backward compatibility, ToDo: drop out
         isWhitelistMode: false,
         enableOnBrowserStartup: false,
-        disableKeyboardWhenErrorMessageIsDisplayed: false,
+        disableKeyboard: false,
         isEnabled: false,
         action: 'blockTab',
         redirectUrl: ''
@@ -279,6 +298,7 @@ function init() {
         whitelist = items.whiteList;
         action = items.action;
         redirectUrl = items.redirectUrl;
+        // start old whitelist recovery
         if (items.whitelist != null) {
             var old_whitelist = items.whitelist;
             browser.storage.remove("whitelist", function(items) {});
@@ -287,14 +307,16 @@ function init() {
                 whiteList: whitelist
             }, function(items) {});
         }
+        // end old whitelist recovery
         isWhitelistMode = items.isWhitelistMode;
-        disableKeyboardWhenErrorMessageIsDisplayed = items.disableKeyboardWhenErrorMessageIsDisplayed;
+        disableKeyboard = items.disableKeyboard;
         isEnabled = items.enableOnBrowserStartup ? true : items.isEnabled;
         if (!items.enableOnBrowserStartup && isEnabled) {
             enable();
         }
     });
     browser.runtime.onStartup.addListener(onBrowserStartup);
+    browser.runtime.onMessage.addListener(handleMessage);
 }
 
 init();

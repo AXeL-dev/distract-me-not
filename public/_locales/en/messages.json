@@ -41,12 +41,6 @@
     "mode": {
         "message": "Mode"
     },
-    "privateModeWarning": {
-        "message": "For some browser compatibility reasons, the panel may not work on private mode. Please use the settings page to whitelist or blacklist websites."
-    },
-    "panelNotAccessible": {
-        "message": "Panel is not accessible at the current time."
-    },
     "defaultAction": {
         "message": "Default action"
     },

@@ -65,7 +65,7 @@
             if (items.errorMessage != '') {
                 overlayTopText.textContent = items.errorMessage;
             } else {
-                overlayTopText.textContent = browser.i18n.getMessage("overlay_message");
+                overlayTopText.textContent = browser.i18n.getMessage("defaultErrorMessage");
             }
         });
         overlayTopText.className = "distract-cursor distract-select distract-overlay-top-text";
