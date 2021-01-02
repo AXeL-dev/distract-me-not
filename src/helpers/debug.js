@@ -12,3 +12,11 @@ export class debug {
   }
 
 }
+
+export class report {
+
+  static error(message, ...params) {
+    !isDevEnv && console.error(message, ...params);
+  }
+
+}

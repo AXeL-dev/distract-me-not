@@ -1,3 +1,4 @@
+import { report } from "./debug";
 
 export function isWebExtension() {
   try {
@@ -12,7 +13,7 @@ export function openOptionsPage() {
     browser.runtime.openOptionsPage();
     window.close();
   } catch (error) {
-    //console.log(error);
+    report.error(error);
   }
 }
 
@@ -32,6 +33,7 @@ export function sendMessage(message, ...params) {
         resolve(response);
       });
     } catch (error) {
+      report.error(error);
       resolve(null);
     }
   });
@@ -43,10 +45,11 @@ export function getActiveTab() {
       browser.tabs.query({
         active: true,
         lastFocusedWindow: true
-      }, function(tabs) {
+      }).then(tabs => {
         resolve(tabs[0]);
       });
     } catch (error) {
+      report.error(error);
       resolve(null);
     }
   });
@@ -72,10 +75,11 @@ export class storage {
   static get(items) {
     return new Promise(resolve => {
       try {
-        browser.storage.local.get(items, function(results) {
+        browser.storage.local.get(items).then(results => {
           resolve(results);
         });
       } catch (error) {
+        report.error(error);
         resolve(null);
       }
     });
@@ -83,9 +87,9 @@ export class storage {
 
   static set(items) {
     try {
-      browser.storage.local.set(items, function() {});
+      browser.storage.local.set(items);
     } catch (error) {
-      //console.log(error);
+      report.error(error);
     }
   }
 
