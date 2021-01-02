@@ -1,4 +1,4 @@
-import { Component, Fragment } from 'react';
+import React, { Component, Fragment } from 'react';
 import { filter } from 'fuzzaldrin-plus';
 import {
   Table,
@@ -38,7 +38,7 @@ export default class WebsiteList extends Component {
 
   constructor(props) {
     super(props);
-
+    this.importFileInputRef = React.createRef();
     this.state = {
       list: this.getOrderedList(props.list), // [{ id, url }]
       favicons: {}, // { hostName: faviconUrl }
@@ -51,7 +51,9 @@ export default class WebsiteList extends Component {
         value: '',
       },
     };
+  }
 
+  componentDidMount() {
     for (let item of this.state.list) {
       this.getFavicon(item.url);
     }
@@ -173,10 +175,10 @@ export default class WebsiteList extends Component {
     }
   }
 
-  submitChanges = (list) => {
+  submitChanges = (list, map = true) => {
     // Call onChange prop
     if (this.props.onChange) {
-      this.props.onChange(list.map(item => item.url));
+      this.props.onChange(map ? list.map(item => item.url) : list);
     }
   }
 
@@ -286,8 +288,26 @@ export default class WebsiteList extends Component {
     return (
       <Menu>
         <Menu.Group>
-          <Menu.Item icon={ExportIcon}>{translate('export')}</Menu.Item>
-          <Menu.Item icon={ImportIcon}>{translate('import')}</Menu.Item>
+          <Menu.Item
+            icon={ExportIcon}
+            onSelect={() => {
+              if (this.props.onExportClick) {
+                this.props.onExportClick(this.state.list.map(item => item.url));
+              }
+              close();
+            }}
+          >
+            {translate('export')}
+          </Menu.Item>
+          <Menu.Item
+            icon={ImportIcon}
+            onSelect={() => {
+              this.importFileInputRef.current.click();
+              close();
+            }}
+          >
+            {translate('import')}
+          </Menu.Item>
         </Menu.Group>
       </Menu>
     )
@@ -429,6 +449,32 @@ export default class WebsiteList extends Component {
             onChange={event => this.setState({ editDialog: { ...this.state.editDialog, value: event.target.value } })}
           />
         </Dialog>
+        {/* Keep file input here to be sure that it will not be removed from dom on popover close for example */}
+        <input
+          ref={this.importFileInputRef}
+          type="file"
+          className="import-file-input"
+          accept=".txt"
+          onClick={event => {
+            event.target.value = '';
+          }}
+          onChange={event => {
+            if (this.props.onImportClick) {
+              const file = event.target.files[0];
+              const setListCallback = list => {
+                // Update state
+                this.setState({ list: this.getOrderedList(list) });
+                // Get new favicons
+                for (let url of list) {
+                  this.getFavicon(url);
+                }
+                // Submit changes
+                this.submitChanges(list, false);
+              };
+              this.props.onImportClick(file, setListCallback);
+            }
+          }}
+        />
       </Fragment>
     )
   }

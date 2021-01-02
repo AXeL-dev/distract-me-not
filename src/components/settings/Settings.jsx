@@ -2,6 +2,7 @@ import { Component, Fragment } from 'react';
 import { Pane, Tablist, Tab, SelectField, Checkbox, TextInputField, Button, TickIcon, Paragraph, toaster } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
 import { debug, isDevEnv } from '../../helpers/debug';
+import { download, readFile } from '../../helpers/file';
 import SwitchField from '../shared/switch-field/SwitchField';
 import TimeField from '../shared/time-field/TimeField';
 import WebsiteList from '../shared/website-list/WebsiteList';
@@ -72,11 +73,9 @@ export default class Settings extends Component {
       this.setState({
         options: {
           ...this.state.options,
-          ...{
-            [params[0]]: {
-              ...this.state.options[params[0]],
-              ...params[1]
-            }
+          [params[0]]: {
+            ...this.state.options[params[0]],
+            ...params[1]
           }
         }
       });
@@ -92,7 +91,22 @@ export default class Settings extends Component {
 
   save = () => {
     debug.log('save:', this.state.options);
+    // ToDo: update background script (blacklist/whitelist) + storage ...
     toaster.success(translate('settingsSaved'), { id: 'settings-toaster' });
+  }
+
+  export = (list, filename) => {
+    const blob = new Blob([list.join("\n")], {type: 'text/plain'});
+    download(blob, filename);
+  }
+
+  import = (file, setListCallback) => {
+    readFile(file).then(content => {
+      const list = content && content.length ? content.split("\n") : [];
+      if (list.length) {
+        setListCallback(list);
+      }
+    });
   }
 
   render() {
@@ -194,6 +208,8 @@ export default class Settings extends Component {
                   <WebsiteList
                     list={this.state.options.blacklist}
                     onChange={list => this.setOption({ blacklist: list })}
+                    onExportClick={list => this.export(list, 'blacklist.txt')}
+                    onImportClick={(file, callback) => this.import(file, callback)}
                   />
                 </Fragment>
               }
@@ -203,6 +219,8 @@ export default class Settings extends Component {
                   <WebsiteList
                     list={this.state.options.whitelist}
                     onChange={list => this.setOption({ whitelist: list })}
+                    onExportClick={list => this.export(list, 'whitelist.txt')}
+                    onImportClick={(file, callback) => this.import(file, callback)}
                   />
                 </Fragment>
               }
