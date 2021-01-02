@@ -41,34 +41,42 @@ export default class Panel extends Component {
     sendMessage('getIsWhitelistMode').then(isWhitelistMode => {
       const mode = !!isWhitelistMode ? Mode.Whitelist : Mode.Blacklist;
       this.setState({ mode: mode });
-      getActiveTab().then(async (tab) => {
-        if (tab) {
-          const isAccessible = await sendMessage('isAccessible', tab);
-          if (!isAccessible) {
-            this.hideAddButton(false);
-          } else {
-            switch (mode) {
-              case Mode.Blacklist:
-                const isBlacklisted = await sendMessage('isBlacklisted', tab);
-                if (isBlacklisted) {
-                  this.hideAddButton(false);
-                }
-                break;
-              case Mode.Whitelist:
-                const isWhitelisted = await sendMessage('isWhitelisted', tab);
-                if (isWhitelisted) {
-                  this.hideAddButton(false);
-                }
-                break;
-            }
-          }
-        }
-      });
+      this.toggleAddButton(mode);
     });
     // For backward compatibility only, ToDo: Refactor/share default lists
     sendMessage('getDefaultBlacklist').then(blacklist => this.setState({ defaults: {...this.state.defaults, blacklist: blacklist } }));
     sendMessage('getDefaultWhitelist').then(whitelist => this.setState({ defaults: {...this.state.defaults, whitelist: whitelist } }));
   }
+
+  toggleAddButton = (mode) => {
+    getActiveTab().then(async (tab) => {
+      if (tab) {
+        const isAccessible = await sendMessage('isAccessible', tab);
+        if (!isAccessible) {
+          this.hideAddButton(false);
+        } else {
+          switch (mode) {
+            case Mode.Blacklist:
+              const isBlacklisted = await sendMessage('isBlacklisted', tab);
+              if (isBlacklisted) {
+                this.hideAddButton(false);
+              } else {
+                this.showAddButton();
+              }
+              break;
+            case Mode.Whitelist:
+              const isWhitelisted = await sendMessage('isWhitelisted', tab);
+              if (isWhitelisted) {
+                this.hideAddButton(false);
+              } else {
+                this.showAddButton();
+              }
+              break;
+          }
+        }
+      }
+    });
+  };
 
   toggleStatus = (value) => {
     this.setState({ status: value });
@@ -81,6 +89,7 @@ export default class Panel extends Component {
     const isWhitelistMode = value === Mode.Whitelist; // used to keep backward compatibility with v1
     sendMessage('setIsWhitelistMode', isWhitelistMode);
     storage.set({ isWhitelistMode: isWhitelistMode }); // ToDo: rename storage key to "mode"
+    this.toggleAddButton(value);
   }
 
   goToSettings = () => {
