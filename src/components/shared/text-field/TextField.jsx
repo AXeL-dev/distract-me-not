@@ -29,8 +29,10 @@ export default class TextField extends Component {
   }
 
   submit = () => {
-    const callback = (value) => this.setState({ value: value });
-    this.props.onSubmit(this.state.value, callback);
+    if (this.props.onSubmit) {
+      const callback = (value) => this.setState({ value: value });
+      this.props.onSubmit(this.state.value, callback);
+    }
   }
 
   render() {
