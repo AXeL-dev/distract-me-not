@@ -19,6 +19,8 @@
   "scripts": {
     "start": "rescripts start",
     "build": "INLINE_RUNTIME_CHUNK=false rescripts build",
+    "build:firefox": "npm run build && cd build && mv -f manifest.firefox.json manifest.json",
+    "build:chrome": "npm run build && cd build && rm -f manifest.firefox.json",
     "test": "rescripts test",
     "eject": "react-scripts eject"
   },

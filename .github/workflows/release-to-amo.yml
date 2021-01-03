@@ -13,7 +13,7 @@ jobs:
       - name: Install and Build 🔧
         run: |
           npm install
-          npm run build
+          npm run build:firefox
 
       - name: Release to AMO 🚀
         run: cd build && npx web-ext-submit
