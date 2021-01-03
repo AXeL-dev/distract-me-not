@@ -55,7 +55,7 @@ export default class Background extends Component {
 
   handleMessage = (request, sender, sendResponse) => {
     //console.log("Handle message:", request);
-    sendResponse({
+    return Promise.resolve({
       response: this.isFunction(request.message) ? this.executeFunction(request.message, ...request.params) : this[request.message]
     });
   }
