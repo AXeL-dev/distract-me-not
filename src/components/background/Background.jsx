@@ -1,8 +1,8 @@
 import { Component } from 'react';
-import { storage } from '../../helpers/webext';
+import { getNativeAPI, storage } from '../../helpers/webext';
 import { Mode, Action, defaultBlacklist, defaultWhitelist, isAccessible } from '../../helpers/block';
 
-const nativeAPI = chrome || browser; // to know: browser is overridden by browser-polyfill
+const nativeAPI = getNativeAPI();
 
 export default class Background extends Component {
 

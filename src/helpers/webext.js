@@ -1,8 +1,16 @@
 import { report } from "./debug";
 
+export function getNativeAPI() {
+  try {
+    return chrome || browser; // to know: browser is overridden by browser-polyfill
+  } catch (error) {
+    return null;
+  }
+}
+
 export function isWebExtension() {
   try {
-    return !!browser.runtime.id;
+    return !!browser;
   } catch (error) {
     return false;
   }
