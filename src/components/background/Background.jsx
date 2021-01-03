@@ -2,6 +2,8 @@ import { Component } from 'react';
 import { storage } from '../../helpers/webext';
 import { Mode, Action, defaultBlacklist, defaultWhitelist, isAccessible } from '../../helpers/block';
 
+const nativeAPI = chrome || browser; // to know: browser is overridden by browser-polyfill
+
 export default class Background extends Component {
 
   constructor(props) {
@@ -35,7 +37,8 @@ export default class Background extends Component {
       this.redirectUrl = items.redirectUrl;
       this.disableKeyboard = items.disableKeyboard;
       this.isEnabled = items.enableOnBrowserStartup ? true : items.isEnabled;
-      if (!items.enableOnBrowserStartup && this.isEnabled) { // ToDo: review this condition
+      // if "enableOnBrowserStartup" is true we don't have to call "enable" function here, it will be done on "onBrowserStartup" event listener
+      if (!items.enableOnBrowserStartup && this.isEnabled) { 
         this.enable();
       }
     });
@@ -48,7 +51,7 @@ export default class Background extends Component {
       enableOnBrowserStartup: false
     }).then(({ enableOnBrowserStartup }) => {
       if (enableOnBrowserStartup) {
-        enable();
+        this.enable();
       }
     });
   }
@@ -74,7 +77,7 @@ export default class Background extends Component {
 
   blockTab = (tab) => {
     if (isAccessible(tab.url)) {
-      browser.tabs.sendMessage(tab.id, {
+      nativeAPI.tabs.sendMessage(tab.id, { // using native API here 'cause brower-polyfill keeps throwing incomprehensible errors
         request: "block",
         disableKeyboard: this.disableKeyboard
       });
@@ -83,7 +86,7 @@ export default class Background extends Component {
 
   unblockTab = (tab) => {
     if (isAccessible(tab.url)) {
-      browser.tabs.sendMessage(tab.id, {
+      nativeAPI.tabs.sendMessage(tab.id, {
         request: "unblock"
       });
     }
@@ -104,6 +107,8 @@ export default class Background extends Component {
           url: this.redirectUrl
         }).then(() => {
           this.enableEventHandlers();
+        }).catch((error) => {
+          console.error(error);
         });
       } else {
         browser.tabs.update(tab.id, {
@@ -112,6 +117,7 @@ export default class Background extends Component {
         }).then((tab) => {
           this.enableEventHandlers();
         }).catch((error) => {
+          console.error(error);
           this.enableEventHandlers();
         });
       }
@@ -125,8 +131,8 @@ export default class Background extends Component {
   }
 
   isDistracting = (tab) => {
-    return (this.mode === Mode.whitelist && !this.isWhitelisted(tab)) || 
-           (this.mode === Mode.blacklist && this.isBlacklisted(tab));
+    return (this.mode === Mode.blacklist && this.isBlacklisted(tab)) || 
+           (this.mode === Mode.whitelist && !this.isWhitelisted(tab));
   }
 
   checkTab = (tab) => {
@@ -160,6 +166,8 @@ export default class Background extends Component {
             }
           }
         }
+      }).catch((error) => {
+        console.error(error);
       });
     }
   }
@@ -173,6 +181,8 @@ export default class Background extends Component {
       if (tab !== null) {
         this.checkTab(tab);
       }
+    }).catch((error) => {
+      console.error(error);
     });
   }
 
@@ -293,6 +303,8 @@ export default class Background extends Component {
             }
           }
         }
+      }).catch((error) => {
+        console.error(error);
       });
     }
   }
@@ -309,6 +321,8 @@ export default class Background extends Component {
             }
           }
         }
+      }).catch((error) => {
+        console.error(error);
       });
     }
   }
