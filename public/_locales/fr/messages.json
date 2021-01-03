@@ -90,7 +90,7 @@
         "message": "Blocage"
     },
     "schedule": {
-        "message": "Planning"
+        "message": "Planification"
     },
     "scheduleDescription": {
         "message": "Planifier le temps de blocage:"
