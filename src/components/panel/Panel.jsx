@@ -1,20 +1,15 @@
 import { Component } from 'react';
-import { Pane, Heading, Tooltip, Position, IconButton, CogIcon, PlusIcon, TickIcon } from 'evergreen-ui';
+import { Pane, Heading, Position, CogIcon, PlusIcon, TickIcon } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
 import { isWebExtension, openOptionsPage, sendMessage, getActiveTab, getActiveTabHost, storage } from '../../helpers/webext';
 import SwitchField from '../shared/switch-field/SwitchField';
 import SegmentedControlField from '../shared/segmented-control-field/SegmentedControlField';
+import AnimatedIconButton from '../shared/animated-icon-button/AnimatedIconButton';
 import './Panel.scss';
 
 const Mode = {
   Blacklist: 'blacklist',
   Whitelist: 'whitelist'
-};
-
-const addButtonDefaults = {
-  isVisible: true,
-  className: '',
-  icon: PlusIcon,
 };
 
 export default class Panel extends Component {
@@ -28,7 +23,7 @@ export default class Panel extends Component {
         { label: translate('whitelist'), value: Mode.Whitelist },
       ],
       mode: Mode.Blacklist,
-      addButton: addButtonDefaults,
+      isAddButtonVisible: true,
       defaults: { // to refactor/remove later
         blacklist: [],
         whitelist: []
@@ -53,13 +48,13 @@ export default class Panel extends Component {
       if (tab) {
         const isAccessible = await sendMessage('isAccessible', tab);
         if (!isAccessible) {
-          this.hideAddButton(false);
+          this.hideAddButton();
         } else {
           switch (mode) {
             case Mode.Blacklist:
               const isBlacklisted = await sendMessage('isBlacklisted', tab);
               if (isBlacklisted) {
-                this.hideAddButton(false);
+                this.hideAddButton();
               } else {
                 this.showAddButton();
               }
@@ -67,7 +62,7 @@ export default class Panel extends Component {
             case Mode.Whitelist:
               const isWhitelisted = await sendMessage('isWhitelisted', tab);
               if (isWhitelisted) {
-                this.hideAddButton(false);
+                this.hideAddButton();
               } else {
                 this.showAddButton();
               }
@@ -77,6 +72,18 @@ export default class Panel extends Component {
       }
     });
   };
+
+  hideAddButton = () => {
+    this.setAddButtonVisibility(false);
+  }
+
+  showAddButton = () => {
+    this.setAddButtonVisibility(true);
+  }
+
+  setAddButtonVisibility = (value) => {
+    this.setState({ isAddButtonVisible: value });
+  }
 
   toggleStatus = (value) => {
     this.setState({ status: value });
@@ -100,31 +107,6 @@ export default class Panel extends Component {
     }
   }
 
-  showAddButton = () => {
-    this.setState({ addButton: addButtonDefaults });
-  }
-
-  hideAddButton = (animate = true) => {
-    const hide = () => this.setState({ addButton: {...this.state.addButton, isVisible: false } });
-    if (animate) {
-      // hide animation
-      setTimeout(() => {
-        this.setState({ addButton: {...this.state.addButton, className: 'scale-0' } }); // scale to 0
-        setTimeout(() => {
-          this.setState({ addButton: {...this.state.addButton, className: '', icon: TickIcon } }); // change icon
-          setTimeout(() => {
-            this.setState({ addButton: {...this.state.addButton, className: 'scale-0' } }); // rescale to 0
-            setTimeout(() => {
-              hide();
-            }, 200);
-          }, 500);
-        }, 200);
-      }, 100);
-    } else {
-      hide();
-    }
-  }
-
   addCurrentHost = () => {
     getActiveTabHost().then(host => {
       if (host) {
@@ -139,7 +121,6 @@ export default class Panel extends Component {
               blacklist.splice(0, 0, host);
               sendMessage('setBlacklist', blacklist);
               storage.set({ blackList: blacklist });
-              this.hideAddButton();
             });
             break;
           case Mode.Whitelist:
@@ -153,12 +134,9 @@ export default class Panel extends Component {
               whitelist.splice(0, 0, host);
               sendMessage('setWhitelist', whitelist);
               storage.set({ whiteList: whitelist });
-              this.hideAddButton();
             });
             break;
         }
-      } else {
-        this.hideAddButton(); // for test purpose
       }
     });
   }
@@ -190,28 +168,28 @@ export default class Panel extends Component {
         />
         <Pane display="flex" paddingX={16} paddingY={12} alignItems="center" justifyContent="space-between" borderTop>
           <Pane>
-            <Tooltip content={translate('settings')} position={Position.RIGHT}>
-              <IconButton
-                className="custom-icon-button fill-grey"
-                appearance="minimal"
-                icon={CogIcon}
-                iconSize={22}
-                onClick={this.goToSettings}
-              />
-            </Tooltip>
+            <AnimatedIconButton
+              tooltipContent={translate('settings')}
+              tooltipPosition={Position.RIGHT}
+              className="fill-grey"
+              icon={CogIcon}
+              iconSize={22}
+              onClick={this.goToSettings}
+            />
           </Pane>
           <Pane>
-            {this.state.addButton.isVisible &&
-              <Tooltip content={this.state.mode === 'blacklist' ? translate('addToBlacklist') : translate('addToWhitelist')} position={Position.LEFT}>
-                <IconButton
-                  className={`custom-icon-button fill-green ${this.state.addButton.className}`}
-                  appearance="minimal"
-                  icon={this.state.addButton.icon}
-                  iconSize={26}
-                  onClick={this.addCurrentHost}
-                />
-              </Tooltip>
-            }
+            <AnimatedIconButton
+              tooltipContent={this.state.mode === 'blacklist' ? translate('addToBlacklist') : translate('addToWhitelist')}
+              tooltipPosition={Position.LEFT}
+              className="fill-green"
+              icon={PlusIcon}
+              iconSize={26}
+              onClick={this.addCurrentHost}
+              hideOnClick={true}
+              hideAnimationIcon={TickIcon}
+              isVisible={this.state.isAddButtonVisible}
+              onVisibilityChange={this.setAddButtonVisibility}
+            />
           </Pane>
         </Pane>
       </Pane>

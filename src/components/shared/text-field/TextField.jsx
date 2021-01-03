@@ -24,7 +24,7 @@ export default class TextField extends Component {
     }
   }
 
-  handleButtonClick = () => {
+  handleButtonClick = (event) => {
     this.submit();
   }
 
