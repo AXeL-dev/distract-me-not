@@ -4,6 +4,16 @@
     var isActive = false;
     var disableKeyboard = false;
 
+    function loadFonts() {
+        var font = new FontFace('OpenSansFont', 'url(' + browser.extension.getURL('fonts/OpenSans-Light.ttf') + ')');
+        font.load().then(function(loaded_face) {
+            document.fonts.add(loaded_face);
+            //document.body.style.fontFamily = '"OpenSansFont", Arial';
+        }).catch(function(error) {
+            console.error(error);
+        });
+    }
+
     function onKeyboardEvent(e) {
         if (!isActive || !disableKeyboard) {
             return true;
@@ -29,6 +39,7 @@
         if (typeof document.body == "undefined" || document.body === null) {
             return;
         }
+        loadFonts();
         if (document.body.className.indexOf("distract-body") < 0) {
             document.body.className = document.body.className + " distract-body ";
         }
@@ -75,6 +86,7 @@
             overlayImg.id = "distract-overlay-img";
             infoContainer.appendChild(overlayImg);
         }
+        overlayImg.style.backgroundImage = 'url(' + browser.extension.getURL('icons/magnet-256.png') + ')';
         overlayImg.className = "distract-cursor distract-select distract-overlay-img";
     }
 
