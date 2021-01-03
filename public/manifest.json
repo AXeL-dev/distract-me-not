@@ -30,7 +30,7 @@
   },
 
   "background": {
-    "scripts": ["js/background.js"]
+    "page": "index.html#background"
   },
 
   "author": "AXeL-dev",

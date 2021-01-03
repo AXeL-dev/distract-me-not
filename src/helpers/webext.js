@@ -55,7 +55,7 @@ export function getActiveTab() {
   });
 }
 
-export function getActiveTabHost() {
+export function getActiveTabHostname() {
   return new Promise(resolve => {
     getActiveTab().then(tab => {
       if (tab) {

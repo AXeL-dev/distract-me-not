@@ -30,10 +30,10 @@
         "message": "Settings"
     },
     "addToBlacklist": {
-        "message": "Add current website to Blacklist"
+        "message": "Add current website to blacklist"
     },
     "addToWhitelist": {
-        "message": "Add current website to Whitelist"
+        "message": "Add current website to whitelist"
     },
     "status": {
         "message": "Status"

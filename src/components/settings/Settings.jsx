@@ -2,21 +2,11 @@ import { Component, Fragment } from 'react';
 import { Pane, Tablist, Tab, SelectField, Checkbox, TextInputField, Button, TickIcon, Paragraph, toaster } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
 import { debug, isDevEnv } from '../../helpers/debug';
+import { Action, defaultBlacklist, defaultWhitelist } from '../../helpers/block';
 import SwitchField from '../shared/switch-field/SwitchField';
 import TimeField from '../shared/time-field/TimeField';
 import WebsiteList from '../shared/website-list/WebsiteList';
 import './Settings.scss';
-
-const blacklistExample = [
-  'www.facebook.com',
-  'www.youtube.com',
-  'www.twitter.com'
-];
-
-const whitelistExample = [
-  'www.google.com',
-  'www.wikipedia.com'
-];
 
 export default class Settings extends Component {
 
@@ -33,12 +23,12 @@ export default class Settings extends Component {
         //{ label: translate('password'), id: 'password' },
       ],
       actions: [
-        { label: translate('displayErrorMessage'), value: 'blockTab' },
-        { label: translate('redirectToUrl'), value: 'redirectToUrl' },
-        { label: translate('closeTab'), value: 'closeTab' },
+        { label: translate('displayErrorMessage'), value: Action.blockTab },
+        { label: translate('redirectToUrl'), value: Action.redirectToUrl },
+        { label: translate('closeTab'), value: Action.closeTab },
       ],
       options: {
-        action: 'blockTab',
+        action: Action.blockTab,
         blockTab: {
           errorMessage: '',
           disableKeyboard: false
@@ -51,8 +41,8 @@ export default class Settings extends Component {
           from: '',
           to: ''
         },
-        blacklist: isDevEnv ? blacklistExample : [],
-        whitelist: isDevEnv ? whitelistExample : [],
+        blacklist: isDevEnv ? defaultBlacklist : [],
+        whitelist: isDevEnv ? defaultWhitelist : [],
         misc: {
           enableOnBrowserStartup: false,
         }
@@ -135,7 +125,7 @@ export default class Settings extends Component {
                       <option key={action.value} value={action.value}>{action.label}</option>
                     ))}
                   </SelectField>
-                  {this.state.options.action === 'blockTab' &&
+                  {this.state.options.action === Action.blockTab &&
                     <Fragment>
                       <TextInputField
                         label={translate('errorMessage')}
@@ -151,7 +141,7 @@ export default class Settings extends Component {
                       />
                     </Fragment>
                   }
-                  {this.state.options.action === 'redirectToUrl' &&
+                  {this.state.options.action === Action.redirectToUrl &&
                     <TextInputField
                       label={translate('url')}
                       placeholder={translate('redirectUrlExample')}

@@ -1,16 +1,12 @@
 import { Component } from 'react';
 import { Pane, Heading, Position, CogIcon, PlusIcon, TickIcon } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
-import { isWebExtension, openOptionsPage, sendMessage, getActiveTab, getActiveTabHost, storage } from '../../helpers/webext';
+import { isWebExtension, openOptionsPage, sendMessage, getActiveTab, getActiveTabHostname, storage } from '../../helpers/webext';
+import { Mode, defaultBlacklist, defaultWhitelist, isAccessible } from '../../helpers/block';
 import SwitchField from '../shared/switch-field/SwitchField';
 import SegmentedControlField from '../shared/segmented-control-field/SegmentedControlField';
 import AnimatedIconButton from '../shared/animated-icon-button/AnimatedIconButton';
 import './Panel.scss';
-
-const Mode = {
-  Blacklist: 'blacklist',
-  Whitelist: 'whitelist'
-};
 
 export default class Panel extends Component {
 
@@ -19,55 +15,46 @@ export default class Panel extends Component {
     this.state = {
       status: true,
       modes: [
-        { label: translate('blacklist'), value: Mode.Blacklist },
-        { label: translate('whitelist'), value: Mode.Whitelist },
+        { label: translate('blacklist'), value: Mode.blacklist },
+        { label: translate('whitelist'), value: Mode.whitelist },
       ],
-      mode: Mode.Blacklist,
+      mode: Mode.blacklist,
       isAddButtonVisible: true,
-      defaults: { // to refactor/remove later
-        blacklist: [],
-        whitelist: []
-      }
     };
   }
 
   componentDidMount() {
     sendMessage('getIsEnabled').then(isEnabled => this.setState({ status: !!isEnabled })); // !! used to cast null to boolean
-    sendMessage('getIsWhitelistMode').then(isWhitelistMode => {
-      const mode = !!isWhitelistMode ? Mode.Whitelist : Mode.Blacklist;
+    sendMessage('getMode').then(mode => {
       this.setState({ mode: mode });
       this.toggleAddButton(mode);
     });
-    // For backward compatibility only, ToDo: Refactor/share default lists
-    sendMessage('getDefaultBlacklist').then(blacklist => this.setState({ defaults: {...this.state.defaults, blacklist: blacklist } }));
-    sendMessage('getDefaultWhitelist').then(whitelist => this.setState({ defaults: {...this.state.defaults, whitelist: whitelist } }));
   }
 
   toggleAddButton = (mode) => {
     getActiveTab().then(async (tab) => {
       if (tab) {
-        const isAccessible = await sendMessage('isAccessible', tab);
-        if (!isAccessible) {
+        if (!isAccessible(tab.url)) {
           this.hideAddButton();
         } else {
           switch (mode) {
-            case Mode.Blacklist:
+            case Mode.blacklist:
               const isBlacklisted = await sendMessage('isBlacklisted', tab);
               if (isBlacklisted) {
                 this.hideAddButton();
-              } else {
-                this.showAddButton();
+                return; // exit
               }
               break;
-            case Mode.Whitelist:
+            case Mode.whitelist:
               const isWhitelisted = await sendMessage('isWhitelisted', tab);
               if (isWhitelisted) {
                 this.hideAddButton();
-              } else {
-                this.showAddButton();
+                return;
               }
               break;
           }
+          // finally, show add button if tab is not blacklisted nor whitelisted
+          this.showAddButton();
         }
       }
     });
@@ -87,15 +74,14 @@ export default class Panel extends Component {
 
   toggleStatus = (value) => {
     this.setState({ status: value });
-    sendMessage('setIsEnabled', value);
+    sendMessage('setIsEnabled', value); // update background script
     storage.set({ isEnabled: value });
   }
 
   changeMode = (value) => {
     this.setState({ mode: value });
-    const isWhitelistMode = value === Mode.Whitelist; // used to keep backward compatibility with v1
-    sendMessage('setIsWhitelistMode', isWhitelistMode);
-    storage.set({ isWhitelistMode: isWhitelistMode }); // ToDo: rename storage key to "mode"
+    sendMessage('setMode', value);
+    storage.set({ mode: value });
     this.toggleAddButton(value);
   }
 
@@ -107,33 +93,37 @@ export default class Panel extends Component {
     }
   }
 
-  addCurrentHost = () => {
-    getActiveTabHost().then(host => {
-      if (host) {
+  addCurrentHostname = () => {
+    getActiveTabHostname().then(hostname => {
+      if (hostname) {
         switch (this.state.mode) {
-          case Mode.Blacklist:
-            storage.get({ blackList: this.state.defaults.blacklist }).then(({ blackList: blacklist }) => { // ToDo: rename storage key to "blacklist"
-              for (let item in blacklist) {
-                if (blacklist[item].indexOf(host) >= 0) {
+          case Mode.blacklist:
+            storage.get({
+              blacklist: defaultBlacklist
+            }).then(({ blacklist }) => {
+              for (let index in blacklist) {
+                if (blacklist[index].indexOf(hostname) >= 0) {
                   return;
                 }
               }
-              blacklist.splice(0, 0, host);
+              blacklist.splice(0, 0, hostname);
               sendMessage('setBlacklist', blacklist);
-              storage.set({ blackList: blacklist });
+              storage.set({ blacklist: blacklist });
             });
             break;
-          case Mode.Whitelist:
+          case Mode.whitelist:
             // ToDo: merge common code (@see above)
-            storage.get({ whiteList: this.state.defaults.whitelist }).then(({ whiteList: whitelist }) => { // ToDo: rename storage key to "whitelist"
-              for (let item in whitelist) {
-                if (whitelist[item].indexOf(host) >= 0) {
+            storage.get({
+              whitelist: defaultWhitelist
+            }).then(({ whitelist }) => {
+              for (let index in whitelist) {
+                if (whitelist[index].indexOf(hostname) >= 0) {
                   return;
                 }
               }
-              whitelist.splice(0, 0, host);
+              whitelist.splice(0, 0, hostname);
               sendMessage('setWhitelist', whitelist);
-              storage.set({ whiteList: whitelist });
+              storage.set({ whitelist: whitelist });
             });
             break;
         }
@@ -184,7 +174,7 @@ export default class Panel extends Component {
               className="fill-green"
               icon={PlusIcon}
               iconSize={26}
-              onClick={this.addCurrentHost}
+              onClick={this.addCurrentHostname}
               hideOnClick={true}
               hideAnimationIcon={TickIcon}
               isVisible={this.state.isAddButtonVisible}
