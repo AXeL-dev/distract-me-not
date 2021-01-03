@@ -58,7 +58,7 @@ export default class Panel extends Component {
         }
       }
     });
-  };
+  }
 
   hideAddButton = () => {
     this.setAddButtonVisibility(false);

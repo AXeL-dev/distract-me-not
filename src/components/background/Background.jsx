@@ -77,7 +77,7 @@ export default class Background extends Component {
 
   blockTab = (tab) => {
     if (isAccessible(tab.url)) {
-      nativeAPI.tabs.sendMessage(tab.id, { // using native API here 'cause brower-polyfill keeps throwing incomprehensible errors
+      nativeAPI.tabs.sendMessage(tab.id, { // using native API here 'cause browser-polyfill keeps throwing incomprehensible errors
         request: "block",
         disableKeyboard: this.disableKeyboard
       });
