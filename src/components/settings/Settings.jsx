@@ -249,6 +249,7 @@ export default class Settings extends Component {
                     list={this.state.options.blacklist}
                     onChange={list => this.setOptions({ blacklist: list })}
                     exportFilename="blacklist.txt"
+                    addNewItemsOnTop={true}
                   />
                 </Fragment>
               }
@@ -260,6 +261,7 @@ export default class Settings extends Component {
                     list={this.state.options.whitelist}
                     onChange={list => this.setOptions({ whitelist: list })}
                     exportFilename="whitelist.txt"
+                    addNewItemsOnTop={true}
                   />
                 </Fragment>
               }

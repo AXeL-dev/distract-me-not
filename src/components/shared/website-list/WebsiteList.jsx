@@ -171,10 +171,13 @@ export default class WebsiteList extends Component {
       toaster.danger(translate('urlAlreadyExists'), { id: 'settings-toaster' });
     } else {
       // Add url
-      const list = [
-        ...this.state.list,
-        { id: this.state.list.length + 1, url: url }
-      ];
+      const list = [...this.state.list];
+      const newItem = { id: list.length + 1, url: url };
+      if (this.props.addNewItemsOnTop) {
+        list.splice(0, 0, newItem);
+      } else {
+        list.push(newItem);
+      }
       this.setState({ list: list });
       // Get favicon
       this.getFavicon(url);
