@@ -18,7 +18,7 @@ export default class AnimatedIconButton extends Component {
   componentDidUpdate(prevProps, prevState) {
     //debug.log({ props: this.props, prevProps: prevProps, state: this.state, prevState: prevState });
     if (this.props.isVisible !== prevProps.isVisible && this.props.isVisible !== this.state.isVisible) {
-      debug.warn('isVisible has changed:', this.props.isVisible);
+      debug.warn('isVisible prop has changed:', this.props.isVisible);
       if (this.props.isVisible) {
         this.show();
       } else {

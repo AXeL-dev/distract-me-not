@@ -144,7 +144,7 @@ export default class Panel extends Component {
   render() {
     return (
       <Pane minWidth={320}>
-        <Pane display="flex" alignItems="center" justifyContent="center" height={64} borderBottom>
+        <Pane display="flex" alignItems="center" justifyContent="center" height={60} borderBottom>
           <img className="logo" src="icons/magnet-256.png" />
           <Heading size={600} fontWeight="bold">{translate('appName') || 'Distract Me Not'}</Heading>
         </Pane>
@@ -166,7 +166,7 @@ export default class Panel extends Component {
           paddingX={16}
           paddingBottom={20}
         />
-        <Pane display="flex" paddingX={16} paddingY={12} alignItems="center" justifyContent="space-between" borderTop>
+        <Pane display="flex" paddingX={16} paddingY={10} alignItems="center" justifyContent="space-between" borderTop>
           <Pane>
             <AnimatedIconButton
               tooltipContent={translate('settings')}
