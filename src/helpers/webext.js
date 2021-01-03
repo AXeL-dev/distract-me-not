@@ -94,11 +94,16 @@ export class storage {
   }
 
   static set(items) {
-    try {
-      browser.storage.local.set(items);
-    } catch (error) {
-      report.error(error);
-    }
+    return new Promise(resolve => {
+      try {
+        browser.storage.local.set(items).then(() => {
+          resolve(true);
+        });
+      } catch (error) {
+        report.error(error);
+        resolve(false);
+      }
+    });
   }
 
 }

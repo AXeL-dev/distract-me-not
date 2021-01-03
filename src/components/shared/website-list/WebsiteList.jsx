@@ -64,6 +64,15 @@ export default class WebsiteList extends Component {
     return list ? list.map((url, index) => ({ id: index + 1, url: url })) : [];
   }
 
+  setList = (list) => { // used to update list from parent component
+    // Update state
+    this.setState({ list: this.getOrderedList(list) });
+    // Get new favicons
+    for (let url of list) {
+      this.getFavicon(url);
+    }
+  }
+
   getFavicon = (url) => {
     // Get favicon by hostname
     const hostName = getHostName(url);
@@ -246,12 +255,8 @@ export default class WebsiteList extends Component {
     readFile(file).then(content => {
       const list = content && content.length ? content.split("\n") : [];
       if (list.length) {
-        // Update state
-        this.setState({ list: this.getOrderedList(list) });
-        // Get new favicons
-        for (let url of list) {
-          this.getFavicon(url);
-        }
+        // Update list
+        this.setList(list);
         // Submit changes
         this.submitChanges(list, false);
       }

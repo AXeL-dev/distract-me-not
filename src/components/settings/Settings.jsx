@@ -1,8 +1,9 @@
-import { Component, Fragment } from 'react';
+import React, { Component, Fragment } from 'react';
 import { Pane, Tablist, Tab, SelectField, Checkbox, TextInputField, Button, TickIcon, Paragraph, toaster } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
 import { debug, isDevEnv } from '../../helpers/debug';
 import { Action, defaultBlacklist, defaultWhitelist } from '../../helpers/block';
+import { sendMessage, storage } from '../../helpers/webext';
 import SwitchField from '../shared/switch-field/SwitchField';
 import TimeField from '../shared/time-field/TimeField';
 import WebsiteList from '../shared/website-list/WebsiteList';
@@ -12,6 +13,8 @@ export default class Settings extends Component {
 
   constructor(props) {
     super(props);
+    this.blacklistComponentRef = React.createRef();
+    this.whitelistComponentRef = React.createRef();
     this.state = {
       selectedTabIndex: 0,
       tabs: [
@@ -50,14 +53,54 @@ export default class Settings extends Component {
     };
   }
 
+  componentDidMount() {
+    storage.get({
+      action: this.state.options.action,
+      errorMessage: this.state.options.blockTab.errorMessage,
+      redirectUrl: this.state.options.redirectToUrl.url,
+      disableKeyboard: this.state.options.blockTab.disableKeyboard,
+      enableOnBrowserStartup: this.state.options.misc.enableOnBrowserStartup,
+      schedule: this.state.options.schedule,
+      blacklist: defaultBlacklist,
+      whitelist: defaultWhitelist,
+    }).then((items) => {
+      if (items) {
+        // Update state
+        this.setOptions({
+          action: items.action,
+          blockTab: {
+            errorMessage: items.errorMessage,
+            disableKeyboard: items.disableKeyboard
+          },
+          redirectToUrl: {
+            url: items.redirectUrl
+          },
+          schedule: {
+            isEnabled: items.schedule.isEnabled,
+            from: items.schedule.from,
+            to: items.schedule.to
+          },
+          blacklist: items.blacklist,
+          whitelist: items.whitelist,
+          misc: {
+            enableOnBrowserStartup: items.enableOnBrowserStartup
+          }
+        });
+        // Update WebsiteList components
+        this.blacklistComponentRef.current.setList(items.blacklist);
+        this.whitelistComponentRef.current.setList(items.whitelist);
+      }
+    });
+  }
+
   /**
-   * Set an option in options state
-   * ex: this.setOption({ key: value })
-   *     this.setOption('parentKey', { key: value })
+   * Set option(s) in options state
+   * ex: this.setOptions({ key: value })
+   *     this.setOptions('parentKey', { key: value })
    * 
    * @param  {...any} params 
    */
-  setOption = (...params) => {
+  setOptions = (...params) => {
     if (params.length === 2) {
       this.setState({
         options: {
@@ -80,8 +123,29 @@ export default class Settings extends Component {
 
   save = () => {
     debug.log('save:', this.state.options);
-    // ToDo: update background script (blacklist/whitelist) + storage ...
-    toaster.success(translate('settingsSaved'), { id: 'settings-toaster' });
+    storage.set({
+      action: this.state.options.action,
+      errorMessage: this.state.options.blockTab.errorMessage,
+      redirectUrl: this.state.options.redirectToUrl.url,
+      disableKeyboard: this.state.options.blockTab.disableKeyboard,
+      enableOnBrowserStartup: this.state.options.misc.enableOnBrowserStartup,
+      schedule: this.state.options.schedule,
+      blacklist: this.state.options.blacklist,
+      whitelist: this.state.options.whitelist,
+    }).then(success => {
+      if (success || isDevEnv) {
+        // Update background script
+        if (success) {
+          sendMessage('setAction', this.state.options.action);
+          sendMessage('setRedirectUrl', this.state.options.redirectToUrl.urld);
+          sendMessage('setDisableKeyboard', this.state.options.blockTab.disableKeyboard);
+          sendMessage('setBlacklist', this.state.options.blacklist);
+          sendMessage('setWhitelist', this.state.options.whitelist);
+        }
+        // Show success message
+        toaster.success(translate('settingsSaved'), { id: 'settings-toaster' });
+      }
+    });
   }
 
   render() {
@@ -118,7 +182,7 @@ export default class Settings extends Component {
                     label={translate('defaultAction')}
                     hint={translate('defaultActionHint')}
                     value={this.state.options.action}
-                    onChange={event => this.setOption({ action: event.target.value })}
+                    onChange={event => this.setOptions({ action: event.target.value })}
                     marginBottom={16}
                   >
                     {this.state.actions.map(action => (
@@ -131,13 +195,13 @@ export default class Settings extends Component {
                         label={translate('errorMessage')}
                         placeholder={translate('defaultErrorMessage')}
                         value={this.state.options.blockTab.errorMessage}
-                        onChange={event => this.setOption('blockTab', { errorMessage: event.target.value })}
+                        onChange={event => this.setOptions('blockTab', { errorMessage: event.target.value })}
                         marginBottom={16}
                       />
                       <Checkbox
                         label={translate('disableKeyboardWhenErrorMessageIsDisplayed')}
                         checked={this.state.options.blockTab.disableKeyboard}
-                        onChange={event => this.setOption('blockTab', { disableKeyboard: event.target.checked })}
+                        onChange={event => this.setOptions('blockTab', { disableKeyboard: event.target.checked })}
                       />
                     </Fragment>
                   }
@@ -146,7 +210,7 @@ export default class Settings extends Component {
                       label={translate('url')}
                       placeholder={translate('redirectUrlExample')}
                       value={this.state.options.redirectToUrl.url}
-                      onChange={event => this.setOption('redirectToUrl', { url: event.target.value })}
+                      onChange={event => this.setOptions('redirectToUrl', { url: event.target.value })}
                       marginBottom={16}
                     />
                   }
@@ -159,20 +223,20 @@ export default class Settings extends Component {
                     labelSize={300}
                     labelColor="muted"
                     checked={this.state.options.schedule.isEnabled}
-                    onChange={event => this.setOption('schedule', { isEnabled: event.target.checked })}
+                    onChange={event => this.setOptions('schedule', { isEnabled: event.target.checked })}
                     marginBottom={16}
                   />
                   <TimeField
                     label={translate('timeFrom')}
                     value={this.state.options.schedule.from}
-                    onChange={event => this.setOption('schedule', { from: event.target.value })}
+                    onChange={event => this.setOptions('schedule', { from: event.target.value })}
                     disabled={!this.state.options.schedule.isEnabled}
                     marginBottom={16}
                   />
                   <TimeField
                     label={translate('timeTo')}
                     value={this.state.options.schedule.to}
-                    onChange={event => this.setOption('schedule', { to: event.target.value })}
+                    onChange={event => this.setOptions('schedule', { to: event.target.value })}
                     disabled={!this.state.options.schedule.isEnabled}
                   />
                 </Fragment>
@@ -181,8 +245,9 @@ export default class Settings extends Component {
                 <Fragment>
                   <Paragraph size={300} color="muted" marginBottom={16}>{translate('blacklistDescription')}</Paragraph>
                   <WebsiteList
+                    ref={this.blacklistComponentRef}
                     list={this.state.options.blacklist}
-                    onChange={list => this.setOption({ blacklist: list })}
+                    onChange={list => this.setOptions({ blacklist: list })}
                     exportFilename="blacklist.txt"
                   />
                 </Fragment>
@@ -191,8 +256,9 @@ export default class Settings extends Component {
                 <Fragment>
                   <Paragraph size={300} color="muted" marginBottom={16}>{translate('whitelistDescription')}</Paragraph>
                   <WebsiteList
+                    ref={this.whitelistComponentRef}
                     list={this.state.options.whitelist}
-                    onChange={list => this.setOption({ whitelist: list })}
+                    onChange={list => this.setOptions({ whitelist: list })}
                     exportFilename="whitelist.txt"
                   />
                 </Fragment>
@@ -202,7 +268,7 @@ export default class Settings extends Component {
                   <SwitchField
                     label={translate('enableOnBrowserStartup')}
                     checked={this.state.options.misc.enableOnBrowserStartup}
-                    onChange={event => this.setOption('misc', { enableOnBrowserStartup: event.target.checked })}
+                    onChange={event => this.setOptions('misc', { enableOnBrowserStartup: event.target.checked })}
                     //marginBottom={16}
                   />
                 </Fragment>
