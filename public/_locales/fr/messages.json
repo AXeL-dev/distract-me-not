@@ -95,6 +95,12 @@
     "scheduleDescription": {
         "message": "Planifier le temps de blocage:"
     },
+    "scheduleStartTime": {
+        "message": "Heure de début:"
+    },
+    "scheduleEndTime": {
+        "message": "Heure de fin:"
+    },
     "miscellaneous": {
         "message": "Divers"
     },
@@ -103,12 +109,6 @@
     },
     "enable": {
         "message": "Activer"
-    },
-    "timeFrom": {
-        "message": "De:"
-    },
-    "timeTo": {
-        "message": "Jusqu'à:"
     },
     "addWebsite": {
         "message": "Ajouter un site web"

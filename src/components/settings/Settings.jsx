@@ -41,8 +41,10 @@ export default class Settings extends Component {
         },
         schedule: {
           isEnabled: false,
-          from: '',
-          to: ''
+          time: {
+            start: '',
+            end: ''
+          }
         },
         blacklist: isDevEnv ? defaultBlacklist : [],
         whitelist: isDevEnv ? defaultWhitelist : [],
@@ -77,8 +79,10 @@ export default class Settings extends Component {
           },
           schedule: {
             isEnabled: items.schedule.isEnabled,
-            from: items.schedule.from,
-            to: items.schedule.to
+            time: {
+              start: items.schedule.time.start,
+              end: items.schedule.time.end
+            }
           },
           blacklist: items.blacklist,
           whitelist: items.whitelist,
@@ -97,27 +101,45 @@ export default class Settings extends Component {
    * Set option(s) in options state
    * ex: this.setOptions({ key: value })
    *     this.setOptions('parentKey', { key: value })
+   *     this.setOptions('parentKey', 'subKey', { key: value })
    * 
    * @param  {...any} params 
    */
   setOptions = (...params) => {
-    if (params.length === 2) {
-      this.setState({
-        options: {
-          ...this.state.options,
-          [params[0]]: {
-            ...this.state.options[params[0]],
-            ...params[1]
+    switch (params.length) {
+      case 1:
+        this.setState({
+          options: {
+            ...this.state.options,
+            ...params[0]
           }
-        }
-      });
-    } else {
-      this.setState({
-        options: {
-          ...this.state.options,
-          ...params[0]
-        }
-      });
+        });
+        break;
+      case 2:
+        this.setState({
+          options: {
+            ...this.state.options,
+            [params[0]]: {
+              ...this.state.options[params[0]],
+              ...params[1]
+            }
+          }
+        });
+        break;
+      case 3:
+        this.setState({
+          options: {
+            ...this.state.options,
+            [params[0]]: {
+              ...this.state.options[params[0]],
+              [params[1]]: {
+                ...this.state.options[params[0]][params[1]],
+                ...params[2]
+              }
+            }
+          }
+        });
+        break;
     }
   }
 
@@ -227,16 +249,16 @@ export default class Settings extends Component {
                     marginBottom={16}
                   />
                   <TimeField
-                    label={translate('timeFrom')}
-                    value={this.state.options.schedule.from}
-                    onChange={event => this.setOptions('schedule', { from: event.target.value })}
+                    label={translate('scheduleStartTime')}
+                    value={this.state.options.schedule.time.start}
+                    onChange={event => this.setOptions('schedule', 'time', { start: event.target.value })}
                     disabled={!this.state.options.schedule.isEnabled}
                     marginBottom={16}
                   />
                   <TimeField
-                    label={translate('timeTo')}
-                    value={this.state.options.schedule.to}
-                    onChange={event => this.setOptions('schedule', { to: event.target.value })}
+                    label={translate('scheduleEndTime')}
+                    value={this.state.options.schedule.time.end}
+                    onChange={event => this.setOptions('schedule', 'time', { end: event.target.value })}
                     disabled={!this.state.options.schedule.isEnabled}
                   />
                 </Fragment>

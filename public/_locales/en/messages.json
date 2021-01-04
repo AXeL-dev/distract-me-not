@@ -95,6 +95,12 @@
     "scheduleDescription": {
         "message": "Schedule blocking time:"
     },
+    "scheduleStartTime": {
+        "message": "Start time:"
+    },
+    "scheduleEndTime": {
+        "message": "End time:"
+    },
     "miscellaneous": {
         "message": "Miscellaneous"
     },
@@ -103,12 +109,6 @@
     },
     "enable": {
         "message": "Enable"
-    },
-    "timeFrom": {
-        "message": "From:"
-    },
-    "timeTo": {
-        "message": "To:"
     },
     "addWebsite": {
         "message": "Add a website"
