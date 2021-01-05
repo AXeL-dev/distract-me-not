@@ -1,8 +1,10 @@
 import { Component } from 'react';
-import { storage } from '../../helpers/webext';
+import { storage, getNativeAPI } from '../../helpers/webext';
 import { Mode, Action, defaultBlacklist, defaultWhitelist } from '../../helpers/block';
 import { hasValidProtocol, getValidUrl } from '../../helpers/url';
 import { regex } from '../../helpers/regex';
+
+const nativeAPI = getNativeAPI();
 
 export default class Background extends Component {
 
@@ -133,24 +135,35 @@ export default class Background extends Component {
     }
   }
 
-  performAction = (data) => {
+  handleAction = (data) => {
     switch (this.action) {
       case Action.blockTab:
       case Action.redirectToUrl:
         return {
-          redirectUrl: Action.redirectToUrl && this.redirectUrl.length ? (
+          redirectUrl: this.action === Action.redirectToUrl && this.redirectUrl.length ? (
             this.redirectUrl
           ) : (
             `${browser.runtime.getURL('index.html')}#blocked?url=${encodeURIComponent(data.url)}`
           )
         };
       case Action.closeTab:
-        // console.log('closing tab:', data.tabId);
-        browser.tabs.remove(data.tabId);
+        this.closeTab(data.tabId);
         return {
           redirectUrl: 'javascript:window.close()'
         };
     }
+  }
+
+  closeTab = (tabId) => {
+    console.log('closing tab:', tabId);
+    nativeAPI.tabs.remove(tabId); // nativeAPI is used to fix weird errors on chrome due to browser-polyfill
+  }
+
+  redirectTab = (tabId, redirectUrl) => {
+    console.log('redirecting tab:', tabId, redirectUrl);
+    nativeAPI.tabs.update(tabId, {
+      url: redirectUrl
+    });
   }
 
   isBlacklisted = (url) => {
@@ -172,40 +185,49 @@ export default class Background extends Component {
   }
 
   parseUrl = (data, caller) => {
-    // console.log('parsing url:', {
-    //   caller: caller,
-    //   data: data,
-    //   mode: this.mode,
-    //   blacklist: this.blacklist,
-    //   whitelist: this.whitelist
-    // });
+    console.log('parsing url:', {
+      caller: caller,
+      data: data,
+      mode: this.mode,
+      blacklist: this.blacklist,
+      whitelist: this.whitelist
+    });
     switch (this.mode) {
       case Mode.blacklist:
         if (this.isBlacklisted(data.url)) {
-          return this.performAction(data);
+          return this.handleAction(data);
         }
         break;
       case Mode.whitelist:
         if (!this.isWhitelisted(data.url)) {
-          return this.performAction(data);
+          return this.handleAction(data);
         }
         break;
     }
   }
 
   onBeforeRequestHandler = (requestDetails) => {
-    return this.parseUrl(requestDetails, 'onBeforeRequestHandler');
+    return this.parseUrl(requestDetails, 'onBeforeRequestHandler'); // redirect will be handled by the event listener
   }
 
   onUpdatedHandler = (tabId, changeInfo, tab) => {
     if (changeInfo.url && hasValidProtocol(changeInfo.url)) {
       const results = this.parseUrl({ ...changeInfo, tabId: tabId }, 'onUpdatedHandler');
       if (results && results.redirectUrl) {
-        browser.tabs.update(tabId, {
-          url: results.redirectUrl
-        });
+        this.redirectTab(tabId, results.redirectUrl);
       }
     }
+  }
+
+  onReplacedHandler = (addedTabId, removedTabId) => {
+    browser.tabs.get(addedTabId).then((tab) => {
+      if (tab) {
+        const results = this.parseUrl({ url: tab.url, tabId: tab.id }, 'onReplacedHandler');
+        if (results && results.redirectUrl) {
+          this.redirectTab(tab.id, results.redirectUrl);
+        }
+      }
+    });
   }
 
   enableEventListeners = () => {
@@ -214,11 +236,13 @@ export default class Background extends Component {
       types: ['main_frame', 'sub_frame']
     }, ["blocking"]);
     browser.tabs.onUpdated.addListener(this.onUpdatedHandler);
+    browser.tabs.onReplaced.addListener(this.onReplacedHandler);
   }
 
   disableEventListeners = () => {
     browser.webRequest.onBeforeRequest.removeListener(this.onBeforeRequestHandler);
     browser.tabs.onUpdated.removeListener(this.onUpdatedHandler);
+    browser.tabs.onReplaced.removeListener(this.onReplacedHandler);
   }
 
   enable = () => {
