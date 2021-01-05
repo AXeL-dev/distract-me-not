@@ -20,7 +20,7 @@ export default class Blocked extends Component {
     }).then((items) => {
       if (items) {
         this.setState({
-          message: items.message,
+          message: items.message.length ? items.message : this.state.message,
           displayBlankPage: items.displayBlankPage
         });
       }

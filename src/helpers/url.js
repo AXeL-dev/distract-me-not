@@ -28,3 +28,14 @@ export function checkFaviconLink(faviconLink) {
     image.src = faviconLink;
   });
 }
+
+export function hasValidProtocol(url) {
+  return /^(?:ftps?|https?|file)\:\/\//i.test(url) || url.startsWith("about:");
+}
+
+export function getValidUrl(url) {
+  if (url && url.length && !hasValidProtocol(url)) {
+    return "https://" + url;
+  }
+  return url;
+}

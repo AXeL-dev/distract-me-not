@@ -1,8 +1,8 @@
 import { Component } from 'react';
-import { getNativeAPI, storage } from '../../helpers/webext';
-import { Mode, Action, defaultBlacklist, defaultWhitelist, isAccessible } from '../../helpers/block';
-
-const nativeAPI = getNativeAPI();
+import { storage } from '../../helpers/webext';
+import { Mode, Action, defaultBlacklist, defaultWhitelist } from '../../helpers/block';
+import { hasValidProtocol, getValidUrl } from '../../helpers/url';
+import { regex } from '../../helpers/regex';
 
 export default class Background extends Component {
 
@@ -14,208 +14,14 @@ export default class Background extends Component {
     this.mode = Mode.blacklist;
     this.action = Action.blockTab;
     this.redirectUrl = '';
-    this.disableKeyboard = false;
 
     this.init();
   }
 
-  init = () => {
-    storage.get({
-      blacklist: defaultBlacklist,
-      whitelist: defaultWhitelist,
-      isEnabled: false,
-      mode: Mode.blacklist,
-      action: Action.blockTab,
-      redirectUrl: '',
-      disableKeyboard: false,
-      enableOnBrowserStartup: false
-    }).then((items) => {
-      this.blacklist = items.blacklist;
-      this.whitelist = items.whitelist;
-      this.mode = items.mode;
-      this.action = items.action;
-      this.redirectUrl = items.redirectUrl;
-      this.disableKeyboard = items.disableKeyboard;
-      this.isEnabled = items.enableOnBrowserStartup ? true : items.isEnabled;
-      // if "enableOnBrowserStartup" is true we don't have to call "enable" function here, it will be done on "onBrowserStartup" event listener
-      if (!items.enableOnBrowserStartup && this.isEnabled) { 
-        this.enable();
-      }
-    });
-    browser.runtime.onStartup.addListener(this.onBrowserStartup);
-    browser.runtime.onMessage.addListener(this.handleMessage);
-  }
-
-  onBrowserStartup = () => {
-    storage.get({
-      enableOnBrowserStartup: false
-    }).then(({ enableOnBrowserStartup }) => {
-      if (enableOnBrowserStartup) {
-        this.enable();
-      }
-    });
-  }
-
-  handleMessage = (request, sender, sendResponse) => {
-    //console.log("Handle message:", request);
-    return Promise.resolve({
-      response: this.isFunction(request.message) ? this.executeFunction(request.message, ...request.params) : this[request.message]
-    });
-  }
-
-  isFunction = (functionName) => {
-    return this[functionName] && typeof this[functionName] === 'function';
-  }
-
-  executeFunction = (functionName, ...params) => {
-    if (params) {
-      return this[functionName](...params);
-    } else {
-      return this[functionName]();
-    }
-  }
-
-  blockTab = (tab) => {
-    if (isAccessible(tab.url)) {
-      nativeAPI.tabs.sendMessage(tab.id, { // using native API here 'cause browser-polyfill keeps throwing incomprehensible errors
-        request: "block",
-        disableKeyboard: this.disableKeyboard
-      });
-    }
-  }
-
-  unblockTab = (tab) => {
-    if (isAccessible(tab.url)) {
-      nativeAPI.tabs.sendMessage(tab.id, {
-        request: "unblock"
-      });
-    }
-  }
-
-  redirectTab = (tab) => {
-    //console.log(this.redirectUrl);
-    if (isAccessible(tab.url) && this.redirectUrl != '' && !tab.url.startsWith(this.redirectUrl)) {
-      if (!this.redirectUrl.startsWith("about:") && 
-          !this.redirectUrl.startsWith("file://") && 
-          !this.redirectUrl.startsWith("http://") && 
-          !this.redirectUrl.startsWith("https://")) { // ToDo: refactor using regex
-        this.redirectUrl = "https://" + this.redirectUrl;
-      }
-      disableEventHandlers();
-      if (chrome) {
-        browser.tabs.update(tab.id, {
-          url: this.redirectUrl
-        }).then(() => {
-          this.enableEventHandlers();
-        }).catch((error) => {
-          console.error(error);
-        });
-      } else {
-        browser.tabs.update(tab.id, {
-          url: this.redirectUrl,
-          loadReplace: true
-        }).then((tab) => {
-          this.enableEventHandlers();
-        }).catch((error) => {
-          console.error(error);
-          this.enableEventHandlers();
-        });
-      }
-    }
-  }
-
-  closeTab = (tab) => {
-    if (isAccessible(tab.url)) {
-      browser.tabs.remove(tab.id);
-    }
-  }
-
-  isDistracting = (tab) => {
-    return (this.mode === Mode.blacklist && this.isBlacklisted(tab)) || 
-           (this.mode === Mode.whitelist && !this.isWhitelisted(tab));
-  }
-
-  checkTab = (tab) => {
-    //console.log('checking tab', tab);
-    if (this.isDistracting(tab)) {
-      //console.log(this.action);
-      switch (this.action) {
-        case Action.blockTab:
-          this.blockTab(tab);
-          break;
-        case Action.redirectToUrl:
-          this.redirectTab(tab);
-          break;
-        case Action.closeTab:
-          this.closeTab(tab);
-          break;
-      }
-    }
-  }
-
-  updateAllTabs = () => {
-    if (this.isEnabled && this.action === Action.blockTab) {
-      browser.tabs.query({}).then((tabs) => {
-        if (tabs.length > 0) {
-          for (let index in tabs) {
-            const tab = tabs[index];
-            if (this.isDistracting(tab)) {
-              this.blockTab(tab);
-            } else {
-              this.unblockTab(tab);
-            }
-          }
-        }
-      }).catch((error) => {
-        console.error(error);
-      });
-    }
-  }
-
-  onUpdatedHandler = (tabId, changeInfo, tab) => {
-    this.checkTab(tab);
-  }
-
-  onReplacedHandler = (addedTabId, removedTabId) => {
-    browser.tabs.get(addedTabId).then((tab) => {
-      if (tab !== null) {
-        this.checkTab(tab);
-      }
-    }).catch((error) => {
-      console.error(error);
-    });
-  }
-
-  isBlacklisted = (tab) => {
-      if (typeof tab.url == "undefined") {
-        return false;
-      }
-      for (let index in this.blacklist) {
-        if (tab.url.toLowerCase().indexOf(this.blacklist[index].toLowerCase()) >= 0) {
-          return true;
-        }
-      }
-      return false;
-  }
-
-  isWhitelisted = (tab) => {
-    if (typeof tab.url == "undefined") {
-      return true;
-    }
-    if (tab.url.startsWith("chrome://newtab")) {
-      return true;
-    }
-    for (let index in this.whitelist) {
-      if (tab.url.toLowerCase().indexOf(this.whitelist[index].toLowerCase()) >= 0) {
-        return true;
-      }
-    }
-    return false;
-  }
+  //----- Start getters & setters
 
   setMode = (value) => {
     this.mode = value;
-    this.updateAllTabs();
   }
 
   getMode = () => {
@@ -236,10 +42,7 @@ export default class Background extends Component {
   }
 
   setBlacklist = (blist) => {
-    //this.blacklist = blist; // this causes "can't access dead object" error, ToDo: review/retest
-    this.blacklist.length = 0;
-    this.blacklist.push.apply(this.blacklist, blist);
-    this.updateAllTabs();
+    this.blacklist = this.transformList(blist);
   }
 
   getBlacklist = () => {
@@ -247,10 +50,7 @@ export default class Background extends Component {
   }
 
   setWhitelist = (wlist) => {
-    //this.whitelist = wlist; // this causes "can't access dead object" error, ToDo: review/retest
-    this.whitelist.length = 0;
-    this.whitelist.push.apply(this.whitelist, wlist);
-    this.updateAllTabs();
+    this.whitelist = this.transformList(wlist);
   }
 
   getWhitelist = () => {
@@ -266,65 +66,167 @@ export default class Background extends Component {
   }
 
   setRedirectUrl = (url) => {
-    this.redirectUrl = url;
+    this.redirectUrl = getValidUrl(url);
   }
 
   getRedirectUrl = () => {
     return this.redirectUrl;
   }
 
-  setDisableKeyboard = (value) => {
-    this.disableKeyboard = value;
+  //----- End getters & setters
+
+  init = () => {
+    storage.get({
+      blacklist: defaultBlacklist,
+      whitelist: defaultWhitelist,
+      isEnabled: false,
+      mode: Mode.blacklist,
+      action: Action.blockTab,
+      redirectUrl: '',
+      enableOnBrowserStartup: false
+    }).then((items) => {
+      this.blacklist = this.transformList(items.blacklist);
+      this.whitelist = this.transformList(items.whitelist);
+      this.mode = items.mode;
+      this.action = items.action;
+      this.redirectUrl = getValidUrl(items.redirectUrl);
+      this.isEnabled = items.enableOnBrowserStartup ? true : items.isEnabled;
+      if (!items.enableOnBrowserStartup && this.isEnabled) {
+        // if "enableOnBrowserStartup" is true we don't have to call "enable" function here, it will be done on "onBrowserStartup" event listener
+        this.enable();
+      }
+    });
+    browser.runtime.onStartup.addListener(this.onBrowserStartup);
+    browser.runtime.onMessage.addListener(this.handleMessage);
   }
 
-  getDisableKeyboard = () => {
-    return this.disableKeyboard;
+  transformList = (list) => {
+    return list.map(url => regex.wildcard(url)).map(url => regex.new(url));
   }
 
-  enableEventHandlers = () => {
+  onBrowserStartup = () => {
+    storage.get({
+      enableOnBrowserStartup: false
+    }).then(({ enableOnBrowserStartup }) => {
+      if (enableOnBrowserStartup) {
+        this.enable();
+      }
+    });
+  }
+
+  handleMessage = (request, sender, sendResponse) => {
+    // console.log("Handle message:", request);
+    return Promise.resolve({
+      response: this.isFunction(request.message) ? this.executeFunction(request.message, ...request.params) : this[request.message]
+    });
+  }
+
+  isFunction = (functionName) => {
+    return this[functionName] && typeof this[functionName] === 'function';
+  }
+
+  executeFunction = (functionName, ...params) => {
+    if (params) {
+      return this[functionName](...params);
+    } else {
+      return this[functionName]();
+    }
+  }
+
+  performAction = (data) => {
+    switch (this.action) {
+      case Action.blockTab:
+      case Action.redirectToUrl:
+        return {
+          redirectUrl: Action.redirectToUrl && this.redirectUrl.length ? (
+            this.redirectUrl
+          ) : (
+            `${browser.runtime.getURL('index.html')}#blocked?url=${encodeURIComponent(data.url)}`
+          )
+        };
+      case Action.closeTab:
+        console.log(data.tabId);
+        browser.tabs.remove(data.tabId);
+        return {
+          redirectUrl: 'javascript:window.close()'
+        };
+    }
+  }
+
+  isBlacklisted = (url) => {
+    for (const rule of this.blacklist) {
+      if (rule.test(url)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isWhitelisted = (url) => {
+    for (const rule of this.whitelist) {
+      if (rule.test(url)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  parseUrl = (data, caller) => {
+    // console.log('parsing url:', {
+    //   caller: caller,
+    //   data: data,
+    //   mode: this.mode,
+    //   blacklist: this.blacklist,
+    //   whitelist: this.whitelist
+    // });
+    switch (this.mode) {
+      case Mode.blacklist:
+        if (this.isBlacklisted(data.url)) {
+          return this.performAction(data);
+        }
+        break;
+      case Mode.whitelist:
+        if (!this.isWhitelisted(data.url)) {
+          return this.performAction(data);
+        }
+        break;
+    }
+  }
+
+  onBeforeRequestHandler = (requestDetails) => {
+    return this.parseUrl(requestDetails, 'onBeforeRequestHandler');
+  }
+
+  onUpdatedHandler = (tabId, changeInfo, tab) => {
+    if (changeInfo.url && hasValidProtocol(changeInfo.url)) {
+      const results = this.parseUrl(changeInfo, 'onUpdatedHandler');
+      if (results && results.redirectUrl) {
+        browser.tabs.update(tabId, {
+          url: results.redirectUrl
+        });
+      }
+    }
+  }
+
+  enableEventListeners = () => {
+    browser.webRequest.onBeforeRequest.addListener(this.onBeforeRequestHandler, {
+      urls: ['*://*/*'],
+      types: ['main_frame', 'sub_frame']
+    }, ["blocking"]);
     browser.tabs.onUpdated.addListener(this.onUpdatedHandler);
-    browser.tabs.onReplaced.addListener(this.onReplacedHandler);
   }
 
-  disableEventHandlers = () => {
+  disableEventListeners = () => {
+    browser.webRequest.onBeforeRequest.removeListener(this.onBeforeRequestHandler);
     browser.tabs.onUpdated.removeListener(this.onUpdatedHandler);
-    browser.tabs.onReplaced.removeListener(this.onReplacedHandler);
   }
 
   enable = () => {
-    this.enableEventHandlers();
-    if (this.action === Action.blockTab) {
-      browser.tabs.query({}).then((tabs) => {
-        if (tabs.length > 0) {
-          for (let index in tabs) {
-            const tab = tabs[index];
-            if (this.isDistracting(tab)) {
-              this.blockTab(tab);
-            }
-          }
-        }
-      }).catch((error) => {
-        console.error(error);
-      });
-    }
+    this.enableEventListeners();
   }
 
   disable = () => {
-    this.disableEventHandlers();
-    if (this.action === Action.blockTab) {
-      browser.tabs.query({}).then((tabs) => {
-        if (tabs.length > 0) {
-          for (let index in tabs) {
-            const tab = tabs[index];
-            if (this.isDistracting(tab)) {
-              this.unblockTab(tab);
-            }
-          }
-        }
-      }).catch((error) => {
-        console.error(error);
-      });
-    }
+    this.disableEventListeners();
   }
 
   render() {

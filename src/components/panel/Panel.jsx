@@ -39,14 +39,14 @@ export default class Panel extends Component {
         } else {
           switch (mode) {
             case Mode.blacklist:
-              const isBlacklisted = await sendMessage('isBlacklisted', tab);
+              const isBlacklisted = await sendMessage('isBlacklisted', tab.url);
               if (isBlacklisted) {
                 this.hideAddButton();
                 return; // exit
               }
               break;
             case Mode.whitelist:
-              const isWhitelisted = await sendMessage('isWhitelisted', tab);
+              const isWhitelisted = await sendMessage('isWhitelisted', tab.url);
               if (isWhitelisted) {
                 this.hideAddButton();
                 return;
