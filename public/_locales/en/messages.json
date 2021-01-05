@@ -20,11 +20,14 @@
     "websiteUrlPlaceholder": {
         "message": "Please enter the URL of the website here"
     },
-    "errorMessage": {
-        "message": "Error message"
+    "blockingMessage": {
+        "message": "Message"
     },
-    "defaultErrorMessage": {
+    "defaultBlockingMessage": {
         "message": "Where are you going..."
+    },
+    "displayBlankPage": {
+        "message": "Display a blank page?"
     },
     "settings": {
         "message": "Settings"
@@ -47,11 +50,14 @@
     "defaultActionHint": {
         "message": "Choose an action to take for the blacklisted websites"
     },
-    "displayErrorMessage": {
-        "message": "Display an error message"
+    "blockTab": {
+        "message": "Block"
     },
     "redirectToUrl": {
         "message": "Redirect to url"
+    },
+    "closeTab": {
+        "message": "Close tab"
     },
     "url": {
         "message": "Url"
@@ -71,14 +77,8 @@
     "copiedToClipboard": {
         "message": "Copied to clipboard!"
     },
-    "closeTab": {
-        "message": "Close tab"
-    },
     "enableOnBrowserStartup": {
         "message": "Enable on browser startup"
-    },
-    "disableKeyboardWhenErrorMessageIsDisplayed": {
-        "message": "Disable keyboard when error message is displayed"
     },
     "import": {
         "message": "Import"
@@ -114,7 +114,7 @@
         "message": "Add a website"
     },
     "addWebsiteHint": {
-        "message": "Use wildcard or regular expression matching to select subdomains or subpages, e.g.: \n<b>*.example.com</b>, <b>example.com/blog/*</b>"
+        "message": "Use wildcard matching to select subdomains or subpages, e.g.: \n<b>*.example.com</b>, <b>example.com/blog/*</b>"
     },
     "add": {
         "message": "Add"

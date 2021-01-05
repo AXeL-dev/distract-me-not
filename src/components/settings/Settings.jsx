@@ -26,15 +26,15 @@ export default class Settings extends Component {
         //{ label: translate('password'), id: 'password' },
       ],
       actions: [
-        { label: translate('displayErrorMessage'), value: Action.blockTab },
+        { label: translate('blockTab'), value: Action.blockTab },
         { label: translate('redirectToUrl'), value: Action.redirectToUrl },
         { label: translate('closeTab'), value: Action.closeTab },
       ],
       options: {
         action: Action.blockTab,
         blockTab: {
-          errorMessage: '',
-          disableKeyboard: false
+          message: '',
+          displayBlankPage: false
         },
         redirectToUrl: {
           url: ''
@@ -58,9 +58,9 @@ export default class Settings extends Component {
   componentDidMount() {
     storage.get({
       action: this.state.options.action,
-      errorMessage: this.state.options.blockTab.errorMessage,
+      message: this.state.options.blockTab.message,
+      displayBlankPage: this.state.options.blockTab.displayBlankPage,
       redirectUrl: this.state.options.redirectToUrl.url,
-      disableKeyboard: this.state.options.blockTab.disableKeyboard,
       enableOnBrowserStartup: this.state.options.misc.enableOnBrowserStartup,
       schedule: this.state.options.schedule,
       blacklist: defaultBlacklist,
@@ -71,8 +71,8 @@ export default class Settings extends Component {
         this.setOptions({
           action: items.action,
           blockTab: {
-            errorMessage: items.errorMessage,
-            disableKeyboard: items.disableKeyboard
+            message: items.message,
+            displayBlankPage: items.displayBlankPage
           },
           redirectToUrl: {
             url: items.redirectUrl
@@ -147,9 +147,9 @@ export default class Settings extends Component {
     debug.log('save:', this.state.options);
     storage.set({
       action: this.state.options.action,
-      errorMessage: this.state.options.blockTab.errorMessage,
+      message: this.state.options.blockTab.message,
+      displayBlankPage: this.state.options.blockTab.displayBlankPage,
       redirectUrl: this.state.options.redirectToUrl.url,
-      disableKeyboard: this.state.options.blockTab.disableKeyboard,
       enableOnBrowserStartup: this.state.options.misc.enableOnBrowserStartup,
       schedule: this.state.options.schedule,
       blacklist: this.state.options.blacklist,
@@ -159,8 +159,7 @@ export default class Settings extends Component {
         // Update background script
         if (success) {
           sendMessage('setAction', this.state.options.action);
-          sendMessage('setRedirectUrl', this.state.options.redirectToUrl.urld);
-          sendMessage('setDisableKeyboard', this.state.options.blockTab.disableKeyboard);
+          sendMessage('setRedirectUrl', this.state.options.redirectToUrl.url);
           sendMessage('setBlacklist', this.state.options.blacklist);
           sendMessage('setWhitelist', this.state.options.whitelist);
         }
@@ -214,16 +213,17 @@ export default class Settings extends Component {
                   {this.state.options.action === Action.blockTab &&
                     <Fragment>
                       <TextInputField
-                        label={translate('errorMessage')}
-                        placeholder={translate('defaultErrorMessage')}
-                        value={this.state.options.blockTab.errorMessage}
-                        onChange={event => this.setOptions('blockTab', { errorMessage: event.target.value })}
+                        label={translate('blockingMessage')}
+                        placeholder={translate('defaultBlockingMessage')}
+                        value={this.state.options.blockTab.message}
+                        onChange={event => this.setOptions('blockTab', { message: event.target.value })}
+                        disabled={this.state.options.blockTab.displayBlankPage}
                         marginBottom={16}
                       />
                       <Checkbox
-                        label={translate('disableKeyboardWhenErrorMessageIsDisplayed')}
-                        checked={this.state.options.blockTab.disableKeyboard}
-                        onChange={event => this.setOptions('blockTab', { disableKeyboard: event.target.checked })}
+                        label={translate('displayBlankPage')}
+                        checked={this.state.options.blockTab.displayBlankPage}
+                        onChange={event => this.setOptions('blockTab', { displayBlankPage: event.target.checked })}
                       />
                     </Fragment>
                   }

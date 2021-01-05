@@ -10,14 +10,7 @@
     "128": "icons/magnet-256.png"
   },
 
-  "content_scripts": [{
-    "matches" : ["<all_urls>"],
-    "js": ["js/overlay.js"],
-    "css": ["css/overlay.css"],
-    "run_at": "document_start"
-  }],
-
-  "web_accessible_resources":["icons/*.png", "fonts/*.ttf"],
+  "web_accessible_resources":["index.html#blocked"],
 
   "browser_action": {
     "default_icon": "icons/magnet-256.png",
@@ -41,6 +34,8 @@
     "storage",
     "tabs",
     "https://*/*",
+    "webRequest",
+    "webRequestBlocking",
     "<all_urls>"
   ]
 }

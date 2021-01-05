@@ -20,11 +20,14 @@
     "websiteUrlPlaceholder": {
         "message": "Veuillez entrer l'URL du site içi"
     },
-    "errorMessage": {
-        "message": "Message d'erreur"
+    "blockingMessage": {
+        "message": "Message à afficher"
     },
-    "defaultErrorMessage": {
+    "defaultBlockingMessage": {
         "message": "Où est-ce que vous allez..."
+    },
+    "displayBlankPage": {
+        "message": "Afficher une page vide?"
     },
     "settings": {
         "message": "Réglages"
@@ -45,13 +48,16 @@
         "message": "Action par défaut"
     },
     "defaultActionHint": {
-        "message": "Choisissez une action à entreprendre pour les sites web blacklistés"
+        "message": "Veuillez choisir une action à entreprendre pour les sites web blacklistés"
     },
-    "displayErrorMessage": {
-        "message": "Afficher un message d'erreur"
+    "blockTab": {
+        "message": "Bloquer"
     },
     "redirectToUrl": {
         "message": "Rediriger vers une URL"
+    },
+    "closeTab": {
+        "message": "Fermer l'onglet"
     },
     "url": {
         "message": "Url"
@@ -71,14 +77,8 @@
     "copiedToClipboard": {
         "message": "Copié dans le presse-papier!"
     },
-    "closeTab": {
-        "message": "Fermer l'onglet"
-    },
     "enableOnBrowserStartup": {
         "message": "Toujours activer au démarrage du navigateur"
-    },
-    "disableKeyboardWhenErrorMessageIsDisplayed": {
-        "message": "Désactiver le clavier lorsque le message d'erreur s'affiche"
     },
     "import": {
         "message": "Importer"
@@ -114,7 +114,7 @@
         "message": "Ajouter un site web"
     },
     "addWebsiteHint": {
-        "message": "Vous pouvez aussi utiliser des caractères génériques ou des expressions régulières pour sélectionner des sous-domaines ou des sous-pages, par exemple: \n<b>*.example.com</b>, <b>example.com/blog/*</b>"
+        "message": "Vous pouvez utiliser des caractères génériques pour sélectionner des sous-domaines ou des sous-pages, par exemple: \n<b>*.example.com</b>, <b>example.com/blog/*</b>"
     },
     "add": {
         "message": "Ajouter"
