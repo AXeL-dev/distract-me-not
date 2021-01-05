@@ -117,10 +117,14 @@ export default class Background extends Component {
   }
 
   handleMessage = (request, sender, sendResponse) => {
-    // console.log("Handle message:", request);
+    this.log('Handle message:', request);
     return Promise.resolve({
       response: this.isFunction(request.message) ? this.executeFunction(request.message, ...request.params) : this[request.message]
     });
+  }
+
+  log = (message, ...params) => {
+    //console.log(message, ...params); // enable/disable this line to see logs
   }
 
   isFunction = (functionName) => {
@@ -155,12 +159,12 @@ export default class Background extends Component {
   }
 
   closeTab = (tabId) => {
-    console.log('closing tab:', tabId);
+    this.log('closing tab:', tabId);
     nativeAPI.tabs.remove(tabId); // nativeAPI is used to fix weird errors on chrome due to browser-polyfill
   }
 
   redirectTab = (tabId, redirectUrl) => {
-    console.log('redirecting tab:', tabId, redirectUrl);
+    this.log('redirecting tab:', tabId, redirectUrl);
     nativeAPI.tabs.update(tabId, {
       url: redirectUrl
     });
@@ -185,7 +189,7 @@ export default class Background extends Component {
   }
 
   parseUrl = (data, caller) => {
-    console.log('parsing url:', {
+    this.log('parsing url:', {
       caller: caller,
       data: data,
       mode: this.mode,
