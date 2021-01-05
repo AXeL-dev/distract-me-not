@@ -21,7 +21,7 @@ export default function SwitchField(props) {
       flexDirection={props.position === Position.LEFT ? 'row-reverse' : 'inherit'}
     >
       <Pane display="flex" alignItems="center" flex={1}>
-        <Text size={props.labelSize} color={props.labelColor}>
+        <Text size={props.labelSize} color={props.labelColor} className={props.labelClassName}>
           {props.label}
         </Text>
       </Pane>

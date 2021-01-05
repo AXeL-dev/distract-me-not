@@ -21,7 +21,7 @@ export default function SegmentedControlField(props) {
       marginRight={props.marginRight || props.marginX}
     >
       <Pane display="flex" alignItems="center" flex={1}>
-        <Text>{props.label}</Text>
+        <Text className={props.labelClassName}>{props.label}</Text>
       </Pane>
       <Pane display="flex" alignItems="center">
         <SegmentedControl

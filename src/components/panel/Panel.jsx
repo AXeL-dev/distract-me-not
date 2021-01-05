@@ -138,23 +138,26 @@ export default class Panel extends Component {
       <Pane minWidth={320}>
         <Pane display="flex" alignItems="center" justifyContent="center" height={60} borderBottom>
           <img className="logo" src="icons/magnet-256.png" />
-          <Heading size={600} fontWeight="bold">{translate('appName') || 'Distract Me Not'}</Heading>
+          <Heading size={600} fontWeight="bold" className="cursor-default">
+            {translate('appName') || 'Distract Me Not'}
+          </Heading>
         </Pane>
         {this.state.status && this.state.schedule.isEnabled ? (
           <Pane display="flex" paddingX={16} paddingY={20}>
             <Pane display="flex" alignItems="center" flex={1}>
-              <Text>{translate('status')}</Text>
+              <Text className="cursor-default">{translate('status')}</Text>
             </Pane>
             <Pane display="flex" alignItems="center" justifyContent="center">
               <TimeIcon color="#3d8bd4" marginRight={10} />
-              <Text size={300}>{this.state.schedule.time.start}</Text>
+              <Text className="cursor-default" size={300}>{this.state.schedule.time.start}</Text>
               <SmallMinusIcon color="#666" marginX={3} />
-              <Text size={300}>{this.state.schedule.time.end}</Text>
+              <Text className="cursor-default" size={300}>{this.state.schedule.time.end}</Text>
             </Pane>
           </Pane>
         ) : (
           <SwitchField
             label={translate('status')}
+            labelClassName="cursor-default"
             checked={this.state.status}
             onChange={event => this.toggleStatus(event.target.checked)}
             height={24}
@@ -165,6 +168,7 @@ export default class Panel extends Component {
         <SegmentedControlField
           name="mode"
           label={translate('mode')}
+          labelClassName="cursor-default"
           options={this.state.modes}
           value={this.state.mode}
           onChange={this.changeMode}
