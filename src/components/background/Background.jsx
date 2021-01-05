@@ -3,6 +3,7 @@ import { storage, getNativeAPI } from '../../helpers/webext';
 import { Mode, Action, defaultBlacklist, defaultWhitelist } from '../../helpers/block';
 import { hasValidProtocol, getValidUrl } from '../../helpers/url';
 import { regex } from '../../helpers/regex';
+import { inTime } from '../../helpers/time';
 
 const nativeAPI = getNativeAPI();
 
@@ -16,11 +17,26 @@ export default class Background extends Component {
     this.mode = Mode.blacklist;
     this.action = Action.blockTab;
     this.redirectUrl = '';
+    this.schedule = {
+      isEnabled: false,
+      time: {
+        start: '',
+        end: ''
+      }
+    };
 
     this.init();
   }
 
   //----- Start getters & setters
+
+  setSchedule = (value) => {
+    this.schedule = value;
+  }
+
+  getSchedule = () => {
+    return this.schedule;
+  }
 
   setMode = (value) => {
     this.mode = value;
@@ -81,16 +97,18 @@ export default class Background extends Component {
     storage.get({
       blacklist: defaultBlacklist,
       whitelist: defaultWhitelist,
-      isEnabled: false,
-      mode: Mode.blacklist,
-      action: Action.blockTab,
-      redirectUrl: '',
+      isEnabled: this.isEnabled,
+      mode: this.mode,
+      action: this.action,
+      schedule: this.schedule,
+      redirectUrl: this.redirectUrl,
       enableOnBrowserStartup: false
     }).then((items) => {
       this.blacklist = this.transformList(items.blacklist);
       this.whitelist = this.transformList(items.whitelist);
       this.mode = items.mode;
       this.action = items.action;
+      this.schedule = items.schedule;
       this.redirectUrl = getValidUrl(items.redirectUrl);
       this.isEnabled = items.enableOnBrowserStartup ? true : items.isEnabled;
       if (!items.enableOnBrowserStartup && this.isEnabled) {
@@ -196,6 +214,22 @@ export default class Background extends Component {
       blacklist: this.blacklist,
       whitelist: this.whitelist
     });
+    // Handle schedule
+    if (this.schedule.isEnabled) {
+      try {
+        const [startHour, startMinute] = this.schedule.time.start.split(':');
+        const start = Number(startHour) * 60 + Number(startMinute);
+        const [endHour, endMinute] = this.schedule.time.end.split(':');
+        const end = Number(endHour) * 60 + Number(endMinute);
+        if (!inTime(start, end)) {
+          this.log('not in schedule time:', this.schedule.time);
+          return;
+        }
+      } catch (error) {
+        this.log(error);
+      }
+    }
+    // Handle blocking
     switch (this.mode) {
       case Mode.blacklist:
         if (this.isBlacklisted(data.url)) {

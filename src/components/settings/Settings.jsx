@@ -160,6 +160,7 @@ export default class Settings extends Component {
         if (success) {
           sendMessage('setAction', this.state.options.action);
           sendMessage('setRedirectUrl', this.state.options.redirectToUrl.url);
+          sendMessage('setSchedule', this.state.options.schedule);
           sendMessage('setBlacklist', this.state.options.blacklist);
           sendMessage('setWhitelist', this.state.options.whitelist);
         }
