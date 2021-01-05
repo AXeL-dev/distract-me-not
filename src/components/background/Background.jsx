@@ -145,7 +145,7 @@ export default class Background extends Component {
           )
         };
       case Action.closeTab:
-        console.log(data.tabId);
+        // console.log('closing tab:', data.tabId);
         browser.tabs.remove(data.tabId);
         return {
           redirectUrl: 'javascript:window.close()'
@@ -199,7 +199,7 @@ export default class Background extends Component {
 
   onUpdatedHandler = (tabId, changeInfo, tab) => {
     if (changeInfo.url && hasValidProtocol(changeInfo.url)) {
-      const results = this.parseUrl(changeInfo, 'onUpdatedHandler');
+      const results = this.parseUrl({ ...changeInfo, tabId: tabId }, 'onUpdatedHandler');
       if (results && results.redirectUrl) {
         browser.tabs.update(tabId, {
           url: results.redirectUrl
