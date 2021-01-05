@@ -140,7 +140,7 @@ export default class Panel extends Component {
           <img className="logo" src="icons/magnet-256.png" />
           <Heading size={600} fontWeight="bold">{translate('appName') || 'Distract Me Not'}</Heading>
         </Pane>
-        {this.state.schedule.isEnabled ? (
+        {this.state.status && this.state.schedule.isEnabled ? (
           <Pane display="flex" paddingX={16} paddingY={20}>
             <Pane display="flex" alignItems="center" flex={1}>
               <Text>{translate('status')}</Text>
