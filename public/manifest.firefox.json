@@ -17,7 +17,7 @@
     "128": "icons/magnet-256.png"
   },
 
-  "web_accessible_resources":["index.html#blocked"],
+  "web_accessible_resources":["index.html"],
 
   "browser_action": {
     "default_icon": "icons/magnet-256.png",
