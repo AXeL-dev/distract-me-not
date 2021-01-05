@@ -4,6 +4,7 @@ export class regex {
   static wildcard(url) {
     if (url.indexOf('://') === -1 && !url.startsWith('^')) {
       return `*://${url}/*`;
+      //return `*://*.${url.replace(/^(?:www|\*+)\./i, '')}/*`; // Adding "*." to the begining of the hostname doesn't seems to work well with all domains
     }
     return url;
   }

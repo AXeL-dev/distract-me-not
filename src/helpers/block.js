@@ -21,5 +21,5 @@ export const defaultWhitelist = [
 ];
 
 export function isAccessible(url) {
-  return url && !url.startsWith("about:") && !/^(?:file|chrome|moz\-extension)\:\/\//i.test(url);
+  return url && !url.startsWith("about:") && !/^(?:file|chrome|moz\-extension|chrome\-extension)\:\/\//i.test(url);
 }
