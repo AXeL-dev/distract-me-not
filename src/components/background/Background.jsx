@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { storage, getNativeAPI } from '../../helpers/webext';
-import { Mode, Action, defaultBlacklist, defaultWhitelist } from '../../helpers/block';
+import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule } from '../../helpers/block';
 import { hasValidProtocol, getValidUrl } from '../../helpers/url';
 import { regex } from '../../helpers/regex';
 import { inTime } from '../../helpers/time';
@@ -17,13 +17,7 @@ export default class Background extends Component {
     this.mode = Mode.blacklist;
     this.action = Action.blockTab;
     this.redirectUrl = '';
-    this.schedule = {
-      isEnabled: false,
-      time: {
-        start: '',
-        end: ''
-      }
-    };
+    this.schedule = defaultSchedule;
 
     this.init();
   }

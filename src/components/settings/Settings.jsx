@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Pane, Tablist, Tab, SelectField, Checkbox, TextInputField, Button, TickIcon, Paragraph, toaster } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
 import { debug, isDevEnv } from '../../helpers/debug';
-import { Action, defaultBlacklist, defaultWhitelist } from '../../helpers/block';
+import { Action, defaultBlacklist, defaultWhitelist, defaultSchedule } from '../../helpers/block';
 import { sendMessage, storage } from '../../helpers/webext';
 import SwitchField from '../shared/switch-field/SwitchField';
 import TimeField from '../shared/time-field/TimeField';
@@ -39,13 +39,7 @@ export default class Settings extends Component {
         redirectToUrl: {
           url: ''
         },
-        schedule: {
-          isEnabled: false,
-          time: {
-            start: '',
-            end: ''
-          }
-        },
+        schedule: defaultSchedule,
         blacklist: isDevEnv ? defaultBlacklist : [],
         whitelist: isDevEnv ? defaultWhitelist : [],
         misc: {

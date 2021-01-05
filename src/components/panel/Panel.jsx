@@ -1,8 +1,8 @@
 import { Component } from 'react';
-import { Pane, Heading, Position, CogIcon, PlusIcon, TickIcon } from 'evergreen-ui';
+import { Pane, Heading, Text, Position, CogIcon, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
 import { isWebExtension, openOptionsPage, sendMessage, getActiveTab, getActiveTabHostname, storage } from '../../helpers/webext';
-import { Mode, defaultBlacklist, defaultWhitelist, isAccessible } from '../../helpers/block';
+import { Mode, defaultBlacklist, defaultWhitelist, defaultSchedule, isAccessible } from '../../helpers/block';
 import SwitchField from '../shared/switch-field/SwitchField';
 import SegmentedControlField from '../shared/segmented-control-field/SegmentedControlField';
 import AnimatedIconButton from '../shared/animated-icon-button/AnimatedIconButton';
@@ -19,12 +19,14 @@ export default class Panel extends Component {
         { label: translate('whitelist'), value: Mode.whitelist },
       ],
       mode: Mode.blacklist,
-      isAddButtonVisible: true,
+      schedule: defaultSchedule,
+      isAddButtonVisible: true
     };
   }
 
   componentDidMount() {
     sendMessage('getIsEnabled').then(isEnabled => this.setState({ status: !!isEnabled })); // !! used to cast null to boolean
+    sendMessage('getSchedule').then(schedule => this.setState({ schedule: schedule || defaultSchedule }));
     sendMessage('getMode').then(mode => {
       this.setState({ mode: mode });
       this.toggleAddButton(mode);
@@ -138,14 +140,28 @@ export default class Panel extends Component {
           <img className="logo" src="icons/magnet-256.png" />
           <Heading size={600} fontWeight="bold">{translate('appName') || 'Distract Me Not'}</Heading>
         </Pane>
-        <SwitchField
-          label={translate('status')}
-          checked={this.state.status}
-          onChange={event => this.toggleStatus(event.target.checked)}
-          height={24}
-          paddingX={16}
-          paddingY={20}
-        />
+        {this.state.schedule.isEnabled ? (
+          <Pane display="flex" paddingX={16} paddingY={20}>
+            <Pane display="flex" alignItems="center" flex={1}>
+              <Text>{translate('status')}</Text>
+            </Pane>
+            <Pane display="flex" alignItems="center" justifyContent="center">
+              <TimeIcon color="#3d8bd4" marginRight={10} />
+              <Text size={300}>{this.state.schedule.time.start}</Text>
+              <SmallMinusIcon color="#666" marginX={3} />
+              <Text size={300}>{this.state.schedule.time.end}</Text>
+            </Pane>
+          </Pane>
+        ) : (
+          <SwitchField
+            label={translate('status')}
+            checked={this.state.status}
+            onChange={event => this.toggleStatus(event.target.checked)}
+            height={24}
+            paddingX={16}
+            paddingY={20}
+          />
+        )}
         <SegmentedControlField
           name="mode"
           label={translate('mode')}
