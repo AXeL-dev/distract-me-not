@@ -8,8 +8,8 @@ export default class Blocked extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      message: translate('defaultBlockingMessage'),
-      displayBlankPage: false
+      message: props.message || translate('defaultBlockingMessage'),
+      displayBlankPage: props.displayBlankPage || false
     };
   }
 
@@ -31,13 +31,13 @@ export default class Blocked extends Component {
     return (
       <Fragment>
         {!this.state.displayBlankPage &&
-          <div class="distract-cursor distract-select distract-overlay-container">
-            <div class="distract-cursor distract-select distract-overlay">
-              <div class="distract-cursor distract-select distract-info-container">
-                <span class="distract-cursor distract-select distract-overlay-top-text">
+          <div className="distract-cursor distract-select distract-overlay-container">
+            <div className="distract-cursor distract-select distract-overlay">
+              <div className="distract-cursor distract-select distract-info-container">
+                <span className="distract-cursor distract-select distract-overlay-top-text">
                   {this.state.message}
                 </span>
-                <div class="distract-cursor distract-select distract-overlay-img"></div>
+                <div className="distract-cursor distract-select distract-overlay-img"></div>
               </div>
             </div>
           </div>
