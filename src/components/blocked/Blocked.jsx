@@ -9,19 +9,19 @@ export default class Blocked extends Component {
     super(props);
     this.state = {
       message: props.message || translate('defaultBlockingMessage'),
-      displayBlankPage: props.displayBlankPage || false
+      isBlank: props.isBlank || false
     };
   }
 
   componentDidMount() {
     storage.get({
       message: this.state.message,
-      displayBlankPage: this.state.displayBlankPage
+      displayBlankPage: this.state.isBlank
     }).then((items) => {
       if (items) {
         this.setState({
           message: items.message.length ? items.message : this.state.message,
-          displayBlankPage: items.displayBlankPage
+          isBlank: items.displayBlankPage
         });
       }
     });
@@ -30,7 +30,7 @@ export default class Blocked extends Component {
   render() {
     return (
       <Fragment>
-        {!this.state.displayBlankPage &&
+        {!this.state.isBlank &&
           <div className="distract-cursor distract-select distract-overlay-container">
             <div className="distract-cursor distract-select distract-overlay">
               <div className="distract-cursor distract-select distract-info-container">

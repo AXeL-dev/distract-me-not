@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import Blocked from "./Blocked";
 
-it('renders a blank page when displayBlankPage prop is true', () => {
-  const { container } = render(<Blocked displayBlankPage={true} />);
+it('renders a blank page when isBlank prop is true', () => {
+  const { container } = render(<Blocked isBlank={true} />);
   expect(container).toBeEmptyDOMElement();
 });
 
