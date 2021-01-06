@@ -101,6 +101,12 @@
     "scheduleEndTime": {
         "message": "End time:"
     },
+    "scheduleDays": {
+        "message": "Days:"
+    },
+    "scheduleDaysDescription": {
+        "message": "Days where blocking should be enabled during the scheduled time. If schedule time is not defined, the blocking will be active the whole day."
+    },
     "miscellaneous": {
         "message": "Miscellaneous"
     },
@@ -157,5 +163,38 @@
     },
     "cancel": {
         "message": "Cancel"
+    },
+    "monday": {
+        "message": "Monday"
+    },
+    "tuesday": {
+        "message": "Tuesday"
+    },
+    "wednesday": {
+        "message": "Wednesday"
+    },
+    "thursday": {
+        "message": "Thursday"
+    },
+    "friday": {
+        "message": "Friday"
+    },
+    "saturday": {
+        "message": "Saturday"
+    },
+    "sunday": {
+        "message": "Sunday"
+    },
+    "select": {
+        "message": "Select..."
+    },
+    "dayEnd": {
+        "message": "Day end"
+    },
+    "dayOff": {
+        "message": "Day off"
+    },
+    "enabled": {
+        "message": "Enabled"
     }
 }

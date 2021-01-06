@@ -1,4 +1,4 @@
-import { Component, Fragment } from 'react';
+import { Component } from 'react';
 import { Pane, TextInput, Button, Paragraph } from 'evergreen-ui';
 import RawHTML from '../raw-html/RawHTML';
 
@@ -37,24 +37,23 @@ export default class TextField extends Component {
 
   render() {
     return (
-      <Fragment>
-        <Pane
-          display="flex"
-          padding={this.props.padding}
-          paddingX={this.props.paddingX || this.props.padding}
-          paddingY={this.props.paddingY || this.props.padding}
-          paddingTop={this.props.paddingTop || this.props.paddingY}
-          paddingBottom={this.props.paddingBottom || this.props.paddingY}
-          paddingLeft={this.props.paddingLeft || this.props.paddingX}
-          paddingRight={this.props.paddingRight || this.props.paddingX}
-          margin={this.props.margin}
-          marginX={this.props.marginX || this.props.margin}
-          marginY={this.props.marginY || this.props.margin}
-          marginTop={this.props.marginTop || this.props.marginY}
-          marginBottom={this.props.marginBottom || this.props.marginY}
-          marginLeft={this.props.marginLeft || this.props.marginX}
-          marginRight={this.props.marginRight || this.props.marginX}
-        >
+      <Pane
+        padding={this.props.padding}
+        paddingX={this.props.paddingX || this.props.padding}
+        paddingY={this.props.paddingY || this.props.padding}
+        paddingTop={this.props.paddingTop || this.props.paddingY}
+        paddingBottom={this.props.paddingBottom || this.props.paddingY}
+        paddingLeft={this.props.paddingLeft || this.props.paddingX}
+        paddingRight={this.props.paddingRight || this.props.paddingX}
+        margin={this.props.margin}
+        marginX={this.props.marginX || this.props.margin}
+        marginY={this.props.marginY || this.props.margin}
+        marginTop={this.props.marginTop || this.props.marginY}
+        marginBottom={this.props.marginBottom || this.props.marginY}
+        marginLeft={this.props.marginLeft || this.props.marginX}
+        marginRight={this.props.marginRight || this.props.marginX}
+      >
+        <Pane display="flex">
           <Pane display="flex" alignItems="center" flex={1}>
             <TextInput
               width="100%"
@@ -86,7 +85,7 @@ export default class TextField extends Component {
             <RawHTML>{this.props.hint}</RawHTML>
           </Paragraph>
         }
-      </Fragment>
+      </Pane>
     );
   }
 }

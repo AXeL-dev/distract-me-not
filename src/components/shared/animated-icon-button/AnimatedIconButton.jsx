@@ -81,7 +81,7 @@ export default class AnimatedIconButton extends Component {
     return (
       <Fragment>
         {this.state.isVisible &&
-          <Tooltip content={this.props.tooltipContent} position={this.props.tooltipPosition}>
+          <Tooltip content={this.props.tooltip} position={this.props.tooltipPosition}>
             <IconButton
               className={`animated-icon-button ${this.props.className} ${this.state.className}`}
               appearance="minimal"

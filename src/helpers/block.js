@@ -1,3 +1,4 @@
+import { DaysOfWeek } from "./date";
 
 export const Mode = {
   blacklist: 'blacklist',
@@ -25,7 +26,8 @@ export const defaultSchedule = {
   time: {
     start: '',
     end: ''
-  }
+  },
+  days: DaysOfWeek
 };
 
 export function isAccessible(url) {

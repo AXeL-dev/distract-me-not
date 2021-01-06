@@ -1,8 +1,9 @@
-import { Component } from 'react';
-import { Pane, Heading, Text, Position, CogIcon, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon } from 'evergreen-ui';
+import { Component, Fragment } from 'react';
+import { Pane, Heading, Text, Position, Badge, CogIcon, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
 import { isWebExtension, openOptionsPage, sendMessage, getActiveTab, getActiveTabHostname, storage } from '../../helpers/webext';
 import { Mode, defaultBlacklist, defaultWhitelist, defaultSchedule, isAccessible } from '../../helpers/block';
+import { inToday } from '../../helpers/date';
 import SwitchField from '../shared/switch-field/SwitchField';
 import SegmentedControlField from '../shared/segmented-control-field/SegmentedControlField';
 import AnimatedIconButton from '../shared/animated-icon-button/AnimatedIconButton';
@@ -148,10 +149,26 @@ export default class Panel extends Component {
               <Text className="cursor-default">{translate('status')}</Text>
             </Pane>
             <Pane display="flex" alignItems="center" justifyContent="center">
-              <TimeIcon color="#3d8bd4" marginRight={10} />
-              <Text className="cursor-default" size={300}>{this.state.schedule.time.start}</Text>
-              <SmallMinusIcon color="#666" marginX={3} />
-              <Text className="cursor-default" size={300}>{this.state.schedule.time.end}</Text>
+              {inToday(this.state.schedule.days) ? (
+                <Fragment>
+                  {this.state.schedule.time.start.length ? (
+                    <Fragment>
+                      <TimeIcon color="#3d8bd4" marginRight={10} />
+                      <Text className="cursor-default" size={300}>{this.state.schedule.time.start}</Text>
+                      <SmallMinusIcon color="#666" marginX={3} />
+                      {this.state.schedule.time.end.length ? (
+                        <Text className="cursor-default" size={300}>{this.state.schedule.time.end}</Text>
+                      ) : (
+                        <Badge color="blue" isSolid={false}>{translate('dayEnd')}</Badge>
+                      )}
+                    </Fragment>
+                  ) : (
+                    <Badge color="green" isSolid={false}>{translate('enabled')}</Badge>
+                  )}
+                </Fragment>
+              ) : (
+                <Badge color="neutral" isSolid={false}>{translate('dayOff')}</Badge>
+              )}
             </Pane>
           </Pane>
         ) : (
@@ -179,7 +196,7 @@ export default class Panel extends Component {
         <Pane display="flex" paddingX={16} paddingY={10} alignItems="center" justifyContent="space-between" borderTop>
           <Pane>
             <AnimatedIconButton
-              tooltipContent={translate('settings')}
+              tooltip={translate('settings')}
               tooltipPosition={Position.RIGHT}
               className="fill-grey"
               icon={CogIcon}
@@ -189,7 +206,7 @@ export default class Panel extends Component {
           </Pane>
           <Pane>
             <AnimatedIconButton
-              tooltipContent={this.state.mode === 'blacklist' ? translate('addToBlacklist') : translate('addToWhitelist')}
+              tooltip={this.state.mode === 'blacklist' ? translate('addToBlacklist') : translate('addToWhitelist')}
               tooltipPosition={Position.LEFT}
               className="fill-green"
               icon={PlusIcon}

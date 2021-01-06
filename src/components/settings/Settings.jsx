@@ -4,8 +4,10 @@ import { translate } from '../../helpers/i18n';
 import { debug, isDevEnv } from '../../helpers/debug';
 import { Action, defaultBlacklist, defaultWhitelist, defaultSchedule } from '../../helpers/block';
 import { sendMessage, storage } from '../../helpers/webext';
+import { DaysOfWeek } from '../../helpers/date';
 import SwitchField from '../shared/switch-field/SwitchField';
 import TimeField from '../shared/time-field/TimeField';
+import MultiSelectField from '../shared/multi-select-field/MultiSelectField';
 import WebsiteList from '../shared/website-list/WebsiteList';
 import './Settings.scss';
 
@@ -30,6 +32,7 @@ export default class Settings extends Component {
         { label: translate('redirectToUrl'), value: Action.redirectToUrl },
         { label: translate('closeTab'), value: Action.closeTab },
       ],
+      allScheduleDays: DaysOfWeek.map(day => ({ label: translate(day), value: day })),
       options: {
         action: Action.blockTab,
         blockTab: {
@@ -72,11 +75,9 @@ export default class Settings extends Component {
             url: items.redirectUrl
           },
           schedule: {
-            isEnabled: items.schedule.isEnabled,
-            time: {
-              start: items.schedule.time.start,
-              end: items.schedule.time.end
-            }
+            // merge both state & storage values
+            ...this.state.options.schedule,
+            ...items.schedule
           },
           blacklist: items.blacklist,
           whitelist: items.whitelist,
@@ -254,6 +255,16 @@ export default class Settings extends Component {
                     label={translate('scheduleEndTime')}
                     value={this.state.options.schedule.time.end}
                     onChange={event => this.setOptions('schedule', 'time', { end: event.target.value })}
+                    disabled={!this.state.options.schedule.isEnabled}
+                    marginBottom={16}
+                  />
+                  <MultiSelectField
+                    label={translate('scheduleDays')}
+                    tooltip={translate('scheduleDaysDescription')}
+                    placeholder={translate('select')}
+                    options={this.state.allScheduleDays}
+                    selected={this.state.options.schedule.days}
+                    onChange={value => this.setOptions('schedule', { days: value })}
                     disabled={!this.state.options.schedule.isEnabled}
                   />
                 </Fragment>

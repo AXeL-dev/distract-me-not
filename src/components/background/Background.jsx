@@ -4,6 +4,7 @@ import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule } fro
 import { hasValidProtocol, getValidUrl } from '../../helpers/url';
 import { regex } from '../../helpers/regex';
 import { inTime } from '../../helpers/time';
+import { inToday } from '../../helpers/date';
 
 const nativeAPI = getNativeAPI();
 
@@ -20,6 +21,10 @@ export default class Background extends Component {
     this.schedule = defaultSchedule;
 
     this.init();
+  }
+
+  log = (message, ...params) => {
+    //console.log(message, ...params); // enable/disable this line to see logs
   }
 
   //----- Start getters & setters
@@ -102,7 +107,7 @@ export default class Background extends Component {
       this.whitelist = this.transformList(items.whitelist);
       this.mode = items.mode;
       this.action = items.action;
-      this.schedule = items.schedule;
+      this.schedule = { ...this.schedule, ...items.schedule }; // merge
       this.redirectUrl = getValidUrl(items.redirectUrl);
       this.isEnabled = items.enableOnBrowserStartup ? true : items.isEnabled;
       if (!items.enableOnBrowserStartup && this.isEnabled) {
@@ -135,19 +140,19 @@ export default class Background extends Component {
     });
   }
 
-  log = (message, ...params) => {
-    //console.log(message, ...params); // enable/disable this line to see logs
-  }
-
   isFunction = (functionName) => {
     return this[functionName] && typeof this[functionName] === 'function';
   }
 
   executeFunction = (functionName, ...params) => {
-    if (params) {
-      return this[functionName](...params);
-    } else {
-      return this[functionName]();
+    try {
+      if (params) {
+        return this[functionName](...params);
+      } else {
+        return this[functionName]();
+      }
+    } catch (error) {
+      this.log(error);
     }
   }
 
@@ -211,13 +216,18 @@ export default class Background extends Component {
     // Handle schedule
     if (this.schedule.isEnabled) {
       try {
-        const [startHour, startMinute] = this.schedule.time.start.split(':');
-        const start = Number(startHour) * 60 + Number(startMinute);
-        const [endHour, endMinute] = this.schedule.time.end.split(':');
-        const end = Number(endHour) * 60 + Number(endMinute);
-        if (!inTime(start, end)) {
-          this.log('not in schedule time:', this.schedule.time);
+        if (!inToday(this.schedule.days)) {
+          this.log('not in schedule days:', this.schedule.days);
           return;
+        } else {
+          const [startHour, startMinute] = this.schedule.time.start.split(':');
+          const start = Number(startHour) * 60 + Number(startMinute);
+          const [endHour, endMinute] = this.schedule.time.end.split(':');
+          const end = Number(endHour) * 60 + Number(endMinute);
+          if (start && !inTime(start, end)) {
+            this.log('not in schedule time:', this.schedule.time);
+            return;
+          }
         }
       } catch (error) {
         this.log(error);

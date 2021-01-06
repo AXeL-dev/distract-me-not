@@ -101,6 +101,12 @@
     "scheduleEndTime": {
         "message": "Heure de fin:"
     },
+    "scheduleDays": {
+        "message": "Jours:"
+    },
+    "scheduleDaysDescription": {
+        "message": "Jours où le blocage doit être activé pendant l'horaire défini. S'il n'y a pas d'horaire, le blocage sera actif toute la journée."
+    },
     "miscellaneous": {
         "message": "Divers"
     },
@@ -157,5 +163,38 @@
     },
     "cancel": {
         "message": "Annuler"
+    },
+    "monday": {
+        "message": "Lundi"
+    },
+    "tuesday": {
+        "message": "Mardi"
+    },
+    "wednesday": {
+        "message": "Mercredi"
+    },
+    "thursday": {
+        "message": "Jeudi"
+    },
+    "friday": {
+        "message": "Vendredi"
+    },
+    "saturday": {
+        "message": "Samedi"
+    },
+    "sunday": {
+        "message": "Dimanche"
+    },
+    "select": {
+        "message": "Sélectionner..."
+    },
+    "dayEnd": {
+        "message": "Fin de journée"
+    },
+    "dayOff": {
+        "message": "Journée off"
+    },
+    "enabled": {
+        "message": "Activé"
     }
 }
