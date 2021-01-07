@@ -1,7 +1,8 @@
 import { Component } from 'react';
-import { Pane, Text, SelectMenu, Button, Paragraph, Tooltip, Position } from 'evergreen-ui';
+import { Pane, Text, SelectMenu, Button, Paragraph, Tooltip, Position, CaretDownIcon } from 'evergreen-ui';
 import { debug } from '../../../helpers/debug';
 import RawHTML from '../raw-html/RawHTML';
+import './MultiSelectField.scss';
 
 export default class MultiSelectField extends Component {
 
@@ -87,7 +88,7 @@ export default class MultiSelectField extends Component {
           <Pane display="flex" alignItems="center" flex={1}>
             {this.props.tooltip ? (
               <Tooltip content={this.props.tooltip} position={this.props.tooltipPosition || Position.BOTTOM}>
-                <Text>{this.props.label}</Text>
+                <Text className="cursor-help">{this.props.label}</Text>
               </Tooltip>
             ) : (
               <Text>{this.props.label}</Text>
@@ -112,7 +113,7 @@ export default class MultiSelectField extends Component {
                 this.handleChange(selectedItems);
               }}
             >
-              <Button disabled={this.props.disabled}>
+              <Button iconAfter={CaretDownIcon} disabled={this.props.disabled}>
                 {this.state.selectedLabels.join(', ') || this.props.placeholder || '...'}
               </Button>
             </SelectMenu>
