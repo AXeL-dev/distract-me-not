@@ -105,7 +105,7 @@
         "message": "Jours:"
     },
     "scheduleDaysDescription": {
-        "message": "Jours où le blocage doit être activé pendant l'horaire défini. S'il n'y a pas d'horaire, le blocage sera actif toute la journée."
+        "message": "Jours où le blocage doit être activé pendant l'horaire défini. S'il n'y a pas d'horaire, le blocage sera actif pendant toute la journée."
     },
     "miscellaneous": {
         "message": "Divers"

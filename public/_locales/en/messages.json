@@ -105,7 +105,7 @@
         "message": "Days:"
     },
     "scheduleDaysDescription": {
-        "message": "Days where blocking should be enabled during the scheduled time. If schedule time is not defined, the blocking will be active the whole day."
+        "message": "Days where blocking should be enabled during the scheduled time. If schedule time is not defined, the blocking will be active for the whole day."
     },
     "miscellaneous": {
         "message": "Miscellaneous"
