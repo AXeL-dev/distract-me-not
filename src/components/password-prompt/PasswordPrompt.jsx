@@ -6,6 +6,7 @@ import { compare } from '../../helpers/crypt';
 import { debug } from '../../helpers/debug';
 import Header from '../shared/header/Header';
 import IconButton from '../shared/icon-button/IconButton';
+import SettingsButton from '../shared/settings-button/SettingsButton';
 import queryString from 'query-string';
 
 const defaultHash = process.env.REACT_APP_HASH;
@@ -21,11 +22,18 @@ export default class PasswordPrompt extends Component {
       redirectPath: this.redirectPath
     });
     this.state = {
-      password: ''
+      password: '',
+      hasHeader: this.hasHeader(),
+      hasFooter: this.hasFooter()
     };
-    if (!this.props.hasHeader) {
-      this.props.hasHeader = !isChrome() || this.redirectPath !== '/settings';
-    }
+  }
+
+  hasHeader = () => {
+    return this.props.hasHeader || !isChrome() || this.redirectPath !== '/settings';
+  }
+
+  hasFooter = () => {
+    return this.props.hasFooter || this.redirectPath !== '/settings';
   }
 
   componentDidMount() {
@@ -38,6 +46,18 @@ export default class PasswordPrompt extends Component {
         this.hash = items.password.hash;
       }
     });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    //debug.log({ props: this.props, prevProps: prevProps, state: this.state, prevState: prevState });
+    if (this.props.path !== prevProps.path && this.props.path !== this.state.path) {
+      debug.warn('path prop has changed:', this.props.path);
+      this.redirectPath = this.props.path;
+      this.setState({
+        hasHeader: this.hasHeader(),
+        hasFooter: this.hasFooter()
+      });
+    }
   }
 
   redirectTo = (path, state = null) => {
@@ -83,7 +103,7 @@ export default class PasswordPrompt extends Component {
         minWidth={320}
         minHeight={230}
       >
-        {this.props.hasHeader && (
+        {this.state.hasHeader && (
           <Header />
         )}
         <Pane
@@ -120,6 +140,11 @@ export default class PasswordPrompt extends Component {
             </Pane>
           </Pane>
         </Pane>
+        {this.state.hasFooter && (
+          <Pane display="flex" paddingX={16} paddingY={10} alignItems="start" justifyContent="space-between" borderTop>
+            <SettingsButton history={this.props.history} />
+          </Pane>
+        )}
       </Pane>
     );
   }
