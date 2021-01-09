@@ -1,9 +1,10 @@
 import { Component, Fragment } from 'react';
-import { Pane, Heading, Text, Position, Badge, CogIcon, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon } from 'evergreen-ui';
+import { Pane, Text, Position, Badge, CogIcon, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
 import { isWebExtension, openOptionsPage, sendMessage, getActiveTab, getActiveTabHostname, storage } from '../../helpers/webext';
 import { Mode, defaultBlacklist, defaultWhitelist, defaultSchedule, isAccessible } from '../../helpers/block';
 import { inToday } from '../../helpers/date';
+import Header from '../shared/header/Header';
 import SwitchField from '../shared/switch-field/SwitchField';
 import SegmentedControlField from '../shared/segmented-control-field/SegmentedControlField';
 import AnimatedIconButton from '../shared/animated-icon-button/AnimatedIconButton';
@@ -137,12 +138,7 @@ export default class Panel extends Component {
   render() {
     return (
       <Pane minWidth={320}>
-        <Pane display="flex" alignItems="center" justifyContent="center" height={60} borderBottom>
-          <img className="logo" src="icons/magnet-256.png" />
-          <Heading size={600} fontWeight="bold" className="cursor-default">
-            {translate('appName') || 'Distract Me Not'}
-          </Heading>
-        </Pane>
+        <Header />
         {this.state.status && this.state.schedule.isEnabled ? (
           <Pane display="flex" paddingX={16} paddingY={20}>
             <Pane display="flex" alignItems="center" flex={1}>
