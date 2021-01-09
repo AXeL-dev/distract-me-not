@@ -5,8 +5,10 @@ import { debug, isDevEnv } from '../../helpers/debug';
 import { Action, defaultBlacklist, defaultWhitelist, defaultSchedule } from '../../helpers/block';
 import { sendMessage, storage } from '../../helpers/webext';
 import { DaysOfWeek } from '../../helpers/date';
+import { hash } from '../../helpers/crypt';
 import SwitchField from '../shared/switch-field/SwitchField';
 import TimeField from '../shared/time-field/TimeField';
+import PasswordField from '../shared/password-field/PasswordField';
 import MultiSelectField from '../shared/multi-select-field/MultiSelectField';
 import WebsiteList from '../shared/website-list/WebsiteList';
 import './Settings.scss';
@@ -22,10 +24,10 @@ export default class Settings extends Component {
       tabs: [
         { label: translate('blocking'), id: 'blocking' },
         { label: translate('schedule'), id: 'schedule' },
+        { label: translate('password'), id: 'password' },
         { label: translate('blacklist'), id: 'blacklist' },
         { label: translate('whitelist'), id: 'whitelist' },
         { label: translate('miscellaneous'), id: 'misc' },
-        //{ label: translate('password'), id: 'password' },
       ],
       actions: [
         { label: translate('blockTab'), value: Action.blockTab },
@@ -45,6 +47,10 @@ export default class Settings extends Component {
         schedule: defaultSchedule,
         blacklist: isDevEnv ? defaultBlacklist : [],
         whitelist: isDevEnv ? defaultWhitelist : [],
+        password: {
+          isEnabled: false,
+          value: ''
+        },
         misc: {
           enableOnBrowserStartup: false,
         }
@@ -60,6 +66,7 @@ export default class Settings extends Component {
       redirectUrl: this.state.options.redirectToUrl.url,
       enableOnBrowserStartup: this.state.options.misc.enableOnBrowserStartup,
       schedule: this.state.options.schedule,
+      password: this.state.options.password,
       blacklist: defaultBlacklist,
       whitelist: defaultWhitelist,
     }).then((items) => {
@@ -78,6 +85,10 @@ export default class Settings extends Component {
             // merge both state & storage values
             ...this.state.options.schedule,
             ...items.schedule
+          },
+          password: {
+            ...this.state.options.password,
+            isEnabled: items.password.isEnabled
           },
           blacklist: items.blacklist,
           whitelist: items.whitelist,
@@ -140,6 +151,10 @@ export default class Settings extends Component {
 
   save = () => {
     debug.log('save:', this.state.options);
+    if (this.state.options.password.isEnabled && this.state.options.password.value.length < 8) {
+      toaster.danger(translate('passwordIsShort'), { id: 'settings-toaster' });
+      return;
+    }
     storage.set({
       action: this.state.options.action,
       message: this.state.options.blockTab.message,
@@ -147,6 +162,10 @@ export default class Settings extends Component {
       redirectUrl: this.state.options.redirectToUrl.url,
       enableOnBrowserStartup: this.state.options.misc.enableOnBrowserStartup,
       schedule: this.state.options.schedule,
+      password: {
+        isEnabled: this.state.options.password.isEnabled,
+        hash: hash(this.state.options.password.value)
+      },
       blacklist: this.state.options.blacklist,
       whitelist: this.state.options.whitelist,
     }).then(success => {
@@ -193,7 +212,7 @@ export default class Settings extends Component {
               display={index === this.state.selectedTabIndex ? 'block' : 'none'}
               //maxWidth={500}
             >
-              {tab.id === 'blocking' &&
+              {tab.id === 'blocking' && (
                 <Fragment>
                   <SelectField
                     label={translate('defaultAction')}
@@ -206,7 +225,7 @@ export default class Settings extends Component {
                       <option key={action.value} value={action.value}>{action.label}</option>
                     ))}
                   </SelectField>
-                  {this.state.options.action === Action.blockTab &&
+                  {this.state.options.action === Action.blockTab && (
                     <Fragment>
                       <TextInputField
                         label={translate('blockingMessage')}
@@ -222,8 +241,8 @@ export default class Settings extends Component {
                         onChange={event => this.setOptions('blockTab', { displayBlankPage: event.target.checked })}
                       />
                     </Fragment>
-                  }
-                  {this.state.options.action === Action.redirectToUrl &&
+                  )}
+                  {this.state.options.action === Action.redirectToUrl && (
                     <TextInputField
                       label={translate('url')}
                       placeholder={translate('redirectUrlExample')}
@@ -231,10 +250,10 @@ export default class Settings extends Component {
                       onChange={event => this.setOptions('redirectToUrl', { url: event.target.value })}
                       marginBottom={16}
                     />
-                  }
+                  )}
                 </Fragment>
-              }
-              {tab.id === 'schedule' &&
+              )}
+              {tab.id === 'schedule' && (
                 <Fragment>
                   <SwitchField
                     label={translate('scheduleDescription')}
@@ -268,8 +287,26 @@ export default class Settings extends Component {
                     disabled={!this.state.options.schedule.isEnabled}
                   />
                 </Fragment>
-              }
-              {tab.id === 'blacklist' &&
+              )}
+              {tab.id === 'password' && (
+                <Fragment>
+                  <SwitchField
+                    label={translate('enablePasswordProtection')}
+                    labelSize={300}
+                    labelColor="muted"
+                    tooltip={translate('passwordDescription')}
+                    checked={this.state.options.password.isEnabled}
+                    onChange={event => this.setOptions('password', { isEnabled: event.target.checked })}
+                    marginBottom={16}
+                  />
+                  <PasswordField
+                    label={`${translate('password')}:`}
+                    onChange={event => this.setOptions('password', { value: event.target.value })}
+                    disabled={!this.state.options.password.isEnabled}
+                  />
+                </Fragment>
+              )}
+              {tab.id === 'blacklist' && (
                 <Fragment>
                   <Paragraph size={300} color="muted" marginBottom={16}>{translate('blacklistDescription')}</Paragraph>
                   <WebsiteList
@@ -280,8 +317,8 @@ export default class Settings extends Component {
                     addNewItemsOnTop={true}
                   />
                 </Fragment>
-              }
-              {tab.id === 'whitelist' &&
+              )}
+              {tab.id === 'whitelist' && (
                 <Fragment>
                   <Paragraph size={300} color="muted" marginBottom={16}>{translate('whitelistDescription')}</Paragraph>
                   <WebsiteList
@@ -292,8 +329,8 @@ export default class Settings extends Component {
                     addNewItemsOnTop={true}
                   />
                 </Fragment>
-              }
-              {tab.id === 'misc' &&
+              )}
+              {tab.id === 'misc' && (
                 <Fragment>
                   <SwitchField
                     label={translate('enableOnBrowserStartup')}
@@ -302,7 +339,7 @@ export default class Settings extends Component {
                     //marginBottom={16}
                   />
                 </Fragment>
-              }
+              )}
             </Pane>
           ))}
         </Pane>

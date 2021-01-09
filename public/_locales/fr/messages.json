@@ -113,6 +113,15 @@
     "password": {
         "message": "Mot de passe"
     },
+    "passwordDescription": {
+        "message": "Verrouille l'accès au panneau et aux paramètres avec un mot de passe."
+    },
+    "enablePasswordProtection": {
+        "message": "Activer la protection par mot de passe:"
+    },
+    "passwordIsShort": {
+        "message": "Le mot de passe doit contenir au moins 8 caractères."
+    },
     "enable": {
         "message": "Activer"
     },

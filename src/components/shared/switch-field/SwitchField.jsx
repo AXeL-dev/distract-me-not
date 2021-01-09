@@ -1,4 +1,5 @@
-import { Pane, Text, Switch, Position } from 'evergreen-ui';
+import { Pane, Text, Switch, Tooltip, Position } from 'evergreen-ui';
+import './SwitchField.scss';
 
 export default function SwitchField(props) {
   return (
@@ -21,9 +22,17 @@ export default function SwitchField(props) {
       flexDirection={props.position === Position.LEFT ? 'row-reverse' : 'inherit'}
     >
       <Pane display="flex" alignItems="center" flex={1}>
-        <Text size={props.labelSize} color={props.labelColor} className={props.labelClassName}>
-          {props.label}
-        </Text>
+        {props.tooltip ? (
+          <Tooltip content={props.tooltip} position={props.tooltipPosition || Position.BOTTOM}>
+            <Text size={props.labelSize} color={props.labelColor} className={`cursor-help ${props.labelClassName}`}>
+              {props.label}
+            </Text>
+          </Tooltip>
+        ) : (
+          <Text size={props.labelSize} color={props.labelColor} className={props.labelClassName}>
+            {props.label}
+          </Text>
+        )}
       </Pane>
       <Pane display="flex" alignItems="center" marginRight={props.position === Position.LEFT ? 12 : 0}>
         <Switch

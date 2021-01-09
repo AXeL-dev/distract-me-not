@@ -113,6 +113,15 @@
     "password": {
         "message": "Password"
     },
+    "passwordDescription": {
+        "message": "Locks access to panel & settings with a password."
+    },
+    "enablePasswordProtection": {
+        "message": "Enable password protection:"
+    },
+    "passwordIsShort": {
+        "message": "The password must contain at least 8 characters."
+    },
     "enable": {
         "message": "Enable"
     },
