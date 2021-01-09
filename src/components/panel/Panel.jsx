@@ -201,6 +201,7 @@ export default class Panel extends Component {
               className="fill-grey"
               icon={CogIcon}
               iconSize={22}
+              iconColor="#4E4E50"
               onClick={this.goToSettings}
             />
           </Pane>
@@ -211,6 +212,7 @@ export default class Panel extends Component {
               className="fill-green"
               icon={PlusIcon}
               iconSize={26}
+              iconColor="#47b881"
               onClick={this.addCurrentHostname}
               hideOnClick={true}
               hideAnimationIcon={TickIcon}

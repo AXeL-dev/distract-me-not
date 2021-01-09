@@ -1,6 +1,6 @@
-import { Component, Fragment } from 'react';
-import { Tooltip, IconButton } from 'evergreen-ui';
+import { Component } from 'react';
 import { debug } from '../../../helpers/debug';
+import IconButton from '../icon-button/IconButton';
 import './AnimatedIconButton.scss';
 
 export default class AnimatedIconButton extends Component {
@@ -78,20 +78,17 @@ export default class AnimatedIconButton extends Component {
   }
 
   render() {
-    return (
-      <Fragment>
-        {this.state.isVisible &&
-          <Tooltip content={this.props.tooltip} position={this.props.tooltipPosition}>
-            <IconButton
-              className={`animated-icon-button ${this.props.className} ${this.state.className}`}
-              appearance="minimal"
-              icon={this.state.icon}
-              iconSize={this.props.iconSize || 22}
-              onClick={this.handleClick}
-            />
-          </Tooltip>
-        }
-      </Fragment>
+    return this.state.isVisible && (
+      <IconButton
+        className={`animated-icon-button ${this.props.className} ${this.state.className}`}
+        appearance="minimal"
+        icon={this.state.icon}
+        iconSize={this.props.iconSize || 22}
+        iconColor={this.props.iconColor}
+        tooltip={this.props.tooltip}
+        tooltipPosition={this.props.tooltipPosition}
+        onClick={this.handleClick}
+      />
     );
   }
 }
