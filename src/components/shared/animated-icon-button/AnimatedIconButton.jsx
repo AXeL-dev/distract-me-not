@@ -81,7 +81,7 @@ export default class AnimatedIconButton extends Component {
     return this.state.isVisible && (
       <IconButton
         className={`animated-icon-button ${this.props.className} ${this.state.className}`}
-        appearance="minimal"
+        appearance={this.props.appearance || 'minimal'}
         icon={this.state.icon}
         iconSize={this.props.iconSize || 22}
         iconColor={this.props.iconColor}

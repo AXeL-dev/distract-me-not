@@ -1,13 +1,14 @@
 import { Component, Fragment } from 'react';
-import { Pane, Text, Position, Badge, CogIcon, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon } from 'evergreen-ui';
+import { Pane, Text, Position, Badge, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
-import { isWebExtension, openOptionsPage, sendMessage, getActiveTab, getActiveTabHostname, storage } from '../../helpers/webext';
+import { sendMessage, getActiveTab, getActiveTabHostname, storage } from '../../helpers/webext';
 import { Mode, defaultBlacklist, defaultWhitelist, defaultSchedule, isAccessible } from '../../helpers/block';
 import { inToday } from '../../helpers/date';
 import Header from '../shared/header/Header';
 import SwitchField from '../shared/switch-field/SwitchField';
 import SegmentedControlField from '../shared/segmented-control-field/SegmentedControlField';
 import AnimatedIconButton from '../shared/animated-icon-button/AnimatedIconButton';
+import SettingsButton from '../shared/settings-button/SettingsButton';
 import './Panel.scss';
 
 export default class Panel extends Component {
@@ -87,14 +88,6 @@ export default class Panel extends Component {
     sendMessage('setMode', value);
     storage.set({ mode: value });
     this.toggleAddButton(value);
-  }
-
-  goToSettings = () => {
-    if (isWebExtension()) {
-      openOptionsPage();
-    } else {
-      this.props.history.push('/settings');
-    }
   }
 
   addCurrentHostname = () => {
@@ -191,18 +184,11 @@ export default class Panel extends Component {
         />
         <Pane display="flex" paddingX={16} paddingY={10} alignItems="center" justifyContent="space-between" borderTop>
           <Pane>
-            <AnimatedIconButton
-              tooltip={translate('settings')}
-              tooltipPosition={Position.RIGHT}
-              className="fill-grey"
-              icon={CogIcon}
-              iconSize={22}
-              iconColor="#4E4E50"
-              onClick={this.goToSettings}
-            />
+            <SettingsButton history={this.props.history} />
           </Pane>
           <Pane>
             <AnimatedIconButton
+              appearance="minimal"
               tooltip={this.state.mode === 'blacklist' ? translate('addToBlacklist') : translate('addToWhitelist')}
               tooltipPosition={Position.LEFT}
               className="fill-green"
