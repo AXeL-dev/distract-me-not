@@ -113,6 +113,9 @@
     "password": {
         "message": "Mot de passe"
     },
+    "changePassword": {
+        "message": "Changer le mot de passe"
+    },
     "passwordDescription": {
         "message": "Verrouille l'accès au panneau et aux paramètres avec un mot de passe."
     },

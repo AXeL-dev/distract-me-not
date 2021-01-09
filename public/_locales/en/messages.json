@@ -113,6 +113,9 @@
     "password": {
         "message": "Password"
     },
+    "changePassword": {
+        "message": "Change password"
+    },
     "passwordDescription": {
         "message": "Locks access to panel & settings with a password."
     },

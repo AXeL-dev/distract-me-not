@@ -49,7 +49,8 @@ export default class Settings extends Component {
         whitelist: isDevEnv ? defaultWhitelist : [],
         password: {
           isEnabled: false,
-          value: ''
+          value: '',
+          hash: ''
         },
         misc: {
           enableOnBrowserStartup: false,
@@ -88,7 +89,7 @@ export default class Settings extends Component {
           },
           password: {
             ...this.state.options.password,
-            isEnabled: items.password.isEnabled
+            ...items.password
           },
           blacklist: items.blacklist,
           whitelist: items.whitelist,
@@ -164,7 +165,7 @@ export default class Settings extends Component {
       schedule: this.state.options.schedule,
       password: {
         isEnabled: this.state.options.password.isEnabled,
-        hash: hash(this.state.options.password.value)
+        hash: this.state.options.password.isEnabled ? hash(this.state.options.password.value) : ''
       },
       blacklist: this.state.options.blacklist,
       whitelist: this.state.options.whitelist,
@@ -300,7 +301,7 @@ export default class Settings extends Component {
                     marginBottom={16}
                   />
                   <PasswordField
-                    label={`${translate('password')}:`}
+                    label={`${translate(this.state.options.password.hash && this.state.options.password.hash.length ? 'changePassword' : 'password')}:`}
                     onChange={event => this.setOptions('password', { value: event.target.value })}
                     disabled={!this.state.options.password.isEnabled}
                   />
