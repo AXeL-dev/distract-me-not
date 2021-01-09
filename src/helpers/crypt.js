@@ -8,5 +8,8 @@ export function hash(password) {
 }
 
 export function compare(password, hash) {
+  if (!hash) {
+    return false;
+  }
   return bcrypt.compareSync(password, hash);
 }

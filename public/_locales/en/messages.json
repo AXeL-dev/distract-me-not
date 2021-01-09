@@ -122,6 +122,9 @@
     "passwordIsShort": {
         "message": "The password must contain at least 8 characters."
     },
+    "passwordIsWrong": {
+        "message": "Wrong password!"
+    },
     "enable": {
         "message": "Enable"
     },

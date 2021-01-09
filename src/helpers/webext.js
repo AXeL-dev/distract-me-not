@@ -16,6 +16,14 @@ export function isWebExtension() {
   }
 }
 
+export function isFirefox() {
+  return navigator.userAgent.indexOf("Firefox") !== -1;
+}
+
+export function isChrome() {
+  return navigator.userAgent.indexOf("Chrome") !== -1;
+}
+
 export function openOptionsPage() {
   try {
     browser.runtime.openOptionsPage();
