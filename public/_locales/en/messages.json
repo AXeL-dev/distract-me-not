@@ -120,7 +120,7 @@
         "message": "Leave empty to keep the old password."
     },
     "passwordDescription": {
-        "message": "Locks access to panel & settings with a password."
+        "message": "Locks access to settings with a password."
     },
     "enablePasswordProtection": {
         "message": "Enable password protection:"

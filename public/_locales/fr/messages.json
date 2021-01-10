@@ -120,7 +120,7 @@
         "message": "Laissez vide pour conserver l'ancien mot de passe."
     },
     "passwordDescription": {
-        "message": "Verrouille l'accès à la fenêtre popup et aux paramètres avec un mot de passe."
+        "message": "Verrouille l'accès aux paramètres avec un mot de passe."
     },
     "enablePasswordProtection": {
         "message": "Activer la protection par mot de passe:"
