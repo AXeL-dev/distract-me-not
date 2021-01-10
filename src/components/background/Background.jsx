@@ -141,7 +141,7 @@ export default class Background extends Component {
       switch (request.message) {
         // unblockSenderTab
         case 'unblockSenderTab':
-          const { url, option, time } = request.params[0];
+          const { url, option, time = 0 } = request.params[0];
           switch (option) {
             case unblockOptions.unblockForWhile:
               this.tmpAllowed.push({
@@ -156,12 +156,18 @@ export default class Background extends Component {
                 once: true,
                 hostname: getHostName(url)
               });
+              break;
           }
           response = this.redirectTab(sender.tab.id, url);
+          break;
+        // redirectSenderTab
+        case 'redirectSenderTab':
+          response = this.redirectTab(sender.tab.id, ...request.params);
           break;
         // default
         default:
           response = this.isFunction(request.message) ? this.executeFunction(request.message, ...request.params) : this[request.message];
+          break;
       }
       resolve({ response });
     });

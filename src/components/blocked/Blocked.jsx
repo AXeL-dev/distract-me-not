@@ -60,6 +60,11 @@ export default class Blocked extends Component {
   }
 
   componentDidMount() {
+    sendMessage('getIsEnabled').then(isEnabled => {
+      if (isEnabled === false && this.url) { // Redirect to url when status is disabled
+        sendMessage('redirectSenderTab', this.url);
+      }
+    });
     storage.get({
       message: this.state.message,
       displayBlankPage: this.state.isBlank,
