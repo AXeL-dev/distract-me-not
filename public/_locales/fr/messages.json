@@ -227,7 +227,13 @@
     "unblockFor": {
         "message": "Débloquer pour"
     },
+    "unblockOnceTimeout": {
+        "message": "Délai d'expiration du déblocage pour une fois:"
+    },
     "minutes": {
         "message": "minute(s)"
+    },
+    "seconds": {
+        "message": "seconde(s)"
     }
 }

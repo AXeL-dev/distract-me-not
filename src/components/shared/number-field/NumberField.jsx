@@ -1,8 +1,8 @@
-import { Pane } from 'evergreen-ui';
+import { Pane, Text } from 'evergreen-ui';
 import TooltipLabel from '../tooltip-label/TooltipLabel';
-import PasswordInput from '../password-input/PasswordInput';
+import NumberInput from '../number-input/NumberInput';
 
-export default function PasswordField(props) {
+export default function NumberField(props) {
   return (
     <Pane
       display="flex"
@@ -31,14 +31,20 @@ export default function PasswordField(props) {
           tooltipPosition={props.tooltipPosition}
         />
       </Pane>
-      <Pane display="flex" alignItems="center">
-        <PasswordInput
+      <Pane display="flex" alignItems="center" gap={10}>
+        <NumberInput
+          min={props.min}
+          max={props.max}
+          step={props.step}
+          width={props.inputWidth}
           value={props.value}
-          placeholder={props.placeholder}
           onChange={props.onChange}
           disabled={props.disabled}
           required={props.required}
         />
+        {props.suffix && (
+          <Text>{props.suffix}</Text>
+        )}
       </Pane>
     </Pane>
   );

@@ -100,15 +100,17 @@ export default class Blocked extends Component {
     this.updateUnblockDialogState({ isShown: true });
   }
 
-  redirectToUrl = () => {
+  unblock = () => {
     this.closeUnblockDialog();
+    const params = {
+      url: this.url,
+      option: this.state.unblockDialog.selected,
+      time: this.state.unblockDialog.time
+    };
+    debug.log('unblocking:', params);
     if (this.url) {
       //window.location.replace(this.url);
-      sendMessage('unblockSenderTab', {
-        url: this.url,
-        option: this.state.unblockDialog.selected,
-        time: this.state.unblockDialog.time
-      });
+      sendMessage('unblockSenderTab', params);
     }
   }
 
@@ -160,7 +162,7 @@ export default class Blocked extends Component {
                   minHeight={50}
                   inputWidth="100%"
                   inputHeight={36}
-                  onSuccess={this.redirectToUrl}
+                  onSuccess={this.unblock}
                 />
               </Pane>
             </Dialog>

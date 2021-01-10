@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { storage, getNativeAPI } from '../../helpers/webext';
-import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule, unblockOptions } from '../../helpers/block';
+import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule, unblockOptions, defaultUnblockOnceTimeout } from '../../helpers/block';
 import { hasValidProtocol, getValidUrl, getHostName } from '../../helpers/url';
 import { regex } from '../../helpers/regex';
 import { inTime } from '../../helpers/time';
@@ -20,6 +20,7 @@ export default class Background extends Component {
     this.action = Action.blockTab;
     this.redirectUrl = '';
     this.schedule = defaultSchedule;
+    this.unblockOnceTimeout = defaultUnblockOnceTimeout;
 
     this.init();
   }
@@ -89,6 +90,14 @@ export default class Background extends Component {
 
   getRedirectUrl = () => {
     return this.redirectUrl;
+  }
+
+  setUnblockOnceTimeout = (value) => {
+    this.unblockOnceTimeout = value;
+  }
+
+  getUnblockOnceTimeout = () => {
+    return this.unblockOnceTimeout;
   }
 
   //----- End getters & setters
@@ -244,7 +253,7 @@ export default class Background extends Component {
         if (this.tmpAllowed[index].once) {
           setTimeout(() => {
             this.tmpAllowed.splice(index, 1);
-          }, 1000);
+          }, this.unblockOnceTimeout * 1000);
         }
         return true;
       }

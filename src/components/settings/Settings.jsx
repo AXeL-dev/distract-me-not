@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Pane, Tablist, Tab, SelectField, Checkbox, TextInputField, Button, TickIcon, Paragraph, toaster } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
 import { debug, isDevEnv } from '../../helpers/debug';
-import { Action, defaultBlacklist, defaultWhitelist, defaultSchedule } from '../../helpers/block';
+import { Action, defaultBlacklist, defaultWhitelist, defaultSchedule, defaultUnblockOnceTimeout } from '../../helpers/block';
 import { sendMessage, storage } from '../../helpers/webext';
 import { DaysOfWeek } from '../../helpers/date';
 import { hash } from '../../helpers/crypt';
@@ -11,6 +11,7 @@ import TimeField from '../shared/time-field/TimeField';
 import PasswordField from '../shared/password-field/PasswordField';
 import MultiSelectField from '../shared/multi-select-field/MultiSelectField';
 import WebsiteList from '../shared/website-list/WebsiteList';
+import NumberField from '../shared/number-field/NumberField';
 import './Settings.scss';
 
 export default class Settings extends Component {
@@ -53,6 +54,7 @@ export default class Settings extends Component {
           value: '',
           hash: '',
           unblockWebsites: false,
+          unblockOnceTimeout: defaultUnblockOnceTimeout
         },
         misc: {
           enableOnBrowserStartup: false,
@@ -179,7 +181,8 @@ export default class Settings extends Component {
         ) : (
           '' // else if protection is disabled, set hash to empty string
         ),
-        unblockWebsites: this.state.options.password.unblockWebsites
+        unblockWebsites: this.state.options.password.unblockWebsites,
+        unblockOnceTimeout: this.state.options.password.unblockOnceTimeout
       },
       blacklist: this.state.options.blacklist,
       whitelist: this.state.options.whitelist,
@@ -192,6 +195,7 @@ export default class Settings extends Component {
           sendMessage('setSchedule', this.state.options.schedule);
           sendMessage('setBlacklist', this.state.options.blacklist);
           sendMessage('setWhitelist', this.state.options.whitelist);
+          sendMessage('setUnblockOnceTimeout', this.state.options.password.unblockOnceTimeout);
         }
         // Show success message
         toaster.success(translate('settingsSaved'), { id: 'settings-toaster' });
@@ -321,12 +325,26 @@ export default class Settings extends Component {
                     disabled={!this.state.options.password.isEnabled}
                   />
                   {this.state.options.action === Action.blockTab && (
-                    <Checkbox
-                      label={translate('unblockWebsitesWithPassword')}
-                      checked={this.state.options.password.unblockWebsites}
-                      onChange={event => this.setOptions('password', { unblockWebsites: event.target.checked })}
-                      disabled={!this.state.options.password.isEnabled}
-                    />
+                    <Fragment>
+                      <Checkbox
+                        label={translate('unblockWebsitesWithPassword')}
+                        checked={this.state.options.password.unblockWebsites}
+                        onChange={event => this.setOptions('password', { unblockWebsites: event.target.checked })}
+                        disabled={!this.state.options.password.isEnabled}
+                      />
+                      {this.state.options.password.unblockWebsites && (
+                        <NumberField
+                          label={translate('unblockOnceTimeout')}
+                          min={5}
+                          max={60}
+                          inputWidth={60}
+                          value={this.state.options.password.unblockOnceTimeout}
+                          onChange={(value) => this.setOptions('password', { unblockOnceTimeout: value })}
+                          suffix={translate('seconds')}
+                          disabled={!this.state.options.password.isEnabled}
+                        />
+                      )}
+                    </Fragment>
                   )}
                 </Fragment>
               )}

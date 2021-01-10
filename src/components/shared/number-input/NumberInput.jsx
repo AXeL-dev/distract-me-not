@@ -21,14 +21,15 @@ export default class NumberInput extends Component {
   }
 
   validateValue = (value) => {
+    const intValue = parseInt(value);
     const min = this.props.min !== undefined ? this.props.min : null;
     const max = this.props.max !== undefined ? this.props.max : null;
-    if (min !== null && value < min) {
+    if (min !== null && intValue < min) {
       return min;
-    } else if (max !== null && value > max) {
+    } else if (max !== null && intValue > max) {
       return max;
     }
-    return value;
+    return intValue;
   }
 
   handleChange = (event) => {
@@ -45,9 +46,12 @@ export default class NumberInput extends Component {
         type="number"
         min={this.props.min}
         max={this.props.max}
+        step={this.props.step}
         style={{ width: this.props.width || 100 }}
         value={this.state.value}
         onChange={this.handleChange}
+        disabled={this.props.disabled}
+        required={this.props.required}
       /> 
     );
   }

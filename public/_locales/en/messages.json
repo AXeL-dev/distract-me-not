@@ -227,7 +227,13 @@
     "unblockFor": {
         "message": "Unblock for"
     },
+    "unblockOnceTimeout": {
+        "message": "Unblock once timeout:"
+    },
     "minutes": {
         "message": "minute(s)"
+    },
+    "seconds": {
+        "message": "second(s)"
     }
 }
