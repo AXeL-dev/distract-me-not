@@ -30,6 +30,11 @@ export const defaultSchedule = {
   days: DaysOfWeek
 };
 
+export const unblockOptions = {
+  unblockOnce: 'unblock-once',
+  unblockForWhile: 'unblock-for-while'
+};
+
 export function isAccessible(url) {
   return url && !url.startsWith("about:") && !/^(?:file|chrome|moz\-extension|chrome\-extension)\:\/\//i.test(url);
 }

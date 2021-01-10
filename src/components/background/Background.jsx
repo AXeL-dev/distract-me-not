@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { storage, getNativeAPI } from '../../helpers/webext';
-import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule } from '../../helpers/block';
+import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule, unblockOptions } from '../../helpers/block';
 import { hasValidProtocol, getValidUrl, getHostName } from '../../helpers/url';
 import { regex } from '../../helpers/regex';
 import { inTime } from '../../helpers/time';
@@ -139,10 +139,27 @@ export default class Background extends Component {
     let response = null;
     return new Promise(resolve => {
       switch (request.message) {
+        // unblockSenderTab
         case 'unblockSenderTab':
-          const url = request.params[0];
-          this.tmpAllowed.push(getHostName(url));
+          const { url, option, time } = request.params[0];
+          switch (option) {
+            case unblockOptions.unblockForWhile:
+              this.tmpAllowed.push({
+                time: time * 60000, // convert to ms
+                startedAt: new Date().getTime(),
+                hostname: getHostName(url)
+              });
+              break;
+            case unblockOptions.unblockOnce:
+            default:
+              this.tmpAllowed.push({
+                once: true,
+                hostname: getHostName(url)
+              });
+          }
           response = this.redirectTab(sender.tab.id, url);
+          break;
+        // default
         default:
           response = this.isFunction(request.message) ? this.executeFunction(request.message, ...request.params) : this[request.message];
       }
@@ -197,19 +214,36 @@ export default class Background extends Component {
     });
   }
 
-  isTmpAllowed = (url) => {
-    if (this.tmpAllowed.length) {
-      const hostname = getHostName(url);
-      const index = this.tmpAllowed.indexOf(hostname);
-      if (index !== -1) {
-        this.log('allowed:', url);
-        setTimeout(() => {
-          this.tmpAllowed.splice(index, 1);
-        }, 1000);
+  removeOutdatedTmpAllowed = () => {
+    const now = new Date().getTime();
+    this.tmpAllowed = this.tmpAllowed.filter(allowed => {
+      if (allowed.once) {
         return true;
       }
-      this.log('not allowed:', url);
+      if (now > allowed.startedAt + allowed.time) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+  }
+
+  isTmpAllowed = (url) => {
+    if (this.tmpAllowed.length) {
+      this.removeOutdatedTmpAllowed();
+      const hostname = getHostName(url);
+      const index = this.tmpAllowed.map(allowed => allowed.hostname).indexOf(hostname);
+      if (index !== -1) {
+        this.log('allowed:', url);
+        if (this.tmpAllowed[index].once) {
+          setTimeout(() => {
+            this.tmpAllowed.splice(index, 1);
+          }, 1000);
+        }
+        return true;
+      }
     }
+    this.log('not allowed:', url);
     return false;
   }
 

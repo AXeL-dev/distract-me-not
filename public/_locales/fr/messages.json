@@ -220,5 +220,14 @@
     },
     "unblock": {
         "message": "Débloquer"
+    },
+    "unblockOnce": {
+        "message": "Débloquer une fois"
+    },
+    "unblockFor": {
+        "message": "Débloquer pour"
+    },
+    "minutes": {
+        "message": "minute(s)"
     }
 }
