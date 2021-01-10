@@ -12,13 +12,13 @@ export const Action = {
 };
 
 export const defaultBlacklist = [
-  'facebook.com',
-  'twitter.com',
-  'youtube.com'
+  '*.facebook.com',
+  '*.twitter.com',
+  '*.youtube.com'
 ];
 
 export const defaultWhitelist = [
-  'wikipedia.org'
+  '*.wikipedia.org'
 ];
 
 export const defaultSchedule = {
