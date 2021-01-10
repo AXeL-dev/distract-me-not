@@ -240,7 +240,7 @@ export default class Background extends Component {
       const hostname = getHostName(url);
       const index = this.tmpAllowed.map(allowed => allowed.hostname).indexOf(hostname);
       if (index !== -1) {
-        this.log('allowed:', url);
+        this.log('tmp allowed:', url);
         if (this.tmpAllowed[index].once) {
           setTimeout(() => {
             this.tmpAllowed.splice(index, 1);
@@ -249,7 +249,7 @@ export default class Background extends Component {
         return true;
       }
     }
-    this.log('not allowed:', url);
+    this.log('not tmp allowed:', url);
     return false;
   }
 
@@ -259,9 +259,11 @@ export default class Background extends Component {
     }
     for (const rule of this.blacklist) {
       if (rule.test(url)) {
+        this.log('is blacklisted:', url);
         return true;
       }
     }
+    this.log('not blacklisted:', url);
     return false;
   }
 
@@ -271,9 +273,11 @@ export default class Background extends Component {
     }
     for (const rule of this.whitelist) {
       if (rule.test(url)) {
+        this.log('is whitelisted:', url);
         return true;
       }
     }
+    this.log('not whitelisted:', url);
     return false;
   }
 

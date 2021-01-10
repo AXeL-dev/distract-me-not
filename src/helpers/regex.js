@@ -4,7 +4,6 @@ export class regex {
   static wildcard(url) {
     if (url.indexOf('://') === -1 && !url.startsWith('^')) {
       return `*://${url}/*`;
-      //return `*://*.${url.replace(/^(?:www|\*+)\./i, '')}/*`; // Adding "*." to the begining of the hostname doesn't seems to work well with all domains
     }
     return url;
   }
@@ -13,7 +12,7 @@ export class regex {
     if (url.startsWith('^')) {
       return new RegExp(url, 'i');
     }
-    const escapeRegexp = str => {
+    const escapeRegex = str => {
       const specials = [
         // order matters for these
         '-', '[', ']',
@@ -23,7 +22,11 @@ export class regex {
       const regex = RegExp('[' + specials.join('\\') + ']', 'g');
       return str.replace(regex, '\\$&');
     };
-    return new RegExp('^' + url.split('*').map(escapeRegexp).join('.*') + '$', 'i');
+    const sanitizeRegex = regex => {
+      return regex.replace(/^\.\*:\\\/\\\/\.\*\\\./, '.*:\\/\\/(.*\\.)?') // If "*." wildcard is after the protocol (which is equivalent to ".*\." in regex), escape it
+                  .replace(/\\\/\.\*$/, '(\\/|$).*'); // If "/*" wildcard is at the end (which is equivalent to "\/.*" in regex), escape it
+    };
+    return new RegExp('^' + sanitizeRegex(url.split('*').map(escapeRegex).join('.*')) + '$', 'i');
   }
 
 }
