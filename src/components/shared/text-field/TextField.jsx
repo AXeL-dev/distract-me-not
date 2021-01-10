@@ -63,8 +63,8 @@ export default class TextField extends Component {
               placeholder={this.props.placeholder}
               disabled={this.props.disabled}
               required={this.props.required}
-              borderTopRightRadius={0}
-              borderBottomRightRadius={0}
+              borderTopRightRadius={this.props.hasButton ? 0 : 3}
+              borderBottomRightRadius={this.props.hasButton ? 0 : 3}
             />
           </Pane>
           {this.props.hasButton &&

@@ -140,6 +140,9 @@ export default class Blocked extends Component {
               hasFooter={false}
               topOffset="40vmin"
               width={400}
+              containerProps={{
+                className: "unblock-dialog"
+              }}
             >
               <Pane width="95%" margin="auto">
                 <RadioGroup

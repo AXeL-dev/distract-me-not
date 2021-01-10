@@ -99,7 +99,7 @@ button.unblock:hover {
   color: $backgroundColor;
   border-color: transparent;
 }
-div[role="dialog"] > div:nth-child(1) { // dialog title
+.unblock-dialog > div:nth-child(1) { // dialog title
   border: 0 !important;
   position: absolute !important;
   top: 0;
