@@ -131,8 +131,8 @@
     "passwordIsWrong": {
         "message": "Wrong password!"
     },
-    "unblockPagesWithPassword": {
-        "message": "Allow unblocking pages with the password"
+    "unblockWebsitesWithPassword": {
+        "message": "Allow unblocking websites with the password"
     },
     "enable": {
         "message": "Enable"

@@ -52,7 +52,7 @@ export default class Settings extends Component {
           isSet: false,
           value: '',
           hash: '',
-          unblockPages: false,
+          unblockWebsites: false,
         },
         misc: {
           enableOnBrowserStartup: false,
@@ -179,7 +179,7 @@ export default class Settings extends Component {
         ) : (
           '' // else if protection is disabled, set hash to empty string
         ),
-        unblockPages: this.state.options.password.unblockPages
+        unblockWebsites: this.state.options.password.unblockWebsites
       },
       blacklist: this.state.options.blacklist,
       whitelist: this.state.options.whitelist,
@@ -322,9 +322,9 @@ export default class Settings extends Component {
                   />
                   {this.state.options.action === Action.blockTab && (
                     <Checkbox
-                      label={translate('unblockPagesWithPassword')}
-                      checked={this.state.options.password.unblockPages}
-                      onChange={event => this.setOptions('password', { unblockPages: event.target.checked })}
+                      label={translate('unblockWebsitesWithPassword')}
+                      checked={this.state.options.password.unblockWebsites}
+                      onChange={event => this.setOptions('password', { unblockWebsites: event.target.checked })}
                       disabled={!this.state.options.password.isEnabled}
                     />
                   )}

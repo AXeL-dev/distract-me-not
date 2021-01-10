@@ -70,14 +70,14 @@ export default class Blocked extends Component {
       displayBlankPage: this.state.isBlank,
       password: {
         isEnabled: false,
-        unblockPages: false
+        unblockWebsites: false
       }
     }).then((items) => {
       if (items) {
         this.setState({
           message: items.message.length ? items.message : this.state.message,
           isBlank: items.displayBlankPage,
-          hasUnblockButton: items.password.isEnabled && items.password.unblockPages
+          hasUnblockButton: items.password.isEnabled && items.password.unblockWebsites
         });
       }
     });
