@@ -16,23 +16,10 @@ export default class PasswordPrompt extends Component {
     super(props);
     this.hash = defaultHash || null;
     this.redirectPath = this.props.path || '/';
-    debug.log({
-      hash: this.hash,
-      redirectPath: this.redirectPath
-    });
+    debug.log({ hash: this.hash, redirectPath: this.redirectPath });
     this.state = {
-      password: '',
-      hasHeader: this.hasHeader(),
-      hasFooter: this.hasFooter()
+      password: ''
     };
-  }
-
-  hasHeader = () => {
-    return this.props.hasHeader !== undefined ? this.props.hasHeader : this.redirectPath !== '/settings';
-  }
-
-  hasFooter = () => {
-    return this.props.hasFooter !== undefined ? this.props.hasFooter : this.redirectPath !== '/settings';
   }
 
   componentDidMount() {
@@ -52,10 +39,6 @@ export default class PasswordPrompt extends Component {
     if (this.props.path !== prevProps.path && this.props.path !== this.state.path) {
       debug.warn('path prop has changed:', this.props.path);
       this.redirectPath = this.props.path;
-      this.setState({
-        hasHeader: this.hasHeader(),
-        hasFooter: this.hasFooter()
-      });
     }
   }
 
@@ -65,11 +48,7 @@ export default class PasswordPrompt extends Component {
     this.props.history.push(path);//, state); // passing state to history.push() doesn't work with hash router
   }
 
-  getRedirectPath = () => {
-    return 
-  }
-
-  unlock = () => {
+  checkPassword = () => {
     if (!compare(this.state.password, this.hash)) {
       toaster.danger(translate('passwordIsWrong'), { id: 'pwd-toaster' });
     } else {
@@ -77,19 +56,19 @@ export default class PasswordPrompt extends Component {
       if (this.props.onSuccess) {
         this.props.onSuccess();
       } else {
-        this.redirectTo(this.redirectPath, { pass: true });
+        this.redirectTo(this.redirectPath, { accessAllowed: true });
       }
     }
   }
 
   handleKeyPress = (event) => {
     if (event.key === 'Enter') {
-      this.unlock();
+      this.checkPassword();
     }
   }
 
   handleButtonClick = (event) => {
-    this.unlock();
+    this.checkPassword();
   }
 
   getMinWidth = () => {
@@ -126,7 +105,7 @@ export default class PasswordPrompt extends Component {
         minWidth={this.getMinWidth()}
         minHeight={this.getMinHeight()}
       >
-        {this.state.hasHeader && (
+        {this.props.hasHeader && (
           <Header />
         )}
         <Pane
@@ -166,7 +145,7 @@ export default class PasswordPrompt extends Component {
             </Pane>
           </Pane>
         </Pane>
-        {this.state.hasFooter && (
+        {this.props.hasFooter && (
           <Pane display="flex" paddingX={16} paddingY={10} alignItems="start" justifyContent="space-between" borderTop>
             <SettingsButton history={this.props.history} />
           </Pane>

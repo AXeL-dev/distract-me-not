@@ -15,7 +15,7 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      pass: true
+      accessAllowed: null
     };
   }
 
@@ -25,9 +25,9 @@ export default class App extends Component {
         isEnabled: false
       }
     }).then((items) => {
-      if (items && items.password.isEnabled) {
-        this.setState({ pass: false });
-      }
+      this.setState({
+        accessAllowed: !items || !items.password.isEnabled
+      });
     });
   }
 
@@ -35,8 +35,8 @@ export default class App extends Component {
     return (
       <Router>
         <Switch>
-          <PasswordProtectedRoute exact path="/" component={Panel} pass={this.state.pass} />
-          <PasswordProtectedRoute path="/settings" component={Settings} pass={this.state.pass} />
+          <PasswordProtectedRoute exact path="/" component={Panel} accessAllowed={this.state.accessAllowed} showPromptHeader={true} showPromptFooter={true} />
+          <PasswordProtectedRoute path="/settings" component={Settings} accessAllowed={this.state.accessAllowed} />
           <Route path="/background" component={Background} />
           <Route path="/blocked" component={Blocked} />
           {isDevEnv && (
