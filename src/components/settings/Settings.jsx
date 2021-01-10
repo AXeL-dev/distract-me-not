@@ -320,12 +320,14 @@ export default class Settings extends Component {
                     onChange={event => this.setOptions('password', { value: event.target.value })}
                     disabled={!this.state.options.password.isEnabled}
                   />
-                  <Checkbox
-                    label={translate('unblockPagesWithPassword')}
-                    checked={this.state.options.password.unblockPages}
-                    onChange={event => this.setOptions('password', { unblockPages: event.target.checked })}
-                    disabled={!this.state.options.password.isEnabled}
-                  />
+                  {this.state.options.action === Action.blockTab && (
+                    <Checkbox
+                      label={translate('unblockPagesWithPassword')}
+                      checked={this.state.options.password.unblockPages}
+                      onChange={event => this.setOptions('password', { unblockPages: event.target.checked })}
+                      disabled={!this.state.options.password.isEnabled}
+                    />
+                  )}
                 </Fragment>
               )}
               {tab.id === 'blacklist' && (
