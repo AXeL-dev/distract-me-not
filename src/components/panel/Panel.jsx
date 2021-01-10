@@ -93,17 +93,18 @@ export default class Panel extends Component {
   addCurrentHostname = () => {
     getActiveTabHostname().then(hostname => {
       if (hostname) {
+        const pattern = `*.${hostname}`;
         switch (this.state.mode) {
           case Mode.blacklist:
             storage.get({
               blacklist: defaultBlacklist
             }).then(({ blacklist }) => {
               for (let index in blacklist) {
-                if (blacklist[index].indexOf(hostname) >= 0) {
+                if (blacklist[index].indexOf(pattern) >= 0) {
                   return;
                 }
               }
-              blacklist.splice(0, 0, hostname);
+              blacklist.splice(0, 0, pattern);
               sendMessage('setBlacklist', blacklist);
               storage.set({ blacklist: blacklist });
             });
@@ -114,11 +115,11 @@ export default class Panel extends Component {
               whitelist: defaultWhitelist
             }).then(({ whitelist }) => {
               for (let index in whitelist) {
-                if (whitelist[index].indexOf(hostname) >= 0) {
+                if (whitelist[index].indexOf(pattern) >= 0) {
                   return;
                 }
               }
-              whitelist.splice(0, 0, hostname);
+              whitelist.splice(0, 0, pattern);
               sendMessage('setWhitelist', whitelist);
               storage.set({ whitelist: whitelist });
             });
