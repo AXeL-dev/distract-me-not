@@ -12,15 +12,18 @@ export default class Background extends Component {
 
   constructor(props) {
     super(props);
+    // public
     this.blacklist = [];
     this.whitelist = [];
-    this.tmpAllowed = [];
     this.isEnabled = false;
     this.mode = Mode.blacklist;
     this.action = Action.blockTab;
     this.redirectUrl = '';
     this.schedule = defaultSchedule;
     this.unblockOnceTimeout = defaultUnblockOnceTimeout;
+    // private
+    this.enableLock = false;
+    this.tmpAllowed = [];
 
     this.init();
   }
@@ -29,7 +32,7 @@ export default class Background extends Component {
     //console.log(message, ...params); // enable/disable this line to see logs
   }
 
-  //----- Start getters & setters
+  //----- Start getters & setters (for public properties)
 
   setSchedule = (value) => {
     this.schedule = value;
@@ -110,18 +113,17 @@ export default class Background extends Component {
       mode: this.mode,
       action: this.action,
       schedule: this.schedule,
-      redirectUrl: this.redirectUrl,
-      enableOnBrowserStartup: false
+      redirectUrl: this.redirectUrl
     }).then((items) => {
+      this.log('items:', items);
       this.blacklist = this.transformList(items.blacklist);
       this.whitelist = this.transformList(items.whitelist);
       this.mode = items.mode;
       this.action = items.action;
       this.schedule = { ...this.schedule, ...items.schedule }; // merge
       this.redirectUrl = getValidUrl(items.redirectUrl);
-      this.isEnabled = items.enableOnBrowserStartup ? true : items.isEnabled;
-      if (!items.enableOnBrowserStartup && this.isEnabled) {
-        // if "enableOnBrowserStartup" is true we don't have to call "enable" function here, it will be done on "onBrowserStartup" event listener
+      this.isEnabled = items.isEnabled;
+      if (this.isEnabled) {
         this.enable();
       }
     });
@@ -138,7 +140,7 @@ export default class Background extends Component {
       enableOnBrowserStartup: false
     }).then(({ enableOnBrowserStartup }) => {
       if (enableOnBrowserStartup) {
-        this.enable();
+        this.enable('enabled on startup!');
       }
     });
   }
@@ -372,12 +374,28 @@ export default class Background extends Component {
     browser.tabs.onReplaced.removeListener(this.onReplacedHandler);
   }
 
-  enable = () => {
-    this.enableEventListeners();
+  enable = (logMessage = 'enabled!') => {
+    if (this.enableLock) {
+      this.log('already enabled!', {
+        enableLock: this.enableLock
+      });
+    } else {
+      this.enableEventListeners();
+      this.log(logMessage);
+      this.enableLock = true;
+    }
   }
 
-  disable = () => {
-    this.disableEventListeners();
+  disable = (logMessage = 'disabled!') => {
+    if (this.enableLock) {
+      this.disableEventListeners();
+      this.log(logMessage);
+      this.enableLock = false;
+    } else {
+      this.log('already disabled!', {
+        enableLock: this.enableLock
+      });
+    }
   }
 
   render() {
