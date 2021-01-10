@@ -92,6 +92,30 @@ export default class PasswordPrompt extends Component {
     this.unlock();
   }
 
+  getMinWidth = () => {
+    return this.props.minWidth || (this.redirectPath === '/settings' ? 580 : 320);
+  }
+
+  getMinHeight = () => {
+    return this.props.minHeight || (this.redirectPath === '/settings' ? 380 : 230);
+  }
+
+  getInputWidth = () => {
+    return this.props.inputWidth || (this.redirectPath === '/settings' ? 320 : '70%');
+  }
+
+  getInputHeight = () => {
+    return this.props.inputHeight || (this.redirectPath === '/settings' ? 36 : 32);
+  }
+
+  getButtonWidth = () => {
+    return this.props.buttonWidth || this.props.inputHeight || (this.redirectPath === '/settings' ? 36 : 32);
+  }
+
+  getButtonHeight = () => {
+    return this.props.buttonHeight || this.props.inputHeight || (this.redirectPath === '/settings' ? 36 : 32);
+  }
+
   render() {
     return (
       <Pane
@@ -99,8 +123,8 @@ export default class PasswordPrompt extends Component {
         flexDirection="column"
         width="100%"
         height="100%"
-        minWidth={this.props.minWidth || 320}
-        minHeight={this.props.minHeight || 230}
+        minWidth={this.getMinWidth()}
+        minHeight={this.getMinHeight()}
       >
         {this.state.hasHeader && (
           <Header />
@@ -113,10 +137,11 @@ export default class PasswordPrompt extends Component {
           alignItems="center"
           justifyContent="center"
         >
-          <Pane display="flex" width={this.props.inputWidth || '70%'}>
+          <Pane display="flex" width={this.getInputWidth()}>
             <Pane display="flex" alignItems="center" flex={1}>
               <TextInput
                 width="100%"
+                height={this.getInputHeight()}
                 type="password"
                 value={this.state.password}
                 onChange={(event) => this.setState({ password: event.target.value })}
@@ -135,6 +160,8 @@ export default class PasswordPrompt extends Component {
                 borderTopLeftRadius={0}
                 borderBottomLeftRadius={0}
                 onClick={this.handleButtonClick}
+                width={this.getButtonWidth()}
+                height={this.getButtonHeight()}
               />
             </Pane>
           </Pane>

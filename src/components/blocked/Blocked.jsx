@@ -68,7 +68,7 @@ export default class Blocked extends Component {
     this.closeUnblockDialog();
     if (this.url) {
       //window.location.replace(this.url);
-      sendMessage('redirectSenderTab', this.url);
+      sendMessage('unblockSenderTab', this.url);
     }
   }
 
@@ -107,6 +107,7 @@ export default class Blocked extends Component {
                 minWidth="auto"
                 minHeight={50}
                 inputWidth="90%"
+                inputHeight={36}
                 onSuccess={this.redirectToUrl}
               />
             </Dialog>

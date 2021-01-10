@@ -139,7 +139,7 @@ export default class Background extends Component {
     let response = null;
     return new Promise(resolve => {
       switch (request.message) {
-        case 'redirectSenderTab':
+        case 'unblockSenderTab':
           const url = request.params[0];
           this.tmpAllowed.push(getHostName(url));
           response = this.redirectTab(sender.tab.id, url);

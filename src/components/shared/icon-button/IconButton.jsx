@@ -19,6 +19,7 @@ export default class IconButton extends Component {
         onClick={this.props.onClick}
         padding={this.props.padding || 0}
         width={this.props.width || 32}
+        height={this.props.height || 32}
         borderTopLeftRadius={this.props.borderTopLeftRadius >= 0 ? this.props.borderTopLeftRadius : 3}
         borderTopRightRadius={this.props.borderTopRightRadius >= 0 ? this.props.borderTopRightRadius : 3}
         borderBottomLeftRadius={this.props.borderBottomLeftRadius >= 0 ? this.props.borderBottomLeftRadius : 3}

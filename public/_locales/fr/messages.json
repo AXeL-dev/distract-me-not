@@ -132,7 +132,7 @@
         "message": "Mot de passe incorrect!"
     },
     "unblockPagesWithPassword": {
-        "message": "Autoriser le déblocage des pages avec le mot de passe"
+        "message": "Permettre le déblocage des pages avec le mot de passe"
     },
     "enable": {
         "message": "Activer"
