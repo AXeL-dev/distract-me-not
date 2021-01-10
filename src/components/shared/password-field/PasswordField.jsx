@@ -1,4 +1,5 @@
-import { Pane, Text } from 'evergreen-ui';
+import { Pane } from 'evergreen-ui';
+import TooltipLabel from '../tooltip-label/TooltipLabel';
 import PasswordInput from '../password-input/PasswordInput';
 
 export default function PasswordField(props) {
@@ -21,7 +22,14 @@ export default function PasswordField(props) {
       marginRight={props.marginRight || props.marginX}
     >
       <Pane display="flex" alignItems="center" flex={1}>
-        <Text>{props.label}</Text>
+      <TooltipLabel
+          text={props.label}
+          size={props.labelSize}
+          color={props.labelColor}
+          className={props.labelClassName}
+          tooltip={props.tooltip}
+          tooltipPosition={props.tooltipPosition}
+        />
       </Pane>
       <Pane display="flex" alignItems="center">
         <PasswordInput

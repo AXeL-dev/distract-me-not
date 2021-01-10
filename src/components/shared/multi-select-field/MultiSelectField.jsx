@@ -1,8 +1,8 @@
 import { Component } from 'react';
-import { Pane, Text, SelectMenu, Button, Paragraph, Tooltip, Position, CaretDownIcon } from 'evergreen-ui';
+import { Pane, SelectMenu, Button, Paragraph, CaretDownIcon } from 'evergreen-ui';
 import { debug } from '../../../helpers/debug';
+import TooltipLabel from '../tooltip-label/TooltipLabel';
 import RawHTML from '../raw-html/RawHTML';
-import './MultiSelectField.scss';
 
 export default class MultiSelectField extends Component {
 
@@ -86,13 +86,14 @@ export default class MultiSelectField extends Component {
       >
         <Pane display="flex">
           <Pane display="flex" alignItems="center" flex={1}>
-            {this.props.tooltip ? (
-              <Tooltip content={this.props.tooltip} position={this.props.tooltipPosition || Position.BOTTOM}>
-                <Text className="cursor-help">{this.props.label}</Text>
-              </Tooltip>
-            ) : (
-              <Text>{this.props.label}</Text>
-            )}
+            <TooltipLabel
+              text={this.props.label}
+              size={this.props.labelSize}
+              color={this.props.labelColor}
+              className={this.props.labelClassName}
+              tooltip={this.props.tooltip}
+              tooltipPosition={this.props.tooltipPosition}
+            />
           </Pane>
           <Pane display="flex" alignItems="center">
             <SelectMenu
