@@ -27,7 +27,7 @@
         "message": "Où est-ce que vous allez..."
     },
     "displayBlankPage": {
-        "message": "Afficher une page vide?"
+        "message": "Afficher une page vide"
     },
     "settings": {
         "message": "Réglages"
@@ -46,9 +46,6 @@
     },
     "defaultAction": {
         "message": "Action par défaut"
-    },
-    "defaultActionHint": {
-        "message": "Veuillez choisir une action à entreprendre pour les sites web blacklistés"
     },
     "blockTab": {
         "message": "Bloquer"
@@ -89,6 +86,9 @@
     "blocking": {
         "message": "Blocage"
     },
+    "blockingDescription": {
+        "message": "Veuillez choisir une action à entreprendre pour les sites web blacklistés:"
+    },
     "schedule": {
         "message": "Planification"
     },
@@ -116,8 +116,11 @@
     "changePassword": {
         "message": "Changer le mot de passe"
     },
+    "changePasswordTooltip": {
+        "message": "Laissez vide pour conserver l'ancien mot de passe."
+    },
     "passwordDescription": {
-        "message": "Verrouille l'accès au panneau et aux paramètres avec un mot de passe."
+        "message": "Verrouille l'accès à la fenêtre popup et aux paramètres avec un mot de passe."
     },
     "enablePasswordProtection": {
         "message": "Activer la protection par mot de passe:"
@@ -127,6 +130,9 @@
     },
     "passwordIsWrong": {
         "message": "Mot de passe incorrect!"
+    },
+    "unblockPagesWithPassword": {
+        "message": "Autoriser le déblocage des pages avec le mot de passe"
     },
     "enable": {
         "message": "Activer"
@@ -211,5 +217,8 @@
     },
     "enabled": {
         "message": "Activé"
+    },
+    "unblock": {
+        "message": "Débloquer"
     }
 }

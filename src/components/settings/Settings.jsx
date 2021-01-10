@@ -49,8 +49,10 @@ export default class Settings extends Component {
         whitelist: isDevEnv ? defaultWhitelist : [],
         password: {
           isEnabled: false,
+          isSet: false,
           value: '',
-          hash: ''
+          hash: '',
+          unblockPages: false,
         },
         misc: {
           enableOnBrowserStartup: false,
@@ -89,7 +91,8 @@ export default class Settings extends Component {
           },
           password: {
             ...this.state.options.password,
-            ...items.password
+            ...items.password,
+            isSet: !!(items.password.hash && items.password.hash.length)
           },
           blacklist: items.blacklist,
           whitelist: items.whitelist,
@@ -152,7 +155,9 @@ export default class Settings extends Component {
 
   save = () => {
     debug.log('save:', this.state.options);
-    if (this.state.options.password.isEnabled && this.state.options.password.value.length < 8) {
+    if (this.state.options.password.isEnabled && this.state.options.password.value.length < 8 && (
+      !this.state.options.password.isSet || this.state.options.password.value.length
+    )) {
       toaster.danger(translate('passwordIsShort'), { id: 'settings-toaster' });
       return;
     }
@@ -165,7 +170,16 @@ export default class Settings extends Component {
       schedule: this.state.options.schedule,
       password: {
         isEnabled: this.state.options.password.isEnabled,
-        hash: this.state.options.password.isEnabled ? hash(this.state.options.password.value) : ''
+        hash: this.state.options.password.isEnabled ? ( // if password protection is enabled
+          this.state.options.password.value.length ? ( // + password length is > 0
+            hash(this.state.options.password.value) // hash & save the new password
+          ) : (
+            this.state.options.password.hash // else, use the old hash
+          )
+        ) : (
+          '' // else if protection is disabled, set hash to empty string
+        ),
+        unblockPages: this.state.options.password.unblockPages
       },
       blacklist: this.state.options.blacklist,
       whitelist: this.state.options.whitelist,
@@ -215,9 +229,9 @@ export default class Settings extends Component {
             >
               {tab.id === 'blocking' && (
                 <Fragment>
+                  <Paragraph size={300} color="muted" marginBottom={16}>{translate('blockingDescription')}</Paragraph>
                   <SelectField
                     label={translate('defaultAction')}
-                    hint={translate('defaultActionHint')}
                     value={this.state.options.action}
                     onChange={event => this.setOptions({ action: event.target.value })}
                     marginBottom={16}
@@ -301,8 +315,15 @@ export default class Settings extends Component {
                     marginBottom={16}
                   />
                   <PasswordField
-                    label={`${translate(this.state.options.password.hash && this.state.options.password.hash.length ? 'changePassword' : 'password')}:`}
+                    label={`${translate(this.state.options.password.isSet ? 'changePassword' : 'password')}:`}
+                    tooltip={this.state.options.password.isSet ? translate('changePasswordTooltip') : null}
                     onChange={event => this.setOptions('password', { value: event.target.value })}
+                    disabled={!this.state.options.password.isEnabled}
+                  />
+                  <Checkbox
+                    label={translate('unblockPagesWithPassword')}
+                    checked={this.state.options.password.unblockPages}
+                    onChange={event => this.setOptions('password', { unblockPages: event.target.checked })}
                     disabled={!this.state.options.password.isEnabled}
                   />
                 </Fragment>

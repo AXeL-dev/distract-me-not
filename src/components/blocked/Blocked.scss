@@ -1,3 +1,7 @@
+
+$backgroundColor: rgba(0, 0, 0, 0.9);
+$textColor: white;
+
 @font-face {
   font-family: OpenSansFont;
   src: url(../../../public/fonts/OpenSans-Light.ttf);
@@ -24,16 +28,16 @@
   position: absolute;
   height: 100%;
   width: 100%;
-  z-index: 2147483647;
+  z-index: 1;
 }
 .distract-overlay {
-  z-index: 2147483647;
+  z-index: 1;
   position: fixed;
   top: 0px;
   left: 0px;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: $backgroundColor;
   text-align: center !important;
   display: inline-block;
   margin: 0;
@@ -52,7 +56,7 @@
 .distract-overlay-top-text {
   font-family: OpenSansFont !important;
   vertical-align: middle;
-  color: white !important;
+  color: $textColor;
   font-size: 32px;
   line-height: 32px;
   cursor: default;
@@ -70,4 +74,28 @@
   height: 128px;
   background-image: url(../../../public/icons/magnet-256.png);
   background-size: contain;
+}
+button.unblock {
+  margin-top: 50px;
+  background-color: transparent;
+  border: 1px solid #d0d0d0;
+  border-radius: 5px;
+  color: #ddd;
+  cursor: pointer;
+  display: inline-block;
+  font-family: OpenSansFont;
+  font-size: 1em;
+  font-weight: 700;
+  outline: none;
+  padding: 10px 50px;
+  position: relative;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  vertical-align: middle;
+  text-transform: uppercase;
+}
+button.unblock:hover {
+  background-color: #ddd;
+  color: $backgroundColor;
+  border-color: transparent;
 }

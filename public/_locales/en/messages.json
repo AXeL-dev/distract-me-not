@@ -27,7 +27,7 @@
         "message": "Where are you going..."
     },
     "displayBlankPage": {
-        "message": "Display a blank page?"
+        "message": "Display a blank page"
     },
     "settings": {
         "message": "Settings"
@@ -46,9 +46,6 @@
     },
     "defaultAction": {
         "message": "Default action"
-    },
-    "defaultActionHint": {
-        "message": "Choose an action to take for the blacklisted websites"
     },
     "blockTab": {
         "message": "Block"
@@ -89,6 +86,9 @@
     "blocking": {
         "message": "Blocking"
     },
+    "blockingDescription": {
+        "message": "Choose an action to take for the blacklisted websites:"
+    },
     "schedule": {
         "message": "Schedule"
     },
@@ -116,6 +116,9 @@
     "changePassword": {
         "message": "Change password"
     },
+    "changePasswordTooltip": {
+        "message": "Leave empty to keep the old password."
+    },
     "passwordDescription": {
         "message": "Locks access to panel & settings with a password."
     },
@@ -127,6 +130,9 @@
     },
     "passwordIsWrong": {
         "message": "Wrong password!"
+    },
+    "unblockPagesWithPassword": {
+        "message": "Allow unblocking pages with the password"
     },
     "enable": {
         "message": "Enable"
@@ -211,5 +217,8 @@
     },
     "enabled": {
         "message": "Enabled"
+    },
+    "unblock": {
+        "message": "Unblock"
     }
 }

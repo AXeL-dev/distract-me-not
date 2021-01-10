@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import { storage, getNativeAPI } from '../../helpers/webext';
 import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule } from '../../helpers/block';
-import { hasValidProtocol, getValidUrl } from '../../helpers/url';
+import { hasValidProtocol, getValidUrl, getHostName } from '../../helpers/url';
 import { regex } from '../../helpers/regex';
 import { inTime } from '../../helpers/time';
 import { inToday } from '../../helpers/date';
@@ -14,6 +14,7 @@ export default class Background extends Component {
     super(props);
     this.blacklist = [];
     this.whitelist = [];
+    this.tmpAllowed = [];
     this.isEnabled = false;
     this.mode = Mode.blacklist;
     this.action = Action.blockTab;
@@ -135,8 +136,17 @@ export default class Background extends Component {
 
   handleMessage = (request, sender, sendResponse) => {
     this.log('Handle message:', request);
-    return Promise.resolve({
-      response: this.isFunction(request.message) ? this.executeFunction(request.message, ...request.params) : this[request.message]
+    let response = null;
+    return new Promise(resolve => {
+      switch (request.message) {
+        case 'redirectSenderTab':
+          const url = request.params[0];
+          this.tmpAllowed.push(getHostName(url));
+          response = this.redirectTab(sender.tab.id, url);
+        default:
+          response = this.isFunction(request.message) ? this.executeFunction(request.message, ...request.params) : this[request.message];
+      }
+      resolve({ response });
     });
   }
 
@@ -187,7 +197,26 @@ export default class Background extends Component {
     });
   }
 
+  isTmpAllowed = (url) => {
+    if (this.tmpAllowed.length) {
+      const hostname = getHostName(url);
+      const index = this.tmpAllowed.indexOf(hostname);
+      if (index !== -1) {
+        this.log('allowed:', url);
+        setTimeout(() => {
+          this.tmpAllowed.splice(index, 1);
+        }, 1000);
+        return true;
+      }
+      this.log('not allowed:', url);
+    }
+    return false;
+  }
+
   isBlacklisted = (url) => {
+    if (this.isTmpAllowed(url)) {
+      return false;
+    }
     for (const rule of this.blacklist) {
       if (rule.test(url)) {
         return true;
@@ -197,6 +226,9 @@ export default class Background extends Component {
   }
 
   isWhitelisted = (url) => {
+    if (this.isTmpAllowed(url)) {
+      return true;
+    }
     for (const rule of this.whitelist) {
       if (rule.test(url)) {
         return true;

@@ -7,7 +7,6 @@ import { debug } from '../../helpers/debug';
 import Header from '../shared/header/Header';
 import IconButton from '../shared/icon-button/IconButton';
 import SettingsButton from '../shared/settings-button/SettingsButton';
-import queryString from 'query-string';
 
 const defaultHash = process.env.REACT_APP_HASH;
 
@@ -16,7 +15,7 @@ export default class PasswordPrompt extends Component {
   constructor(props) {
     super(props);
     this.hash = defaultHash || null;
-    this.redirectPath = this.props.path || queryString.parse(props.location.search).path || '/';
+    this.redirectPath = this.props.path || '/';
     debug.log({
       hash: this.hash,
       redirectPath: this.redirectPath
@@ -29,11 +28,11 @@ export default class PasswordPrompt extends Component {
   }
 
   hasHeader = () => {
-    return this.props.hasHeader || !isChrome() || this.redirectPath !== '/settings';
+    return this.props.hasHeader !== undefined ? this.props.hasHeader : !isChrome() || this.redirectPath !== '/settings';
   }
 
   hasFooter = () => {
-    return this.props.hasFooter || this.redirectPath !== '/settings';
+    return this.props.hasFooter !== undefined ? this.props.hasFooter : this.redirectPath !== '/settings';
   }
 
   componentDidMount() {
@@ -100,8 +99,8 @@ export default class PasswordPrompt extends Component {
         flexDirection="column"
         width="100%"
         height="100%"
-        minWidth={320}
-        minHeight={230}
+        minWidth={this.props.minWidth || 320}
+        minHeight={this.props.minHeight || 230}
       >
         {this.state.hasHeader && (
           <Header />
@@ -114,7 +113,7 @@ export default class PasswordPrompt extends Component {
           alignItems="center"
           justifyContent="center"
         >
-          <Pane display="flex" width="70%">
+          <Pane display="flex" width={this.props.inputWidth || '70%'}>
             <Pane display="flex" alignItems="center" flex={1}>
               <TextInput
                 width="100%"
