@@ -13,7 +13,7 @@ export function getDomainName(url) {
 }
 
 export function getFaviconLink(url) {
-  return `https://${getHostName(url)}/favicon.ico`;
+  return `https://${getHostName(url).replace(/\$$/, '')}/favicon.ico`;
 }
 
 export function checkFaviconLink(faviconLink) {
