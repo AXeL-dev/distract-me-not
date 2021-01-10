@@ -141,7 +141,7 @@
         "message": "Ajouter un site web"
     },
     "addWebsiteHint": {
-        "message": "Vous pouvez utiliser des caractères génériques pour sélectionner des sous-domaines ou des sous-pages, par exemple: \n<b>*.example.com</b>, <b>example.com/blog/*</b>"
+        "message": "Vous pouvez utiliser des caractères génériques pour sélectionner des sous-domaines ou des sous-pages, par exemple: <b>*.example.com</b>, <b>example.com/blog/*</b>"
     },
     "add": {
         "message": "Ajouter"

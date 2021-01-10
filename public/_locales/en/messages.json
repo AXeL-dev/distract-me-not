@@ -141,7 +141,7 @@
         "message": "Add a website"
     },
     "addWebsiteHint": {
-        "message": "Use wildcard matching to select subdomains or subpages, e.g.: \n<b>*.example.com</b>, <b>example.com/blog/*</b>"
+        "message": "Use wildcard matching to select subdomains or subpages, e.g.: <b>*.example.com</b>, <b>example.com/blog/*</b>"
     },
     "add": {
         "message": "Add"
