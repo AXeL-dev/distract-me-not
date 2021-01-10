@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import { Pane, TextInput, UnlockIcon, toaster } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
-import { storage, isChrome } from '../../helpers/webext';
+import { storage } from '../../helpers/webext';
 import { compare } from '../../helpers/crypt';
 import { debug } from '../../helpers/debug';
 import Header from '../shared/header/Header';
@@ -28,7 +28,7 @@ export default class PasswordPrompt extends Component {
   }
 
   hasHeader = () => {
-    return this.props.hasHeader !== undefined ? this.props.hasHeader : !isChrome() || this.redirectPath !== '/settings';
+    return this.props.hasHeader !== undefined ? this.props.hasHeader : this.redirectPath !== '/settings';
   }
 
   hasFooter = () => {
