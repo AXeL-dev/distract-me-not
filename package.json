@@ -23,6 +23,7 @@
     "build": "INLINE_RUNTIME_CHUNK=false rescripts build",
     "build:firefox": "npm run build && cd build && mv -f manifest.firefox.json manifest.json",
     "build:chrome": "npm run build && cd build && rm -f manifest.firefox.json",
+    "package": "web-ext build --source-dir=build --artifacts-dir=. --overwrite-dest",
     "test": "rescripts test",
     "test:all": "npm test -- --watchAll --verbose --testMatch \"**/src/**/*.test.{js,jsx}\"",
     "eject": "react-scripts eject"
