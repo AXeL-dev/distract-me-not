@@ -14,7 +14,7 @@ export default class IconButton extends Component {
       <Button
         display="flex"
         justifyContent="center"
-        className={`icon-button ${this.props.className}`}
+        className={`icon-button ${this.props.className || ''}`}
         appearance={this.props.appearance}
         onClick={this.props.onClick}
         padding={this.props.padding || 0}

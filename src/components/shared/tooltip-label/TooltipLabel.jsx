@@ -13,7 +13,7 @@ export default function TooltipLabel(props) {
 
   return props.tooltip ? (
     <Tooltip content={props.tooltip} position={props.tooltipPosition || Position.BOTTOM}>
-      {renderLabel(props.text, props.size, props.color, `cursor-help ${props.className}`)}
+      {renderLabel(props.text, props.size, props.color, `cursor-help ${props.className || ''}`)}
     </Tooltip>
   ) : (
     renderLabel(props.text, props.size, props.color, props.className)
