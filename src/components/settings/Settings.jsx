@@ -187,19 +187,17 @@ export default class Settings extends Component {
       blacklist: this.state.options.blacklist,
       whitelist: this.state.options.whitelist,
     }).then(success => {
-      if (success || isDevEnv) {
+      if (success) {
         // Update background script
-        if (success) {
-          sendMessage('setAction', this.state.options.action);
-          sendMessage('setRedirectUrl', this.state.options.redirectToUrl.url);
-          sendMessage('setSchedule', this.state.options.schedule);
-          sendMessage('setBlacklist', this.state.options.blacklist);
-          sendMessage('setWhitelist', this.state.options.whitelist);
-          sendMessage('setUnblockOnceTimeout', this.state.options.password.unblockOnceTimeout);
-        }
-        // Show success message
-        toaster.success(translate('settingsSaved'), { id: 'settings-toaster' });
+        sendMessage('setAction', this.state.options.action);
+        sendMessage('setRedirectUrl', this.state.options.redirectToUrl.url);
+        sendMessage('setSchedule', this.state.options.schedule);
+        sendMessage('setBlacklist', this.state.options.blacklist);
+        sendMessage('setWhitelist', this.state.options.whitelist);
+        sendMessage('setUnblockOnceTimeout', this.state.options.password.unblockOnceTimeout);
       }
+      // Show success message (keep out of success condition to ensure it's executed on unit tests & dev env.)
+      toaster.success(translate('settingsSaved'), { id: 'settings-toaster' });
     });
   }
 

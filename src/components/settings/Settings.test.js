@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+//import { toaster } from 'evergreen-ui';
 import Settings from "./Settings";
 
 it('renders all tabs', () => {
@@ -23,10 +24,12 @@ it('renders save button', () => {
   expect(saveButton).toBeInTheDocument();
 });
 
-// it('saves settings on save button click', async () => {
-//   const { container } = render(<Settings />);
-//   const saveButton = screen.getByRole('button', { name: 'save' });
-//   fireEvent.click(saveButton);
-//   const saveSuccessText = await waitFor(() => screen.getByText(/settingsSaved/i), { container });
-//   expect(saveSuccessText).toBeInTheDocument();
-// });
+it('saves settings on save button click', async () => {
+  //const toasterSuccess = jest.spyOn(toaster, 'success');
+  render(<Settings />);
+  const saveButton = screen.getByRole('button', { name: 'save' });
+  fireEvent.click(saveButton);
+  const saveSuccessText = await waitFor(() => screen.getByText(/settingsSaved/i));
+  expect(saveSuccessText).toBeInTheDocument();
+  //expect(toasterSuccess).toBeCalled();
+});
