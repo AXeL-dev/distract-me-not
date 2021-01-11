@@ -10,9 +10,10 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v2
 
-      - name: Install and Build 🔧
+      - name: Install, test and Build 🔧
         run: |
           npm install
+          npm test
           npm run build:firefox
 
       - name: Release to AMO 🚀

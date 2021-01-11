@@ -18,7 +18,7 @@ export default class TextField extends Component {
     }
   }
 
-  handleKeyPress = (event) => {
+  handleKeyDown = (event) => {
     if (event.key === 'Enter') {
       this.submit();
     }
@@ -59,7 +59,7 @@ export default class TextField extends Component {
               width="100%"
               value={this.state.value}
               onChange={this.handleChange}
-              onKeyPress={this.handleKeyPress}
+              onKeyDown={this.handleKeyDown}
               placeholder={this.props.placeholder}
               disabled={this.props.disabled}
               required={this.props.required}

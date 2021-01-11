@@ -4,11 +4,18 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 
-// ignore some specific console error messages
+// ignore some specific console errors/warnings
 const consoleError = console.error;
+const consoleWarn = console.warn;
 
 console.error = (message, ...params) => {
   if (!/browser is not defined/i.test(message)) {
     consoleError(message, ...params);
+  }
+};
+
+console.warn = (message, ...params) => {
+  if (!/componentWillReceiveProps has been renamed/i.test(message)) {
+    consoleWarn(message, ...params);
   }
 };

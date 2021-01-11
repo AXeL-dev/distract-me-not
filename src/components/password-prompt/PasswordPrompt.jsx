@@ -61,7 +61,7 @@ export default class PasswordPrompt extends Component {
     }
   }
 
-  handleKeyPress = (event) => {
+  handleKeyDown = (event) => {
     if (event.key === 'Enter') {
       this.checkPassword();
     }
@@ -124,7 +124,7 @@ export default class PasswordPrompt extends Component {
                 type="password"
                 value={this.state.password}
                 onChange={(event) => this.setState({ password: event.target.value })}
-                onKeyPress={this.handleKeyPress}
+                onKeyDown={this.handleKeyDown}
                 placeholder={translate('password')}
                 borderTopRightRadius={0}
                 borderBottomRightRadius={0}

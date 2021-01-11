@@ -29,7 +29,7 @@ export default class Background extends Component {
   }
 
   log = (message, ...params) => {
-    //console.log(message, ...params); // enable/disable this line to see logs
+    //console.log(message, ...params); // uncomment this line to see logs
   }
 
   //----- Start getters & setters (for public properties)
