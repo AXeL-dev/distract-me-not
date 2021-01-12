@@ -33,3 +33,28 @@ it('saves settings on save button click', async () => {
   expect(saveSuccessText).toBeInTheDocument();
   //expect(toasterSuccess).toBeCalled();
 });
+
+it('accepts only passwords that contains at least 8 characters', async () => {
+  const passwords = [],
+        minCharsNumber = 8;
+  // fill passwords array with generic strings having length from 0 to 8
+  for (let i = 0; i <= minCharsNumber; i++) {
+    passwords.push(Array(i + 1).join('p'));
+  }
+  // render our component
+  render(<Settings enablePassword={true} />);
+  const passwordInput = screen.getByTestId('password');
+  const saveButton = screen.getByRole('button', { name: 'save' });
+  // test passwords containing less than 8 characters
+  for (let i = 0; i < minCharsNumber; i++) {
+    fireEvent.change(passwordInput, { target: { value: passwords[i] } });
+    fireEvent.click(saveButton);
+    const passwordErrorText = await waitFor(() => screen.getByText(/passwordIsShort/i));
+    expect(passwordErrorText).toBeInTheDocument();
+  }
+  // test correct password (having 8 chars)
+  fireEvent.change(passwordInput, { target: { value: passwords[minCharsNumber] } });
+  fireEvent.click(saveButton);
+  const saveSuccessText = await waitFor(() => screen.getByText(/settingsSaved/i));
+  expect(saveSuccessText).toBeInTheDocument();
+});

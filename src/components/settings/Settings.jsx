@@ -49,7 +49,7 @@ export default class Settings extends Component {
         blacklist: isDevEnv ? defaultBlacklist : [],
         whitelist: isDevEnv ? defaultWhitelist : [],
         password: {
-          isEnabled: false,
+          isEnabled: props.enablePassword || false,
           isSet: false,
           value: '',
           hash: '',
@@ -321,6 +321,7 @@ export default class Settings extends Component {
                     tooltip={this.state.options.password.isSet ? translate('changePasswordTooltip') : null}
                     onChange={event => this.setOptions('password', { value: event.target.value })}
                     disabled={!this.state.options.password.isEnabled}
+                    data-testid="password"
                   />
                   {this.state.options.action === Action.blockTab && (
                     <Fragment>
