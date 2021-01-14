@@ -2,12 +2,13 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import Panel from "./Panel";
 
 it('renders panel correctly', () => {
-  const { container } = render(<Panel />);
+  const { container, asFragment } = render(<Panel />);
   const status = screen.getByText(/status/i);
   const mode = screen.getByText(/mode/i);
   expect(container).not.toBeEmptyDOMElement();
   expect(status).toBeInTheDocument();
   expect(mode).toBeInTheDocument();
+  expect(asFragment()).toMatchSnapshot();
 });
 
 it('updates status when toggled', () => {
