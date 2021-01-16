@@ -15,7 +15,7 @@ jobs:
         run: |
           npm install
           npm test
-          npm run build:firefox
+          CI=false npm run build:firefox
 
       - name: Release to AMO 🚀
         run: cd build && npx web-ext-submit
