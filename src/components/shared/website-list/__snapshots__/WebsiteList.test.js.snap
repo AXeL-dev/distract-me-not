@@ -66,6 +66,7 @@ exports[`renders correctly 1`] = `
         <button
           aria-haspopup="true"
           class="css-1ii3p2c ub-fnt-fam_b77syt ub-mt_0px ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_24px ub-ltr-spc_0 ub-btrr_3px ub-bbrr_3px ub-btlr_3px ub-bblr_3px ub-pt_0px ub-pb_0px ub-pr_0px ub-pl_0px ub-ml_0px ub-mr_0px ub-mb_0px ub-h_24px ub-pst_relative ub-dspl_flex ub-algn-itms_center ub-flx-wrap_nowrap ub-w_24px ub-just-cnt_center ub-box-szg_border-box"
+          data-testid="list-more-button"
           role="button"
         >
           <div
@@ -302,6 +303,7 @@ exports[`renders correctly 1`] = `
   <input
     accept=".txt"
     class="hidden"
+    data-testid="file-input"
     type="file"
   />
 </DocumentFragment>

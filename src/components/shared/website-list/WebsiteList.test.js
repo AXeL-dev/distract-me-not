@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
 import { defaultBlacklist } from "../../../helpers/block";
+import * as fileHelper from "../../../helpers/file";
 import WebsiteList from "./WebsiteList";
 
 it('renders correctly', () => {
@@ -62,7 +63,21 @@ it('deletes a url', async () => {
   expect(list).not.toHaveTextContent(url);
 });
 
-it('filters urls', async () => {
+it('copies a url to clipboard', async () => {
+  render(<WebsiteList list={[defaultBlacklist[0]]} />);
+  // mock clipboard handler
+  document.execCommand = jest.fn();
+  // click on more button
+  const moreButton = screen.getByTestId('more-button');
+  fireEvent.click(moreButton);
+  // click on copy button
+  const copyButton = await waitFor(() => screen.getByRole('menuitem', { name: /copy/i }));
+  fireEvent.click(copyButton);
+  // verify
+  expect(document.execCommand).toHaveBeenCalledWith('copy');
+});
+
+it('filters urls', () => {
   const filter = defaultBlacklist[0];
   const { container } = render(<WebsiteList list={defaultBlacklist} />);
   const list = container.querySelector('div[data-evergreen-table-body="true"]');
@@ -70,7 +85,7 @@ it('filters urls', async () => {
   const filterInput = screen.getByPlaceholderText('filter...', { selector: 'input[type="text"]' });
   fireEvent.change(filterInput, { target: { value: filter } });
   // verify
-  for (let url in defaultBlacklist) {
+  for (let url of defaultBlacklist) {
     if (url === filter) continue;
     expect(list).not.toHaveTextContent(url);
   }
@@ -87,7 +102,50 @@ it('sorts urls in descending order', async () => {
   const descButton = await waitFor(() => screen.getByRole('menuitemradio', { name: /descending/i }));
   fireEvent.click(descButton);
   // verify
-  const expectedOrder = defaultBlacklist.slice().sort((a, b) => b.localeCompare(a)); // desc
   const listOrder = within(list).getAllByTestId('url').map(url => url.innerHTML);
+  const expectedOrder = defaultBlacklist.slice().sort((a, b) => b.localeCompare(a)); // desc
   expect(listOrder).toEqual(expectedOrder);
+});
+
+it('imports urls', async () => {
+  const { container } = render(<WebsiteList list={[]} />);
+  const list = container.querySelector('div[data-evergreen-table-body="true"]');
+  // trigger file input change event
+  const fileInput = screen.getByTestId('file-input');
+  const file = new File(defaultBlacklist, 'blacklist.txt', { type: 'text/plain' });
+  fireEvent.change(fileInput, { target: { files: [file] } });
+  // verify
+  for (let url of defaultBlacklist) {
+    await waitFor(() => expect(list).toHaveTextContent(url));
+  }
+});
+
+it('exports urls', async () => {
+  const exportFilename = 'blacklist.txt';
+  render(<WebsiteList list={defaultBlacklist} exportFilename={exportFilename} />);
+  // spy on file helper download function
+  jest.spyOn(fileHelper, 'download');
+  global.URL.createObjectURL = jest.fn(); // fix error: URL.createObjectURL is not a function
+  global.Blob = function(content, options) { // allow us to compare Blobs
+    return {
+      content: content[0].split("\n"),
+      options
+    };
+  };
+  // click on more button
+  const moreButton = screen.getByTestId('list-more-button');
+  fireEvent.click(moreButton);
+  // click on export button
+  const exportButton = await waitFor(() => screen.getByRole('menuitem', { name: /export/i }));
+  fireEvent.click(exportButton);
+  // verify
+  expect(fileHelper.download).toHaveBeenCalledWith(
+    {
+      content: defaultBlacklist,
+      options: {
+        type: 'text/plain'
+      }
+    }, 
+    exportFilename
+  );
 });

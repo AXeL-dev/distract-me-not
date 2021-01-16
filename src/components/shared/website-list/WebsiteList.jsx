@@ -250,7 +250,7 @@ export default class WebsiteList extends Component {
 
   export = () => {
     const list = this.state.list.map(item => item.url),
-          blob = new Blob([list.join("\n")], {type: 'text/plain'});
+          blob = new Blob([list.join("\n")], { type: 'text/plain' });
     download(blob, this.props.exportFilename || 'export.txt');
   }
 
@@ -442,7 +442,7 @@ export default class WebsiteList extends Component {
                 position={Position.BOTTOM_RIGHT}
                 minWidth={160}
               >
-                <IconButton icon={MoreIcon} height={24} appearance="minimal" />
+                <IconButton icon={MoreIcon} height={24} appearance="minimal" data-testid="list-more-button" />
               </Popover>
             </Table.HeaderCell>
           </Table.Head>
@@ -490,6 +490,7 @@ export default class WebsiteList extends Component {
             const file = event.target.files[0];
             this.import(file);
           }}
+          data-testid="file-input"
         />
       </Fragment>
     )
