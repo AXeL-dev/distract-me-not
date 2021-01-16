@@ -3,6 +3,7 @@ on:
   push:
     tags:
       - 'v*.*.*'
+      - 'force-release'
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
