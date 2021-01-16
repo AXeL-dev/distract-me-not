@@ -1,4 +1,4 @@
-import { render, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import SegmentedControlField from "./SegmentedControlField";
 
 const options = [
@@ -14,8 +14,8 @@ it('renders correctly', () => {
 
 it('handles selected option change', () => {
   const handleChange = jest.fn();
-  const { getByRole } = render(<SegmentedControlField options={options} onChange={handleChange} />);
-  const secondOption = getByRole('radio', { name: 'Option 2' });
+  render(<SegmentedControlField options={options} onChange={handleChange} />);
+  const secondOption = screen.getByRole('radio', { name: 'Option 2' });
   fireEvent.click(secondOption);
   expect(handleChange).toHaveBeenCalledTimes(1);
 });

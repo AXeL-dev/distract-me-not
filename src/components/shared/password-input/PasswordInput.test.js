@@ -1,4 +1,4 @@
-import { render, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import PasswordInput from "./PasswordInput";
 
 const password = {
@@ -22,10 +22,10 @@ it('handles value change', () => {
 });
 
 it('toggles password visibility', () => {
-  const { container, getByRole } = render(<PasswordInput value={password.value} />);
+  const { container } = render(<PasswordInput value={password.value} />);
   const passwordInput = container.querySelector('input[type="password"]');
   expect(passwordInput.getAttribute('type')).toBe('password');
-  const toggleButton = getByRole('button', { selector: '.password-toggle' });
+  const toggleButton = screen.getByRole('button', { selector: '.password-toggle' });
   fireEvent.click(toggleButton);
   expect(passwordInput.getAttribute('type')).toBe('text');
 });

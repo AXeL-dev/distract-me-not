@@ -1,4 +1,4 @@
-import { render, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import MultiSelectField from "./MultiSelectField";
 
 const options = [
@@ -14,15 +14,15 @@ it('renders correctly', () => {
 
 it('handles selection change', () => {
   const handleChange = jest.fn();
-  const { getByRole, getByText } = render(<MultiSelectField label="My field" options={options} onChange={handleChange} />);
-  const selectMenu = getByRole('button');
+  render(<MultiSelectField label="My field" options={options} onChange={handleChange} />);
+  const selectMenu = screen.getByRole('button');
   fireEvent.click(selectMenu);
   // check if all options are visible
   for (let option of options) {
-    expect(getByText(option.label)).toBeInTheDocument();
+    expect(screen.getByText(option.label)).toBeInTheDocument();
   }
   // select 2nd option
-  fireEvent.click(getByText(options[2].label));
+  fireEvent.click(screen.getByText(options[2].label));
   expect(handleChange).toHaveBeenCalledTimes(1);
   expect(selectMenu).toHaveTextContent(options[2].label);
 });

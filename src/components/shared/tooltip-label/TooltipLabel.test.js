@@ -1,10 +1,10 @@
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import TooltipLabel from "./TooltipLabel";
 
 it('renders correctly', () => {
   const text = 'some text';
-  const { getByText, asFragment } = render(<TooltipLabel text={text} />);
-  expect(getByText(text)).toBeInTheDocument();
+  const { asFragment } = render(<TooltipLabel text={text} />);
+  expect(screen.getByText(text)).toBeInTheDocument();
   expect(asFragment()).toMatchSnapshot();
 });
 

@@ -1,4 +1,4 @@
-import { render, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import SwitchField from "./SwitchField";
 
 it('renders correctly', () => {
@@ -8,8 +8,8 @@ it('renders correctly', () => {
 
 it('handles value change', () => {
   const handleChange = jest.fn();
-  const { getByRole } = render(<SwitchField checked={false} onChange={handleChange} />);
-  const _switch = getByRole('checkbox');
+  render(<SwitchField checked={false} onChange={handleChange} />);
+  const _switch = screen.getByRole('checkbox');
   expect(_switch.checked).toBe(false);
   fireEvent.click(_switch);
   expect(handleChange).toHaveBeenCalledTimes(1);

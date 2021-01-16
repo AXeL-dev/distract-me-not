@@ -1,4 +1,4 @@
-import { render, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import NumberField from "./NumberField";
 
 const input = {
@@ -13,8 +13,8 @@ it('renders correctly', () => {
 
 it('handles value change', () => {
   const handleChange = jest.fn();
-  const { getByRole } = render(<NumberField label={input.label} value={input.value} onChange={handleChange} />);
-  const numberInput = getByRole('spinbutton');
+  render(<NumberField label={input.label} value={input.value} onChange={handleChange} />);
+  const numberInput = screen.getByRole('spinbutton');
   fireEvent.change(numberInput, { target: { value: 10 } });
   expect(handleChange).toHaveBeenCalledTimes(1);
 });
