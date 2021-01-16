@@ -109,6 +109,8 @@ export default class Background extends Component {
     storage.get({
       blacklist: defaultBlacklist,
       whitelist: defaultWhitelist,
+      blackList: null, // for backward compatibility (with v1)
+      whiteList: null,
       isEnabled: this.isEnabled,
       mode: this.mode,
       action: this.action,
@@ -116,6 +118,22 @@ export default class Background extends Component {
       redirectUrl: this.redirectUrl
     }).then((items) => {
       this.log('items:', items);
+      //----- Start backward compatibility with v1
+      if (items.blackList !== null) {
+        items.blacklist = this.removeListDuplicates(
+          items.blacklist.concat(items.blackList) // merge current & old list
+        );
+        storage.remove('blackList'); // remove old list from storage
+        storage.set({ blacklist: items.blacklist }); // save merged list
+      }
+      if (items.whiteList !== null) {
+        items.whitelist = this.removeListDuplicates(
+          items.whitelist.concat(items.whiteList)
+        );
+        storage.remove('whiteList');
+        storage.set({ whitelist: items.whitelist });
+      }
+      //----- End backward compatibility with v1
       this.blacklist = this.transformList(items.blacklist);
       this.whitelist = this.transformList(items.whitelist);
       this.mode = items.mode;
@@ -129,6 +147,10 @@ export default class Background extends Component {
     });
     browser.runtime.onStartup.addListener(this.onBrowserStartup);
     browser.runtime.onMessage.addListener(this.handleMessage);
+  }
+
+  removeListDuplicates = (list) => {
+    return list.filter((url, index) => list.indexOf(url) === index);
   }
 
   transformList = (list) => {

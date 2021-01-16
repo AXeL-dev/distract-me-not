@@ -114,4 +114,17 @@ export class storage {
     });
   }
 
+  static remove(keys) {
+    return new Promise(resolve => {
+      try {
+        browser.storage.local.remove(keys).then(() => {
+          resolve(true);
+        });
+      } catch (error) {
+        report.error(error);
+        resolve(false);
+      }
+    });
+  }
+
 }
