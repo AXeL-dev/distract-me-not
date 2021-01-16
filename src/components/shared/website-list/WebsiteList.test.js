@@ -139,7 +139,7 @@ it('exports urls', async () => {
   const exportFilename = 'blacklist.txt';
   render(<WebsiteList list={defaultBlacklist} exportFilename={exportFilename} />);
   // spy on file helper download function
-  jest.spyOn(fileHelper, 'download');
+  const downloadFn = jest.spyOn(fileHelper, 'download');
   global.URL.createObjectURL = jest.fn(); // fix error: URL.createObjectURL is not a function
   global.Blob = function(content, options) { // allow us to compare Blobs
     return {
@@ -154,7 +154,7 @@ it('exports urls', async () => {
   const exportButton = await waitFor(() => screen.getByRole('menuitem', { name: /export/i }));
   fireEvent.click(exportButton);
   // verify
-  expect(fileHelper.download).toHaveBeenCalledWith(
+  expect(downloadFn).toHaveBeenCalledWith(
     {
       content: defaultBlacklist,
       options: {
