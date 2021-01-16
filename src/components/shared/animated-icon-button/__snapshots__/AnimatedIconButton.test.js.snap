@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<DocumentFragment>
+  <button
+    class="css-1ii3p2c icon-button animated-icon-button   ub-fnt-fam_b77syt ub-mt_0px ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_32px ub-ltr-spc_0 ub-btrr_3px ub-bbrr_3px ub-btlr_3px ub-bblr_3px ub-pt_0px ub-pb_0px ub-pr_0px ub-pl_0px ub-ml_0px ub-mr_0px ub-mb_0px ub-h_32px ub-pst_relative ub-dspl_flex ub-algn-itms_center ub-flx-wrap_nowrap ub-just-cnt_center ub-w_32px ub-box-szg_border-box"
+  >
+    <div
+      class="ub-dspl_inline-flex ub-box-szg_border-box"
+    >
+      <svg
+        class="ub-w_22px ub-h_22px ub-box-szg_border-box"
+        data-icon="cross"
+        style="fill: currentColor;"
+        viewBox="0 0 20 20"
+      >
+        <path
+          d="M11.41 10l4.29-4.29c.19-.18.3-.43.3-.71a1.003 1.003 0 00-1.71-.71L10 8.59l-4.29-4.3a1.003 1.003 0 00-1.42 1.42L8.59 10 4.3 14.29c-.19.18-.3.43-.3.71a1.003 1.003 0 001.71.71l4.29-4.3 4.29 4.29c.18.19.43.3.71.3a1.003 1.003 0 00.71-1.71L11.41 10z"
+          fill-rule="evenodd"
+        />
+      </svg>
+    </div>
+  </button>
+</DocumentFragment>
+`;

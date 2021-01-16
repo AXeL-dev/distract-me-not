@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<DocumentFragment>
+  <div
+    class="css-nil ub-dspl_flex ub-flx-drct_inherit ub-box-szg_border-box"
+  >
+    <div
+      class="css-nil ub-dspl_flex ub-algn-itms_center ub-flx_1 ub-box-szg_border-box"
+    >
+      <span
+        class="ub-color_425A70 ub-fnt-fam_b77syt ub-fnt-sze_14px ub-f-wght_400 ub-ln-ht_20px ub-ltr-spc_-0-05px ub-box-szg_border-box"
+      />
+    </div>
+    <div
+      class="css-nil ub-dspl_flex ub-algn-itms_center ub-mr_0px ub-box-szg_border-box"
+    >
+      <label
+        class="ub-dspl_block ub-w_36px ub-pst_relative ub-box-szg_border-box"
+      >
+        <input
+          class="css-17gzcr6 ub-box-szg_border-box"
+          type="checkbox"
+        />
+        <div
+          class="ub-h_18px ub-w_36px ub-box-szg_border-box"
+        >
+          <div
+            class="css-17bhmw6 ub-h_18px ub-w_18px ub-box-szg_border-box"
+            data-checked="false"
+          >
+            <svg
+              height="6"
+              viewBox="0 0 10 7"
+              width="10"
+            >
+              <path
+                d="M4 4.586L1.707 2.293A1 1 0 1 0 .293 3.707l3 3a.997.997 0 0 0 1.414 0l5-5A1 1 0 1 0 8.293.293L4 4.586z"
+                fill="currentColor"
+                fill-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div
+            class="css-1rprxtl ub-w_36px ub-dspl_flex ub-box-szg_border-box"
+            data-checked="false"
+          >
+            <div
+              class="ub-flx_1 ub-pb_2px ub-pl_2px ub-pr_2px ub-pt_2px ub-box-szg_border-box"
+            >
+              <div
+                class="css-13qcn8a ub-w_14px ub-h_14px ub-box-szg_border-box"
+              />
+            </div>
+          </div>
+        </div>
+      </label>
+    </div>
+  </div>
+</DocumentFragment>
+`;

@@ -300,6 +300,7 @@ export default class WebsiteList extends Component {
               ? this.getIconForOrder(this.state.ordering)
               : CaretDownIcon
           }
+          data-testid="sort-button"
         >
           {label}
         </TextDropdownButton>
@@ -403,7 +404,7 @@ export default class WebsiteList extends Component {
               size={24}
             />
           )}
-          <Text marginLeft={8} size={300} fontWeight={500}>
+          <Text marginLeft={8} size={300} fontWeight={500} data-testid="url">
             {row.url}
           </Text>
         </Table.Cell>
@@ -413,7 +414,7 @@ export default class WebsiteList extends Component {
             position={Position.BOTTOM_RIGHT}
             minWidth={160}
           >
-            <IconButton icon={MoreIcon} height={24} appearance="minimal" />
+            <IconButton icon={MoreIcon} height={24} appearance="minimal" data-testid="more-button" />
           </Popover>
         </Table.Cell>
       </Table.Row>

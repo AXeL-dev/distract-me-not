@@ -32,7 +32,7 @@ export default class MultiSelectField extends Component {
         this.setHeight(this.props.options.length);
       }
       // check for selected change
-      if (this.props.selected.length !== prevProps.selected.length && this.props.selected.length !== this.state.selected.length) {
+      if (this.props.selected && this.props.selected.length !== prevProps.selected.length && this.props.selected.length !== this.state.selected.length) {
         debug.warn('selected has changed:', this.props.selected);
         this.setState({
           selected: this.props.selected,

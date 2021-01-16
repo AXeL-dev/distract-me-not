@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<DocumentFragment>
+  <input
+    style="width: 100px;"
+    type="number"
+    value="5"
+  />
+</DocumentFragment>
+`;

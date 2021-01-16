@@ -42,8 +42,8 @@ it('accepts only passwords that contains at least 8 characters', async () => {
     passwords.push(Array(i + 1).join('p'));
   }
   // render our component
-  render(<Settings enablePassword={true} />);
-  const passwordInput = screen.getByTestId('password');
+  const { container } = render(<Settings enablePassword={true} />);
+  const passwordInput = container.querySelector('input[type="password"]'); // screen.getByTestId('password');
   const saveButton = screen.getByRole('button', { name: 'save' });
   // test passwords containing less than 8 characters
   for (let i = 0; i < minCharsNumber; i++) {

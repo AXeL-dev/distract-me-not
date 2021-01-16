@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<DocumentFragment>
+  <div
+    class="css-nil ub-dspl_flex ub-box-szg_border-box"
+  >
+    <div
+      class="css-nil ub-dspl_flex ub-algn-itms_center ub-flx_1 ub-box-szg_border-box"
+    >
+      <span
+        class="ub-color_425A70 ub-fnt-fam_b77syt ub-fnt-sze_14px ub-f-wght_400 ub-ln-ht_20px ub-ltr-spc_-0-05px ub-box-szg_border-box"
+      >
+        time
+      </span>
+    </div>
+    <div
+      class="css-nil ub-dspl_flex ub-algn-itms_center ub-box-szg_border-box"
+    >
+      <input
+        type="time"
+        value=""
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;

@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<DocumentFragment>
+  <div
+    class="css-nil ub-b-btm_1px-solid-E4E7EB ub-dspl_flex ub-algn-itms_center ub-just-cnt_center ub-h_60px ub-box-szg_border-box"
+  >
+    <img
+      class="logo"
+      src="icons/magnet-256.png"
+    />
+    <h2
+      class="cursor-default ub-mt_0px ub-mb_0px ub-fnt-sze_20px ub-f-wght_bold ub-ln-ht_24px ub-ltr-spc_-0-07px ub-fnt-fam_wm9v6k ub-color_234361 ub-box-szg_border-box"
+    >
+      appName
+    </h2>
+  </div>
+</DocumentFragment>
+`;

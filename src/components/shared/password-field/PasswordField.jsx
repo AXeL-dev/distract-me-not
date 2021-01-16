@@ -38,7 +38,7 @@ export default function PasswordField(props) {
           onChange={props.onChange}
           disabled={props.disabled}
           required={props.required}
-          data-testid={props['data-testid']}
+          //data-testid={props['data-testid']}
         />
       </Pane>
     </Pane>

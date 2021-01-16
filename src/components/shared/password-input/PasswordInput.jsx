@@ -52,7 +52,7 @@ export default class PasswordInput extends Component {
               placeholder={this.props.placeholder}
               disabled={this.props.disabled}
               required={this.props.required}
-              data-testid={this.props['data-testid']}
+              //data-testid={this.props['data-testid']}
               paddingRight={40}
             />
             <IconButton

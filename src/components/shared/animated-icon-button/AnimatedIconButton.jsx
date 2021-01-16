@@ -71,9 +71,9 @@ export default class AnimatedIconButton extends Component {
   handleClick = (event) => {
     if (this.props.onClick) {
       this.props.onClick(event);
-      if (this.state.hideOnClick) {
-        this.playHideAnimation();
-      }
+    }
+    if (this.state.hideOnClick) {
+      this.playHideAnimation();
     }
   }
 
