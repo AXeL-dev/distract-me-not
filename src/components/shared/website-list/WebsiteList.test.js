@@ -92,6 +92,21 @@ it('filters urls', () => {
   expect(list).toHaveTextContent(filter);
 });
 
+it('sorts urls in ascending order', async () => {
+  const { container } = render(<WebsiteList list={defaultBlacklist} />);
+  const list = container.querySelector('div[data-evergreen-table-body="true"]');
+  // click on sort button
+  const sortButton = screen.getByTestId('sort-button');
+  fireEvent.click(sortButton);
+  // choose asc order
+  const ascButton = await waitFor(() => screen.getByRole('menuitemradio', { name: /ascending/i }));
+  fireEvent.click(ascButton);
+  // verify
+  const listOrder = within(list).getAllByTestId('url').map(url => url.innerHTML);
+  const expectedOrder = defaultBlacklist.slice().sort((a, b) => a.localeCompare(b)); // asc
+  expect(listOrder).toEqual(expectedOrder);
+});
+
 it('sorts urls in descending order', async () => {
   const { container } = render(<WebsiteList list={defaultBlacklist} />);
   const list = container.querySelector('div[data-evergreen-table-body="true"]');
