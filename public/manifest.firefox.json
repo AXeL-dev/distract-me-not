@@ -1,0 +1,48 @@
+{
+  "manifest_version": 2,
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{5f884915-160e-4276-a216-770a753a3abe}",
+      "strict_min_version": "52.0"
+    }
+  },
+
+  "name": "__MSG_appName__",
+  "version": "2.0.0",
+
+  "default_locale": "en",
+  "description": "__MSG_appDesc__",
+  "icons": {
+    "128": "icons/magnet-256.png"
+  },
+
+  "web_accessible_resources":["index.html"],
+
+  "browser_action": {
+    "default_icon": "icons/magnet-256.png",
+    "default_popup": "index.html"
+  },
+
+  "options_ui":{
+    "page": "index.html#settings",
+    "open_in_tab": false
+  },
+
+  "background": {
+    "page": "index.html#background"
+  },
+
+  "author": "AXeL-dev",
+  "homepage_url": "https://github.com/AXeL-dev/distract-me-not",
+
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs",
+    "https://*/*",
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>"
+  ]
+}

@@ -1,0 +1,14 @@
+
+.animated-icon-button {
+  transition: transform 0.2s;
+  &.scale-0 {
+    transform: scale(0);
+  }
+}
+
+// .grow {
+//   transition: all .2s ease-in-out;
+//   &:hover {
+//     transform: scale(1.1);
+//   }
+// }

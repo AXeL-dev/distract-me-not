@@ -1,0 +1,239 @@
+{
+    "appName": {
+        "message": "Distract Me Not"
+    },
+    "appDesc": {
+        "message": "Restez concentré dans un monde rempli de distractions."
+    },
+    "blacklist": {
+        "message": "Liste noire"
+    },
+    "whitelist": {
+        "message": "Liste blanche"
+    },
+    "whitelistDescription": {
+        "message": "Quand le mode liste blanche est actif, vous pouvez uniquement visiter les sites web suivants:"
+    },
+    "blacklistDescription": {
+        "message": "Quand le mode liste noire est actif, vous ne pouvez pas visiter les sites web suivants:"
+    },
+    "websiteUrlPlaceholder": {
+        "message": "Veuillez entrer l'URL du site içi"
+    },
+    "blockingMessage": {
+        "message": "Message à afficher"
+    },
+    "defaultBlockingMessage": {
+        "message": "Où est-ce que vous allez..."
+    },
+    "displayBlankPage": {
+        "message": "Afficher une page vide"
+    },
+    "settings": {
+        "message": "Réglages"
+    },
+    "addToBlacklist": {
+        "message": "Ajouter le site web actuel à la liste noire"
+    },
+    "addToWhitelist": {
+        "message": "Ajouter le site web actuel à la liste blanche"
+    },
+    "status": {
+        "message": "Statut"
+    },
+    "mode": {
+        "message": "Mode"
+    },
+    "defaultAction": {
+        "message": "Action par défaut"
+    },
+    "blockTab": {
+        "message": "Bloquer"
+    },
+    "redirectToUrl": {
+        "message": "Rediriger vers une URL"
+    },
+    "closeTab": {
+        "message": "Fermer l'onglet"
+    },
+    "url": {
+        "message": "Url"
+    },
+    "redirectUrlExample": {
+        "message": "Exemple: about:blank, https://www.google.com, ..."
+    },
+    "urlExample": {
+        "message": "Exemple: www.facebook.com, www.youtube.com, ..."
+    },
+    "urlIsNotValid": {
+        "message": "L'url n'est pas valide"
+    },
+    "urlAlreadyExists": {
+        "message": "L'url existe déjà!"
+    },
+    "copiedToClipboard": {
+        "message": "Copié dans le presse-papier!"
+    },
+    "enableOnBrowserStartup": {
+        "message": "Toujours activer au démarrage du navigateur"
+    },
+    "import": {
+        "message": "Importer"
+    },
+    "export": {
+        "message": "Exporter"
+    },
+    "blocking": {
+        "message": "Blocage"
+    },
+    "blockingDescription": {
+        "message": "Veuillez choisir une action à entreprendre pour les sites web blacklistés:"
+    },
+    "schedule": {
+        "message": "Planification"
+    },
+    "scheduleDescription": {
+        "message": "Planifier le temps de blocage:"
+    },
+    "scheduleStartTime": {
+        "message": "Heure de début:"
+    },
+    "scheduleEndTime": {
+        "message": "Heure de fin:"
+    },
+    "scheduleDays": {
+        "message": "Jours:"
+    },
+    "scheduleDaysDescription": {
+        "message": "Jours où le blocage doit être activé pendant l'horaire défini. S'il n'y a pas d'horaire, le blocage sera actif pendant toute la journée."
+    },
+    "miscellaneous": {
+        "message": "Divers"
+    },
+    "password": {
+        "message": "Mot de passe"
+    },
+    "changePassword": {
+        "message": "Changer le mot de passe"
+    },
+    "changePasswordTooltip": {
+        "message": "Laissez vide pour conserver l'ancien mot de passe."
+    },
+    "passwordDescription": {
+        "message": "Verrouille l'accès aux paramètres avec un mot de passe."
+    },
+    "enablePasswordProtection": {
+        "message": "Activer la protection par mot de passe:"
+    },
+    "passwordIsShort": {
+        "message": "Le mot de passe doit contenir au moins 8 caractères."
+    },
+    "passwordIsWrong": {
+        "message": "Mot de passe incorrect!"
+    },
+    "unblockWebsitesWithPassword": {
+        "message": "Permettre le déblocage des sites web avec le mot de passe"
+    },
+    "enable": {
+        "message": "Activer"
+    },
+    "addWebsite": {
+        "message": "Ajouter un site web"
+    },
+    "addWebsiteHint": {
+        "message": "Vous pouvez utiliser des caractères génériques pour sélectionner des sous-domaines ou des sous-pages, par exemple: <b>*.example.com</b>, <b>example.com/blog/*</b>"
+    },
+    "add": {
+        "message": "Ajouter"
+    },
+    "save": {
+        "message": "Sauvegarder"
+    },
+    "settingsSaved": {
+        "message": "Paramètres sauvegardés!"
+    },
+    "copy": {
+        "message": "Copier"
+    },
+    "edit": {
+        "message": "Modifier"
+    },
+    "duplicate": {
+        "message": "Dupliquer"
+    },
+    "delete": {
+        "message": "Supprimer"
+    },
+    "order": {
+        "message": "Ordre"
+    },
+    "ascending": {
+        "message": "Ascendant"
+    },
+    "descending": {
+        "message": "Descendant"
+    },
+    "show": {
+        "message": "Afficher"
+    },
+    "filter": {
+        "message": "Filtrer"
+    },
+    "close": {
+        "message": "Fermer"
+    },
+    "cancel": {
+        "message": "Annuler"
+    },
+    "monday": {
+        "message": "Lundi"
+    },
+    "tuesday": {
+        "message": "Mardi"
+    },
+    "wednesday": {
+        "message": "Mercredi"
+    },
+    "thursday": {
+        "message": "Jeudi"
+    },
+    "friday": {
+        "message": "Vendredi"
+    },
+    "saturday": {
+        "message": "Samedi"
+    },
+    "sunday": {
+        "message": "Dimanche"
+    },
+    "select": {
+        "message": "Sélectionner..."
+    },
+    "dayEnd": {
+        "message": "Fin de journée"
+    },
+    "dayOff": {
+        "message": "Journée off"
+    },
+    "enabled": {
+        "message": "Activé"
+    },
+    "unblock": {
+        "message": "Débloquer"
+    },
+    "unblockOnce": {
+        "message": "Débloquer une fois"
+    },
+    "unblockFor": {
+        "message": "Débloquer pour"
+    },
+    "unblockOnceTimeout": {
+        "message": "Délai d'expiration du déblocage pour une fois:"
+    },
+    "minutes": {
+        "message": "minute(s)"
+    },
+    "seconds": {
+        "message": "seconde(s)"
+    }
+}

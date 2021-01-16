@@ -1,0 +1,23 @@
+name: Build and Release to AMO
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+
+      - name: Install, Test and Build 🔧
+        run: |
+          npm install
+          npm test
+          npm run build:firefox
+
+      - name: Release to AMO 🚀
+        run: cd build && npx web-ext-submit
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+          WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}

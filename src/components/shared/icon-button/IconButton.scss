@@ -1,0 +1,6 @@
+
+.icon-button {
+  &:hover, &:focus, &:active {
+    box-shadow: none !important;
+  }
+}

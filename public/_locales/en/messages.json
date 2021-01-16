@@ -1,0 +1,239 @@
+{
+    "appName": {
+        "message": "Distract Me Not"
+    },
+    "appDesc": {
+        "message": "Stay focused in a world full of distractions."
+    },
+    "blacklist": {
+        "message": "Blacklist"
+    },
+    "whitelist": {
+        "message": "Whitelist"
+    },
+    "whitelistDescription": {
+        "message": "When mode is set to whitelist, you can only visit the following websites:"
+    },
+    "blacklistDescription": {
+        "message": "When mode is set to blacklist, you cannot visit the following websites:"
+    },
+    "websiteUrlPlaceholder": {
+        "message": "Please enter the URL of the website here"
+    },
+    "blockingMessage": {
+        "message": "Message"
+    },
+    "defaultBlockingMessage": {
+        "message": "Where are you going..."
+    },
+    "displayBlankPage": {
+        "message": "Display a blank page"
+    },
+    "settings": {
+        "message": "Settings"
+    },
+    "addToBlacklist": {
+        "message": "Add current website to blacklist"
+    },
+    "addToWhitelist": {
+        "message": "Add current website to whitelist"
+    },
+    "status": {
+        "message": "Status"
+    },
+    "mode": {
+        "message": "Mode"
+    },
+    "defaultAction": {
+        "message": "Default action"
+    },
+    "blockTab": {
+        "message": "Block"
+    },
+    "redirectToUrl": {
+        "message": "Redirect to url"
+    },
+    "closeTab": {
+        "message": "Close tab"
+    },
+    "url": {
+        "message": "Url"
+    },
+    "redirectUrlExample": {
+        "message": "Example: about:blank, https://www.google.com, ..."
+    },
+    "urlExample": {
+        "message": "Example: www.facebook.com, www.youtube.com, ..."
+    },
+    "urlIsNotValid": {
+        "message": "Url is not valid"
+    },
+    "urlAlreadyExists": {
+        "message": "Url already exists!"
+    },
+    "copiedToClipboard": {
+        "message": "Copied to clipboard!"
+    },
+    "enableOnBrowserStartup": {
+        "message": "Enable on browser startup"
+    },
+    "import": {
+        "message": "Import"
+    },
+    "export": {
+        "message": "Export"
+    },
+    "blocking": {
+        "message": "Blocking"
+    },
+    "blockingDescription": {
+        "message": "Choose an action to take for the blacklisted websites:"
+    },
+    "schedule": {
+        "message": "Schedule"
+    },
+    "scheduleDescription": {
+        "message": "Schedule blocking time:"
+    },
+    "scheduleStartTime": {
+        "message": "Start time:"
+    },
+    "scheduleEndTime": {
+        "message": "End time:"
+    },
+    "scheduleDays": {
+        "message": "Days:"
+    },
+    "scheduleDaysDescription": {
+        "message": "Days where blocking should be enabled during the scheduled time. If schedule time is not defined, the blocking will be active for the whole day."
+    },
+    "miscellaneous": {
+        "message": "Miscellaneous"
+    },
+    "password": {
+        "message": "Password"
+    },
+    "changePassword": {
+        "message": "Change password"
+    },
+    "changePasswordTooltip": {
+        "message": "Leave empty to keep the old password."
+    },
+    "passwordDescription": {
+        "message": "Locks access to settings with a password."
+    },
+    "enablePasswordProtection": {
+        "message": "Enable password protection:"
+    },
+    "passwordIsShort": {
+        "message": "The password must contain at least 8 characters."
+    },
+    "passwordIsWrong": {
+        "message": "Wrong password!"
+    },
+    "unblockWebsitesWithPassword": {
+        "message": "Allow unblocking websites with the password"
+    },
+    "enable": {
+        "message": "Enable"
+    },
+    "addWebsite": {
+        "message": "Add a website"
+    },
+    "addWebsiteHint": {
+        "message": "Use wildcard matching to select subdomains or subpages, e.g.: <b>*.example.com</b>, <b>example.com/blog/*</b>"
+    },
+    "add": {
+        "message": "Add"
+    },
+    "save": {
+        "message": "Save"
+    },
+    "settingsSaved": {
+        "message": "Settings saved!"
+    },
+    "copy": {
+        "message": "Copy"
+    },
+    "edit": {
+        "message": "Edit"
+    },
+    "duplicate": {
+        "message": "Duplicate"
+    },
+    "delete": {
+        "message": "Delete"
+    },
+    "order": {
+        "message": "Order"
+    },
+    "ascending": {
+        "message": "Ascending"
+    },
+    "descending": {
+        "message": "Descending"
+    },
+    "show": {
+        "message": "Show"
+    },
+    "filter": {
+        "message": "Filter"
+    },
+    "close": {
+        "message": "Close"
+    },
+    "cancel": {
+        "message": "Cancel"
+    },
+    "monday": {
+        "message": "Monday"
+    },
+    "tuesday": {
+        "message": "Tuesday"
+    },
+    "wednesday": {
+        "message": "Wednesday"
+    },
+    "thursday": {
+        "message": "Thursday"
+    },
+    "friday": {
+        "message": "Friday"
+    },
+    "saturday": {
+        "message": "Saturday"
+    },
+    "sunday": {
+        "message": "Sunday"
+    },
+    "select": {
+        "message": "Select..."
+    },
+    "dayEnd": {
+        "message": "Day end"
+    },
+    "dayOff": {
+        "message": "Day off"
+    },
+    "enabled": {
+        "message": "Enabled"
+    },
+    "unblock": {
+        "message": "Unblock"
+    },
+    "unblockOnce": {
+        "message": "Unblock once"
+    },
+    "unblockFor": {
+        "message": "Unblock for"
+    },
+    "unblockOnceTimeout": {
+        "message": "Unblock once timeout:"
+    },
+    "minutes": {
+        "message": "minute(s)"
+    },
+    "seconds": {
+        "message": "second(s)"
+    }
+}
