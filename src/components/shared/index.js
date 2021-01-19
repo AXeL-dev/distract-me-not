@@ -4,6 +4,7 @@ export * from './icon-button';
 export * from './multi-select-field';
 export * from './number-field';
 export * from './number-input';
+export * from './outer-pane';
 export * from './password-field';
 export * from './password-input';
 export * from './raw-html';

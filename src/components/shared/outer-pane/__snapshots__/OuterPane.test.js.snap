@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<DocumentFragment>
+  <div
+    class="css-nil ub-box-szg_border-box"
+  >
+    <span>
+      Children
+    </span>
+  </div>
+</DocumentFragment>
+`;

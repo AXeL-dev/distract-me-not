@@ -19,7 +19,7 @@ exports[`renders panel correctly 1`] = `
       </h2>
     </div>
     <div
-      class="css-nil ub-dspl_flex ub-pb_20px ub-pl_16px ub-pr_16px ub-pt_20px ub-flx-drct_inherit ub-box-szg_border-box"
+      class="css-nil ub-dspl_flex ub-pb_20px ub-pl_16px ub-pr_16px ub-pt_20px ub-box-szg_border-box"
     >
       <div
         class="css-nil ub-dspl_flex ub-algn-itms_center ub-flx_1 ub-box-szg_border-box"

@@ -3,7 +3,7 @@
 exports[`renders correctly 1`] = `
 <DocumentFragment>
   <div
-    class="css-nil ub-dspl_flex ub-flx-drct_inherit ub-box-szg_border-box"
+    class="css-nil ub-dspl_flex ub-box-szg_border-box"
   >
     <div
       class="css-nil ub-dspl_flex ub-algn-itms_center ub-flx_1 ub-box-szg_border-box"
