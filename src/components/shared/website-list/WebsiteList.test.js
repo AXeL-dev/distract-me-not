@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
 import { defaultBlacklist } from "../../../helpers/block";
 import * as fileHelper from "../../../helpers/file";
-import WebsiteList from "./WebsiteList";
+import { WebsiteList } from ".";
 
 it('renders correctly', () => {
   const { container, asFragment } = render(<WebsiteList list={defaultBlacklist} />);

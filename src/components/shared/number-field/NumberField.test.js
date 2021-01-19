@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import NumberField from "./NumberField";
+import { NumberField } from ".";
 
 const input = {
   label: 'My number field',

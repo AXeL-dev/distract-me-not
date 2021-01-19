@@ -1,5 +1,5 @@
 import { render, fireEvent } from "@testing-library/react";
-import TimeField from "./TimeField";
+import { TimeField } from ".";
 
 it('renders correctly', () => {
   const { asFragment } = render(<TimeField label="time" />);

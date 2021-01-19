@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import Panel from "./Panel";
+import { Panel } from ".";
 
 it('renders panel correctly', () => {
   const { container, asFragment } = render(<Panel />);

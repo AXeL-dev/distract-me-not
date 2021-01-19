@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import MultiSelectField from "./MultiSelectField";
+import { MultiSelectField } from ".";
 
 const options = [
   { label: 'Option 1', value: 'option-1' },

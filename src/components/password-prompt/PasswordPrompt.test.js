@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import PasswordPrompt from "./PasswordPrompt";
+import { PasswordPrompt } from ".";
 
 const password = {
   correct: 'test1234',

@@ -1,5 +1,5 @@
 import { render, fireEvent } from "@testing-library/react";
-import PasswordField from "./PasswordField";
+import { PasswordField } from ".";
 
 const password = {
   value: 'p@ssword',

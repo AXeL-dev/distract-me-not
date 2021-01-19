@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import PasswordInput from "./PasswordInput";
+import { PasswordInput } from ".";
 
 const password = {
   value: 'p@ssword',

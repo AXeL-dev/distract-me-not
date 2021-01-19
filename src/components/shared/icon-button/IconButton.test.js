@@ -1,6 +1,6 @@
 import { render, fireEvent } from "@testing-library/react";
 import { CrossIcon } from "evergreen-ui";
-import IconButton from "./IconButton";
+import { IconButton } from ".";
 
 it('renders correctly', () => {
   const { asFragment } = render(<IconButton icon={CrossIcon} />);

@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import SettingsButton from "./SettingsButton";
+import { SettingsButton } from ".";
 
 it('renders correctly', () => {
   const { asFragment } = render(<SettingsButton />);
