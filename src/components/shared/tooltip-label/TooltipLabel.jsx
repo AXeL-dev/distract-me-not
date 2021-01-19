@@ -1,21 +1,21 @@
 import { Text, Tooltip, Position } from 'evergreen-ui';
 import './TooltipLabel.scss';
 
-export function TooltipLabel(props) {
+export function TooltipLabel({ tooltip, tooltipPosition, ...props}) {
 
-  const renderLabel = (text, size, color, className) => {
+  const renderLabel = ({ text, ...props}) => {
     return (
-      <Text size={size} color={color} className={className}>
+      <Text {...props}>
         {text}
       </Text>
     );
   }
 
-  return props.tooltip ? (
-    <Tooltip content={props.tooltip} position={props.tooltipPosition || Position.BOTTOM}>
-      {renderLabel(props.text, props.size, props.color, `cursor-help ${props.className || ''}`)}
+  return tooltip ? (
+    <Tooltip content={tooltip} position={tooltipPosition || Position.BOTTOM}>
+      {renderLabel({...props, className: `cursor-help ${props.className || ''}`})}
     </Tooltip>
   ) : (
-    renderLabel(props.text, props.size, props.color, props.className)
+    renderLabel(props)
   );
 }
