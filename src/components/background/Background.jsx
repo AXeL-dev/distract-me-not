@@ -8,7 +8,7 @@ import { inToday } from '../../helpers/date';
 
 const nativeAPI = getNativeAPI();
 
-export default class Background extends Component {
+export class Background extends Component {
 
   constructor(props) {
     super(props);

@@ -4,14 +4,10 @@ import { translate } from '../../helpers/i18n';
 import { sendMessage, getActiveTab, getActiveTabHostname, storage } from '../../helpers/webext';
 import { Mode, defaultBlacklist, defaultWhitelist, defaultSchedule, isAccessible } from '../../helpers/block';
 import { inToday } from '../../helpers/date';
-import Header from '../shared/header/Header';
-import SwitchField from '../shared/switch-field/SwitchField';
-import SegmentedControlField from '../shared/segmented-control-field/SegmentedControlField';
-import AnimatedIconButton from '../shared/animated-icon-button/AnimatedIconButton';
-import SettingsButton from '../shared/settings-button/SettingsButton';
+import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton } from '..';
 import './Panel.scss';
 
-export default class Panel extends Component {
+export class Panel extends Component {
 
   constructor(props) {
     super(props);

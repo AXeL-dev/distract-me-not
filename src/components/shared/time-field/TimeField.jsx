@@ -1,6 +1,6 @@
 import { Pane, Text } from 'evergreen-ui';
 
-export default function TimeField(props) {
+export function TimeField(props) {
   return (
     <Pane
       display="flex"

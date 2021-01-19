@@ -22,7 +22,7 @@ import {
   Dialog
 } from 'evergreen-ui';
 import copy from 'copy-to-clipboard';
-import TextField from '../text-field/TextField';
+import { TextField } from '..';
 import { translate } from '../../../helpers/i18n';
 import { debug } from '../../../helpers/debug';
 import { download, readFile } from '../../../helpers/file';
@@ -35,7 +35,7 @@ const Order = {
   DESC: 'DESC'
 };
 
-export default class WebsiteList extends Component {
+export class WebsiteList extends Component {
 
   constructor(props) {
     super(props);

@@ -6,15 +6,10 @@ import { Action, defaultBlacklist, defaultWhitelist, defaultSchedule, defaultUnb
 import { sendMessage, storage } from '../../helpers/webext';
 import { DaysOfWeek } from '../../helpers/date';
 import { hash } from '../../helpers/crypt';
-import SwitchField from '../shared/switch-field/SwitchField';
-import TimeField from '../shared/time-field/TimeField';
-import PasswordField from '../shared/password-field/PasswordField';
-import MultiSelectField from '../shared/multi-select-field/MultiSelectField';
-import WebsiteList from '../shared/website-list/WebsiteList';
-import NumberField from '../shared/number-field/NumberField';
+import { SwitchField, TimeField, PasswordField, MultiSelectField, WebsiteList, NumberField } from '..';
 import './Settings.scss';
 
-export default class Settings extends Component {
+export class Settings extends Component {
 
   constructor(props) {
     super(props);

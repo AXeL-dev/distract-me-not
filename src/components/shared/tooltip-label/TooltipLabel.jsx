@@ -1,7 +1,7 @@
 import { Text, Tooltip, Position } from 'evergreen-ui';
 import './TooltipLabel.scss';
 
-export default function TooltipLabel(props) {
+export function TooltipLabel(props) {
 
   const renderLabel = (text, size, color, className) => {
     return (

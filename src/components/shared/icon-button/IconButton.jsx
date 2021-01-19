@@ -3,7 +3,7 @@ import { Tooltip, Button, Icon } from 'evergreen-ui';
 import './IconButton.scss';
 
 // Icon button component with support for custom icon color
-export default class IconButton extends Component {
+export class IconButton extends Component {
 
   constructor(props) {
     super(props);

@@ -1,9 +1,9 @@
 import { Component } from 'react';
 import { debug } from '../../../helpers/debug';
-import IconButton from '../icon-button/IconButton';
+import { IconButton } from '..';
 import './AnimatedIconButton.scss';
 
-export default class AnimatedIconButton extends Component {
+export class AnimatedIconButton extends Component {
 
   constructor(props) {
     super(props);

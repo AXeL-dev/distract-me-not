@@ -1,8 +1,8 @@
 import { Component } from 'react';
 import { Pane, TextInput, Button, Paragraph } from 'evergreen-ui';
-import RawHTML from '../raw-html/RawHTML';
+import { RawHTML } from '..';
 
-export default class TextField extends Component {
+export class TextField extends Component {
 
   constructor(props) {
     super(props);

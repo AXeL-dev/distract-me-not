@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import { debug } from '../../../helpers/debug';
 
-export default class NumberInput extends Component {
+export class NumberInput extends Component {
 
   constructor(props) {
     super(props);

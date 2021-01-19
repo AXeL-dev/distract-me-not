@@ -1,7 +1,7 @@
 import { Pane, Text, SegmentedControl } from 'evergreen-ui';
 import './SegmentedControlField.scss';
 
-export default function SegmentedControlField(props) {
+export function SegmentedControlField(props) {
   return (
     <Pane
       display="flex"

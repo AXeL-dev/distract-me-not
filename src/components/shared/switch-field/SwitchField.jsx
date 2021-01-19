@@ -1,7 +1,7 @@
 import { Pane, Switch, Position } from 'evergreen-ui';
-import TooltipLabel from '../tooltip-label/TooltipLabel';
+import { TooltipLabel } from '..';
 
-export default function SwitchField(props) {
+export function SwitchField(props) {
   return (
     <Pane
       display="flex"

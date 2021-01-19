@@ -1,8 +1,7 @@
 import { Pane, Text } from 'evergreen-ui';
-import TooltipLabel from '../tooltip-label/TooltipLabel';
-import NumberInput from '../number-input/NumberInput';
+import { TooltipLabel, NumberInput } from '..';
 
-export default function NumberField(props) {
+export function NumberField(props) {
   return (
     <Pane
       display="flex"

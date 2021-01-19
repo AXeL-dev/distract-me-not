@@ -5,12 +5,11 @@ import { storage, sendMessage } from '../../helpers/webext';
 import { debug, isDevEnv } from '../../helpers/debug';
 import { isUrl, getValidUrl } from '../../helpers/url';
 import { unblockOptions } from '../../helpers/block';
-import NumberInput from '../shared/number-input/NumberInput';
-import PasswordPrompt from '../password-prompt/PasswordPrompt';
+import { NumberInput, PasswordPrompt } from '..';
 import queryString from 'query-string';
 import './Blocked.scss';
 
-export default class Blocked extends Component {
+export class Blocked extends Component {
 
   constructor(props) {
     super(props);

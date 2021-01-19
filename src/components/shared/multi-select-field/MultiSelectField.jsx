@@ -1,10 +1,9 @@
 import { Component } from 'react';
 import { Pane, SelectMenu, Button, Paragraph, CaretDownIcon } from 'evergreen-ui';
 import { debug } from '../../../helpers/debug';
-import TooltipLabel from '../tooltip-label/TooltipLabel';
-import RawHTML from '../raw-html/RawHTML';
+import { TooltipLabel, RawHTML } from '..';
 
-export default class MultiSelectField extends Component {
+export class MultiSelectField extends Component {
 
   constructor(props) {
     super(props);

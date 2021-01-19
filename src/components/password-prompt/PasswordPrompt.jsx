@@ -4,13 +4,11 @@ import { translate } from '../../helpers/i18n';
 import { storage } from '../../helpers/webext';
 import { compare } from '../../helpers/crypt';
 import { debug } from '../../helpers/debug';
-import Header from '../shared/header/Header';
-import IconButton from '../shared/icon-button/IconButton';
-import SettingsButton from '../shared/settings-button/SettingsButton';
+import { Header, IconButton, SettingsButton } from '..';
 
 const defaultHash = process.env.REACT_APP_HASH;
 
-export default class PasswordPrompt extends Component {
+export class PasswordPrompt extends Component {
 
   constructor(props) {
     super(props);

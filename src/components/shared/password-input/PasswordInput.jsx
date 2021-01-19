@@ -1,9 +1,9 @@
 import { Component } from 'react';
 import { Pane, TextInput, IconButton, Paragraph, EyeOpenIcon, EyeOffIcon } from 'evergreen-ui';
-import RawHTML from '../raw-html/RawHTML';
+import { RawHTML } from '..';
 import './PasswordInput.scss';
 
-export default class PasswordInput extends Component {
+export class PasswordInput extends Component {
 
   constructor(props) {
     super(props);
