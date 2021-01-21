@@ -7,7 +7,7 @@ import { isUrl, getValidUrl } from '../../helpers/url';
 import { unblockOptions } from '../../helpers/block';
 import { NumberInput, PasswordPrompt } from '..';
 import queryString from 'query-string';
-import './Blocked.scss';
+import './styles.scss';
 
 export class Blocked extends Component {
 

@@ -27,7 +27,7 @@ import { translate } from '../../../helpers/i18n';
 import { debug } from '../../../helpers/debug';
 import { download, readFile } from '../../../helpers/file';
 import { getHostName, getFaviconLink, checkFaviconLink, isUrl } from '../../../helpers/url';
-import './WebsiteList.scss';
+import './styles.scss';
 
 const Order = {
   NONE: 'NONE',

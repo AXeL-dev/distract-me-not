@@ -1,5 +1,5 @@
 import { Text, Tooltip, Position } from 'evergreen-ui';
-import './TooltipLabel.scss';
+import './styles.scss';
 
 export function TooltipLabel({ tooltip, tooltipPosition, ...props}) {
 

@@ -7,7 +7,7 @@ import { sendMessage, storage } from '../../helpers/webext';
 import { DaysOfWeek } from '../../helpers/date';
 import { hash } from '../../helpers/crypt';
 import { SwitchField, TimeField, PasswordField, MultiSelectField, WebsiteList, NumberField } from '..';
-import './Settings.scss';
+import './styles.scss';
 
 export class Settings extends Component {
 

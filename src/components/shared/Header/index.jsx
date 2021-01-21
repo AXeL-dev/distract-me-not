@@ -1,6 +1,6 @@
 import { Pane, Heading } from 'evergreen-ui';
 import { translate } from '../../../helpers/i18n';
-import './Header.scss';
+import './styles.scss';
 
 export function Header(props) {
   return (

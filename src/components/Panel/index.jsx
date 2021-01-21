@@ -5,7 +5,7 @@ import { sendMessage, getActiveTab, getActiveTabHostname, storage } from '../../
 import { Mode, defaultBlacklist, defaultWhitelist, defaultSchedule, isAccessible } from '../../helpers/block';
 import { inToday } from '../../helpers/date';
 import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton } from '..';
-import './Panel.scss';
+import './styles.scss';
 
 export class Panel extends Component {
 
