@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 //import { toaster } from 'evergreen-ui';
-import { Settings } from ".";
+import { Settings } from "../components";
 
 it('renders all tabs', () => {
   render(<Settings />);

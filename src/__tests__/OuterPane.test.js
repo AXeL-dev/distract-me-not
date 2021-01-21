@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { OuterPane } from ".";
+import { OuterPane } from "../components";
 
 it('renders correctly', () => {
   const { asFragment } = render(
