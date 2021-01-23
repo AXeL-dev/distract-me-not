@@ -93,11 +93,11 @@ button.unblock {
   transition: all 0.3s;
   vertical-align: middle;
   text-transform: uppercase;
-}
-button.unblock:hover {
-  background-color: #ddd;
-  color: $backgroundColor;
-  border-color: transparent;
+  &:hover {
+    background-color: #ddd;
+    color: $backgroundColor;
+    border-color: transparent;
+  }
 }
 .unblock-dialog > div:nth-child(1) { // dialog title
   border: 0 !important;
