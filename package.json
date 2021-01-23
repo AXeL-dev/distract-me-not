@@ -24,6 +24,7 @@
     "build:firefox": "npm run build && cd build && mv -f manifest.firefox.json manifest.json",
     "build:chrome": "npm run build && cd build && rm -f manifest.firefox.json",
     "package": "web-ext build --source-dir=build --artifacts-dir=. --overwrite-dest",
+    "package:source": "zip -r -FS distract_me_not-source.zip * .rescriptsrc.js .env.development .env.test -x build\\* node_modules\\* old\\* old-src\\* screenshots\\* *.zip",
     "test": "rescripts test --verbose",
     "test:all": "npm test -- --watchAll --testMatch \"**/src/**/*.test.{js,jsx}\"",
     "eject": "react-scripts eject"
