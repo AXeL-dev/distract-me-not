@@ -2,11 +2,11 @@ import React, { Component, Fragment } from 'react';
 import { Pane, Tablist, Tab, SelectField, Checkbox, TextInputField, Button, TickIcon, Paragraph, toaster } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
 import { debug, isDevEnv } from '../../helpers/debug';
-import { Action, defaultBlacklist, defaultWhitelist, defaultSchedule, defaultUnblockOnceTimeout } from '../../helpers/block';
+import { Mode, Action, modes, actions, defaultMode, defaultBlacklist, defaultWhitelist, defaultSchedule, defaultUnblockOnceTimeout } from '../../helpers/block';
 import { sendMessage, storage } from '../../helpers/webext';
 import { DaysOfWeek } from '../../helpers/date';
 import { hash } from '../../helpers/crypt';
-import { SwitchField, TimeField, PasswordField, MultiSelectField, WebsiteList, NumberField } from '..';
+import { SwitchField, SegmentedControlField, TimeField, PasswordField, MultiSelectField, WebsiteList, NumberField } from '..';
 import './styles.scss';
 
 export class Settings extends Component {
@@ -21,17 +21,14 @@ export class Settings extends Component {
         { label: translate('blocking'), id: 'blocking' },
         { label: translate('schedule'), id: 'schedule' },
         { label: translate('password'), id: 'password' },
-        { label: translate('blacklist'), id: 'blacklist' },
-        { label: translate('whitelist'), id: 'whitelist' },
+        { label: translate('blacklist'), id: 'blacklist', disabled: defaultMode === Mode.whitelist },
+        { label: translate('whitelist'), id: 'whitelist', disabled: defaultMode === Mode.blacklist },
         { label: translate('miscellaneous'), id: 'misc' },
-      ],
-      actions: [
-        { label: translate('blockTab'), value: Action.blockTab },
-        { label: translate('redirectToUrl'), value: Action.redirectToUrl },
-        { label: translate('closeTab'), value: Action.closeTab },
       ],
       allScheduleDays: DaysOfWeek.map(day => ({ label: translate(day), value: day })),
       options: {
+        isEnabled: true,
+        mode: defaultMode,
         action: Action.blockTab,
         blockTab: {
           message: '',
@@ -60,6 +57,8 @@ export class Settings extends Component {
 
   componentDidMount() {
     storage.get({
+      isEnabled: this.state.options.isEnabled,
+      mode: this.state.options.mode,
       action: this.state.options.action,
       message: this.state.options.blockTab.message,
       displayBlankPage: this.state.options.blockTab.displayBlankPage,
@@ -73,6 +72,8 @@ export class Settings extends Component {
       if (items) {
         // Update state
         this.setOptions({
+          isEnabled: items.isEnabled,
+          mode: items.mode,
           action: items.action,
           blockTab: {
             message: items.message,
@@ -97,10 +98,31 @@ export class Settings extends Component {
             enableOnBrowserStartup: items.enableOnBrowserStartup
           }
         });
+        // Disable whitelist/blacklist tab depending on active mode
+        this.toggleListTabs(items.mode);
         // Update WebsiteList components
         this.blacklistComponentRef.current.setList(items.blacklist);
         this.whitelistComponentRef.current.setList(items.whitelist);
       }
+    });
+  }
+
+  changeMode = (value) => {
+    this.setOptions({ mode: value });
+    this.toggleListTabs(value);
+  }
+
+  toggleListTabs = (mode) => {
+    const tabIdToDisable = mode === Mode.blacklist ? 'whitelist' : 'blacklist';
+    this.setState({
+      tabs: this.state.tabs.map(tab => {
+        if (tab.id === tabIdToDisable) {
+          tab.disabled = true;
+        } else if (tab.disabled) {
+          tab.disabled = false;
+        }
+        return tab;
+      })
     });
   }
 
@@ -159,6 +181,8 @@ export class Settings extends Component {
       return;
     }
     storage.set({
+      isEnabled: this.state.options.isEnabled,
+      mode: this.state.options.mode,
       action: this.state.options.action,
       message: this.state.options.blockTab.message,
       displayBlankPage: this.state.options.blockTab.displayBlankPage,
@@ -184,6 +208,8 @@ export class Settings extends Component {
     }).then(success => {
       if (success) {
         // Update background script
+        sendMessage('setIsEnabled', this.state.options.isEnabled);
+        sendMessage('setMode', this.state.options.mode);
         sendMessage('setAction', this.state.options.action);
         sendMessage('setRedirectUrl', this.state.options.redirectToUrl.url);
         sendMessage('setSchedule', this.state.options.schedule);
@@ -208,6 +234,7 @@ export class Settings extends Component {
               isSelected={index === this.state.selectedTabIndex}
               aria-controls={`panel-${tab.id}`}
               fontSize={14}
+              disabled={tab.disabled}
             >
               {tab.label}
             </Tab>
@@ -226,6 +253,22 @@ export class Settings extends Component {
             >
               {tab.id === 'blocking' && (
                 <Fragment>
+                  <SwitchField
+                    label={translate('status')}
+                    checked={this.state.options.isEnabled}
+                    onChange={event => this.setOptions({ isEnabled: event.target.checked })}
+                    height={24}
+                    marginBottom={16}
+                  />
+                  <SegmentedControlField
+                    name="mode"
+                    label={translate('mode')}
+                    options={modes}
+                    value={this.state.options.mode}
+                    onChange={this.changeMode}
+                    width={200}
+                    marginBottom={16}
+                  />
                   <Paragraph size={300} color="muted" marginBottom={16}>{translate('blockingDescription')}</Paragraph>
                   <SelectField
                     label={translate('defaultAction')}
@@ -233,7 +276,7 @@ export class Settings extends Component {
                     onChange={event => this.setOptions({ action: event.target.value })}
                     marginBottom={16}
                   >
-                    {this.state.actions.map(action => (
+                    {actions.map(action => (
                       <option key={action.value} value={action.value}>{action.label}</option>
                     ))}
                   </SelectField>

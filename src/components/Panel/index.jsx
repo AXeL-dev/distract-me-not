@@ -2,7 +2,7 @@ import { Component, Fragment } from 'react';
 import { Pane, Text, Position, Badge, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon } from 'evergreen-ui';
 import { translate } from '../../helpers/i18n';
 import { sendMessage, getActiveTab, getActiveTabHostname, storage } from '../../helpers/webext';
-import { Mode, defaultBlacklist, defaultWhitelist, defaultSchedule, isAccessible } from '../../helpers/block';
+import { Mode, modes, defaultMode, defaultBlacklist, defaultWhitelist, defaultSchedule, isAccessible } from '../../helpers/block';
 import { inToday } from '../../helpers/date';
 import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton } from '..';
 import './styles.scss';
@@ -12,19 +12,15 @@ export class Panel extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      status: true,
-      modes: [
-        { label: translate('blacklist'), value: Mode.blacklist },
-        { label: translate('whitelist'), value: Mode.whitelist },
-      ],
-      mode: Mode.blacklist,
+      isEnabled: true,
+      mode: defaultMode,
       schedule: defaultSchedule,
       isAddButtonVisible: true
     };
   }
 
   componentDidMount() {
-    sendMessage('getIsEnabled').then(isEnabled => this.setState({ status: !!isEnabled })); // !! used to cast null to boolean
+    sendMessage('getIsEnabled').then(isEnabled => this.setState({ isEnabled: !!isEnabled })); // !! used to cast null to boolean
     sendMessage('getSchedule').then(schedule => this.setState({ schedule: schedule || defaultSchedule }));
     sendMessage('getMode').then(mode => {
       this.setState({ mode: mode });
@@ -74,7 +70,7 @@ export class Panel extends Component {
   }
 
   toggleStatus = (value) => {
-    this.setState({ status: value });
+    this.setState({ isEnabled: value });
     sendMessage('setIsEnabled', value); // update background script
     storage.set({ isEnabled: value });
   }
@@ -129,7 +125,7 @@ export class Panel extends Component {
     return (
       <Pane minWidth={320}>
         <Header />
-        {this.state.status && this.state.schedule.isEnabled ? (
+        {this.state.isEnabled && this.state.schedule.isEnabled ? (
           <Pane display="flex" paddingX={16} paddingY={20}>
             <Pane display="flex" alignItems="center" flex={1}>
               <Text className="cursor-default">{translate('status')}</Text>
@@ -161,7 +157,7 @@ export class Panel extends Component {
           <SwitchField
             label={translate('status')}
             labelClassName="cursor-default"
-            checked={this.state.status}
+            checked={this.state.isEnabled}
             onChange={event => this.toggleStatus(event.target.checked)}
             height={24}
             paddingX={16}
@@ -172,7 +168,7 @@ export class Panel extends Component {
           name="mode"
           label={translate('mode')}
           labelClassName="cursor-default"
-          options={this.state.modes}
+          options={modes}
           value={this.state.mode}
           onChange={this.changeMode}
           width={200}

@@ -1,4 +1,5 @@
 import { DaysOfWeek } from "./date";
+import { translate } from './i18n';
 
 export const Mode = {
   blacklist: 'blacklist',
@@ -10,6 +11,19 @@ export const Action = {
   redirectToUrl: 'redirectToUrl',
   closeTab: 'closeTab'
 };
+
+export const modes = [
+  { label: translate('blacklist'), value: Mode.blacklist },
+  { label: translate('whitelist'), value: Mode.whitelist },
+];
+
+export const actions = [
+  { label: translate('blockTab'), value: Action.blockTab },
+  { label: translate('redirectToUrl'), value: Action.redirectToUrl },
+  { label: translate('closeTab'), value: Action.closeTab },
+];
+
+export const defaultMode = Mode.blacklist;
 
 export const defaultBlacklist = [
   '*.facebook.com',
