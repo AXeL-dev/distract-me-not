@@ -1,12 +1,10 @@
 import { Component } from 'react';
-import { storage, getNativeAPI } from '../../helpers/webext';
+import { storage, nativeAPI } from '../../helpers/webext';
 import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule, unblockOptions, defaultUnblockOnceTimeout, isAccessible } from '../../helpers/block';
 import { hasValidProtocol, getValidUrl, getHostName } from '../../helpers/url';
 import { regex } from '../../helpers/regex';
 import { inTime } from '../../helpers/time';
 import { inToday } from '../../helpers/date';
-
-const nativeAPI = getNativeAPI();
 
 export class Background extends Component {
 

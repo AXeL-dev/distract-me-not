@@ -1,12 +1,14 @@
 import { report } from "./debug";
 
-export function getNativeAPI() {
+function getNativeAPI() {
   try {
     return chrome || browser; // to know: browser is overridden by browser-polyfill
   } catch (error) {
     return null;
   }
 }
+
+export const nativeAPI = getNativeAPI();
 
 export function isWebExtension() {
   try {
@@ -27,7 +29,14 @@ export function isChrome() {
 export function openOptionsPage() {
   try {
     browser.runtime.openOptionsPage();
-    window.close();
+    if (isFirefox()) {
+      nativeAPI.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0].url && tabs[0].url.startsWith('about:addons')) {
+          nativeAPI.tabs.reload(tabs[0].id);
+        }
+        window.close();
+      });
+    }
   } catch (error) {
     report.error(error);
   }
