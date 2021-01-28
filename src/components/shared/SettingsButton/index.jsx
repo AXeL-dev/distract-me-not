@@ -11,7 +11,7 @@ export class SettingsButton extends Component {
   }
 
   goToSettings = () => {
-    if (isWebExtension()) {
+    if (isWebExtension) {
       openOptionsPage();
     } else {
       this.props.history.push('/settings');

@@ -8,15 +8,17 @@ function getNativeAPI() {
   }
 }
 
-export const nativeAPI = getNativeAPI();
-
-export function isWebExtension() {
+function isBrowserAPIAvailable() {
   try {
     return !!browser;
   } catch (error) {
     return false;
   }
 }
+
+export const nativeAPI = getNativeAPI();
+
+export const isWebExtension = isBrowserAPIAvailable();
 
 export function isFirefox() {
   return navigator.userAgent.indexOf("Firefox") !== -1;
