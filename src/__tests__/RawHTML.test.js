@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { RawHTML } from "../components";
+import { RawHTML } from "components";
 
 it('renders correctly', () => {
   const html = '<span>Hello world!</span>';

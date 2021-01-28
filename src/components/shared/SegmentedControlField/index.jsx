@@ -1,5 +1,5 @@
 import { Pane, Text, SegmentedControl } from 'evergreen-ui';
-import { OuterPane } from '..';
+import { OuterPane } from 'components';
 import './styles.scss';
 
 export function SegmentedControlField(props) {

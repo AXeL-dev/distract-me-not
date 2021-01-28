@@ -1,5 +1,5 @@
 import { Pane } from 'evergreen-ui';
-import { TooltipLabel, PasswordInput, OuterPane } from '..';
+import { TooltipLabel, PasswordInput, OuterPane } from 'components';
 
 export function PasswordField(props) {
   return (

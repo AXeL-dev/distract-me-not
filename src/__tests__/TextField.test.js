@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { TextField } from "../components";
+import { TextField } from "components";
 
 it('renders correctly', () => {
   const { asFragment } = render(<TextField />);

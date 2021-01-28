@@ -22,11 +22,11 @@ import {
   Dialog
 } from 'evergreen-ui';
 import copy from 'copy-to-clipboard';
-import { TextField } from '..';
-import { translate } from '../../../helpers/i18n';
-import { debug } from '../../../helpers/debug';
-import { download, readFile } from '../../../helpers/file';
-import { getHostName, getFaviconLink, checkFaviconLink, isUrl } from '../../../helpers/url';
+import { TextField } from 'components';
+import { translate } from 'helpers/i18n';
+import { debug } from 'helpers/debug';
+import { download, readFile } from 'helpers/file';
+import { getHostName, getFaviconLink, checkFaviconLink, isUrl } from 'helpers/url';
 import './styles.scss';
 
 const Order = {

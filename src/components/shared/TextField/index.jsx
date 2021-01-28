@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { Pane, TextInput, Button, Paragraph } from 'evergreen-ui';
-import { RawHTML, OuterPane } from '..';
+import { RawHTML, OuterPane } from 'components';
 
 export class TextField extends Component {
 

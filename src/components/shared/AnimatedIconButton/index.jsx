@@ -1,6 +1,6 @@
 import { Component } from 'react';
-import { debug } from '../../../helpers/debug';
-import { IconButton } from '..';
+import { debug } from 'helpers/debug';
+import { IconButton } from 'components';
 import './styles.scss';
 
 export class AnimatedIconButton extends Component {

@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { debug } from '../../../helpers/debug';
+import { debug } from 'helpers/debug';
 
 export class NumberInput extends Component {
 

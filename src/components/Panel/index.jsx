@@ -1,10 +1,10 @@
 import { Component, Fragment } from 'react';
 import { Pane, Text, Position, Badge, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon } from 'evergreen-ui';
-import { translate } from '../../helpers/i18n';
-import { sendMessage, getActiveTab, getActiveTabHostname, storage } from '../../helpers/webext';
-import { Mode, modes, defaultMode, defaultBlacklist, defaultWhitelist, defaultSchedule, isAccessible } from '../../helpers/block';
-import { inToday } from '../../helpers/date';
-import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton } from '..';
+import { translate } from 'helpers/i18n';
+import { sendMessage, getActiveTab, getActiveTabHostname, storage } from 'helpers/webext';
+import { Mode, modes, defaultMode, defaultBlacklist, defaultWhitelist, defaultSchedule, isAccessible } from 'helpers/block';
+import { inToday } from 'helpers/date';
+import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton } from 'components';
 import './styles.scss';
 
 export class Panel extends Component {

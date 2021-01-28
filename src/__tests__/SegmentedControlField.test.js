@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { SegmentedControlField } from "../components";
+import { SegmentedControlField } from "components";
 
 const options = [
   { label: 'Option 1', value: 'option-1' },

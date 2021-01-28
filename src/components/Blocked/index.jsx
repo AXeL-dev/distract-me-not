@@ -1,11 +1,11 @@
 import { Component, Fragment } from 'react';
 import { Pane, Dialog, RadioGroup } from 'evergreen-ui';
-import { translate } from '../../helpers/i18n';
-import { storage, sendMessage } from '../../helpers/webext';
-import { debug, isDevEnv } from '../../helpers/debug';
-import { isUrl, getValidUrl } from '../../helpers/url';
-import { unblockOptions } from '../../helpers/block';
-import { NumberInput, PasswordPrompt } from '..';
+import { translate } from 'helpers/i18n';
+import { storage, sendMessage } from 'helpers/webext';
+import { debug, isDevEnv } from 'helpers/debug';
+import { isUrl, getValidUrl } from 'helpers/url';
+import { unblockOptions } from 'helpers/block';
+import { NumberInput, PasswordPrompt } from 'components';
 import queryString from 'query-string';
 import './styles.scss';
 

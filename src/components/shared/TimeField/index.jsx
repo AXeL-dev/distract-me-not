@@ -1,5 +1,5 @@
 import { Pane, Text } from 'evergreen-ui';
-import { OuterPane } from '..';
+import { OuterPane } from 'components';
 
 export function TimeField(props) {
   return (

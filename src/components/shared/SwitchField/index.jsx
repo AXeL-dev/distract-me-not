@@ -1,5 +1,5 @@
 import { Pane, Switch, Position } from 'evergreen-ui';
-import { TooltipLabel, OuterPane } from '..';
+import { TooltipLabel, OuterPane } from 'components';
 
 export function SwitchField(props) {
   return (

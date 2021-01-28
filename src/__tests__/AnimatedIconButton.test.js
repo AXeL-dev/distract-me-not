@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { CrossIcon } from "evergreen-ui";
-import { AnimatedIconButton } from "../components";
+import { AnimatedIconButton } from "components";
 
 it('renders correctly', () => {
   const { asFragment } = render(<AnimatedIconButton icon={CrossIcon} />);

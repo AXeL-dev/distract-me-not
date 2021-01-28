@@ -1,12 +1,12 @@
 import React, { Component, Fragment } from 'react';
 import { Pane, Tablist, Tab, SelectField, Checkbox, TextInputField, Button, TickIcon, Paragraph, toaster } from 'evergreen-ui';
-import { translate } from '../../helpers/i18n';
-import { debug, isDevEnv } from '../../helpers/debug';
-import { Mode, Action, modes, actions, defaultMode, defaultBlacklist, defaultWhitelist, defaultSchedule, defaultUnblockOnceTimeout } from '../../helpers/block';
-import { sendMessage, storage } from '../../helpers/webext';
-import { DaysOfWeek } from '../../helpers/date';
-import { hash } from '../../helpers/crypt';
-import { SwitchField, SegmentedControlField, TimeField, PasswordField, MultiSelectField, WebsiteList, NumberField } from '..';
+import { translate } from 'helpers/i18n';
+import { debug, isDevEnv } from 'helpers/debug';
+import { Mode, Action, modes, actions, defaultMode, defaultBlacklist, defaultWhitelist, defaultSchedule, defaultUnblockOnceTimeout } from 'helpers/block';
+import { sendMessage, storage } from 'helpers/webext';
+import { DaysOfWeek } from 'helpers/date';
+import { hash } from 'helpers/crypt';
+import { SwitchField, SegmentedControlField, TimeField, PasswordField, MultiSelectField, WebsiteList, NumberField } from 'components';
 import './styles.scss';
 
 export class Settings extends Component {

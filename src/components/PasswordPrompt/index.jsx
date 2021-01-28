@@ -1,10 +1,10 @@
 import { Component } from 'react';
 import { Pane, TextInput, UnlockIcon, toaster } from 'evergreen-ui';
-import { translate } from '../../helpers/i18n';
-import { storage } from '../../helpers/webext';
-import { compare } from '../../helpers/crypt';
-import { debug } from '../../helpers/debug';
-import { Header, IconButton, SettingsButton } from '..';
+import { translate } from 'helpers/i18n';
+import { storage } from 'helpers/webext';
+import { compare } from 'helpers/crypt';
+import { debug } from 'helpers/debug';
+import { Header, IconButton, SettingsButton } from 'components';
 
 const defaultHash = process.env.REACT_APP_HASH;
 

@@ -1,5 +1,5 @@
 import { Pane, Text } from 'evergreen-ui';
-import { TooltipLabel, NumberInput, OuterPane } from '..';
+import { TooltipLabel, NumberInput, OuterPane } from 'components';
 
 export function NumberField(props) {
   return (

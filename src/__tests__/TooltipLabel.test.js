@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { TooltipLabel } from "../components";
+import { TooltipLabel } from "components";
 
 it('renders correctly', () => {
   const text = 'some text';

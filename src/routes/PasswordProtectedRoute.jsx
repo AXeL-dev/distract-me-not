@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import { debug } from '../helpers/debug';
-import { PasswordPrompt } from '../components';
+import { debug } from 'helpers/debug';
+import { PasswordPrompt } from 'components';
 
 // Inspired from: https://blog.netcetera.com/how-to-create-guarded-routes-for-your-react-app-d2fe7c7b6122
 
