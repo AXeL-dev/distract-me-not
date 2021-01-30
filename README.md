@@ -29,6 +29,16 @@ Distract Me Not is a lightweight website blocker with a user friendly interface.
 
 [How to install?](https://github.com/AXeL-dev/install-webextension)
 
+## Technical
+
+### Stack
+
+- [React](https://reactjs.org/): Core library
+- [evergreen-ui](https://evergreen.segment.com/): UI toolkit
+- [bcryptjs](https://github.com/dcodeIO/bcrypt.js): Encryption library
+- [fuzzaldrin-plus](https://github.com/jeancroy/fuzz-aldrin-plus): Data filtering library
+- [query-string](https://github.com/sindresorhus/query-string): URL query strings parsing library
+
 ### Scripts
 
 In the project directory, you can run:
