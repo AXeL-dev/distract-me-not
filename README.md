@@ -1,10 +1,10 @@
 # ![icon](public/icons/magnet-32.png) Distract Me Not <img align="right" src="screenshots/panel.png">
 
-[![Mozilla Add-on version](https://img.shields.io/amo/v/distract-me-not.svg)](https://addons.mozilla.org/firefox/addon/distract-me-not/?src=external-github-shield-downloads)
+[![Mozilla Add-on version](https://img.shields.io/amo/v/distract-me-not.svg?label=release)](https://addons.mozilla.org/firefox/addon/distract-me-not/?src=external-github-shield-downloads)
 [![Mozilla Add-on downloads](https://img.shields.io/amo/dw/distract-me-not.svg)](https://addons.mozilla.org/firefox/addon/distract-me-not/?src=external-github-shield-downloads)
 [![Mozilla Add-on users](https://img.shields.io/amo/users/distract-me-not.svg)](https://addons.mozilla.org/firefox/addon/distract-me-not/statistics/)
 [![Mozilla Add-on stars](https://img.shields.io/amo/stars/distract-me-not.svg)](https://addons.mozilla.org/firefox/addon/distract-me-not/reviews/)
-[![Donate](https://img.shields.io/badge/PayPal-Donate-gray.svg?style=flat&logo=paypal&colorA=0071bb&logoColor=fff)](https://www.paypal.me/axeldev)
+[![Donate](https://img.shields.io/badge/PayPal-grey.svg?style=flat&logo=paypal&labelColor=grey&color=168CC2)](https://www.paypal.me/axeldev)
 
 > **Stay focused in a world full of distractions.**
 
