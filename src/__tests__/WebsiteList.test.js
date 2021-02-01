@@ -1,7 +1,9 @@
+import React from 'react';
 import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
 import { defaultBlacklist } from "helpers/block";
 import * as fileHelper from "helpers/file";
 import { WebsiteList } from "components";
+import copy from 'copy-to-clipboard';
 
 it('renders correctly', () => {
   const { container, asFragment } = render(<WebsiteList list={defaultBlacklist} />);
@@ -65,8 +67,6 @@ it('deletes a url', async () => {
 
 it('copies a url to clipboard', async () => {
   render(<WebsiteList list={[defaultBlacklist[0]]} />);
-  // mock clipboard handler
-  document.execCommand = jest.fn();
   // click on more button
   const moreButton = screen.getByTestId('more-button');
   fireEvent.click(moreButton);
@@ -74,7 +74,7 @@ it('copies a url to clipboard', async () => {
   const copyButton = await waitFor(() => screen.getByRole('menuitem', { name: /copy/i }));
   fireEvent.click(copyButton);
   // verify
-  expect(document.execCommand).toHaveBeenCalledWith('copy');
+  expect(copy).toHaveBeenCalledTimes(1);
 });
 
 it('filters urls', () => {

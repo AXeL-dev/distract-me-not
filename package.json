@@ -52,6 +52,7 @@
   },
   "devDependencies": {
     "@rescripts/cli": "0.0.15",
+    "@sheerun/mutationobserver-shim": "^0.3.3",
     "@types/jest": "^26.0.19"
   }
 }

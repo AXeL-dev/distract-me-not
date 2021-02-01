@@ -6,6 +6,7 @@ exports[`renders correctly 1`] = `
     class="css-nil ub-b-btm_1px-solid-E4E7EB ub-dspl_flex ub-algn-itms_center ub-just-cnt_center ub-h_60px ub-box-szg_border-box"
   >
     <img
+      alt="logo"
       class="logo"
       src="icons/magnet-256.png"
     />
