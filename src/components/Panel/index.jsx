@@ -49,6 +49,8 @@ export class Panel extends Component {
                 return;
               }
               break;
+            default:
+              break;
           }
           // finally, show add button if tab is not blacklisted nor whitelisted
           this.showAddButton();
@@ -115,6 +117,8 @@ export class Panel extends Component {
               sendMessage('setWhitelist', whitelist);
               storage.set({ whitelist: whitelist });
             });
+            break;
+          default:
             break;
         }
       }

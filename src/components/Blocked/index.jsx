@@ -147,12 +147,10 @@ export class Blocked extends Component {
             >
               <Pane width="95%" margin="auto">
                 <RadioGroup
-                  marginTop={40}
                   size={16}
                   value={this.state.unblockDialog.selected}
                   options={this.state.unblockDialog.options}
                   onChange={event => this.updateUnblockDialogState({ selected: event.target.value })}
-                  marginTop={0}
                 />
                 <PasswordPrompt
                   hasHeader={false}

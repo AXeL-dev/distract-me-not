@@ -229,6 +229,7 @@ export class Background extends Component {
     switch (this.action) {
       case Action.blockTab:
       case Action.redirectToUrl:
+      default:
         return {
           redirectUrl: this.action === Action.redirectToUrl && this.redirectUrl.length ? (
             this.redirectUrl
@@ -239,7 +240,7 @@ export class Background extends Component {
       case Action.closeTab:
         this.closeTab(data.tabId);
         return {
-          redirectUrl: 'javascript:window.close()'
+          redirectUrl: 'javascript:window.close()' // eslint-disable-line
         };
     }
   }
@@ -356,6 +357,8 @@ export class Background extends Component {
         if (!this.isWhitelisted(data.url)) {
           return this.handleAction(data);
         }
+        break;
+      default:
         break;
     }
   }

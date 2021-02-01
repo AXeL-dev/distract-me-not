@@ -5,10 +5,6 @@ import './styles.scss';
 // Icon button component with support for custom icon color
 export class IconButton extends Component {
 
-  constructor(props) {
-    super(props);
-  }
-
   renderButton() {
     return (
       <Button

@@ -8,7 +8,7 @@ export function getHostName(url) {
 }
 
 export function getDomainName(url) {
-  const matches = url.match(/^(?:https?:)?(?:\/\/)?([^\/\?]+)/i); // or: /^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i
+  const matches = url.match(/^(?:https?:)?(?:\/\/)?([^/?]+)/i); // or: /^https?\:\/\/([^/?#]+)(?:[/?#]|$)/i
   return matches ? matches[1] : url;
 }
 
@@ -30,7 +30,7 @@ export function checkFaviconLink(faviconLink) {
 }
 
 export function hasValidProtocol(url) {
-  return /^(?:ftps?|https?|file)\:\/\//i.test(url) || url.startsWith("about:");
+  return /^(?:ftps?|https?|file):\/\//i.test(url) || url.startsWith("about:");
 }
 
 export function getValidUrl(url) {

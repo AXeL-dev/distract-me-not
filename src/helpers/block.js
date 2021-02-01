@@ -52,5 +52,5 @@ export const unblockOptions = {
 export const defaultUnblockOnceTimeout = 10; // seconds
 
 export function isAccessible(url) {
-  return url && !url.startsWith("about:") && !/^(?:file|chrome|moz\-extension|chrome\-extension)\:\/\//i.test(url);
+  return url && !url.startsWith("about:") && !/^(?:file|chrome|moz-extension|chrome-extension):\/\//i.test(url);
 }

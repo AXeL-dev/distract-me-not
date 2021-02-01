@@ -6,10 +6,6 @@ import { IconButton } from 'components';
 
 export class SettingsButton extends Component {
 
-  constructor(props) {
-    super(props);
-  }
-
   goToSettings = () => {
     if (isWebExtension) {
       openOptionsPage();

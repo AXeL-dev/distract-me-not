@@ -101,7 +101,7 @@ export class WebsiteList extends Component {
   }
 
   sort = items => {
-    const { ordering, orderedColumn } = this.state;
+    const { ordering } = this.state;
     // Return if there's no ordering.
     if (ordering === Order.NONE) return items;
 

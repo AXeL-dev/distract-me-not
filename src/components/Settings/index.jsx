@@ -137,6 +137,7 @@ export class Settings extends Component {
   setOptions = (...params) => {
     switch (params.length) {
       case 1:
+      default:
         this.setState({
           options: {
             ...this.state.options,
