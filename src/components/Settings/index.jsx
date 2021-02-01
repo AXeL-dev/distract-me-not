@@ -68,11 +68,11 @@ export class Settings extends Component {
       password: this.state.options.password,
       blacklist: defaultBlacklist,
       whitelist: defaultWhitelist,
-    }).then((items) => {
+    }).then(async (items) => {
       if (items) {
         // Update state
         this.setOptions({
-          isEnabled: items.isEnabled,
+          isEnabled: items.isEnabled || await sendMessage('getIsEnabled'),
           mode: items.mode,
           action: items.action,
           blockTab: {

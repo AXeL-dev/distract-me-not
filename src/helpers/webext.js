@@ -1,3 +1,5 @@
+/* global browser, chrome */
+
 import { report } from "./debug";
 
 function getNativeAPI() {

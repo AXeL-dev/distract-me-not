@@ -1,3 +1,5 @@
+/* global browser */
+
 import { isDevEnv, report } from './debug';
 
 const translations = isDevEnv ? require('../../public/_locales/en/messages') : {};

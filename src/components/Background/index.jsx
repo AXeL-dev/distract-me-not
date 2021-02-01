@@ -1,4 +1,6 @@
-import { Component } from 'react';
+/* global browser */
+
+import React, { Component } from 'react';
 import { storage, nativeAPI } from 'helpers/webext';
 import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule, unblockOptions, defaultUnblockOnceTimeout, isAccessible } from 'helpers/block';
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
@@ -113,7 +115,8 @@ export class Background extends Component {
       mode: this.mode,
       action: this.action,
       schedule: this.schedule,
-      redirectUrl: this.redirectUrl
+      redirectUrl: this.redirectUrl,
+      enableOnBrowserStartup: false
     }).then((items) => {
       this.log('items:', items);
       //----- Start backward compatibility with v1
@@ -141,6 +144,8 @@ export class Background extends Component {
       this.isEnabled = items.isEnabled;
       if (this.isEnabled) {
         this.enable();
+      } else if (items.enableOnBrowserStartup) {
+        this.isEnabled = true;
       }
     });
     browser.runtime.onStartup.addListener(this.onBrowserStartup);
