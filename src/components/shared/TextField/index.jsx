@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { Pane, TextInput, Button, Paragraph } from 'evergreen-ui';
 import { RawHTML, OuterPane } from 'components';
 

@@ -1,3 +1,4 @@
+import React from 'react';
 import { Pane, Position } from 'evergreen-ui';
 
 export function OuterPane(props) {

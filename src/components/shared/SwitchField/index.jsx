@@ -1,3 +1,4 @@
+import React from 'react';
 import { Pane, Switch, Position } from 'evergreen-ui';
 import { TooltipLabel, OuterPane } from 'components';
 

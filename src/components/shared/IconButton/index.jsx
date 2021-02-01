@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { Tooltip, Button, Icon } from 'evergreen-ui';
 import './styles.scss';
 

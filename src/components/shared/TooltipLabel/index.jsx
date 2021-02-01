@@ -1,3 +1,4 @@
+import React from 'react';
 import { Text, Tooltip, Position } from 'evergreen-ui';
 import './styles.scss';
 

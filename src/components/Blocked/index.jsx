@@ -1,4 +1,4 @@
-import { Component, Fragment } from 'react';
+import React, { Component, Fragment } from 'react';
 import { Pane, Dialog, RadioGroup } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { storage, sendMessage } from 'helpers/webext';

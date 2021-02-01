@@ -1,4 +1,4 @@
-import { Component, Fragment } from 'react';
+import React, { Component, Fragment } from 'react';
 import { Pane, Text, Position, Badge, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { sendMessage, getActiveTab, getActiveTabHostname, storage } from 'helpers/webext';

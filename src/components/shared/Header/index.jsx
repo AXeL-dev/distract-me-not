@@ -1,3 +1,4 @@
+import React from 'react';
 import { Pane, Heading } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import './styles.scss';

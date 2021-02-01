@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
 import { storage } from './helpers/webext';
 import { isDevEnv } from './helpers/debug';

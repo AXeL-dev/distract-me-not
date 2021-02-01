@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { Pane, TextInput, UnlockIcon, toaster } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { storage } from 'helpers/webext';

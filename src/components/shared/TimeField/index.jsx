@@ -1,3 +1,4 @@
+import React from 'react';
 import { Pane, Text } from 'evergreen-ui';
 import { OuterPane } from 'components';
 

@@ -1,3 +1,4 @@
+import React from 'react';
 import { Pane, Text } from 'evergreen-ui';
 import { TooltipLabel, NumberInput, OuterPane } from 'components';
 
