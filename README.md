@@ -1,6 +1,6 @@
 # ![icon](public/icons/magnet-32.png) Distract Me Not <img align="right" src="screenshots/panel.png">
 
-[![Mozilla Add-on version](https://img.shields.io/amo/v/distract-me-not.svg?label=release)](https://addons.mozilla.org/firefox/addon/distract-me-not/?src=external-github-shield-downloads)
+[![Mozilla Add-on version](https://img.shields.io/amo/v/distract-me-not.svg?logo=mozilla&label=&labelColor=grey)](https://addons.mozilla.org/firefox/addon/distract-me-not/?src=external-github-shield-downloads)
 [![Mozilla Add-on downloads](https://img.shields.io/amo/dw/distract-me-not.svg)](https://addons.mozilla.org/firefox/addon/distract-me-not/?src=external-github-shield-downloads)
 [![Mozilla Add-on users](https://img.shields.io/amo/users/distract-me-not.svg)](https://addons.mozilla.org/firefox/addon/distract-me-not/statistics/)
 [![Mozilla Add-on stars](https://img.shields.io/amo/stars/distract-me-not.svg)](https://addons.mozilla.org/firefox/addon/distract-me-not/reviews/)
