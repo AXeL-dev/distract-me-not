@@ -28,4 +28,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: ${{ steps.package.outputs.PACKAGE_NAME }}
+          gzip: folders
           allow_override: true
