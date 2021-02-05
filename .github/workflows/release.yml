@@ -1,0 +1,30 @@
+name: Build and Release
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - 'force-release'
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+
+      - name: Install, Test and Build 🔧
+        run: |
+          npm install
+          npm test
+          npm run build:firefox
+
+      - name: Package 📦
+        run: |
+          npm run package
+          echo "::set-output name=PACKAGE_NAME::$(ls -d distract_me_not-*.zip)"
+        id: package
+
+      - name: Upload to release 💾
+        uses: meeDamian/github-release@2.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: ${{ steps.package.outputs.PACKAGE_NAME }}
