@@ -28,3 +28,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: ${{ steps.package.outputs.PACKAGE_NAME }}
+          allow_override: true
