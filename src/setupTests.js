@@ -4,8 +4,12 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 import MutationObserver from '@sheerun/mutationobserver-shim';
+import bcrypt from 'bcryptjs';
 
 window.MutationObserver = MutationObserver;
+
+// fix ReferenceError: dcodeIO is not defined
+global.dcodeIO = { bcrypt };
 
 // ignore some specific console errors & warnings
 const consoleError = console.error;
