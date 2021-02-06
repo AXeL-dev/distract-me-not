@@ -1,4 +1,6 @@
-import bcrypt from 'bcryptjs';
+/* global dcodeIO */
+//import bcrypt from 'bcryptjs'; // @see https://github.com/dcodeIO/bcrypt.js/issues/70
+const bcrypt = dcodeIO.bcrypt;
 
 export function hash(password) {
   if (!password || password.length === 0) {
