@@ -23,6 +23,7 @@
     "build": "INLINE_RUNTIME_CHUNK=false rescripts build",
     "build:firefox": "npm run build && cd build && mv -f manifest.firefox.json manifest.json",
     "build:chrome": "npm run build && cd build && rm -f manifest.firefox.json",
+    "build:edge": "npm run build:chrome && cd build && sed -i 's/\"open_in_tab\": false/\"open_in_tab\": true/g' manifest.json",
     "package": "web-ext build --source-dir=build --artifacts-dir=. --overwrite-dest",
     "package:source": "zip -r -FS distract_me_not-source.zip * .rescriptsrc.js .env.development .env.test -x build\\* node_modules\\* old\\* old-src\\* screenshots\\* *.zip",
     "test": "rescripts test --verbose",
