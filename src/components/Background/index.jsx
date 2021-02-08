@@ -1,7 +1,7 @@
 /* global browser */
 
 import React, { Component } from 'react';
-import { storage, nativeAPI } from 'helpers/webext';
+import { storage, nativeAPI, indexUrl } from 'helpers/webext';
 import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule, unblockOptions, defaultUnblockOnceTimeout, isAccessible } from 'helpers/block';
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
 import { regex } from 'helpers/regex';
@@ -234,7 +234,7 @@ export class Background extends Component {
           redirectUrl: this.action === Action.redirectToUrl && this.redirectUrl.length ? (
             this.redirectUrl
           ) : (
-            `${browser.runtime.getURL('index.html')}#blocked?url=${encodeURIComponent(data.url)}`
+            `${indexUrl}#blocked?url=${encodeURIComponent(data.url)}`
           )
         };
       case Action.closeTab:
@@ -369,22 +369,23 @@ export class Background extends Component {
 
   onUpdatedHandler = (tabId, changeInfo, tab) => {
     if (changeInfo.url && hasValidProtocol(changeInfo.url)) {
-      const results = this.parseUrl({ ...changeInfo, tabId: tabId }, 'onUpdatedHandler');
-      if (results && results.redirectUrl) {
-        this.redirectTab(tabId, results.redirectUrl);
-      }
+      this.checkTab({ ...changeInfo, tabId: tabId }, 'onUpdatedHandler');
     }
   }
 
   onReplacedHandler = (addedTabId, removedTabId) => {
     browser.tabs.get(addedTabId).then((tab) => {
       if (tab) {
-        const results = this.parseUrl({ url: tab.url, tabId: tab.id }, 'onReplacedHandler');
-        if (results && results.redirectUrl) {
-          this.redirectTab(tab.id, results.redirectUrl);
-        }
+        this.checkTab({ url: tab.url, tabId: tab.id }, 'onReplacedHandler');
       }
     });
+  }
+
+  checkTab = (data, caller) => {
+    const results = this.parseUrl(data, caller);
+    if (results && results.redirectUrl) {
+      this.redirectTab(data.tabId, results.redirectUrl);
+    }
   }
 
   enableEventListeners = () => {
@@ -402,12 +403,27 @@ export class Background extends Component {
     browser.tabs.onReplaced.removeListener(this.onReplacedHandler);
   }
 
+  checkAllTabs = () => {
+    browser.tabs.query({}).then((tabs) => {
+      if (tabs.length > 0) {
+        for (let tab of tabs) {
+          if (this.isEnabled) {
+            this.checkTab({ url: tab.url, tabId: tab.id }, 'checkAllTabs');
+          } else if (tab.url.startsWith(`${indexUrl}#/blocked?url=`)) {
+            browser.tabs.reload(tab.id);
+          }
+        }
+      }
+    });
+  }
+
   enable = (logMessage = 'enabled!') => {
     if (this.enableLock) {
       this.log('already enabled!', {
         enableLock: this.enableLock
       });
     } else {
+      this.checkAllTabs();
       this.enableEventListeners();
       this.log(logMessage);
       this.enableLock = true;
@@ -417,6 +433,7 @@ export class Background extends Component {
   disable = (logMessage = 'disabled!') => {
     if (this.enableLock) {
       this.disableEventListeners();
+      this.checkAllTabs();
       this.log(logMessage);
       this.enableLock = false;
     } else {
