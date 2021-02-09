@@ -10,8 +10,6 @@
 
 Distract Me Not is a lightweight website blocker with a user friendly interface.
 
-> :warning: version 2.0 is not available on [AMO](https://addons.mozilla.org/firefox/addon/distract-me-not/) due to review issues, you can still get the latest release from [here](https://github.com/AXeL-dev/distract-me-not/releases/latest) & [install it manually](https://github.com/AXeL-dev/install-webextension).
-
 ## Features
 
 - Prevent access to a range of websites.
