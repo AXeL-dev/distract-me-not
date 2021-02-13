@@ -22,7 +22,7 @@ export const nativeAPI = getNativeAPI();
 
 export const isWebExtension = isBrowserAPIAvailable();
 
-export const indexUrl = browser.runtime.getURL('index.html');
+export const indexUrl = isWebExtension ? browser.runtime.getURL('index.html') : '';
 
 export function isFirefox() {
   return navigator.userAgent.indexOf("Firefox") !== -1;
