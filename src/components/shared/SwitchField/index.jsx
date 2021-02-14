@@ -17,7 +17,7 @@ export function SwitchField(props) {
       </Pane>
       <Pane display="flex" alignItems="center" marginRight={props.position === Position.LEFT ? 12 : 0}>
         <Switch
-          height={props.height || 18}
+          height={props.height || 20}
           checked={props.checked}
           onChange={props.onChange}
         />

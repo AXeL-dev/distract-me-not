@@ -258,7 +258,6 @@ export class Settings extends Component {
                     label={translate('status')}
                     checked={this.state.options.isEnabled}
                     onChange={event => this.setOptions({ isEnabled: event.target.checked })}
-                    height={24}
                     marginBottom={16}
                   />
                   <SegmentedControlField
