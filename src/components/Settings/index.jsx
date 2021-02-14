@@ -267,44 +267,48 @@ export class Settings extends Component {
                     value={this.state.options.mode}
                     onChange={this.changeMode}
                     width={200}
-                    marginBottom={16}
+                    marginBottom={this.state.options.isEnabled ? 16 : 0}
                   />
-                  <Paragraph size={300} color="muted" marginBottom={16}>{translate('blockingDescription')}</Paragraph>
-                  <SelectField
-                    label={translate('defaultAction')}
-                    value={this.state.options.action}
-                    onChange={event => this.setOptions({ action: event.target.value })}
-                    marginBottom={16}
-                  >
-                    {actions.map(action => (
-                      <option key={action.value} value={action.value}>{action.label}</option>
-                    ))}
-                  </SelectField>
-                  {this.state.options.action === Action.blockTab && (
+                  {this.state.options.isEnabled && (
                     <Fragment>
-                      <TextInputField
-                        label={translate('blockingMessage')}
-                        placeholder={translate('defaultBlockingMessage')}
-                        value={this.state.options.blockTab.message}
-                        onChange={event => this.setOptions('blockTab', { message: event.target.value })}
-                        disabled={this.state.options.blockTab.displayBlankPage}
+                      <Paragraph size={300} color="muted" marginBottom={16}>{translate('blockingDescription')}</Paragraph>
+                      <SelectField
+                        label={translate('defaultAction')}
+                        value={this.state.options.action}
+                        onChange={event => this.setOptions({ action: event.target.value })}
                         marginBottom={16}
-                      />
-                      <Checkbox
-                        label={translate('displayBlankPage')}
-                        checked={this.state.options.blockTab.displayBlankPage}
-                        onChange={event => this.setOptions('blockTab', { displayBlankPage: event.target.checked })}
-                      />
+                      >
+                        {actions.map(action => (
+                          <option key={action.value} value={action.value}>{action.label}</option>
+                        ))}
+                      </SelectField>
+                      {this.state.options.action === Action.blockTab && (
+                        <Fragment>
+                          <TextInputField
+                            label={translate('blockingMessage')}
+                            placeholder={translate('defaultBlockingMessage')}
+                            value={this.state.options.blockTab.message}
+                            onChange={event => this.setOptions('blockTab', { message: event.target.value })}
+                            disabled={this.state.options.blockTab.displayBlankPage}
+                            marginBottom={16}
+                          />
+                          <Checkbox
+                            label={translate('displayBlankPage')}
+                            checked={this.state.options.blockTab.displayBlankPage}
+                            onChange={event => this.setOptions('blockTab', { displayBlankPage: event.target.checked })}
+                          />
+                        </Fragment>
+                      )}
+                      {this.state.options.action === Action.redirectToUrl && (
+                        <TextInputField
+                          label={translate('url')}
+                          placeholder={translate('redirectUrlExample')}
+                          value={this.state.options.redirectToUrl.url}
+                          onChange={event => this.setOptions('redirectToUrl', { url: event.target.value })}
+                          marginBottom={16}
+                        />
+                      )}
                     </Fragment>
-                  )}
-                  {this.state.options.action === Action.redirectToUrl && (
-                    <TextInputField
-                      label={translate('url')}
-                      placeholder={translate('redirectUrlExample')}
-                      value={this.state.options.redirectToUrl.url}
-                      onChange={event => this.setOptions('redirectToUrl', { url: event.target.value })}
-                      marginBottom={16}
-                    />
                   )}
                 </Fragment>
               )}

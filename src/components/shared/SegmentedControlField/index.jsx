@@ -17,6 +17,7 @@ export function SegmentedControlField(props) {
           options={props.options}
           value={props.value}
           onChange={props.onChange}
+          disabled={props.disabled}
         />
       </Pane>
     </OuterPane>
