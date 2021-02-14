@@ -35,7 +35,7 @@ exports[`renders panel correctly 1`] = `
         class="css-nil ub-dspl_flex ub-algn-itms_center ub-mr_0px ub-box-szg_border-box"
       >
         <label
-          class="ub-dspl_block ub-w_48px ub-pst_relative ub-box-szg_border-box"
+          class="ub-dspl_block ub-w_44px ub-pst_relative ub-box-szg_border-box"
         >
           <input
             checked=""
@@ -43,14 +43,14 @@ exports[`renders panel correctly 1`] = `
             type="checkbox"
           />
           <div
-            class="ub-h_24px ub-w_48px ub-box-szg_border-box"
+            class="ub-h_22px ub-w_44px ub-box-szg_border-box"
           >
             <div
-              class="css-17bhmw6 ub-h_24px ub-w_24px ub-box-szg_border-box"
+              class="css-17bhmw6 ub-h_22px ub-w_22px ub-box-szg_border-box"
               data-checked="true"
             >
               <svg
-                height="9"
+                height="8"
                 viewBox="0 0 10 7"
                 width="10"
               >
@@ -62,14 +62,14 @@ exports[`renders panel correctly 1`] = `
               </svg>
             </div>
             <div
-              class="css-1rprxtl ub-w_48px ub-dspl_flex ub-box-szg_border-box"
+              class="css-1rprxtl ub-w_44px ub-dspl_flex ub-box-szg_border-box"
               data-checked="true"
             >
               <div
                 class="ub-flx_1 ub-pb_2px ub-pl_2px ub-pr_2px ub-pt_2px ub-box-szg_border-box"
               >
                 <div
-                  class="css-13qcn8a ub-w_20px ub-h_20px ub-box-szg_border-box"
+                  class="css-13qcn8a ub-w_18px ub-h_18px ub-box-szg_border-box"
                 />
               </div>
             </div>
