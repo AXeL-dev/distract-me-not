@@ -20,7 +20,7 @@
   },
   "scripts": {
     "start": "rescripts start",
-    "build": "INLINE_RUNTIME_CHUNK=false rescripts build",
+    "build": "INLINE_RUNTIME_CHUNK=false GENERATE_SOURCEMAP=false rescripts build",
     "build:firefox": "npm run build && cd build && mv -f manifest.firefox.json manifest.json",
     "build:chrome": "npm run build && cd build && rm -f manifest.firefox.json",
     "build:edge": "npm run build:chrome",

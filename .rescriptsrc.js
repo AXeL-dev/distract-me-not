@@ -14,9 +14,9 @@ module.exports = config => {
   config.output.chunkFilename = 'static/js/[name].chunk.js';
   config.plugins[4].options.filename = 'static/css/[name].css';
   config.plugins[4].options.chunkFilename = 'static/css/[name].chunk.css';
-  //config.plugins[7].config.precacheManifestFilename = 'precache-manifest.js';
-  config.module.rules[2].oneOf[0].options.name = 'static/media/[name].[ext]';
-  config.module.rules[2].oneOf[7].options.name = 'static/media/[name].[ext]';
+  config.module.rules[1].oneOf[0].options.name = 'static/media/[name].[ext]';
+  config.module.rules[1].oneOf[1].options.name = 'static/media/[name].[ext]';
+  config.module.rules[1].oneOf[8].options.name = 'static/media/[name].[ext]';
 
   return config;
 };

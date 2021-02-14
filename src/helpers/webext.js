@@ -36,6 +36,7 @@ export function openOptionsPage() {
   try {
     browser.runtime.openOptionsPage();
     if (isFirefox()) {
+      // refresh settings page when "open_in_tab" manifest option is false
       nativeAPI.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0].url && tabs[0].url.startsWith('about:addons')) {
           nativeAPI.tabs.reload(tabs[0].id);
