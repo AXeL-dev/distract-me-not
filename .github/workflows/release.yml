@@ -26,7 +26,12 @@ jobs:
       - name: Package 📦
         run: |
           npm run package:all
-          packages="$(ls -d distract_me_not-*.zip)"
+          packages="$(ls -d distract_me_not-*.zip --format=across)"
+          # the following lines are only required for multi line
+          packages="${packages//'%'/'%25'}"
+          packages="${packages//$'\n'/'%0A'}"
+          packages="${packages//$'\r'/'%0D'}"
+          # end of optional handling for multi line
           echo "::set-output name=PACKAGES::$packages"
         id: package
 
