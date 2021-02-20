@@ -33,6 +33,7 @@ jobs:
         uses: meeDamian/github-release@2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: ${{ steps.package.outputs.PACKAGES }}
           gzip: folders
           allow_override: true
+          files: >
+            ${{ steps.package.outputs.PACKAGES }}
