@@ -30,6 +30,10 @@ jobs:
           echo "::set-output name=PACKAGES::$packages"
         id: package
 
+      - name: List packages 🔍
+        run: |
+          echo "Packages: ${{ steps.package.outputs.PACKAGES }}"
+
       - name: Upload to release 💾
         uses: meeDamian/github-release@2.0
         with:
