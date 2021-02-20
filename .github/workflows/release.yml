@@ -21,19 +21,19 @@ jobs:
         run: |
           npm install
           npm test
-          npm run build:firefox
+          npm run build
 
       - name: Package 📦
         run: |
           npm run package:all
-          echo "::set-output name=PACKAGES::$(ls -d distract_me_not-*.zip --format=single-column)"
+          packages="$(ls -d distract_me_not-*.zip)"
+          echo "::set-output name=PACKAGES::$packages"
         id: package
 
       - name: Upload to release 💾
         uses: meeDamian/github-release@2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          files: ${{ steps.package.outputs.PACKAGES }}
           gzip: folders
           allow_override: true
-          files: >
-            ${{ steps.package.outputs.PACKAGES }}
