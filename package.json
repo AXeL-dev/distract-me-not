@@ -21,9 +21,9 @@
   "scripts": {
     "start": "rescripts start",
     "build": "INLINE_RUNTIME_CHUNK=false GENERATE_SOURCEMAP=false rescripts build",
-    "build:firefox": "npm run build && npm run postbuild:firefox",
-    "build:chrome": "npm run build && npm run postbuild:chrome",
-    "build:edge": "npm run build:chrome",
+    "build:firefox": "npm run build",
+    "build:chrome": "npm run build",
+    "build:edge": "npm run build",
     "postbuild:firefox": "cd build && mv -f manifest.firefox.json manifest.json",
     "postbuild:chrome": "cd build && cp -f ../public/manifest.json manifest.json && rm -f manifest.firefox.json",
     "postbuild:edge": "npm run postbuild:chrome",
