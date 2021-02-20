@@ -25,14 +25,14 @@ jobs:
 
       - name: Package 📦
         run: |
-          npm run package
-          echo "::set-output name=PACKAGE_NAME::$(ls -d distract_me_not-*.zip)"
+          npm run package:all
+          echo "::set-output name=PACKAGES::$(ls -d distract_me_not-*.zip)"
         id: package
 
       - name: Upload to release 💾
         uses: meeDamian/github-release@2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: ${{ steps.package.outputs.PACKAGE_NAME }}
+          files: ${{ steps.package.outputs.PACKAGES }}
           gzip: folders
           allow_override: true
