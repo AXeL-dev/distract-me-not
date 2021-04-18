@@ -39,6 +39,7 @@ Distract Me Not is a lightweight website blocker with a user friendly interface.
 - [bcryptjs](https://github.com/dcodeIO/bcrypt.js): Encryption library
 - [fuzzaldrin-plus](https://github.com/jeancroy/fuzz-aldrin-plus): Data filtering library
 - [query-string](https://github.com/sindresorhus/query-string): URL query strings parsing library
+- [lodash](https://lodash.com): Utility library
 
 ### Scripts
 
