@@ -89,6 +89,18 @@
     "blockingDescription": {
         "message": "Veuillez choisir une action à entreprendre pour les sites web blacklistés:"
     },
+    "unblocking": {
+        "message": "Déblocage"
+    },
+    "enableUnblocking": {
+        "message": "Activer le déblocage"
+    },
+    "unblockingDescription": {
+        "message": "Affiche un boutton pour débloquer les sites web"
+    },
+    "requirePasswordToUnblockWebsites": {
+        "message": "Exiger un mot de passe pour débloquer les sites web"
+    },
     "schedule": {
         "message": "Planification"
     },
@@ -130,9 +142,6 @@
     },
     "passwordIsWrong": {
         "message": "Mot de passe incorrect!"
-    },
-    "unblockWebsitesWithPassword": {
-        "message": "Permettre le déblocage des sites web avec le mot de passe"
     },
     "enable": {
         "message": "Activer"

@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Dialog, RadioGroup } from 'evergreen-ui';
+import { Pane, Dialog, RadioGroup, Button, UnlockIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { storage, sendMessage } from 'helpers/webext';
 import { debug, isDevEnv } from 'helpers/debug';
@@ -28,7 +28,8 @@ export class Blocked extends Component {
         isShown: false,
         options: this.getUnblockOptions(defaultUnblockTime),
         selected: unblockOptions.unblockOnce,
-        time: defaultUnblockTime
+        time: defaultUnblockTime,
+        requirePassword: props.requirePassword || false,
       }
     };
   }
@@ -67,16 +68,23 @@ export class Blocked extends Component {
     storage.get({
       message: this.state.message,
       displayBlankPage: this.state.isBlank,
+      unblock: {
+        isEnabled: false,
+        requirePassword: false,
+      },
       password: {
         isEnabled: false,
-        unblockWebsites: false
-      }
+      },
     }).then((items) => {
       if (items) {
         this.setState({
           message: items.message.length ? items.message : this.state.message,
           isBlank: items.displayBlankPage,
-          hasUnblockButton: items.password.isEnabled && items.password.unblockWebsites
+          hasUnblockButton: items.unblock.isEnabled,
+          unblockDialog: {
+            ...this.state.unblockDialog,
+            requirePassword: items.unblock.isEnabled && items.unblock.requirePassword && items.password.isEnabled,
+          },
         });
       }
     });
@@ -152,15 +160,28 @@ export class Blocked extends Component {
                   options={this.state.unblockDialog.options}
                   onChange={event => this.updateUnblockDialogState({ selected: event.target.value })}
                 />
-                <PasswordPrompt
-                  hasHeader={false}
-                  hasFooter={false}
-                  minWidth="auto"
-                  minHeight={50}
-                  inputWidth="100%"
-                  inputHeight={36}
-                  onSuccess={this.unblock}
-                />
+                {this.state.unblockDialog.requirePassword ? (
+                  <PasswordPrompt
+                    hasHeader={false}
+                    hasFooter={false}
+                    minWidth="auto"
+                    minHeight={50}
+                    inputWidth="100%"
+                    inputHeight={36}
+                    onSuccess={this.unblock}
+                  />
+                ) : (
+                  <Pane display="flex" alignItems="center" justifyContent="center" marginTop={16}>
+                    <Button
+                      height={32}
+                      appearance="primary"
+                      iconBefore={UnlockIcon}
+                      onClick={this.unblock}
+                    >
+                      {translate('unblock')}
+                    </Button>
+                  </Pane>
+                )}
               </Pane>
             </Dialog>
           </Fragment>

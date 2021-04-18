@@ -23,6 +23,8 @@ export const actions = [
   { label: translate('closeTab'), value: Action.closeTab },
 ];
 
+export const defaultAction = Action.blockTab;
+
 export const defaultMode = Mode.blacklist;
 
 export const defaultBlacklist = [

@@ -89,6 +89,18 @@
     "blockingDescription": {
         "message": "Choose an action to take for the blacklisted websites:"
     },
+    "unblocking": {
+        "message": "Unblocking"
+    },
+    "enableUnblocking": {
+        "message": "Enable Unblocking"
+    },
+    "unblockingDescription": {
+        "message": "Displays an 'Unblock' button on the blocked websites"
+    },
+    "requirePasswordToUnblockWebsites": {
+        "message": "Require password to unblock websites"
+    },
     "schedule": {
         "message": "Schedule"
     },
@@ -130,9 +142,6 @@
     },
     "passwordIsWrong": {
         "message": "Wrong password!"
-    },
-    "unblockWebsitesWithPassword": {
-        "message": "Allow unblocking websites with the password"
     },
     "enable": {
         "message": "Enable"
