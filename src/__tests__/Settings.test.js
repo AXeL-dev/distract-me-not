@@ -5,17 +5,19 @@ import { Settings } from "components";
 
 it('renders all tabs', () => {
   render(<Settings />);
-  const blocking = screen.getByRole('tab', { name: /blocking/i });
-  const schedule = screen.getByRole('tab', { name: /schedule/i });
-  const password = screen.getByRole('tab', { name: /password/i });
-  const blacklist = screen.getByRole('tab', { name: /blacklist/i });
-  const whitelist = screen.getByRole('tab', { name: /whitelist/i });
-  const miscellaneous = screen.getByRole('tab', { name: /miscellaneous/i });
+  const blocking = screen.getByRole('tab', { name: /^blocking/i });
+  const schedule = screen.getByRole('tab', { name: /^schedule/i });
+  const blacklist = screen.getByRole('tab', { name: /^blacklist/i });
+  const whitelist = screen.getByRole('tab', { name: /^whitelist/i });
+  const unblocking = screen.getByRole('tab', { name: /^unblocking/i });
+  const password = screen.getByRole('tab', { name: /^password/i });
+  const miscellaneous = screen.getByRole('tab', { name: /^miscellaneous/i });
   expect(blocking).toBeInTheDocument();
   expect(schedule).toBeInTheDocument();
-  expect(password).toBeInTheDocument();
   expect(blacklist).toBeInTheDocument();
   expect(whitelist).toBeInTheDocument();
+  expect(unblocking).toBeInTheDocument();
+  expect(password).toBeInTheDocument();
   expect(miscellaneous).toBeInTheDocument();
 });
 
