@@ -24,6 +24,7 @@ old-src
 .env.development.local
 .env.test.local
 .env.production.local
+screenshots/edge/*
 
 npm-debug.log*
 yarn-debug.log*

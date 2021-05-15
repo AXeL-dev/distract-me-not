@@ -93,7 +93,7 @@ export function getActiveTabHostname() {
       if (tab) {
         const parser = document.createElement("a");
         parser.href = tab.url;
-        const host = parser.hostname;
+        const host = parser.hostname.replace(/^www./i, '');
         resolve(host);
       } else {
         resolve(null);
