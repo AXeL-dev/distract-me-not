@@ -4,7 +4,6 @@ import { storage } from './helpers/webext';
 import { isDevEnv } from './helpers/debug';
 import { Panel, Settings, Background, Blocked, PasswordPrompt } from './components';
 import { PasswordProtectedRoute } from './routes';
-import './App.css';
 
 export default class App extends Component {
 
