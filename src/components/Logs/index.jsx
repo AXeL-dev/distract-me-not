@@ -36,6 +36,7 @@ export class Logs extends Component {
       list: [],
       searchQuery: '',
       orderedColumn: 1,
+      scrollToIndex: 0,
       ordering: Order.NONE,
     };
   }
@@ -175,6 +176,7 @@ export class Logs extends Component {
             icon={RefreshIcon}
             onSelect={() => {
               this.fetchLogs();
+              this.setState({ scrollToIndex: 0 });
               close();
             }}
           >
@@ -237,7 +239,7 @@ export class Logs extends Component {
               </Popover>
             </Table.HeaderCell>
           </Table.Head>
-          <Table.VirtualBody height="calc(100% - 32px)">
+          <Table.VirtualBody scrollToIndex={this.state.scrollToIndex} height="calc(100% - 32px)">
             {items.map(item => this.renderRow({ row: item }))}
           </Table.VirtualBody>
         </Table>
