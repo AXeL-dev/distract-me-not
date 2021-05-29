@@ -182,14 +182,13 @@ export class Panel extends Component {
           paddingBottom={20}
         />
         <Pane display="flex" paddingX={16} paddingY={10} alignItems="center" justifyContent="space-between" borderTop>
-          <Pane display="flex" justifyContent="space-between" gap={6}>
+          <Pane display="flex" gap={10}>
             <SettingsButton history={this.props.history} />
             <LinkIconButton
               icon={HistoryIcon}
               link="/logs"
               tooltip={translate('logs')}
               history={this.props.history}
-              marginLeft={6}
             />
           </Pane>
           <Pane>

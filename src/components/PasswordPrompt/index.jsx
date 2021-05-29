@@ -70,27 +70,27 @@ export class PasswordPrompt extends Component {
   }
 
   getMinWidth = () => {
-    return this.props.minWidth || (this.redirectPath === '/settings' ? 580 : 320);
+    return this.props.minWidth || (['/settings', '/logs'].includes(this.redirectPath) ? 580 : 350);
   }
 
   getMinHeight = () => {
-    return this.props.minHeight || (this.redirectPath === '/settings' ? 380 : 230);
+    return this.props.minHeight || (['/settings', '/logs'].includes(this.redirectPath) ? 380 : 230);
   }
 
   getInputWidth = () => {
-    return this.props.inputWidth || (this.redirectPath === '/settings' ? 320 : '70%');
+    return this.props.inputWidth || (['/settings', '/logs'].includes(this.redirectPath) ? 320 : '70%');
   }
 
   getInputHeight = () => {
-    return this.props.inputHeight || (this.redirectPath === '/settings' ? 36 : 32);
+    return this.props.inputHeight || (['/settings', '/logs'].includes(this.redirectPath) ? 36 : 32);
   }
 
   getButtonWidth = () => {
-    return this.props.buttonWidth || this.props.inputHeight || (this.redirectPath === '/settings' ? 36 : 32);
+    return this.props.buttonWidth || this.props.inputHeight || (['/settings', '/logs'].includes(this.redirectPath) ? 36 : 32);
   }
 
   getButtonHeight = () => {
-    return this.props.buttonHeight || this.props.inputHeight || (this.redirectPath === '/settings' ? 36 : 32);
+    return this.props.buttonHeight || this.props.inputHeight || (['/settings', '/logs'].includes(this.redirectPath) ? 36 : 32);
   }
 
   render() {

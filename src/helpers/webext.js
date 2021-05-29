@@ -24,18 +24,14 @@ export const isWebExtension = isBrowserAPIAvailable();
 
 export const indexUrl = isWebExtension ? browser.runtime.getURL('index.html') : '';
 
-export function isFirefox() {
-  return navigator.userAgent.indexOf("Firefox") !== -1;
-}
+export const isFirefox = navigator.userAgent.indexOf('Firefox') !== -1;
 
-export function isChrome() {
-  return navigator.userAgent.indexOf("Chrome") !== -1;
-}
+export const isChrome = navigator.userAgent.indexOf('Chrome') !== -1;
 
 export function openOptionsPage() {
   try {
     browser.runtime.openOptionsPage();
-    if (isFirefox()) {
+    if (isFirefox) {
       // refresh settings page when "open_in_tab" manifest option is false
       nativeAPI.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0].url && tabs[0].url.startsWith('about:addons')) {
