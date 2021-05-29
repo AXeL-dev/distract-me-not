@@ -86,8 +86,11 @@
     "blocking": {
         "message": "Blocage"
     },
-    "blockingDescription": {
-        "message": "Veuillez choisir une action à entreprendre pour les sites web blacklistés:"
+    "blockingBlacklistDescription": {
+        "message": "Veuillez choisir une action à entreprendre pour les sites web sur la liste noire:"
+    },
+    "blockingWhitelistDescription": {
+        "message": "Veuillez choisir une action à entreprendre pour les sites web sur la liste blanche:"
     },
     "unblocking": {
         "message": "Déblocage"

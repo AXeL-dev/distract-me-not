@@ -86,8 +86,11 @@
     "blocking": {
         "message": "Blocking"
     },
-    "blockingDescription": {
+    "blockingBlacklistDescription": {
         "message": "Choose an action to take for the blacklisted websites:"
+    },
+    "blockingWhitelistDescription": {
+        "message": "Choose an action to take for the whitelisted websites:"
     },
     "unblocking": {
         "message": "Unblocking"
