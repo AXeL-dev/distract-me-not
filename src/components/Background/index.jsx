@@ -356,7 +356,7 @@ export class Background extends Component {
       case Mode.whitelist:
         shouldBlock = !this.isWhitelisted(data.url);
         break;
-      case Mode.both:
+      case Mode.combined:
         shouldBlock = !this.isWhitelisted(data.url) && this.isBlacklisted(data.url);
         break;
       default:

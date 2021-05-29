@@ -4,7 +4,7 @@ import { translate } from './i18n';
 export const Mode = {
   blacklist: 'blacklist',
   whitelist: 'whitelist',
-  both: 'both'
+  combined: 'combined'
 };
 
 export const Action = {
@@ -16,7 +16,7 @@ export const Action = {
 export const modes = [
   { label: translate('blacklist'), value: Mode.blacklist },
   { label: translate('whitelist'), value: Mode.whitelist },
-  { label: translate('both'), value: Mode.both },
+  { label: translate('combined'), value: Mode.combined },
 ];
 
 export const actions = [

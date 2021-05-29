@@ -11,8 +11,8 @@
     "whitelist": {
         "message": "Whitelist"
     },
-    "both": {
-        "message": "Both"
+    "combined": {
+        "message": "Combined"
     },
     "whitelistDescription": {
         "message": "When mode is set to whitelist, you can only visit the following websites:"

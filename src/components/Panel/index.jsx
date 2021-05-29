@@ -36,7 +36,7 @@ export class Panel extends Component {
         } else {
           switch (mode) {
             case Mode.blacklist:
-            case Mode.both:
+            case Mode.combined:
               const isBlacklisted = await sendMessage('isBlacklisted', tab.url);
               if (isBlacklisted) {
                 this.hideAddButton();
@@ -91,7 +91,7 @@ export class Panel extends Component {
         const pattern = `*.${hostname}`;
         switch (this.state.mode) {
           case Mode.blacklist:
-          case Mode.both:
+          case Mode.combined:
             storage.get({
               blacklist: defaultBlacklist
             }).then(({ blacklist }) => {

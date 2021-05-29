@@ -11,8 +11,8 @@
     "whitelist": {
         "message": "Liste blanche"
     },
-    "both": {
-        "message": "Les deux"
+    "combined": {
+        "message": "Combiné"
     },
     "whitelistDescription": {
         "message": "Quand le mode liste blanche est actif, vous pouvez uniquement visiter les sites web suivants:"

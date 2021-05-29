@@ -141,13 +141,13 @@ exports[`renders panel correctly 1`] = `
               id="SegmentedControl-12"
               name="mode"
               type="radio"
-              value="both"
+              value="combined"
             />
             <label
               class="css-17kak1e ub-color_425A70 ub-fnt-fam_b77syt ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_16px ub-ltr-spc_0 ub-crsr_pointer ub-box-szg_border-box"
               for="SegmentedControl-12"
             >
-              both
+              combined
             </label>
           </div>
         </div>
