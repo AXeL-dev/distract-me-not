@@ -36,6 +36,7 @@ export class Panel extends Component {
         } else {
           switch (mode) {
             case Mode.blacklist:
+            case Mode.both:
               const isBlacklisted = await sendMessage('isBlacklisted', tab.url);
               if (isBlacklisted) {
                 this.hideAddButton();
@@ -90,6 +91,7 @@ export class Panel extends Component {
         const pattern = `*.${hostname}`;
         switch (this.state.mode) {
           case Mode.blacklist:
+          case Mode.both:
             storage.get({
               blacklist: defaultBlacklist
             }).then(({ blacklist }) => {
@@ -127,7 +129,7 @@ export class Panel extends Component {
 
   render() {
     return (
-      <Pane minWidth={320}>
+      <Pane minWidth={360}>
         <Header />
         {this.state.isEnabled && this.state.schedule.isEnabled ? (
           <Pane display="flex" paddingX={16} paddingY={20}>
@@ -175,7 +177,7 @@ export class Panel extends Component {
           options={modes}
           value={this.state.mode}
           onChange={this.changeMode}
-          width={200}
+          width={270}
           paddingX={16}
           paddingBottom={20}
         />

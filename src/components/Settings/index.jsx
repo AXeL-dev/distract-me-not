@@ -275,13 +275,13 @@ export class Settings extends Component {
                       options={modes}
                       value={this.state.options.mode}
                       onChange={this.changeMode}
-                      width={200}
+                      width={300}
                       marginBottom={this.state.options.isEnabled ? 16 : 0}
                     />
                     {this.state.options.isEnabled && (
                       <Fragment>
                         <Paragraph size={300} color="muted" marginBottom={16}>
-                          {translate(this.state.options.mode === Mode.blacklist ? 'blockingBlacklistDescription' : 'blockingWhitelistDescription')}
+                          {translate(this.state.options.mode === Mode.whitelist ? 'blockingWhitelistDescription' : 'blockingBlacklistDescription')}
                         </Paragraph>
                         <SelectField
                           label={translate('defaultAction')}

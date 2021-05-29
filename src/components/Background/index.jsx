@@ -347,19 +347,23 @@ export class Background extends Component {
       }
     }
     // Handle blocking
+    let shouldTakeAction = false;
     switch (this.mode) {
       case Mode.blacklist:
-        if (this.isBlacklisted(data.url)) {
-          return this.handleAction(data);
-        }
+        shouldTakeAction = this.isBlacklisted(data.url);
         break;
       case Mode.whitelist:
-        if (!this.isWhitelisted(data.url)) {
-          return this.handleAction(data);
-        }
+        shouldTakeAction = !this.isWhitelisted(data.url);
+        break;
+      case Mode.both:
+        shouldTakeAction = !this.isWhitelisted(data.url) && this.isBlacklisted(data.url);
         break;
       default:
         break;
+    }
+    // Execute action
+    if (shouldTakeAction) {
+      return this.handleAction(data);
     }
   }
 
