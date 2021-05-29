@@ -5,6 +5,7 @@ import { storage, nativeAPI, indexUrl } from 'helpers/webext';
 import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule, unblockOptions, defaultUnblockOnceTimeout, isAccessible } from 'helpers/block';
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
 import { regex } from 'helpers/regex';
+import { logger } from 'helpers/logger';
 import { inTime } from 'helpers/time';
 import { inToday } from 'helpers/date';
 
@@ -28,7 +29,7 @@ export class Background extends Component {
     this.init();
   }
 
-  log = (message, ...params) => {
+  debug = (message, ...params) => {
     //console.log(message, ...params); // uncomment this line to see logs
   }
 
@@ -118,7 +119,7 @@ export class Background extends Component {
       redirectUrl: this.redirectUrl,
       enableOnBrowserStartup: false
     }).then((items) => {
-      this.log('items:', items);
+      this.debug('items:', items);
       //----- Start backward compatibility with v1
       if (items.blackList !== null) {
         items.blacklist = this.removeListDuplicates(
@@ -171,7 +172,7 @@ export class Background extends Component {
   }
 
   handleMessage = (request, sender, sendResponse) => {
-    this.log('Handle message:', request);
+    this.debug('Handle message:', request);
     let response = null;
     return new Promise(resolve => {
       switch (request.message) {
@@ -221,7 +222,7 @@ export class Background extends Component {
         return this[functionName]();
       }
     } catch (error) {
-      this.log(error);
+      this.debug(error);
     }
   }
 
@@ -246,12 +247,12 @@ export class Background extends Component {
   }
 
   closeTab = (tabId) => {
-    this.log('closing tab:', tabId);
+    this.debug('closing tab:', tabId);
     nativeAPI.tabs.remove(tabId); // nativeAPI is used to fix weird errors on chrome due to browser-polyfill
   }
 
   redirectTab = (tabId, redirectUrl) => {
-    this.log('redirecting tab:', tabId, redirectUrl);
+    this.debug('redirecting tab:', tabId, redirectUrl);
     nativeAPI.tabs.update(tabId, {
       url: redirectUrl
     });
@@ -277,7 +278,7 @@ export class Background extends Component {
       const hostname = getHostName(url);
       const index = this.tmpAllowed.map(allowed => allowed.hostname).indexOf(hostname);
       if (index !== -1) {
-        this.log('tmp allowed:', url);
+        this.debug('tmp allowed:', url);
         if (this.tmpAllowed[index].once) {
           setTimeout(() => {
             this.tmpAllowed.splice(index, 1);
@@ -286,7 +287,7 @@ export class Background extends Component {
         return true;
       }
     }
-    this.log('not tmp allowed:', url);
+    this.debug('not tmp allowed:', url);
     return false;
   }
 
@@ -296,11 +297,11 @@ export class Background extends Component {
     }
     for (const rule of this.blacklist) {
       if (rule.test(url)) {
-        this.log('is blacklisted:', url);
+        this.debug('is blacklisted:', url);
         return true;
       }
     }
-    this.log('not blacklisted:', url);
+    this.debug('not blacklisted:', url);
     return false;
   }
 
@@ -310,16 +311,16 @@ export class Background extends Component {
     }
     for (const rule of this.whitelist) {
       if (rule.test(url)) {
-        this.log('is whitelisted:', url);
+        this.debug('is whitelisted:', url);
         return true;
       }
     }
-    this.log('not whitelisted:', url);
+    this.debug('not whitelisted:', url);
     return false;
   }
 
   parseUrl = (data, caller) => {
-    this.log('parsing url:', {
+    this.debug('parsing url:', {
       caller: caller,
       data: data,
       mode: this.mode,
@@ -330,7 +331,7 @@ export class Background extends Component {
     if (this.schedule.isEnabled) {
       try {
         if (!inToday(this.schedule.days)) {
-          this.log('not in schedule days:', this.schedule.days);
+          this.debug('not in schedule days:', this.schedule.days);
           return;
         } else {
           const [startHour, startMinute] = this.schedule.time.start.split(':');
@@ -338,31 +339,33 @@ export class Background extends Component {
           const [endHour, endMinute] = this.schedule.time.end.split(':');
           const end = Number(endHour) * 60 + Number(endMinute);
           if (start && !inTime(start, end)) {
-            this.log('not in schedule time:', this.schedule.time);
+            this.debug('not in schedule time:', this.schedule.time);
             return;
           }
         }
       } catch (error) {
-        this.log(error);
+        this.debug(error);
       }
     }
     // Handle blocking
-    let shouldTakeAction = false;
+    let shouldBlock = false;
     switch (this.mode) {
       case Mode.blacklist:
-        shouldTakeAction = this.isBlacklisted(data.url);
+        shouldBlock = this.isBlacklisted(data.url);
         break;
       case Mode.whitelist:
-        shouldTakeAction = !this.isWhitelisted(data.url);
+        shouldBlock = !this.isWhitelisted(data.url);
         break;
       case Mode.both:
-        shouldTakeAction = !this.isWhitelisted(data.url) && this.isBlacklisted(data.url);
+        shouldBlock = !this.isWhitelisted(data.url) && this.isBlacklisted(data.url);
         break;
       default:
         break;
     }
+    // Log url
+    logger.add({ url: data.url, blocked: shouldBlock });
     // Execute action
-    if (shouldTakeAction) {
+    if (shouldBlock) {
       return this.handleAction(data);
     }
   }
@@ -410,7 +413,7 @@ export class Background extends Component {
   checkAllTabs = () => {
     browser.tabs.query({}).then((tabs) => {
       if (tabs.length > 0) {
-        for (let tab of tabs) {
+        for (const tab of tabs) {
           if (this.isEnabled) {
             this.checkTab({ url: tab.url, tabId: tab.id }, 'checkAllTabs');
           } else if (tab.url.startsWith(`${indexUrl}#/blocked?url=`)) {
@@ -423,13 +426,13 @@ export class Background extends Component {
 
   enable = (logMessage = 'enabled!') => {
     if (this.enableLock) {
-      this.log('already enabled!', {
+      this.debug('already enabled!', {
         enableLock: this.enableLock
       });
     } else {
       this.checkAllTabs();
       this.enableEventListeners();
-      this.log(logMessage);
+      this.debug(logMessage);
       this.enableLock = true;
     }
   }
@@ -438,10 +441,10 @@ export class Background extends Component {
     if (this.enableLock) {
       this.disableEventListeners();
       this.checkAllTabs();
-      this.log(logMessage);
+      this.debug(logMessage);
       this.enableLock = false;
     } else {
-      this.log('already disabled!', {
+      this.debug('already disabled!', {
         enableLock: this.enableLock
       });
     }

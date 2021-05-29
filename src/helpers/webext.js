@@ -49,6 +49,33 @@ export function openOptionsPage() {
   }
 }
 
+export function openExtensionPage(url, reloadIfExists = true) {
+  const pageUrl = `${browser.runtime.getURL('index.html')}#${url}`;
+
+  if (!reloadIfExists) {
+    return createTab(pageUrl);
+  }
+
+  nativeAPI.tabs.query({}, (tabs) => {
+    if (tabs.length > 0) {
+      for (const tab of tabs) {
+        if (tab.url === pageUrl) {
+          nativeAPI.tabs.reload(tab.id);
+          return;
+        }
+      }
+      createTab(pageUrl);
+    }
+  });
+}
+
+export function createTab(url, isActive = true) {
+  return browser.tabs.create({
+    url: url,
+    active: isActive
+  });
+}
+
 /**
  * Send message to background script
  * 

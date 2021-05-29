@@ -35,6 +35,12 @@
     "settings": {
         "message": "Settings"
     },
+    "logs": {
+        "message": "Logs"
+    },
+    "refresh": {
+        "message": "Refresh"
+    },
     "addToBlacklist": {
         "message": "Add current website to blacklist"
     },

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
 import { storage } from './helpers/webext';
 import { isDevEnv } from './helpers/debug';
-import { Panel, Settings, Background, Blocked, PasswordPrompt } from './components';
+import { Panel, Settings, Logs, Background, Blocked, PasswordPrompt } from './components';
 import { PasswordProtectedRoute } from './routes';
 
 export default class App extends Component {
@@ -32,6 +32,7 @@ export default class App extends Component {
         <Switch>
           <PasswordProtectedRoute exact path="/" component={Panel} accessAllowed={this.state.accessAllowed} showPromptHeader={true} showPromptFooter={true} />
           <PasswordProtectedRoute path="/settings" component={Settings} accessAllowed={this.state.accessAllowed} />
+          <PasswordProtectedRoute path="/logs" component={Logs} accessAllowed={this.state.accessAllowed} />
           <Route path="/background" component={Background} />
           <Route path="/blocked" component={Blocked} />
           {isDevEnv && (

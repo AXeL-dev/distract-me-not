@@ -35,6 +35,12 @@
     "settings": {
         "message": "Réglages"
     },
+    "logs": {
+        "message": "Journaux"
+    },
+    "refresh": {
+        "message": "Rafraîchir"
+    },
     "addToBlacklist": {
         "message": "Ajouter le site web actuel à la liste noire"
     },

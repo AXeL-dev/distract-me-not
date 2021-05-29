@@ -1,10 +1,10 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Text, Position, Badge, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon } from 'evergreen-ui';
+import { Pane, Text, Position, Badge, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon, HistoryIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { sendMessage, getActiveTab, getActiveTabHostname, storage } from 'helpers/webext';
 import { Mode, modes, defaultMode, defaultBlacklist, defaultWhitelist, defaultSchedule, isAccessible } from 'helpers/block';
 import { inToday } from 'helpers/date';
-import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton } from 'components';
+import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton, LinkIconButton } from 'components';
 import './styles.scss';
 
 export class Panel extends Component {
@@ -129,7 +129,7 @@ export class Panel extends Component {
 
   render() {
     return (
-      <Pane minWidth={360}>
+      <Pane minWidth={350}>
         <Header />
         {this.state.isEnabled && this.state.schedule.isEnabled ? (
           <Pane display="flex" paddingX={16} paddingY={20}>
@@ -177,13 +177,20 @@ export class Panel extends Component {
           options={modes}
           value={this.state.mode}
           onChange={this.changeMode}
-          width={270}
+          width={260}
           paddingX={16}
           paddingBottom={20}
         />
         <Pane display="flex" paddingX={16} paddingY={10} alignItems="center" justifyContent="space-between" borderTop>
-          <Pane>
+          <Pane display="flex" justifyContent="space-between" gap={6}>
             <SettingsButton history={this.props.history} />
+            <LinkIconButton
+              icon={HistoryIcon}
+              link="/logs"
+              tooltip={translate('logs')}
+              history={this.props.history}
+              marginLeft={6}
+            />
           </Pane>
           <Pane>
             <AnimatedIconButton
