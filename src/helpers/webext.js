@@ -57,10 +57,12 @@ export function openExtensionPage(url, reloadIfExists = true) {
       for (const tab of tabs) {
         if (tab.url === pageUrl) {
           nativeAPI.tabs.reload(tab.id);
+          nativeAPI.tabs.update(tab.id, { active: true });
           return;
         }
       }
       createTab(pageUrl);
+      window.close();
     }
   });
 }

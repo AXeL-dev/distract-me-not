@@ -38,6 +38,9 @@
     "logs": {
         "message": "Logs"
     },
+    "donate": {
+        "message": "Donate"
+    },
     "refresh": {
         "message": "Refresh"
     },

@@ -22,7 +22,7 @@ export class SettingsButton extends Component {
         tooltipPosition={Position.RIGHT}
         className="fill-grey"
         icon={CogIcon}
-        iconSize={22}
+        iconSize={20}
         iconColor="#4E4E50"
         onClick={this.goToSettings}
       />

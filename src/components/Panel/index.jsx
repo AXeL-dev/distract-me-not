@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Text, Position, Badge, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon, HistoryIcon } from 'evergreen-ui';
+import { Pane, Text, Position, Badge, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon, HistoryIcon, HeartIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { sendMessage, getActiveTab, getActiveTabHostname, storage } from 'helpers/webext';
 import { Mode, modes, defaultMode, defaultBlacklist, defaultWhitelist, defaultSchedule, isAccessible } from 'helpers/block';
@@ -188,6 +188,13 @@ export class Panel extends Component {
               icon={HistoryIcon}
               link="/logs"
               tooltip={translate('logs')}
+              history={this.props.history}
+            />
+            <LinkIconButton
+              icon={HeartIcon}
+              link="https://www.paypal.com/paypalme/axeldev"
+              external
+              tooltip={translate('donate')}
               history={this.props.history}
             />
           </Pane>

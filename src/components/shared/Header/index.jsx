@@ -10,7 +10,7 @@ export function Header(props) {
       display="flex"
       alignItems="center"
       justifyContent="center"
-      height={62}
+      height={props.height || 62}
       borderBottom
     >
       <img className="logo" alt="logo" src="icons/magnet-256.png" />

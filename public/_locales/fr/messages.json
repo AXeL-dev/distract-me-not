@@ -38,6 +38,9 @@
     "logs": {
         "message": "Journaux"
     },
+    "donate": {
+        "message": "Faire un don"
+    },
     "refresh": {
         "message": "Rafraîchir"
     },
