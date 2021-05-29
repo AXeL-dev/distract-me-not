@@ -16,4 +16,9 @@ export class logger {
       .get({ logs: [] })
       .then(({ logs }) => logs);
   }
+
+  static clear() {
+    return storage.set({ logs: [] });
+  }
+
 }

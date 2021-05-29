@@ -16,6 +16,7 @@ import {
   TickCircleIcon,
   BanCircleIcon,
   RefreshIcon,
+  EraserIcon,
 } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { logger } from 'helpers/logger';
@@ -178,6 +179,16 @@ export class Logs extends Component {
             }}
           >
             {translate('refresh')}
+          </Menu.Item>
+          <Menu.Item
+            icon={EraserIcon}
+            onSelect={() => {
+              logger.clear();
+              this.setState({ list: [] });
+              close();
+            }}
+          >
+            {translate('clear')}
           </Menu.Item>
         </Menu.Group>
       </Menu>

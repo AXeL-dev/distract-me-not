@@ -41,6 +41,9 @@
     "refresh": {
         "message": "Rafraîchir"
     },
+    "clear": {
+        "message": "Effacer"
+    },
     "addToBlacklist": {
         "message": "Ajouter le site web actuel à la liste noire"
     },
