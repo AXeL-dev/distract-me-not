@@ -195,7 +195,7 @@ export class Panel extends Component {
           <Pane>
             <AnimatedIconButton
               appearance="minimal"
-              tooltip={this.state.mode === 'blacklist' ? translate('addToBlacklist') : translate('addToWhitelist')}
+              tooltip={this.state.mode === Mode.whitelist ? translate('addToWhitelist') : translate('addToBlacklist')}
               tooltipPosition={Position.LEFT}
               className="fill-green"
               icon={PlusIcon}
