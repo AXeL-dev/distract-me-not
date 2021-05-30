@@ -41,6 +41,24 @@
     "donate": {
         "message": "Donate"
     },
+    "help": {
+        "message": "Need help?"
+    },
+    "about": {
+        "message": "About"
+    },
+    "version": {
+        "message": "Version"
+    },
+    "license": {
+        "message": "License"
+    },
+    "supportDeveloper": {
+        "message": "* If you liked this extension please consider supporting the developer."
+    },
+    "reportIssue": {
+        "message": "Report an issue"
+    },
     "refresh": {
         "message": "Refresh"
     },
@@ -123,16 +141,16 @@
         "message": "Schedule"
     },
     "scheduleDescription": {
-        "message": "Schedule blocking time:"
+        "message": "Schedule blocking time"
     },
     "scheduleStartTime": {
-        "message": "Start time:"
+        "message": "Start time"
     },
     "scheduleEndTime": {
-        "message": "End time:"
+        "message": "End time"
     },
     "scheduleDays": {
-        "message": "Days:"
+        "message": "Days"
     },
     "scheduleDaysDescription": {
         "message": "Days where blocking should be enabled during the scheduled time. If schedule time is not defined, the blocking will be active for the whole day."
@@ -153,7 +171,7 @@
         "message": "Locks access to settings with a password."
     },
     "enablePasswordProtection": {
-        "message": "Enable password protection:"
+        "message": "Enable password protection"
     },
     "passwordIsShort": {
         "message": "The password must contain at least 8 characters."
@@ -255,7 +273,7 @@
         "message": "Unblock for"
     },
     "unblockOnceTimeout": {
-        "message": "Unblock once timeout:"
+        "message": "Unblock once timeout"
     },
     "minutes": {
         "message": "minute(s)"

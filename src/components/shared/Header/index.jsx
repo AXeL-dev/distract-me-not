@@ -1,7 +1,6 @@
 import React from 'react';
 import { Pane, Heading } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
-import { isFirefox } from 'helpers/webext';
 import './styles.scss';
 
 export function Header(props) {
@@ -9,16 +8,18 @@ export function Header(props) {
     <Pane
       display="flex"
       alignItems="center"
-      justifyContent="center"
+      justifyContent={props.justifyContent || 'center'}
       height={props.height || 62}
-      borderBottom
+      borderBottom={!props.noBorderBottom}
+      marginBottom={props.marginBottom}
     >
       <img className="logo" alt="logo" src="icons/magnet-256.png" />
       <Heading
         size={600}
-        height={isFirefox ? 20 : 'initial'}
+        fontFamily="Roboto, arial, sans-serif"
         fontWeight="bold"
         className="cursor-default"
+        color="#333"
       >
         {translate('appName') || 'Distract Me Not'}
       </Heading>

@@ -137,7 +137,7 @@ export class storage {
         });
       } catch (error) {
         report.error(error);
-        resolve(null);
+        resolve(undefined);
       }
     });
   }

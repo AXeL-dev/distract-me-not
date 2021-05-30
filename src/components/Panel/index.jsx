@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Text, Position, Badge, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon, HistoryIcon, HeartIcon } from 'evergreen-ui';
+import { Pane, Text, Position, Badge, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon, HistoryIcon, IssueNewIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { sendMessage, getActiveTab, getActiveTabHostname, storage } from 'helpers/webext';
 import { Mode, modes, defaultMode, defaultBlacklist, defaultWhitelist, defaultSchedule, isAccessible } from 'helpers/block';
@@ -13,7 +13,7 @@ export class Panel extends Component {
     super(props);
     this.state = {
       isEnabled: true,
-      mode: defaultMode,
+      mode: '',//defaultMode,
       schedule: defaultSchedule,
       isAddButtonVisible: true
     };
@@ -191,10 +191,10 @@ export class Panel extends Component {
               history={this.props.history}
             />
             <LinkIconButton
-              icon={HeartIcon}
-              link="https://www.paypal.com/paypalme/axeldev"
+              icon={IssueNewIcon}
+              link="https://github.com/AXeL-dev/distract-me-not/issues"
               external
-              tooltip={translate('donate')}
+              tooltip={translate('reportIssue')}
               history={this.props.history}
             />
           </Pane>

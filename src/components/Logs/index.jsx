@@ -36,7 +36,7 @@ export class Logs extends Component {
       list: [],
       searchQuery: '',
       orderedColumn: 1,
-      scrollToIndex: 0,
+      scrollToIndex: null,
       ordering: Order.NONE,
     };
   }
@@ -45,9 +45,12 @@ export class Logs extends Component {
     this.fetchLogs();
   }
 
-  fetchLogs = () => {
+  fetchLogs = (scrollToTop = false) => {
     logger.get().then((logs) => {
-      this.setState({ list: this.getOrderedList(logs) });
+      this.setState({
+        list: this.getOrderedList(logs),
+        scrollToIndex: scrollToTop ? (logs.length > 0 ? 0 : null) : this.state.scrollToIndex,
+      });
     });
   }
 
@@ -175,8 +178,7 @@ export class Logs extends Component {
           <Menu.Item
             icon={RefreshIcon}
             onSelect={() => {
-              this.fetchLogs();
-              this.setState({ scrollToIndex: 0 });
+              this.fetchLogs(true);
               close();
             }}
           >
@@ -186,7 +188,7 @@ export class Logs extends Component {
             icon={EraserIcon}
             onSelect={() => {
               logger.clear();
-              this.setState({ list: [] });
+              this.setState({ list: [], scrollToIndex: null });
               close();
             }}
           >
@@ -200,7 +202,7 @@ export class Logs extends Component {
   renderRow = ({ row }) => {
     return (
       <Table.Row key={row.id} height={38}>
-        <Table.Cell display="flex" alignItems="center">
+        <Table.Cell flex="none" display="flex" alignItems="center">
           {row.blocked ? (
             <BanCircleIcon color="#dc3545" size={16} />
           ) : (

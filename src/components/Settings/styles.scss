@@ -6,3 +6,42 @@
 // textarea {
 //   resize: none;
 // }
+
+.about {
+  font-family: Roboto, arial, sans-serif;
+  .title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000;
+    margin: 0;
+    border-bottom: 1px solid #EDF0F2;
+    padding-bottom: 8px;
+    padding-left: 5px;
+  }
+  .block {
+    display: block;
+    margin-bottom: 20px;
+    margin-left: 5px;
+  }
+  .text {
+    font-size: 15px;
+    font-weight: 400;
+    color: #333;
+    padding: 12px 0;
+  }
+  .link {
+    font-size: 13px;
+    font-weight: 400;
+    text-decoration: none;
+    color: #1070ca;
+    margin-right: 10px;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  .small-text {
+    font-size: 13px;
+    font-weight: 400;
+    color: #333;
+  }
+}

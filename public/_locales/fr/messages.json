@@ -41,6 +41,24 @@
     "donate": {
         "message": "Faire un don"
     },
+    "help": {
+        "message": "Besoin d'aide?"
+    },
+    "about": {
+        "message": "À propos"
+    },
+    "version": {
+        "message": "Version"
+    },
+    "license": {
+        "message": "License"
+    },
+    "supportDeveloper": {
+        "message": "* Si vous avez aimé cette extension, pensez à soutenir le développeur."
+    },
+    "reportIssue": {
+        "message": "Signaler un problème"
+    },
     "refresh": {
         "message": "Rafraîchir"
     },
@@ -123,16 +141,16 @@
         "message": "Planification"
     },
     "scheduleDescription": {
-        "message": "Planifier le temps de blocage:"
+        "message": "Planifier le temps de blocage"
     },
     "scheduleStartTime": {
-        "message": "Heure de début:"
+        "message": "Heure de début"
     },
     "scheduleEndTime": {
-        "message": "Heure de fin:"
+        "message": "Heure de fin"
     },
     "scheduleDays": {
-        "message": "Jours:"
+        "message": "Jours"
     },
     "scheduleDaysDescription": {
         "message": "Jours où le blocage doit être activé pendant l'horaire défini. S'il n'y a pas d'horaire, le blocage sera actif pendant toute la journée."
@@ -153,7 +171,7 @@
         "message": "Verrouille l'accès aux paramètres avec un mot de passe."
     },
     "enablePasswordProtection": {
-        "message": "Activer la protection par mot de passe:"
+        "message": "Activer la protection par mot de passe"
     },
     "passwordIsShort": {
         "message": "Le mot de passe doit contenir au moins 8 caractères."
@@ -255,7 +273,7 @@
         "message": "Débloquer pour"
     },
     "unblockOnceTimeout": {
-        "message": "Délai d'expiration du déblocage pour une fois:"
+        "message": "Délai d'expiration du déblocage pour une fois"
     },
     "minutes": {
         "message": "minute(s)"

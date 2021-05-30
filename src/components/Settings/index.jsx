@@ -1,12 +1,13 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Tablist, SidebarTab, SelectField, Checkbox, TextInputField, Button, TickIcon, Paragraph, toaster } from 'evergreen-ui';
+import { Pane, Tablist, SidebarTab, SelectField, Checkbox, TextInputField, Button, TickIcon, Paragraph, toaster, HeartIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv } from 'helpers/debug';
 import { Mode, Action, modes, actions, defaultAction, defaultMode, defaultBlacklist, defaultWhitelist, defaultSchedule, defaultUnblockOnceTimeout } from 'helpers/block';
 import { sendMessage, storage } from 'helpers/webext';
 import { DaysOfWeek } from 'helpers/date';
 import { hash } from 'helpers/crypt';
-import { SwitchField, SegmentedControlField, TimeField, PasswordField, MultiSelectField, WebsiteList, NumberField } from 'components';
+import { Header, SwitchField, SegmentedControlField, TimeField, PasswordField, MultiSelectField, WebsiteList, NumberField } from 'components';
+import { version } from '../../../package.json';
 import _ from 'lodash';
 import './styles.scss';
 
@@ -26,11 +27,12 @@ export class Settings extends Component {
         { label: translate('unblocking'), id: 'unblocking', disabled: defaultAction !== Action.blockTab },
         { label: translate('password'), id: 'password' },
         { label: translate('miscellaneous'), id: 'misc' },
+        { label: translate('about'), id: 'about' },
       ],
       allScheduleDays: DaysOfWeek.map(day => ({ label: translate(day), value: day })),
       options: {
         isEnabled: true,
-        mode: defaultMode,
+        mode: '',//defaultMode,
         action: defaultAction,
         blockTab: {
           message: '',
@@ -231,24 +233,36 @@ export class Settings extends Component {
     });
   }
 
+  openDonationLink = () => {
+    window.open('https://www.paypal.com/paypalme/axeldev', '_blank');
+  }
+
   render() {
     return (
       <Pane display="flex" padding={16} minWidth={960} width={1080}>
-        <Tablist flexBasis={240} marginRight={16}>
-          {this.state.tabs.map((tab, index) => (
-            <SidebarTab
-              key={tab.id}
-              id={tab.id}
-              onSelect={() => this.setState({ selectedTabIndex: index })}
-              isSelected={index === this.state.selectedTabIndex}
-              aria-controls={`panel-${tab.id}`}
-              fontSize={14}
-              disabled={tab.disabled}
-            >
-              {tab.label}
-            </SidebarTab>
-          ))}
-        </Tablist>
+        <Pane width={250}>
+          <Header
+            height={50}
+            justifyContent="start"
+            marginBottom={10}
+            noBorderBottom
+          />
+          <Tablist flexBasis={240} marginRight={16}>
+            {this.state.tabs.map((tab, index) => (
+              <SidebarTab
+                key={tab.id}
+                id={tab.id}
+                onSelect={() => this.setState({ selectedTabIndex: index })}
+                isSelected={index === this.state.selectedTabIndex}
+                aria-controls={`panel-${tab.id}`}
+                fontSize={14}
+                disabled={tab.disabled}
+              >
+                {tab.label}
+              </SidebarTab>
+            ))}
+          </Tablist>
+        </Pane>
         <Pane flex="1">
           <Pane padding={16} border="muted">
             {this.state.tabs.map((tab, index) => (
@@ -423,7 +437,7 @@ export class Settings extends Component {
                       marginBottom={16}
                     />
                     <PasswordField
-                      label={`${translate(this.state.options.password.isSet ? 'changePassword' : 'password')}:`}
+                      label={`${translate(this.state.options.password.isSet ? 'changePassword' : 'password')}`}
                       tooltip={this.state.options.password.isSet ? translate('changePasswordTooltip') : null}
                       onChange={event => this.setOptions('password.value', event.target.value)}
                       disabled={!this.state.options.password.isEnabled}
@@ -441,18 +455,47 @@ export class Settings extends Component {
                     />
                   </Fragment>
                 )}
+                {tab.id === 'about' && (
+                  <div className="about">
+                    <h3 className="title">
+                      {translate('appName')}
+                    </h3>
+                    <div className="block">
+                      <div className="text">
+                        {translate('appDesc')}
+                      </div>
+                      <a className="link" href="https://github.com/AXeL-dev/distract-me-not/releases" target="_blank">{`${translate('version')} ${version}`}</a>
+                      <a className="link" href="https://github.com/AXeL-dev/distract-me-not/blob/master/LICENSE" target="_blank">{translate('license')}</a>
+                      <a className="link" href="https://github.com/AXeL-dev/distract-me-not" target="_blank">Github</a>
+                    </div>
+                    <div className="small-text">
+                      {translate('supportDeveloper')}
+                    </div>
+                  </div>
+                )}
               </Pane>
             ))}
           </Pane>
           <Pane display="flex" alignItems="center" justifyContent="center" marginTop={16}>
-            <Button
-              height={32}
-              appearance="primary"
-              iconBefore={TickIcon}
-              onClick={this.save}
-            >
-              {translate('save')}
-            </Button>
+            {this.state.selectedTabIndex === this.state.tabs.findIndex(tab => tab.id === 'about') ? (
+              <Button
+                height={32}
+                appearance="primary"
+                iconBefore={HeartIcon}
+                onClick={this.openDonationLink}
+              >
+                {translate('donate')}
+              </Button>
+            ) : (
+              <Button
+                height={32}
+                appearance="primary"
+                iconBefore={TickIcon}
+                onClick={this.save}
+              >
+                {translate('save')}
+              </Button>
+            )}
           </Pane>
         </Pane>
       </Pane>
