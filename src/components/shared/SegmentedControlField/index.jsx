@@ -5,10 +5,10 @@ import './styles.scss';
 
 export function SegmentedControlField(props) {
   const options = props.options.map((option) => ({
-    label: props.showTooltips ? <TooltipLabel
+    label: props.showTooltips && option.tooltip ? <TooltipLabel
       text={option.label}
       tooltip={option.tooltip}
-      size="inherit"
+      size={300}
       color="inherit"
     /> : option.label,
     value: option.value,

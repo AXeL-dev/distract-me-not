@@ -14,7 +14,7 @@ exports[`renders panel correctly 1`] = `
         src="icons/magnet-256.png"
       />
       <h2
-        class="cursor-default ub-mt_0px ub-mb_0px ub-fnt-sze_20px ub-f-wght_bold ub-ln-ht_24px ub-ltr-spc_-0-07px ub-fnt-fam_wm9v6k ub-color_234361 ub-h_initial ub-box-szg_border-box"
+        class="cursor-default ub-mt_0px ub-mb_0px ub-fnt-sze_20px ub-f-wght_bold ub-ln-ht_24px ub-ltr-spc_-0-07px ub-fnt-fam_v92vt9 ub-color_333 ub-box-szg_border-box"
       >
         appName
       </h2>
@@ -97,10 +97,9 @@ exports[`renders panel correctly 1`] = `
         >
           <div
             class="css-3grw6g css-4b8qak ub-btlr_3px ub-bblr_3px ub-box-szg_border-box"
-            data-active="true"
+            data-active="false"
           >
             <input
-              checked=""
               class="css-87b09r"
               id="SegmentedControl-10"
               name="mode"
@@ -208,12 +207,12 @@ exports[`renders panel correctly 1`] = `
           >
             <svg
               class="ub-w_20px ub-h_20px ub-box-szg_border-box"
-              data-icon="heart"
+              data-icon="issue-new"
               style="fill: #4E4E50;"
               viewBox="0 0 20 20"
             >
               <path
-                d="M20 6.25C20 3.35 17.65 1 14.75 1c-1.02 0-1.95.31-2.75.82v-.04c-.09.06-.17.12-.26.19-.04.03-.09.06-.14.1-.68.51-1.24 1.18-1.6 1.96-.4-.86-1.04-1.57-1.8-2.1-.04-.02-.07-.05-.1-.08a7 7 0 00-.6-.33c-.13-.04-.23-.1-.35-.15-.05-.02-.1-.05-.15-.07v.02C6.45 1.13 5.87 1 5.25 1A5.25 5.25 0 000 6.25c0 .09.01.17.01.25H0c0 .06.01.12.02.18s.01.12.02.18C.13 7.89.44 9 1.07 10.17 2.23 12.33 4.1 14.11 7 16.53v.01c.9.75 1.89 1.55 3 2.46.71-.58 1.38-1.12 2-1.63 3.48-2.86 5.64-4.78 6.93-7.18.63-1.17.94-2.27 1.03-3.3.01-.07.01-.14.02-.21 0-.06.01-.11.02-.17h-.01c0-.09.01-.17.01-.26z"
+                d="M13.167.512a2.98 2.98 0 00-.131.524c-.74.115-1.39.5-1.848 1.052a8 8 0 106.724 6.724 2.997 2.997 0 001.052-1.848 2.98 2.98 0 00.524-.13A9.99 9.99 0 0120 10c0 5.523-4.477 10-10 10S0 15.523 0 10 4.477 0 10 0a9.99 9.99 0 013.167.512zM11 16H9v-2h2v2zm0-3H9V4h2v9zm6-10h1.5a1 1 0 010 2H17v1.5a1 1 0 01-2 0V5h-1.5a1 1 0 010-2H15V1.5a1 1 0 012 0V3z"
                 fill-rule="evenodd"
               />
             </svg>

@@ -11,7 +11,7 @@ exports[`renders correctly 1`] = `
       src="icons/magnet-256.png"
     />
     <h2
-      class="cursor-default ub-mt_0px ub-mb_0px ub-fnt-sze_20px ub-f-wght_bold ub-ln-ht_24px ub-ltr-spc_-0-07px ub-fnt-fam_wm9v6k ub-color_234361 ub-h_initial ub-box-szg_border-box"
+      class="cursor-default ub-mt_0px ub-mb_0px ub-fnt-sze_20px ub-f-wght_bold ub-ln-ht_24px ub-ltr-spc_-0-07px ub-fnt-fam_v92vt9 ub-color_333 ub-box-szg_border-box"
     >
       appName
     </h2>
