@@ -95,8 +95,8 @@ export class Panel extends Component {
             storage.get({
               blacklist: defaultBlacklist
             }).then(({ blacklist }) => {
-              for (let index in blacklist) {
-                if (blacklist[index].indexOf(pattern) >= 0) {
+              for (const url of blacklist) {
+                if (url === pattern) {
                   return;
                 }
               }
@@ -110,8 +110,8 @@ export class Panel extends Component {
             storage.get({
               whitelist: defaultWhitelist
             }).then(({ whitelist }) => {
-              for (let index in whitelist) {
-                if (whitelist[index].indexOf(pattern) >= 0) {
+              for (const url of whitelist) {
+                if (url === pattern) {
                   return;
                 }
               }
