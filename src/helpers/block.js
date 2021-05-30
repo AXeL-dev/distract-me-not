@@ -16,7 +16,7 @@ export const Action = {
 export const modes = [
   { label: translate('blacklist'), value: Mode.blacklist },
   { label: translate('whitelist'), value: Mode.whitelist },
-  { label: translate('combined'), value: Mode.combined },
+  { label: translate('combined'), value: Mode.combined, tooltip: translate('combinedDescription') },
 ];
 
 export const actions = [

@@ -291,6 +291,7 @@ export class Settings extends Component {
                       onChange={this.changeMode}
                       width={300}
                       marginBottom={this.state.options.isEnabled ? 16 : 0}
+                      showTooltips
                     />
                     {this.state.options.isEnabled && (
                       <Fragment>
