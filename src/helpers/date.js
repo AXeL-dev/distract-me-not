@@ -28,3 +28,8 @@ export function inToday(days) {
   const day = now.getDay();
   return !!days.find(d => DaysNumbers[d] === day);
 }
+
+export function now(asTimestamp = false) {
+  const date = new Date();
+  return asTimestamp ? date.getTime() : date;
+}

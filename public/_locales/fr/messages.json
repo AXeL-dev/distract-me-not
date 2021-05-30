@@ -68,6 +68,12 @@
     "clear": {
         "message": "Effacer"
     },
+    "blocked": {
+        "message": "Bloquée"
+    },
+    "allowed": {
+        "message": "Permise"
+    },
     "addToBlacklist": {
         "message": "Ajouter le site web actuel à la liste noire"
     },
@@ -223,6 +229,12 @@
     },
     "show": {
         "message": "Afficher"
+    },
+    "hide": {
+        "message": "Cacher"
+    },
+    "date": {
+        "message": "Date"
     },
     "filter": {
         "message": "Filtrer"

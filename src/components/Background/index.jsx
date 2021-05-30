@@ -7,7 +7,7 @@ import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
 import { regex } from 'helpers/regex';
 import { logger } from 'helpers/logger';
 import { inTime } from 'helpers/time';
-import { inToday } from 'helpers/date';
+import { inToday, now } from 'helpers/date';
 
 export class Background extends Component {
 
@@ -365,7 +365,7 @@ export class Background extends Component {
         break;
     }
     // Log url
-    logger.add({ url: data.url, blocked: shouldBlock });
+    logger.add({ url: data.url, blocked: shouldBlock, date: now(true) });
     // Execute action
     if (shouldBlock) {
       return this.handleAction(data);

@@ -266,7 +266,7 @@ export class WebsiteList extends Component {
     });
   }
 
-  renderColumnSortButton = ({ order, label }) => {
+  renderColumnSortButton = ({ orderedColumn, label }) => {
     return (
       <Popover
         position={Position.BOTTOM_LEFT}
@@ -280,15 +280,15 @@ export class WebsiteList extends Component {
                 { label: translate('descending'), value: Order.DESC }
               ]}
               selected={
-                this.state.orderedColumn === order ? this.state.ordering : null
+                this.state.orderedColumn === orderedColumn ? this.state.ordering : null
               }
               onChange={value => {
                 this.setState({
-                  orderedColumn: order,
+                  orderedColumn,
                   ordering: value
-                })
+                });
                 // Close the popover when you select a value.
-                close()
+                close();
               }}
             />
           </Menu>
@@ -296,7 +296,7 @@ export class WebsiteList extends Component {
       >
         <TextDropdownButton
           icon={
-            this.state.orderedColumn === order
+            this.state.orderedColumn === orderedColumn
               ? this.getIconForOrder(this.state.ordering)
               : CaretDownIcon
           }
@@ -305,14 +305,6 @@ export class WebsiteList extends Component {
           {label}
         </TextDropdownButton>
       </Popover>
-    )
-  }
-
-  renderColumnTableHeaderCell = ({ order, label }) => {
-    return (
-      <Table.TextHeaderCell>
-        {this.renderColumnSortButton({ order: order, label: label })}
-      </Table.TextHeaderCell>
     )
   }
 
@@ -434,7 +426,7 @@ export class WebsiteList extends Component {
               placeholder={translate('filter') + '...'}
             />
             <Table.HeaderCell flex="none">
-              {this.renderColumnSortButton({ order: 1 })}
+              {this.renderColumnSortButton({ orderedColumn: 1 })}
             </Table.HeaderCell>
             <Table.HeaderCell width={48} flex="none">
               <Popover

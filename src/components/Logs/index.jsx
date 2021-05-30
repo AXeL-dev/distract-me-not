@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { filter } from 'fuzzaldrin-plus';
+import { format } from 'date-fns';
 import {
   Pane,
   Table,
@@ -17,6 +18,7 @@ import {
   BanCircleIcon,
   RefreshIcon,
   EraserIcon,
+  TimeIcon,
 } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { logger } from 'helpers/logger';
@@ -37,6 +39,7 @@ export class Logs extends Component {
       searchQuery: '',
       orderedColumn: 1,
       scrollToIndex: null,
+      showDate: false,
       ordering: Order.NONE,
     };
   }
@@ -121,7 +124,7 @@ export class Logs extends Component {
     this.setState({ searchQuery: value });
   }
 
-  renderColumnSortButton = ({ order, label }) => {
+  renderColumnSortButton = ({ orderedColumn, label }) => {
     return (
       <Popover
         position={Position.BOTTOM_LEFT}
@@ -135,15 +138,15 @@ export class Logs extends Component {
                 { label: translate('descending'), value: Order.DESC }
               ]}
               selected={
-                this.state.orderedColumn === order ? this.state.ordering : null
+                this.state.orderedColumn === orderedColumn ? this.state.ordering : null
               }
               onChange={value => {
                 this.setState({
-                  orderedColumn: order,
+                  orderedColumn,
                   ordering: value
-                })
+                });
                 // Close the popover when you select a value.
-                close()
+                close();
               }}
             />
           </Menu>
@@ -151,7 +154,7 @@ export class Logs extends Component {
       >
         <TextDropdownButton
           icon={
-            this.state.orderedColumn === order
+            this.state.orderedColumn === orderedColumn
               ? this.getIconForOrder(this.state.ordering)
               : CaretDownIcon
           }
@@ -163,11 +166,33 @@ export class Logs extends Component {
     )
   }
 
-  renderColumnTableHeaderCell = ({ order, label }) => {
+  renderColumnDateButton = ({ label } = {}) => {
     return (
-      <Table.TextHeaderCell>
-        {this.renderColumnSortButton({ order: order, label: label })}
-      </Table.TextHeaderCell>
+      <Popover
+        position={Position.BOTTOM_LEFT}
+        minWidth={160}
+        content={({ close }) => (
+          <Menu>
+            <Menu.OptionsGroup
+              title={translate('date')}
+              options={[
+                { label: translate('show'), value: true },
+                { label: translate('hide'), value: false }
+              ]}
+              selected={this.state.showDate}
+              onChange={value => {
+                this.setState({ showDate: value });
+                // Close the popover when you select a value.
+                close();
+              }}
+            />
+          </Menu>
+        )}
+      >
+        <TextDropdownButton icon={TimeIcon} data-testid="date-button">
+          {label}
+        </TextDropdownButton>
+      </Popover>
     )
   }
 
@@ -202,11 +227,21 @@ export class Logs extends Component {
   renderRow = ({ row }) => {
     return (
       <Table.Row key={row.id} height={38}>
-        <Table.Cell flex="none" display="flex" alignItems="center">
+        <Table.Cell
+          flex="none"
+          display="flex"
+          alignItems="center"
+          title={translate(row.blocked ? 'blocked' : 'allowed')}
+        >
           {row.blocked ? (
             <BanCircleIcon color="#dc3545" size={16} />
           ) : (
             <TickCircleIcon color="#28a745" size={16} />
+          )}
+          {this.state.showDate && row.date && (
+            <Text marginLeft={8} size={300} fontWeight={500} data-testid="date">
+              {format(new Date(row.date), 'dd/MM/yyyy HH:mm:ss')}
+            </Text>
           )}
           <Text marginLeft={8} size={300} fontWeight={500} data-testid="url">
             {row.url}
@@ -229,7 +264,10 @@ export class Logs extends Component {
               placeholder={translate('filter') + '...'}
             />
             <Table.HeaderCell flex="none">
-              {this.renderColumnSortButton({ order: 1 })}
+              {this.renderColumnSortButton({ orderedColumn: 1 })}
+            </Table.HeaderCell>
+            <Table.HeaderCell flex="none">
+              {this.renderColumnDateButton()}
             </Table.HeaderCell>
             <Table.HeaderCell width={48} flex="none">
               <Popover
