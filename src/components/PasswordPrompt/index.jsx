@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { Pane, TextInput, UnlockIcon, toaster } from 'evergreen-ui';
+import { Pane, TextInput, UnlockIcon, toaster, HistoryIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { storage } from 'helpers/webext';
 import { compare } from 'helpers/crypt';
 import { debug } from 'helpers/debug';
-import { Header, IconButton, SettingsButton } from 'components';
+import { Header, IconButton, SettingsButton, LinkIconButton } from 'components';
 
 const defaultHash = process.env.REACT_APP_HASH;
 
@@ -145,7 +145,15 @@ export class PasswordPrompt extends Component {
         </Pane>
         {this.props.hasFooter && (
           <Pane display="flex" paddingX={16} paddingY={10} alignItems="start" justifyContent="space-between" borderTop>
-            <SettingsButton history={this.props.history} />
+            <Pane display="flex" gap={10}>
+              <SettingsButton history={this.props.history} />
+              <LinkIconButton
+                icon={HistoryIcon}
+                link="/logs"
+                tooltip={translate('logs')}
+                history={this.props.history}
+              />
+            </Pane>
           </Pane>
         )}
       </Pane>
