@@ -142,11 +142,11 @@ export class Background extends Component {
       this.action = items.action;
       this.schedule = { ...this.schedule, ...items.schedule }; // merge
       this.redirectUrl = getValidUrl(items.redirectUrl);
-      this.isEnabled = items.isEnabled;
-      if (this.isEnabled) {
-        this.enable();
-      } else if (items.enableOnBrowserStartup) {
-        this.isEnabled = true;
+      if (!items.enableOnBrowserStartup) {
+        this.isEnabled = items.isEnabled;
+        if (this.isEnabled) {
+          this.enable();
+        }
       }
     });
     browser.runtime.onStartup.addListener(this.onBrowserStartup);
@@ -165,7 +165,8 @@ export class Background extends Component {
     storage.get({
       enableOnBrowserStartup: false
     }).then(({ enableOnBrowserStartup }) => {
-      if (enableOnBrowserStartup) {
+      if (enableOnBrowserStartup && !this.isEnabled) {
+        this.isEnabled = true;
         this.enable('enabled on startup!');
       }
     });
@@ -206,6 +207,7 @@ export class Background extends Component {
           response = this.isFunction(request.message) ? this.executeFunction(request.message, ...request.params) : this[request.message];
           break;
       }
+      this.debug('response:', response);
       resolve({ response });
     });
   }
