@@ -22,7 +22,7 @@ export class Blocked extends Component {
     const defaultUnblockTime = 10; // min
     this.state = {
       message: props.message || translate('defaultBlockingMessage'),
-      isBlank: props.isBlank || true,
+      isBlank: props.isBlank === undefined ? (isDevEnv ? false : true) : props.isBlank,
       hasUnblockButton: props.hasUnblockButton || isDevEnv, // == isDevEnv ? true : false
       unblockDialog: {
         isShown: false,

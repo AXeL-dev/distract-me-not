@@ -8,7 +8,7 @@ it('renders nothing when isBlank prop is true', () => {
 });
 
 it('renders the provided message prop', () => {
-  render(<Blocked message="Hello world!" />);
+  render(<Blocked message="Hello world!" isBlank={false} />);
   const message = screen.getByText('Hello world!', { selector: '.distract-overlay-top-text' });
   expect(message).toBeInTheDocument();
 });
