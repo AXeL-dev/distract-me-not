@@ -21,10 +21,10 @@ export class Settings extends Component {
       selectedTabIndex: 0,
       tabs: [
         { label: translate('blocking'), id: 'blocking' },
+        { label: translate('unblocking'), id: 'unblocking', disabled: defaultAction !== Action.blockTab },
         { label: translate('schedule'), id: 'schedule' },
         { label: translate('blacklist'), id: 'blacklist', disabled: defaultMode === Mode.whitelist },
         { label: translate('whitelist'), id: 'whitelist', disabled: defaultMode === Mode.blacklist },
-        { label: translate('unblocking'), id: 'unblocking', disabled: defaultAction !== Action.blockTab },
         { label: translate('password'), id: 'password' },
         { label: translate('miscellaneous'), id: 'misc' },
         { label: translate('about'), id: 'about' },
@@ -338,6 +338,35 @@ export class Settings extends Component {
                     )}
                   </Fragment>
                 )}
+                {tab.id === 'unblocking' && (
+                  <Fragment>
+                    <SwitchField
+                      label={translate('enableUnblocking')}
+                      labelSize={300}
+                      labelColor="muted"
+                      tooltip={translate('unblockingDescription')}
+                      checked={this.state.options.unblock.isEnabled}
+                      onChange={event => this.setOptions('unblock.isEnabled', event.target.checked)}
+                      marginBottom={16}
+                    />
+                    <NumberField
+                      label={translate('unblockOnceTimeout')}
+                      min={5}
+                      max={60}
+                      inputWidth={60}
+                      value={this.state.options.unblock.unblockOnceTimeout}
+                      onChange={(value) => this.setOptions('unblock.unblockOnceTimeout', value)}
+                      suffix={translate('seconds')}
+                      disabled={!this.state.options.unblock.isEnabled}
+                    />
+                    <Checkbox
+                      label={translate('requirePasswordToUnblockWebsites')}
+                      checked={this.state.options.unblock.requirePassword}
+                      onChange={event => this.setOptions('unblock.requirePassword', event.target.checked)}
+                      disabled={!this.state.options.unblock.isEnabled || !this.state.options.password.isEnabled}
+                    />
+                  </Fragment>
+                )}
                 {tab.id === 'schedule' && (
                   <Fragment>
                     <SwitchField
@@ -394,35 +423,6 @@ export class Settings extends Component {
                       onChange={list => this.setOptions('whitelist', list)}
                       exportFilename="whitelist.txt"
                       addNewItemsOnTop={true}
-                    />
-                  </Fragment>
-                )}
-                {tab.id === 'unblocking' && (
-                  <Fragment>
-                    <SwitchField
-                      label={translate('enableUnblocking')}
-                      labelSize={300}
-                      labelColor="muted"
-                      tooltip={translate('unblockingDescription')}
-                      checked={this.state.options.unblock.isEnabled}
-                      onChange={event => this.setOptions('unblock.isEnabled', event.target.checked)}
-                      marginBottom={16}
-                    />
-                    <NumberField
-                      label={translate('unblockOnceTimeout')}
-                      min={5}
-                      max={60}
-                      inputWidth={60}
-                      value={this.state.options.unblock.unblockOnceTimeout}
-                      onChange={(value) => this.setOptions('unblock.unblockOnceTimeout', value)}
-                      suffix={translate('seconds')}
-                      disabled={!this.state.options.unblock.isEnabled}
-                    />
-                    <Checkbox
-                      label={translate('requirePasswordToUnblockWebsites')}
-                      checked={this.state.options.unblock.requirePassword}
-                      onChange={event => this.setOptions('unblock.requirePassword', event.target.checked)}
-                      disabled={!this.state.options.unblock.isEnabled || !this.state.options.password.isEnabled}
                     />
                   </Fragment>
                 )}
