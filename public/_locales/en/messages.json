@@ -15,7 +15,7 @@
         "message": "Combined"
     },
     "combinedDescription": {
-        "message": "Combines both blacklist & whitelist modes by ignoring whitelisted websites from the blacklist"
+        "message": "Combines both blacklist & whitelist modes by ignoring whitelisted websites & blocking blacklisted ones"
     },
     "whitelistDescription": {
         "message": "When mode is set to whitelist, you can only visit the following websites:"

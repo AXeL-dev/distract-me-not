@@ -15,7 +15,7 @@
         "message": "Combiné"
     },
     "combinedDescription": {
-        "message": "Combine les modes liste noire et liste blanche en ignorant les sites web en liste blanche de la liste noire"
+        "message": "Combine les modes liste noire et liste blanche en ignorant les sites web sur liste blanche et en bloquant ceux de la liste noire"
     },
     "whitelistDescription": {
         "message": "Quand le mode liste blanche est actif, vous pouvez uniquement visiter les sites web suivants:"
