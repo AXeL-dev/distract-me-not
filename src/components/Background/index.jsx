@@ -23,6 +23,7 @@ export class Background extends Component {
     this.schedule = defaultSchedule;
     this.unblockOnceTimeout = defaultUnblockOnceTimeout;
     // private
+    this.hasBeenEnabledOnStartup = false;
     this.enableLock = false;
     this.tmpAllowed = [];
 
@@ -116,8 +117,7 @@ export class Background extends Component {
       mode: this.mode,
       action: this.action,
       schedule: this.schedule,
-      redirectUrl: this.redirectUrl,
-      enableOnBrowserStartup: false
+      redirectUrl: this.redirectUrl
     }).then((items) => {
       this.debug('items:', items);
       //----- Start backward compatibility with v1
@@ -142,7 +142,7 @@ export class Background extends Component {
       this.action = items.action;
       this.schedule = { ...this.schedule, ...items.schedule }; // merge
       this.redirectUrl = getValidUrl(items.redirectUrl);
-      if (!items.enableOnBrowserStartup) {
+      if (!this.hasBeenEnabledOnStartup) {
         this.isEnabled = items.isEnabled;
         if (this.isEnabled) {
           this.enable();
@@ -166,8 +166,9 @@ export class Background extends Component {
       enableOnBrowserStartup: false
     }).then(({ enableOnBrowserStartup }) => {
       if (enableOnBrowserStartup && !this.isEnabled) {
-        this.isEnabled = true;
         this.enable('enabled on startup!');
+        this.isEnabled = true;
+        this.hasBeenEnabledOnStartup = true;
       }
     });
   }
@@ -426,7 +427,7 @@ export class Background extends Component {
     });
   }
 
-  enable = (logMessage = 'enabled!') => {
+  enable = (debugMessage = 'enabled!') => {
     if (this.enableLock) {
       this.debug('already enabled!', {
         enableLock: this.enableLock
@@ -434,16 +435,16 @@ export class Background extends Component {
     } else {
       this.checkAllTabs();
       this.enableEventListeners();
-      this.debug(logMessage);
+      this.debug(debugMessage);
       this.enableLock = true;
     }
   }
 
-  disable = (logMessage = 'disabled!') => {
+  disable = (debugMessage = 'disabled!') => {
     if (this.enableLock) {
       this.disableEventListeners();
       this.checkAllTabs();
-      this.debug(logMessage);
+      this.debug(debugMessage);
       this.enableLock = false;
     } else {
       this.debug('already disabled!', {
