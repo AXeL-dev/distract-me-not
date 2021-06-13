@@ -6,7 +6,7 @@ export class logger {
     const logs = await this.get();
     logs.unshift(data);
     if (logs.length > 100) {
-      logs.splice(-1 * logs.length - 100);
+      logs.splice(-1 * (logs.length - 100));
     }
     return storage.set({ logs });
   }
