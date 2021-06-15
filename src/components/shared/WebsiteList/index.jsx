@@ -256,7 +256,7 @@ export class WebsiteList extends Component {
 
   import = (file) => {
     readFile(file).then(content => {
-      const list = content && content.length ? content.split("\n") : [];
+      const list = content && content.length ? content.split("\n").filter(url => isUrl(url)) : [];
       if (list.length) {
         // Update list
         this.setList(list);
