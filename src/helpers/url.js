@@ -1,6 +1,6 @@
 
 export function isUrl(url) {
-  return url.match(/(^|\s)((https?:\/\/)?(\*?|[\w-]+)(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi);
+  return url.match(/(^|\s)((https?:\/\/)?(localhost(:\d+)?$|(\*?|[\w-]+)(\.[\w-]+)+\.?(:\d+)?(\/\S*)?))/gi);
 }
 
 export function getHostName(url) {
