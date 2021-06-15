@@ -73,6 +73,7 @@ export class Settings extends Component {
       enableOnBrowserStartup: this.state.options.misc.enableOnBrowserStartup,
       schedule: this.state.options.schedule,
       password: this.state.options.password,
+      unblock: this.state.options.unblock,
       blacklist: defaultBlacklist,
       whitelist: defaultWhitelist,
     }).then(async (items) => {
