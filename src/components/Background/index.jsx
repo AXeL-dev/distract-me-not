@@ -148,9 +148,20 @@ export class Background extends Component {
           this.enable();
         }
       }
+      if (!this.isEnabled) {
+        this.updateIcon();
+      }
     });
     browser.runtime.onStartup.addListener(this.onBrowserStartup);
     browser.runtime.onMessage.addListener(this.handleMessage);
+  }
+
+  updateIcon = () => {
+    browser.browserAction.setIcon({
+      path: {
+        128: this.isEnabled ? 'icons/magnet-256.png' : 'icons/magnet-grayscale-256.png',
+      },
+    });
   }
 
   removeListDuplicates = (list) => {
@@ -166,8 +177,8 @@ export class Background extends Component {
       enableOnBrowserStartup: false
     }).then(({ enableOnBrowserStartup }) => {
       if (enableOnBrowserStartup && !this.isEnabled) {
-        this.enable('enabled on startup!');
         this.isEnabled = true;
+        this.enable('enabled on startup!');
         this.hasBeenEnabledOnStartup = true;
       }
     });
@@ -435,6 +446,7 @@ export class Background extends Component {
     } else {
       this.checkAllTabs();
       this.enableEventListeners();
+      this.updateIcon();
       this.debug(debugMessage);
       this.enableLock = true;
     }
@@ -444,6 +456,7 @@ export class Background extends Component {
     if (this.enableLock) {
       this.disableEventListeners();
       this.checkAllTabs();
+      this.updateIcon();
       this.debug(debugMessage);
       this.enableLock = false;
     } else {
