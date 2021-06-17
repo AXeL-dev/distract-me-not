@@ -158,8 +158,18 @@ export class Background extends Component {
 
   updateIcon = () => {
     browser.browserAction.setIcon({
-      path: {
-        128: this.isEnabled ? 'icons/magnet-256.png' : 'icons/magnet-grayscale-256.png',
+      path: this.isEnabled ? {
+        '16': 'icons/magnet-16.png',
+        '32': 'icons/magnet-32.png',
+        '48': 'icons/magnet-48.png',
+        '64': 'icons/magnet-64.png',
+        '128': 'icons/magnet-128.png',
+      } : {
+        '16': 'icons/magnet-grayscale-16.png',
+        '32': 'icons/magnet-grayscale-32.png',
+        '48': 'icons/magnet-grayscale-48.png',
+        '64': 'icons/magnet-grayscale-64.png',
+        '128': 'icons/magnet-grayscale-128.png',
       },
     });
   }

@@ -7,13 +7,17 @@
   "default_locale": "en",
   "description": "__MSG_appDesc__",
   "icons": {
-    "128": "icons/magnet-256.png"
+    "16": "icons/magnet-16.png",
+    "32": "icons/magnet-32.png",
+    "48": "icons/magnet-48.png",
+    "64": "icons/magnet-64.png",
+    "128": "icons/magnet-128.png"
   },
 
   "web_accessible_resources":["index.html"],
 
   "browser_action": {
-    "default_icon": "icons/magnet-256.png",
+    "default_icon": "icons/magnet-128.png",
     "default_popup": "index.html"
   },
 
