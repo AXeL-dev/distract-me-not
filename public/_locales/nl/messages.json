@@ -1,299 +1,299 @@
 {
-    "appName": {
-        "message": "Niet storen s.v.p."
-    },
-    "appDesc": {
-        "message": "Laat de wereld je niet afleiden."
-    },
-    "blacklist": {
-        "message": "Zwarte lijst"
-    },
-    "whitelist": {
-        "message": "Witte lijst"
-    },
-    "combined": {
-        "message": "Gecombineerd"
-    },
-    "combinedDescription": {
-        "message": "Combineert de zwarte en witte lijst door websites op de witte lijst te negeren en websites op de zwarte lijst te blokkeren"
-    },
-    "whitelistDescription": {
-        "message": "Schakel de witte lijst in om alleen de volgende websites te bezoeken:"
-    },
-    "blacklistDescription": {
-        "message": "Schakel de zwarte lijst in om de volgende websites niet te bezoeken:"
-    },
-    "websiteUrlPlaceholder": {
-        "message": "Voer de volledige website-url in"
-    },
-    "blockingMessage": {
-        "message": "Bericht"
-    },
-    "defaultBlockingMessage": {
-        "message": "Waar denk je naartoe te gaan?"
-    },
-    "displayBlankPage": {
-        "message": "Blanco pagina tonen"
-    },
-    "settings": {
-        "message": "Instellingen"
-    },
-    "logs": {
-        "message": "Logboek"
-    },
-    "donate": {
-        "message": "Doneren"
-    },
-    "help": {
-        "message": "Hulp nodig?"
-    },
-    "about": {
-        "message": "Over"    },
-    },
-    "version": {
-        "message": "Versie"
-    },
-    "license": {
-        "message": "Licentie"
-    },
-    "supportDeveloper": {
-        "message": "*Overweeg om een donatie te doen aan de ontwikkelaar."
-    },
-    "reportIssue": {
-        "message": "Probleem melden"
-    },
-    "refresh": {
-        "message": "Verversen"
-    },
-    "clear": {
-        "message": "Wissen"
-    },
-    "blocked": {
-        "message": "Geblokkeerd"
-    },
-    "allowed": {
-        "message": "Toegestaan"
-    },
-    "addToBlacklist": {
-        "message": "Huidige website toevoegen aan zwarte lijst"
-    },
-    "addToWhitelist": {
-        "message": "Huidige website toevoegen aan witte lijst"
-    },
-    "status": {
-        "message": "Status"
-    },
-    "mode": {
-        "message": "Modus"
-    },
-    "defaultAction": {
-        "message": "Standaardactie"
-    },
-    "blockTab": {
-        "message": "Blokkeren"
-    },
-    "redirectToUrl": {
-        "message": "Doorsturen naar url"
-    },
-    "closeTab": {
-        "message": "Tabblad sluiten"
-    },
-    "url": {
-        "message": "URL"
-    },
-    "redirectUrlExample": {
-        "message": "Voorbeelden: about:blank, https://www.google.nl, …"
-    },
-    "urlExample": {
-        "message": "Voorbeelden: www.facebook.com, www.youtube.com, …"
-    },
-    "urlIsNotValid": {
-        "message": "De url is ongeldig"
-    },
-    "urlAlreadyExists": {
-        "message": "De url is al toegevoegd."
-    },
-    "copiedToClipboard": {
-        "message": "De url is gekopieerd naar het klembord!"
-    },
-    "enableOnBrowserStartup": {
-        "message": "Automatisch opstarten"
-    },
-    "import": {
-        "message": "Importeren"
-    },
-    "export": {
-        "message": "Exporteren"
-    },
-    "blocking": {
-        "message": "Blokkering"
-    },
-    "blockingBlacklistDescription": {
-        "message": "Kies welke actie moet worden genomen bij websites op de zwarte lijst:"
-    },
-    "blockingWhitelistDescription": {
-        "message": "Kies welke actie moet worden genomen bij websites op de witte lijst:"
-    },
-    "unblocking": {
-        "message": "Deblokkeren"
-    },
-    "enableUnblocking": {
-        "message": "Deblokkeren inschakelen"
-    },
-    "unblockingDescription": {
-        "message": "Toont een knop ‘Deblokkeren’ op geblokkeerde websites"
-    },
-    "requirePasswordToUnblockWebsites": {
-        "message": "Wachtwoord vereisen om websites te ontgrendelen"
-    },
-    "schedule": {
-        "message": "Planning"
-    },
-    "scheduleDescription": {
-        "message": "Blokkeertijd inplannen"
-    },
-    "scheduleStartTime": {
-        "message": "Begintijd"
-    },
-    "scheduleEndTime": {
-        "message": "Eindtijd"
-    },
-    "scheduleDays": {
-        "message": "Dagen"
-    },
-    "scheduleDaysDescription": {
-        "message": "De dagen waarop blokkering moet worden ingeschakeld. Als je geen tijd opgeeft, dan is de blokkade de hele dag actief."
-    },
-    "miscellaneous": {
-        "message": "Overig"
-    },
-    "password": {
-        "message": "Wachtwoord"
-    },
-    "changePassword": {
-        "message": "Wachtwoord wijzigen"
-    },
-    "changePasswordTooltip": {
-        "message": "Laat leeg om het oude wachtwoord te behouden."
-    },
-    "passwordDescription": {
-        "message": "Vergrendelt toegang tot de instellingen met een wachtwoord."
-    },
-    "enablePasswordProtection": {
-        "message": "Wachtwoordbeveiliging inschakelen"
-    },
-    "passwordIsShort": {
-        "message": "Het wachtwoord moet minimaal 8 tekens bevatten."
-    },
-    "passwordIsWrong": {
-        "message": "Het wachtwoord is onjuist!"
-    },
-    "enable": {
-        "message": "Inschakelen"
-    },
-    "addWebsite": {
-        "message": "Website toevoegen"
-    },
-    "addWebsiteHint": {
-        "message": "Gebruik jokertekens om subdomeinen of -pagina's overeen te laten komen, bijv.: <b>*.voorbeeld.nl</b>, <b>voorbeeld.nl/blog/*</b>, <b>voorbeeld.nl/exacte-link&#36;</b>"
-    },
-    "add": {
-        "message": "Toevoegen"
-    },
-    "save": {
-        "message": "Opslaan"
-    },
-    "settingsSaved": {
-        "message": "De instellingen zijn opgeslagen!"
-    },
-    "copy": {
-        "message": "Kopiëren"
-    },
-    "edit": {
-        "message": "Bewerken"
-    },
-    "duplicate": {
-        "message": "Klonen"
-    },
-    "delete": {
-        "message": "Verwijderen"
-    },
-    "order": {
-        "message": "Volgorde"
-    },
-    "ascending": {
-        "message": "Oplopend"
-    },
-    "descending": {
-        "message": "Aflopend"
-    },
-    "show": {
-        "message": "Tonen"
-    },
-    "hide": {
-        "message": "Verbergen"
-    },
-    "date": {
-        "message": "Datum"
-    },
-    "filter": {
-        "message": "Filteren"
-    },
-    "close": {
-        "message": "Sluiten"
-    },
-    "cancel": {
-        "message": "Annuleren"
-    },
-    "monday": {
-        "message": "maandag"
-    },
-    "tuesday": {
-        "message": "dinsdag"
-    },
-    "wednesday": {
-        "message": "woensdag"
-    },
-    "thursday": {
-        "message": "donderdag"
-    },
-    "friday": {
-        "message": "vrijdag"
-    },
-    "saturday": {
-        "message": "zaterdag"
-    },
-    "sunday": {
-        "message": "zondag"
-    },
-    "select": {
-        "message": "Selecteren…"
-    },
-    "dayEnd": {
-        "message": "Einde van de dag"
-    },
-    "dayOff": {
-        "message": "ADV-dag"
-    },
-    "enabled": {
-        "message": "Ingeschakeld"
-    },
-    "unblock": {
-        "message": "Deblokkeren"
-    },
-    "unblockOnce": {
-        "message": "Eenmalig deblokkeren"
-    },
-    "unblockFor": {
-        "message": "Deblokkeren gedurende"
-    },
-    "unblockOnceTimeout": {
-        "message": "Eenmalig deblokkeren gedurende"
-    },
-    "minutes": {
-        "message": "minute(n)"
-    },
-    "seconds": {
-        "message": "second(en)"
-    }
+  "appName": {
+    "message": "Niet storen s.v.p."
+  },
+  "appDesc": {
+    "message": "Laat de wereld je niet afleiden."
+  },
+  "blacklist": {
+    "message": "Zwarte lijst"
+  },
+  "whitelist": {
+    "message": "Witte lijst"
+  },
+  "combined": {
+    "message": "Gecombineerd"
+  },
+  "combinedDescription": {
+    "message": "Combineert de zwarte en witte lijst door websites op de witte lijst te negeren en websites op de zwarte lijst te blokkeren"
+  },
+  "whitelistDescription": {
+    "message": "Schakel de witte lijst in om alleen de volgende websites te bezoeken:"
+  },
+  "blacklistDescription": {
+    "message": "Schakel de zwarte lijst in om de volgende websites niet te bezoeken:"
+  },
+  "websiteUrlPlaceholder": {
+    "message": "Voer de volledige website-url in"
+  },
+  "blockingMessage": {
+    "message": "Bericht"
+  },
+  "defaultBlockingMessage": {
+    "message": "Waar denk je naartoe te gaan?"
+  },
+  "displayBlankPage": {
+    "message": "Blanco pagina tonen"
+  },
+  "settings": {
+    "message": "Instellingen"
+  },
+  "logs": {
+    "message": "Logboek"
+  },
+  "donate": {
+    "message": "Doneren"
+  },
+  "help": {
+    "message": "Hulp nodig?"
+  },
+  "about": {
+    "message": "Over"
+  },
+  "version": {
+    "message": "Versie"
+  },
+  "license": {
+    "message": "Licentie"
+  },
+  "supportDeveloper": {
+    "message": "*Overweeg om een donatie te doen aan de ontwikkelaar."
+  },
+  "reportIssue": {
+    "message": "Probleem melden"
+  },
+  "refresh": {
+    "message": "Verversen"
+  },
+  "clear": {
+    "message": "Wissen"
+  },
+  "blocked": {
+    "message": "Geblokkeerd"
+  },
+  "allowed": {
+    "message": "Toegestaan"
+  },
+  "addToBlacklist": {
+    "message": "Huidige website toevoegen aan zwarte lijst"
+  },
+  "addToWhitelist": {
+    "message": "Huidige website toevoegen aan witte lijst"
+  },
+  "status": {
+    "message": "Status"
+  },
+  "mode": {
+    "message": "Modus"
+  },
+  "defaultAction": {
+    "message": "Standaardactie"
+  },
+  "blockTab": {
+    "message": "Blokkeren"
+  },
+  "redirectToUrl": {
+    "message": "Doorsturen naar url"
+  },
+  "closeTab": {
+    "message": "Tabblad sluiten"
+  },
+  "url": {
+    "message": "URL"
+  },
+  "redirectUrlExample": {
+    "message": "Voorbeelden: about:blank, https://www.google.nl, …"
+  },
+  "urlExample": {
+    "message": "Voorbeelden: www.facebook.com, www.youtube.com, …"
+  },
+  "urlIsNotValid": {
+    "message": "De url is ongeldig"
+  },
+  "urlAlreadyExists": {
+    "message": "De url is al toegevoegd."
+  },
+  "copiedToClipboard": {
+    "message": "De url is gekopieerd naar het klembord!"
+  },
+  "enableOnBrowserStartup": {
+    "message": "Automatisch opstarten"
+  },
+  "import": {
+    "message": "Importeren"
+  },
+  "export": {
+    "message": "Exporteren"
+  },
+  "blocking": {
+    "message": "Blokkering"
+  },
+  "blockingBlacklistDescription": {
+    "message": "Kies welke actie moet worden genomen bij websites op de zwarte lijst:"
+  },
+  "blockingWhitelistDescription": {
+    "message": "Kies welke actie moet worden genomen bij websites op de witte lijst:"
+  },
+  "unblocking": {
+    "message": "Deblokkeren"
+  },
+  "enableUnblocking": {
+    "message": "Deblokkeren inschakelen"
+  },
+  "unblockingDescription": {
+    "message": "Toont een knop ‘Deblokkeren’ op geblokkeerde websites"
+  },
+  "requirePasswordToUnblockWebsites": {
+    "message": "Wachtwoord vereisen om websites te ontgrendelen"
+  },
+  "schedule": {
+    "message": "Planning"
+  },
+  "scheduleDescription": {
+    "message": "Blokkeertijd inplannen"
+  },
+  "scheduleStartTime": {
+    "message": "Begintijd"
+  },
+  "scheduleEndTime": {
+    "message": "Eindtijd"
+  },
+  "scheduleDays": {
+    "message": "Dagen"
+  },
+  "scheduleDaysDescription": {
+    "message": "De dagen waarop blokkering moet worden ingeschakeld. Als je geen tijd opgeeft, dan is de blokkade de hele dag actief."
+  },
+  "miscellaneous": {
+    "message": "Overig"
+  },
+  "password": {
+    "message": "Wachtwoord"
+  },
+  "changePassword": {
+    "message": "Wachtwoord wijzigen"
+  },
+  "changePasswordTooltip": {
+    "message": "Laat leeg om het oude wachtwoord te behouden."
+  },
+  "passwordDescription": {
+    "message": "Vergrendelt toegang tot de instellingen met een wachtwoord."
+  },
+  "enablePasswordProtection": {
+    "message": "Wachtwoordbeveiliging inschakelen"
+  },
+  "passwordIsShort": {
+    "message": "Het wachtwoord moet minimaal 8 tekens bevatten."
+  },
+  "passwordIsWrong": {
+    "message": "Het wachtwoord is onjuist!"
+  },
+  "enable": {
+    "message": "Inschakelen"
+  },
+  "addWebsite": {
+    "message": "Website toevoegen"
+  },
+  "addWebsiteHint": {
+    "message": "Gebruik jokertekens om subdomeinen of -pagina's overeen te laten komen, bijv.: <b>*.voorbeeld.nl</b>, <b>voorbeeld.nl/blog/*</b>, <b>voorbeeld.nl/exacte-link&#36;</b>"
+  },
+  "add": {
+    "message": "Toevoegen"
+  },
+  "save": {
+    "message": "Opslaan"
+  },
+  "settingsSaved": {
+    "message": "De instellingen zijn opgeslagen!"
+  },
+  "copy": {
+    "message": "Kopiëren"
+  },
+  "edit": {
+    "message": "Bewerken"
+  },
+  "duplicate": {
+    "message": "Klonen"
+  },
+  "delete": {
+    "message": "Verwijderen"
+  },
+  "order": {
+    "message": "Volgorde"
+  },
+  "ascending": {
+    "message": "Oplopend"
+  },
+  "descending": {
+    "message": "Aflopend"
+  },
+  "show": {
+    "message": "Tonen"
+  },
+  "hide": {
+    "message": "Verbergen"
+  },
+  "date": {
+    "message": "Datum"
+  },
+  "filter": {
+    "message": "Filteren"
+  },
+  "close": {
+    "message": "Sluiten"
+  },
+  "cancel": {
+    "message": "Annuleren"
+  },
+  "monday": {
+    "message": "maandag"
+  },
+  "tuesday": {
+    "message": "dinsdag"
+  },
+  "wednesday": {
+    "message": "woensdag"
+  },
+  "thursday": {
+    "message": "donderdag"
+  },
+  "friday": {
+    "message": "vrijdag"
+  },
+  "saturday": {
+    "message": "zaterdag"
+  },
+  "sunday": {
+    "message": "zondag"
+  },
+  "select": {
+    "message": "Selecteren…"
+  },
+  "dayEnd": {
+    "message": "Einde van de dag"
+  },
+  "dayOff": {
+    "message": "ADV-dag"
+  },
+  "enabled": {
+    "message": "Ingeschakeld"
+  },
+  "unblock": {
+    "message": "Deblokkeren"
+  },
+  "unblockOnce": {
+    "message": "Eenmalig deblokkeren"
+  },
+  "unblockFor": {
+    "message": "Deblokkeren gedurende"
+  },
+  "unblockOnceTimeout": {
+    "message": "Eenmalig deblokkeren gedurende"
+  },
+  "minutes": {
+    "message": "minute(n)"
+  },
+  "seconds": {
+    "message": "second(en)"
+  }
 }
