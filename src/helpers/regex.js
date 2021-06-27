@@ -31,3 +31,7 @@ export class regex {
   }
 
 }
+
+export function transformList(list) {
+  return list.map(url => regex.wildcard(url)).map(url => regex.new(url));
+}

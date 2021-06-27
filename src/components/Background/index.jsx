@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { storage, nativeAPI, indexUrl } from 'helpers/webext';
 import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule, unblockOptions, defaultUnblockOnceTimeout, isAccessible } from 'helpers/block';
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
-import { regex } from 'helpers/regex';
+import { transformList } from 'helpers/regex';
 import { logger } from 'helpers/logger';
 import { inTime } from 'helpers/time';
 import { inToday, now } from 'helpers/date';
@@ -66,7 +66,7 @@ export class Background extends Component {
   }
 
   setBlacklist = (blist) => {
-    this.blacklist = this.transformList(blist);
+    this.blacklist = transformList(blist);
   }
 
   getBlacklist = () => {
@@ -74,7 +74,7 @@ export class Background extends Component {
   }
 
   setWhitelist = (wlist) => {
-    this.whitelist = this.transformList(wlist);
+    this.whitelist = transformList(wlist);
   }
 
   getWhitelist = () => {
@@ -136,8 +136,8 @@ export class Background extends Component {
         storage.set({ whitelist: items.whitelist });
       }
       //----- End backward compatibility with v1
-      this.blacklist = this.transformList(items.blacklist);
-      this.whitelist = this.transformList(items.whitelist);
+      this.blacklist = transformList(items.blacklist);
+      this.whitelist = transformList(items.whitelist);
       this.mode = items.mode;
       this.action = items.action;
       this.schedule = { ...this.schedule, ...items.schedule }; // merge
@@ -176,10 +176,6 @@ export class Background extends Component {
 
   removeListDuplicates = (list) => {
     return list.filter((url, index) => list.indexOf(url) === index);
-  }
-
-  transformList = (list) => {
-    return list.map(url => regex.wildcard(url)).map(url => regex.new(url));
   }
 
   onBrowserStartup = () => {
