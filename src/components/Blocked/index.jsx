@@ -46,7 +46,7 @@ export class Blocked extends Component {
             <span>{translate('unblockFor')}</span>
             <NumberInput
               min={1}
-              max={360}
+              max={720}
               width={65}
               value={time}
               onChange={(value) => this.updateUnblockDialogState({ selected: unblockOptions.unblockForWhile, time: value })}
