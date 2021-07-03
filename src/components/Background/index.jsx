@@ -22,7 +22,7 @@ export class Background extends Component {
     this.redirectUrl = '';
     this.schedule = defaultSchedule;
     this.unblockOnceTimeout = defaultUnblockOnceTimeout;
-    this.autoReblockOnTimeout = true;
+    this.autoReblockOnTimeout = false;
     // private
     this.hasBeenEnabledOnStartup = false;
     this.enableLock = false;

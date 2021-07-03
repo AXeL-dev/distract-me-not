@@ -54,7 +54,7 @@ export class Settings extends Component {
           isEnabled: false,
           requirePassword: false,
           unblockOnceTimeout: defaultUnblockOnceTimeout,
-          autoReblockOnTimeout: true,
+          autoReblockOnTimeout: false,
         },
         misc: {
           enableOnBrowserStartup: false,
