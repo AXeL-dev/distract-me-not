@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { storage, nativeAPI, indexUrl, getTab } from 'helpers/webext';
-import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule, unblockOptions, defaultUnblockOnceTimeout, isAccessible } from 'helpers/block';
+import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule, unblockOptions, defaultUnblock, isAccessible } from 'helpers/block';
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
 import { transformList } from 'helpers/regex';
 import { logger } from 'helpers/logger';
@@ -20,9 +20,8 @@ export class Background extends Component {
     this.mode = Mode.blacklist;
     this.action = Action.blockTab;
     this.redirectUrl = '';
+    this.unblock = defaultUnblock;
     this.schedule = defaultSchedule;
-    this.unblockOnceTimeout = defaultUnblockOnceTimeout;
-    this.autoReblockOnTimeout = false;
     // private
     this.hasBeenEnabledOnStartup = false;
     this.enableLock = false;
@@ -99,19 +98,19 @@ export class Background extends Component {
   }
 
   setUnblockOnceTimeout = (value) => {
-    this.unblockOnceTimeout = value;
+    this.unblock.unblockOnceTimeout = value;
   }
 
   getUnblockOnceTimeout = () => {
-    return this.unblockOnceTimeout;
+    return this.unblock.unblockOnceTimeout;
   }
 
   setAutoReblockOnTimeout = (value) => {
-    this.autoReblockOnTimeout = value;
+    this.unblock.autoReblockOnTimeout = value;
   }
 
   getAutoReblockOnTimeout = () => {
-    return this.autoReblockOnTimeout;
+    return this.unblock.autoReblockOnTimeout;
   }
 
   //----- End getters & setters
@@ -125,11 +124,8 @@ export class Background extends Component {
       isEnabled: this.isEnabled,
       mode: this.mode,
       action: this.action,
+      unblock: this.unblock,
       schedule: this.schedule,
-      unblock: {
-        unblockOnceTimeout: this.unblockOnceTimeout,
-        autoReblockOnTimeout: this.autoReblockOnTimeout,
-      },
       redirectUrl: this.redirectUrl
     }).then((items) => {
       this.debug('items:', items);
@@ -153,9 +149,8 @@ export class Background extends Component {
       this.whitelist = transformList(items.whitelist);
       this.mode = items.mode;
       this.action = items.action;
-      this.schedule = { ...this.schedule, ...items.schedule }; // merge
-      this.unblockOnceTimeout = items.unblock.unblockOnceTimeout;
-      this.autoReblockOnTimeout = items.unblock.autoReblockOnTimeout;
+      this.unblock = { ...this.unblock, ...items.unblock }; // merge
+      this.schedule = { ...this.schedule, ...items.schedule };
       this.redirectUrl = getValidUrl(items.redirectUrl);
       if (!this.hasBeenEnabledOnStartup) {
         this.isEnabled = items.isEnabled;
@@ -229,7 +224,7 @@ export class Background extends Component {
                 once: true,
                 hostname: getHostName(url)
               });
-              this.reblockTabAfterTimeout(sender.tab.id, this.unblockOnceTimeout * 1000);
+              this.reblockTabAfterTimeout(sender.tab.id, this.unblock.unblockOnceTimeout * 1000);
               break;
           }
           response = this.redirectTab(sender.tab.id, url);
@@ -249,7 +244,7 @@ export class Background extends Component {
   }
 
   reblockTabAfterTimeout = (tabId, timeout) => {
-    if (this.autoReblockOnTimeout) {
+    if (this.unblock.autoReblockOnTimeout) {
       setTimeout(() => {
         getTab(tabId).then((tab) => { // get latest tab infos (url)
           this.redirectTab(tab.id, `${indexUrl}#blocked?url=${encodeURIComponent(tab.url)}`);
@@ -330,7 +325,7 @@ export class Background extends Component {
         if (this.tmpAllowed[index].once) {
           setTimeout(() => {
             this.tmpAllowed.splice(index, 1);
-          }, this.unblockOnceTimeout * 1000);
+          }, this.unblock.unblockOnceTimeout * 1000);
         }
         return true;
       }

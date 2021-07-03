@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Pane, Tablist, SidebarTab, SelectField, Checkbox, TextInputField, Button, TickIcon, Paragraph, toaster, HeartIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv } from 'helpers/debug';
-import { Mode, Action, modes, actions, defaultAction, defaultMode, defaultBlacklist, defaultWhitelist, defaultSchedule, defaultUnblockOnceTimeout } from 'helpers/block';
+import { Mode, Action, modes, actions, defaultAction, defaultMode, defaultBlacklist, defaultWhitelist, defaultSchedule, defaultUnblock } from 'helpers/block';
 import { sendMessage, storage } from 'helpers/webext';
 import { DaysOfWeek } from 'helpers/date';
 import { hash } from 'helpers/crypt';
@@ -41,6 +41,7 @@ export class Settings extends Component {
         redirectToUrl: {
           url: ''
         },
+        unblock: defaultUnblock,
         schedule: defaultSchedule,
         blacklist: isDevEnv ? defaultBlacklist : [],
         whitelist: isDevEnv ? defaultWhitelist : [],
@@ -49,12 +50,6 @@ export class Settings extends Component {
           isSet: false,
           value: '',
           hash: '',
-        },
-        unblock: {
-          isEnabled: false,
-          requirePassword: false,
-          unblockOnceTimeout: defaultUnblockOnceTimeout,
-          autoReblockOnTimeout: false,
         },
         misc: {
           enableOnBrowserStartup: false,
