@@ -126,6 +126,10 @@ export class Background extends Component {
       mode: this.mode,
       action: this.action,
       schedule: this.schedule,
+      unblock: {
+        unblockOnceTimeout: this.unblockOnceTimeout,
+        autoReblockOnTimeout: this.autoReblockOnTimeout,
+      },
       redirectUrl: this.redirectUrl
     }).then((items) => {
       this.debug('items:', items);
@@ -150,6 +154,8 @@ export class Background extends Component {
       this.mode = items.mode;
       this.action = items.action;
       this.schedule = { ...this.schedule, ...items.schedule }; // merge
+      this.unblockOnceTimeout = items.unblock.unblockOnceTimeout;
+      this.autoReblockOnTimeout = items.unblock.autoReblockOnTimeout;
       this.redirectUrl = getValidUrl(items.redirectUrl);
       if (!this.hasBeenEnabledOnStartup) {
         this.isEnabled = items.isEnabled;
