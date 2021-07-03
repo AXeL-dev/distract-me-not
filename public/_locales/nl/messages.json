@@ -290,6 +290,9 @@
   "unblockOnceTimeout": {
     "message": "Eenmalig deblokkeren gedurende"
   },
+  "autoReblockOnTimeout": {
+    "message": "Blokkeer niet-geblokkeerde websites automatisch opnieuw zodra de tijd is verstreken"
+  },
   "minutes": {
     "message": "minute(n)"
   },

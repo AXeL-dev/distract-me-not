@@ -54,6 +54,7 @@ export class Settings extends Component {
           isEnabled: false,
           requirePassword: false,
           unblockOnceTimeout: defaultUnblockOnceTimeout,
+          autoReblockOnTimeout: true,
         },
         misc: {
           enableOnBrowserStartup: false,
@@ -228,6 +229,7 @@ export class Settings extends Component {
         sendMessage('setBlacklist', this.state.options.blacklist);
         sendMessage('setWhitelist', this.state.options.whitelist);
         sendMessage('setUnblockOnceTimeout', this.state.options.unblock.unblockOnceTimeout);
+        sendMessage('setAutoReblockOnTimeout', this.state.options.unblock.autoReblockOnTimeout);
       }
       // Show success message (keep out of success condition to ensure it's executed on unit tests & dev env.)
       toaster.success(translate('settingsSaved'), { id: 'settings-toaster' });
@@ -358,6 +360,12 @@ export class Settings extends Component {
                       value={this.state.options.unblock.unblockOnceTimeout}
                       onChange={(value) => this.setOptions('unblock.unblockOnceTimeout', value)}
                       suffix={translate('seconds')}
+                      disabled={!this.state.options.unblock.isEnabled}
+                    />
+                    <Checkbox
+                      label={translate('autoReblockOnTimeout')}
+                      checked={this.state.options.unblock.autoReblockOnTimeout}
+                      onChange={event => this.setOptions('unblock.autoReblockOnTimeout', event.target.checked)}
                       disabled={!this.state.options.unblock.isEnabled}
                     />
                     <Checkbox

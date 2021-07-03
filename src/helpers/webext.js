@@ -112,6 +112,19 @@ export function getActiveTab() {
   });
 }
 
+export function getTab(tabId) {
+  return new Promise(resolve => {
+    try {
+      browser.tabs.get(tabId).then(tabInfo => {
+        resolve(tabInfo);
+      });
+    } catch (error) {
+      report.error(error);
+      resolve(null);
+    }
+  });
+}
+
 export function getActiveTabHostname() {
   return new Promise(resolve => {
     getActiveTab().then(tab => {

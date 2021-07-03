@@ -1,7 +1,7 @@
 /* global browser */
 
 import React, { Component } from 'react';
-import { storage, nativeAPI, indexUrl } from 'helpers/webext';
+import { storage, nativeAPI, indexUrl, getTab } from 'helpers/webext';
 import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule, unblockOptions, defaultUnblockOnceTimeout, isAccessible } from 'helpers/block';
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
 import { transformList } from 'helpers/regex';
@@ -22,6 +22,7 @@ export class Background extends Component {
     this.redirectUrl = '';
     this.schedule = defaultSchedule;
     this.unblockOnceTimeout = defaultUnblockOnceTimeout;
+    this.autoReblockOnTimeout = true;
     // private
     this.hasBeenEnabledOnStartup = false;
     this.enableLock = false;
@@ -103,6 +104,14 @@ export class Background extends Component {
 
   getUnblockOnceTimeout = () => {
     return this.unblockOnceTimeout;
+  }
+
+  setAutoReblockOnTimeout = (value) => {
+    this.autoReblockOnTimeout = value;
+  }
+
+  getAutoReblockOnTimeout = () => {
+    return this.autoReblockOnTimeout;
   }
 
   //----- End getters & setters
@@ -200,11 +209,13 @@ export class Background extends Component {
           const { url, option, time = 0 } = request.params[0];
           switch (option) {
             case unblockOptions.unblockForWhile:
+              const timeout = time * 60000; // convert to ms
               this.tmpAllowed.push({
-                time: time * 60000, // convert to ms
+                time: timeout,
                 startedAt: new Date().getTime(),
                 hostname: getHostName(url)
               });
+              this.reblockTabAfterTimeout(sender.tab.id, timeout);
               break;
             case unblockOptions.unblockOnce:
             default:
@@ -212,6 +223,7 @@ export class Background extends Component {
                 once: true,
                 hostname: getHostName(url)
               });
+              this.reblockTabAfterTimeout(sender.tab.id, this.unblockOnceTimeout * 1000);
               break;
           }
           response = this.redirectTab(sender.tab.id, url);
@@ -228,6 +240,16 @@ export class Background extends Component {
       this.debug('response:', response);
       resolve({ response });
     });
+  }
+
+  reblockTabAfterTimeout = (tabId, timeout) => {
+    if (this.autoReblockOnTimeout) {
+      setTimeout(() => {
+        getTab(tabId).then((tab) => { // get latest tab infos (url)
+          this.redirectTab(tab.id, `${indexUrl}#blocked?url=${encodeURIComponent(tab.url)}`);
+        });
+      }, timeout);
+    }
   }
 
   isFunction = (functionName) => {

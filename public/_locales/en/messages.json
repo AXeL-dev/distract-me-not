@@ -290,6 +290,9 @@
   "unblockOnceTimeout": {
     "message": "Unblock once timeout"
   },
+  "autoReblockOnTimeout": {
+    "message": "Auto re-block unblocked websites once time is elapsed"
+  },
   "minutes": {
     "message": "minute(s)"
   },

@@ -290,6 +290,9 @@
   "unblockOnceTimeout": {
     "message": "Délai d'expiration du déblocage pour une fois"
   },
+  "autoReblockOnTimeout": {
+    "message": "Rebloquer automatiquement les sites web débloqués une fois le temps écoulé"
+  },
   "minutes": {
     "message": "minute(s)"
   },
