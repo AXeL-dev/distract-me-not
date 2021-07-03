@@ -209,7 +209,7 @@ export class Background extends Component {
         case 'unblockSenderTab':
           const { url, option, time = 0 } = request.params[0];
           switch (option) {
-            case unblockOptions.unblockForWhile:
+            case unblockOptions.unblockForWhile: {
               const timeout = time * 60000; // convert to ms
               this.tmpAllowed.push({
                 time: timeout,
@@ -218,14 +218,17 @@ export class Background extends Component {
               });
               this.reblockTabAfterTimeout(sender.tab.id, timeout);
               break;
+            }
             case unblockOptions.unblockOnce:
-            default:
+            default: {
               this.tmpAllowed.push({
                 once: true,
                 hostname: getHostName(url)
               });
-              this.reblockTabAfterTimeout(sender.tab.id, this.unblock.unblockOnceTimeout * 1000);
+              const timeout = this.unblock.unblockOnceTimeout * 1000;
+              this.reblockTabAfterTimeout(sender.tab.id, timeout);
               break;
+            }
           }
           response = this.redirectTab(sender.tab.id, url);
           break;
@@ -245,6 +248,7 @@ export class Background extends Component {
 
   reblockTabAfterTimeout = (tabId, timeout) => {
     if (this.unblock.autoReblockOnTimeout) {
+      this.debug('auto reblock after timeout:', tabId, timeout);
       setTimeout(() => {
         getTab(tabId).then((tab) => { // get latest tab infos (url)
           this.redirectTab(tab.id, `${indexUrl}#blocked?url=${encodeURIComponent(tab.url)}`);
