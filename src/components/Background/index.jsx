@@ -208,28 +208,22 @@ export class Background extends Component {
         // unblockSenderTab
         case 'unblockSenderTab':
           const { url, option, time = 0 } = request.params[0];
+          let timeout = 0;
           switch (option) {
-            case unblockOptions.unblockForWhile: {
-              const timeout = time * 60000; // convert to ms
-              this.tmpAllowed.push({
-                time: timeout,
-                startedAt: new Date().getTime(),
-                hostname: getHostName(url)
-              });
-              this.reblockTabAfterTimeout(sender.tab.id, timeout);
+            case unblockOptions.unblockForWhile: 
+              timeout = time * 60000; // convert minutes to ms
               break;
-            }
             case unblockOptions.unblockOnce:
-            default: {
-              this.tmpAllowed.push({
-                once: true,
-                hostname: getHostName(url)
-              });
-              const timeout = this.unblock.unblockOnceTimeout * 1000;
-              this.reblockTabAfterTimeout(sender.tab.id, timeout);
+            default:
+              timeout = this.unblock.unblockOnceTimeout * 1000; // convert seconds to ms
               break;
-            }
           }
+          this.tmpAllowed.push({
+            time: timeout,
+            startedAt: new Date().getTime(),
+            hostname: getHostName(url)
+          });
+          this.reblockTabAfterTimeout(sender.tab.id, timeout);
           response = this.redirectTab(sender.tab.id, url);
           break;
         // redirectSenderTab
@@ -247,7 +241,7 @@ export class Background extends Component {
   }
 
   reblockTabAfterTimeout = (tabId, timeout) => {
-    if (this.unblock.autoReblockOnTimeout) {
+    if (this.unblock.autoReblockOnTimeout && timeout > 0) {
       this.debug('auto reblock after timeout:', tabId, timeout);
       setTimeout(() => {
         getTab(tabId).then((tab) => { // get latest tab infos (url)
@@ -308,9 +302,6 @@ export class Background extends Component {
   removeOutdatedTmpAllowed = () => {
     const now = new Date().getTime();
     this.tmpAllowed = this.tmpAllowed.filter(allowed => {
-      if (allowed.once) {
-        return true;
-      }
       if (now > allowed.startedAt + allowed.time) {
         return false;
       } else {
@@ -326,11 +317,6 @@ export class Background extends Component {
       const index = this.tmpAllowed.map(allowed => allowed.hostname).indexOf(hostname);
       if (index !== -1) {
         this.debug('tmp allowed:', url);
-        if (this.tmpAllowed[index].once) {
-          setTimeout(() => {
-            this.tmpAllowed.splice(index, 1);
-          }, this.unblock.unblockOnceTimeout * 1000);
-        }
         return true;
       }
     }
