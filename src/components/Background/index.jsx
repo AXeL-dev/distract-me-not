@@ -1,13 +1,14 @@
 /* global browser */
 
 import React, { Component } from 'react';
-import { storage, nativeAPI, indexUrl, getTab } from 'helpers/webext';
+import { storage, nativeAPI, indexUrl, getTab, sendNotification } from 'helpers/webext';
 import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule, unblockOptions, defaultUnblock, isAccessible } from 'helpers/block';
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
 import { transformList } from 'helpers/regex';
 import { logger } from 'helpers/logger';
 import { inTime } from 'helpers/time';
 import { inToday, now } from 'helpers/date';
+import { translate } from 'helpers/i18n';
 
 export class Background extends Component {
 
@@ -103,6 +104,14 @@ export class Background extends Component {
 
   getUnblockOnceTimeout = () => {
     return this.unblock.unblockOnceTimeout;
+  }
+
+  setDisplayNotificationOnTimeout = (value) => {
+    this.unblock.displayNotificationOnTimeout = value;
+  }
+
+  getDisplayNotificationOnTimeout = () => {
+    return this.unblock.displayNotificationOnTimeout;
   }
 
   setAutoReblockOnTimeout = (value) => {
@@ -218,12 +227,7 @@ export class Background extends Component {
               timeout = this.unblock.unblockOnceTimeout * 1000; // convert seconds to ms
               break;
           }
-          this.tmpAllowed.push({
-            time: timeout,
-            startedAt: new Date().getTime(),
-            hostname: getHostName(url)
-          });
-          this.reblockTabAfterTimeout(sender.tab.id, timeout);
+          this.unblockTab(sender.tab.id, url, timeout);
           response = this.redirectTab(sender.tab.id, url);
           break;
         // redirectSenderTab
@@ -240,14 +244,29 @@ export class Background extends Component {
     });
   }
 
-  reblockTabAfterTimeout = (tabId, timeout) => {
-    if (this.unblock.autoReblockOnTimeout && timeout > 0) {
-      this.debug('auto reblock after timeout:', tabId, timeout);
-      setTimeout(() => {
-        getTab(tabId).then((tab) => { // get latest tab infos (url)
-          this.redirectTab(tab.id, `${indexUrl}#blocked?url=${encodeURIComponent(tab.url)}`);
-        });
-      }, timeout);
+  unblockTab = (tabId, url, timeout) => {
+    if (timeout > 0) {
+      this.tmpAllowed.push({
+        time: timeout,
+        startedAt: new Date().getTime(),
+        hostname: getHostName(url)
+      });
+
+      if (this.unblock.displayNotificationOnTimeout || this.unblock.autoReblockOnTimeout) {
+        setTimeout(() => {
+          if (this.unblock.displayNotificationOnTimeout) {
+            const title = translate('appName');
+            const message = translate('timeOverFor', url);
+            sendNotification(message, title);
+          }
+          if (this.unblock.autoReblockOnTimeout) {
+            this.debug('auto reblock after timeout:', tabId, timeout);
+            getTab(tabId).then((tab) => { // get latest tab infos (url)
+              this.redirectTab(tab.id, `${indexUrl}#blocked?url=${encodeURIComponent(tab.url)}`);
+            });
+          }
+        }, timeout);
+      }
     }
   }
 

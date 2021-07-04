@@ -140,6 +140,19 @@ export function getActiveTabHostname() {
   });
 }
 
+export function sendNotification(message, title = 'Distract Me Not', type = 'basic', id = undefined) {
+  try {
+    browser.notifications.create(id, {
+      type,
+      title,
+      message,
+      iconUrl: 'icons/magnet-128.png',
+    });
+  } catch (error) {
+    report.error(error);
+  }
+}
+
 export class storage {
 
   static get(items) {

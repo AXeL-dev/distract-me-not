@@ -290,8 +290,19 @@
   "unblockOnceTimeout": {
     "message": "Délai d'expiration du déblocage pour une fois"
   },
+  "displayNotificationOnTimeout": {
+    "message": "Afficher une notification une fois le temps écoulé"
+  },
   "autoReblockOnTimeout": {
     "message": "Rebloquer automatiquement les sites web débloqués une fois le temps écoulé"
+  },
+  "timeOverFor": {
+    "message": "Temps écoulé pour $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
   },
   "minutes": {
     "message": "minute(s)"

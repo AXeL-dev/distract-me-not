@@ -224,6 +224,7 @@ export class Settings extends Component {
         sendMessage('setBlacklist', this.state.options.blacklist);
         sendMessage('setWhitelist', this.state.options.whitelist);
         sendMessage('setUnblockOnceTimeout', this.state.options.unblock.unblockOnceTimeout);
+        sendMessage('setDisplayNotificationOnTimeout', this.state.options.unblock.displayNotificationOnTimeout);
         sendMessage('setAutoReblockOnTimeout', this.state.options.unblock.autoReblockOnTimeout);
       }
       // Show success message (keep out of success condition to ensure it's executed on unit tests & dev env.)
@@ -355,6 +356,12 @@ export class Settings extends Component {
                       value={this.state.options.unblock.unblockOnceTimeout}
                       onChange={(value) => this.setOptions('unblock.unblockOnceTimeout', value)}
                       suffix={translate('seconds')}
+                      disabled={!this.state.options.unblock.isEnabled}
+                    />
+                    <Checkbox
+                      label={translate('displayNotificationOnTimeout')}
+                      checked={this.state.options.unblock.displayNotificationOnTimeout}
+                      onChange={event => this.setOptions('unblock.displayNotificationOnTimeout', event.target.checked)}
                       disabled={!this.state.options.unblock.isEnabled}
                     />
                     <Checkbox

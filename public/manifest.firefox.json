@@ -41,6 +41,7 @@
   "homepage_url": "https://github.com/AXeL-dev/distract-me-not",
 
   "permissions": [
+    "notifications",
     "activeTab",
     "storage",
     "tabs",

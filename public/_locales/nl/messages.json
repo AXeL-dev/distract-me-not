@@ -290,8 +290,19 @@
   "unblockOnceTimeout": {
     "message": "Eenmalig deblokkeren gedurende"
   },
+  "displayNotificationOnTimeout": {
+    "message": "Een melding weergeven zodra de tijd is verstreken"
+  },
   "autoReblockOnTimeout": {
     "message": "Blokkeer niet-geblokkeerde websites automatisch opnieuw zodra de tijd is verstreken"
+  },
+  "timeOverFor": {
+    "message": "Verstreken tijd voor $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
   },
   "minutes": {
     "message": "minute(n)"

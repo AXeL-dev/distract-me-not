@@ -290,8 +290,19 @@
   "unblockOnceTimeout": {
     "message": "Unblock once timeout"
   },
+  "displayNotificationOnTimeout": {
+    "message": "Display a notification when time is over"
+  },
   "autoReblockOnTimeout": {
-    "message": "Auto re-block unblocked websites once time is elapsed"
+    "message": "Auto re-block unblocked websites when time is over"
+  },
+  "timeOverFor": {
+    "message": "Time over for $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
   },
   "minutes": {
     "message": "minute(s)"

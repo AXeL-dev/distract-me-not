@@ -52,6 +52,7 @@ export const defaultUnblock = {
   isEnabled: false,
   requirePassword: false,
   unblockOnceTimeout: 10, // seconds
+  displayNotificationOnTimeout: true,
   autoReblockOnTimeout: false,
 };
 
