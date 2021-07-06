@@ -23,6 +23,7 @@ export class Background extends Component {
     this.redirectUrl = '';
     this.unblock = defaultUnblock;
     this.schedule = defaultSchedule;
+    this.enableLogs = false;
     // private
     this.hasBeenEnabledOnStartup = false;
     this.enableLock = false;
@@ -122,6 +123,14 @@ export class Background extends Component {
     return this.unblock.autoReblockOnTimeout;
   }
 
+  setEnableLogs = (value) => {
+    this.enableLogs = value;
+  }
+
+  getEnableLogs = () => {
+    return this.enableLogs;
+  }
+
   //----- End getters & setters
 
   init = () => {
@@ -135,7 +144,8 @@ export class Background extends Component {
       action: this.action,
       unblock: this.unblock,
       schedule: this.schedule,
-      redirectUrl: this.redirectUrl
+      redirectUrl: this.redirectUrl,
+      enableLogs: this.enableLogs
     }).then((items) => {
       this.debug('items:', items);
       //----- Start backward compatibility with v1
@@ -161,6 +171,7 @@ export class Background extends Component {
       this.unblock = { ...this.unblock, ...items.unblock }; // merge
       this.schedule = { ...this.schedule, ...items.schedule };
       this.redirectUrl = getValidUrl(items.redirectUrl);
+      this.enableLogs = items.enableLogs;
       if (!this.hasBeenEnabledOnStartup) {
         this.isEnabled = items.isEnabled;
         if (this.isEnabled) {
@@ -415,7 +426,9 @@ export class Background extends Component {
         break;
     }
     // Log url
-    logger.add({ url: data.url, blocked: shouldBlock, date: now(true) });
+    if (this.enableLogs) {
+      logger.add({ url: data.url, blocked: shouldBlock, date: now(true) });
+    }
     // Execute action
     if (shouldBlock) {
       return this.handleAction(data);

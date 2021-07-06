@@ -309,5 +309,11 @@
   },
   "seconds": {
     "message": "second(en)"
+  },
+  "enableLogs": {
+    "message": "Traceerlogboeken inschakelen"
+  },
+  "hideReportIssueButton": {
+    "message": "Verberg de knop \"een probleem melden\" op het hoofdpaneel"
   }
 }

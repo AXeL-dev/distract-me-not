@@ -309,5 +309,11 @@
   },
   "seconds": {
     "message": "second(s)"
+  },
+  "enableLogs": {
+    "message": "Enable trace logs"
+  },
+  "hideReportIssueButton": {
+    "message": "Hide \"report an issue\" button on the main panel"
   }
 }

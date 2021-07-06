@@ -15,13 +15,17 @@ export class Panel extends Component {
       isEnabled: true,
       mode: '',//defaultMode,
       schedule: defaultSchedule,
-      isAddButtonVisible: true
+      isAddButtonVisible: true,
+      enableLogs: false,
+      hideReportIssueButton: false,
     };
   }
 
   componentDidMount() {
     sendMessage('getIsEnabled').then(isEnabled => this.setState({ isEnabled: !!isEnabled })); // !! used to cast null to boolean
     sendMessage('getSchedule').then(schedule => this.setState({ schedule: schedule || defaultSchedule }));
+    sendMessage('getEnableLogs').then(enableLogs => this.setState({ enableLogs: !!enableLogs }));
+    storage.get({ hideReportIssueButton: false }).then(({ hideReportIssueButton }) => this.setState({ hideReportIssueButton }));
     sendMessage('getMode').then(mode => {
       this.setState({ mode: mode });
       this.toggleAddButton(mode);
@@ -184,19 +188,23 @@ export class Panel extends Component {
         <Pane display="flex" paddingX={16} paddingY={10} alignItems="center" justifyContent="space-between" borderTop>
           <Pane display="flex" gap={10}>
             <SettingsButton history={this.props.history} />
-            <LinkIconButton
-              icon={HistoryIcon}
-              link="/logs"
-              tooltip={translate('logs')}
-              history={this.props.history}
-            />
-            <LinkIconButton
-              icon={IssueNewIcon}
-              link="https://github.com/AXeL-dev/distract-me-not/issues"
-              external
-              tooltip={translate('reportIssue')}
-              history={this.props.history}
-            />
+            {this.state.enableLogs && (
+              <LinkIconButton
+                icon={HistoryIcon}
+                link="/logs"
+                tooltip={translate('logs')}
+                history={this.props.history}
+              />
+            )}
+            {!this.state.hideReportIssueButton && (
+              <LinkIconButton
+                icon={IssueNewIcon}
+                link="https://github.com/AXeL-dev/distract-me-not/issues"
+                external
+                tooltip={translate('reportIssue')}
+                history={this.props.history}
+              />
+            )}
           </Pane>
           <Pane>
             <AnimatedIconButton

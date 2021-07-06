@@ -309,5 +309,11 @@
   },
   "seconds": {
     "message": "seconde(s)"
+  },
+  "enableLogs": {
+    "message": "Activer les journaux de suivi"
+  },
+  "hideReportIssueButton": {
+    "message": "Masquer le bouton \"signaler un problème\" sur le panneau principal"
   }
 }

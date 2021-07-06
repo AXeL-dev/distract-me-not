@@ -52,6 +52,8 @@ export class Settings extends Component {
           hash: '',
         },
         misc: {
+          enableLogs: false,
+          hideReportIssueButton: false,
           enableOnBrowserStartup: false,
         }
       }
@@ -66,6 +68,8 @@ export class Settings extends Component {
       message: this.state.options.blockTab.message,
       displayBlankPage: this.state.options.blockTab.displayBlankPage,
       redirectUrl: this.state.options.redirectToUrl.url,
+      enableLogs: this.state.options.misc.enableLogs,
+      hideReportIssueButton: this.state.options.misc.hideReportIssueButton,
       enableOnBrowserStartup: this.state.options.misc.enableOnBrowserStartup,
       schedule: this.state.options.schedule,
       password: this.state.options.password,
@@ -103,6 +107,8 @@ export class Settings extends Component {
           blacklist: items.blacklist,
           whitelist: items.whitelist,
           misc: {
+            enableLogs: items.enableLogs,
+            hideReportIssueButton: items.hideReportIssueButton,
             enableOnBrowserStartup: items.enableOnBrowserStartup
           }
         });
@@ -196,6 +202,8 @@ export class Settings extends Component {
       message: this.state.options.blockTab.message,
       displayBlankPage: this.state.options.blockTab.displayBlankPage,
       redirectUrl: this.state.options.redirectToUrl.url,
+      enableLogs: this.state.options.misc.enableLogs,
+      hideReportIssueButton: this.state.options.misc.hideReportIssueButton,
       enableOnBrowserStartup: this.state.options.misc.enableOnBrowserStartup,
       schedule: this.state.options.schedule,
       blacklist: this.state.options.blacklist,
@@ -226,6 +234,7 @@ export class Settings extends Component {
         sendMessage('setUnblockOnceTimeout', this.state.options.unblock.unblockOnceTimeout);
         sendMessage('setDisplayNotificationOnTimeout', this.state.options.unblock.displayNotificationOnTimeout);
         sendMessage('setAutoReblockOnTimeout', this.state.options.unblock.autoReblockOnTimeout);
+        sendMessage('setEnableLogs', this.state.options.misc.enableLogs);
       }
       // Show success message (keep out of success condition to ensure it's executed on unit tests & dev env.)
       toaster.success(translate('settingsSaved'), { id: 'settings-toaster' });
@@ -460,10 +469,21 @@ export class Settings extends Component {
                 {tab.id === 'misc' && (
                   <Fragment>
                     <SwitchField
+                      label={translate('enableLogs')}
+                      checked={this.state.options.misc.enableLogs}
+                      onChange={event => this.setOptions('misc.enableLogs', event.target.checked)}
+                      marginBottom={16}
+                    />
+                    <SwitchField
+                      label={translate('hideReportIssueButton')}
+                      checked={this.state.options.misc.hideReportIssueButton}
+                      onChange={event => this.setOptions('misc.hideReportIssueButton', event.target.checked)}
+                      marginBottom={16}
+                    />
+                    <SwitchField
                       label={translate('enableOnBrowserStartup')}
                       checked={this.state.options.misc.enableOnBrowserStartup}
                       onChange={event => this.setOptions('misc.enableOnBrowserStartup', event.target.checked)}
-                      //marginBottom={16}
                     />
                   </Fragment>
                 )}
