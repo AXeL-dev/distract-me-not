@@ -163,7 +163,7 @@ export class storage {
         });
       } catch (error) {
         report.error(error);
-        resolve(undefined);
+        resolve(items);
       }
     });
   }
