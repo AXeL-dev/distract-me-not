@@ -208,7 +208,7 @@ export class WebsiteList extends Component {
     debug.log('edit:', { row: row, value: value });
     if (!isUrl(value)) {
       toaster.danger(translate('urlIsNotValid'), { id: 'settings-toaster' });
-    } else if (this.state.list.find(item => item.url === value)) {
+    } else if (this.state.list.find(item => item.url === value && item.id !== row.id)) {
       toaster.danger(translate('urlAlreadyExists'), { id: 'settings-toaster' });
     } else {
       // Edit url
