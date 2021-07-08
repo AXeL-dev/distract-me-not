@@ -68,11 +68,12 @@ export class AnimatedIconButton extends Component {
     }, 100);
   }
 
-  handleClick = (event) => {
+  handleClick = async (event) => {
+    let shouldHide = this.state.hideOnClick;
     if (this.props.onClick) {
-      this.props.onClick(event);
+      shouldHide = await this.props.onClick(event);
     }
-    if (this.state.hideOnClick) {
+    if (shouldHide) {
       this.playHideAnimation();
     }
   }

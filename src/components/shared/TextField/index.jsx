@@ -29,7 +29,7 @@ export class TextField extends Component {
   }
 
   submit = () => {
-    if (this.props.onSubmit) {
+    if (this.props.onSubmit && !this.props.disabled) {
       const callback = (value) => this.setState({ value: value });
       this.props.onSubmit(this.state.value, callback);
     }
@@ -46,7 +46,6 @@ export class TextField extends Component {
               onChange={this.handleChange}
               onKeyDown={this.handleKeyDown}
               placeholder={this.props.placeholder}
-              disabled={this.props.disabled}
               required={this.props.required}
               borderTopRightRadius={this.props.hasButton ? 0 : 3}
               borderBottomRightRadius={this.props.hasButton ? 0 : 3}
@@ -59,6 +58,7 @@ export class TextField extends Component {
                 borderTopLeftRadius={0}
                 borderBottomLeftRadius={0}
                 onClick={this.handleButtonClick}
+                disabled={this.props.disabled}
               >
                 {this.props.buttonLabel || '+'}
               </Button>

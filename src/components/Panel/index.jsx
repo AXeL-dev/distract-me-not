@@ -1,8 +1,8 @@
 import React, { Component, Fragment } from 'react';
 import { Pane, Text, Position, Badge, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon, HistoryIcon, IssueNewIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
-import { sendMessage, getActiveTab, getActiveTabHostname, storage } from 'helpers/webext';
-import { Mode, modes, defaultMode, defaultBlacklist, defaultWhitelist, defaultSchedule, isAccessible } from 'helpers/block';
+import { sendMessage, getActiveTab, getActiveTabHostname, storage, createWindow, indexUrl } from 'helpers/webext';
+import { Mode, modes, defaultSchedule, isAccessible, blockUrl } from 'helpers/block';
 import { inToday } from 'helpers/date';
 import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton, LinkIconButton } from 'components';
 import './styles.scss';
@@ -18,6 +18,7 @@ export class Panel extends Component {
       isAddButtonVisible: true,
       enableLogs: false,
       hideReportIssueButton: false,
+      showAddWebsitePrompt: false,
     };
   }
 
@@ -25,10 +26,18 @@ export class Panel extends Component {
     sendMessage('getIsEnabled').then(isEnabled => this.setState({ isEnabled: !!isEnabled })); // !! used to cast null to boolean
     sendMessage('getSchedule').then(schedule => this.setState({ schedule: schedule || defaultSchedule }));
     sendMessage('getEnableLogs').then(enableLogs => this.setState({ enableLogs: !!enableLogs }));
-    storage.get({ hideReportIssueButton: false }).then(({ hideReportIssueButton }) => this.setState({ hideReportIssueButton }));
     sendMessage('getMode').then(mode => {
       this.setState({ mode: mode });
       this.toggleAddButton(mode);
+    });
+    storage.get({
+      hideReportIssueButton: this.state.hideReportIssueButton,
+      showAddWebsitePrompt: this.state.showAddWebsitePrompt,
+    }).then(({ hideReportIssueButton, showAddWebsitePrompt }) => {
+      this.setState({
+        hideReportIssueButton,
+        showAddWebsitePrompt,
+      });
     });
   }
 
@@ -89,46 +98,18 @@ export class Panel extends Component {
     this.toggleAddButton(value);
   }
 
-  addCurrentHostname = () => {
-    getActiveTabHostname().then(hostname => {
-      if (hostname) {
-        const pattern = `*.${hostname}`;
-        switch (this.state.mode) {
-          case Mode.blacklist:
-          case Mode.combined:
-            storage.get({
-              blacklist: defaultBlacklist
-            }).then(({ blacklist }) => {
-              for (const url of blacklist) {
-                if (url === pattern) {
-                  return;
-                }
-              }
-              blacklist.splice(0, 0, pattern);
-              sendMessage('setBlacklist', blacklist);
-              storage.set({ blacklist: blacklist });
-            });
-            break;
-          case Mode.whitelist:
-            // ToDo: merge common code (@see above)
-            storage.get({
-              whitelist: defaultWhitelist
-            }).then(({ whitelist }) => {
-              for (const url of whitelist) {
-                if (url === pattern) {
-                  return;
-                }
-              }
-              whitelist.splice(0, 0, pattern);
-              sendMessage('setWhitelist', whitelist);
-              storage.set({ whitelist: whitelist });
-            });
-            break;
-          default:
-            break;
-        }
+  addCurrentWebsite = async () => {
+    const hostname = await getActiveTabHostname();
+    if (hostname) {
+      const url = `*.${hostname}`;
+      if (this.state.showAddWebsitePrompt) {
+        createWindow(`${indexUrl}#addWebsitePrompt?url=${url}&mode=${this.state.mode}`, 600, 140);
+      } else {
+        blockUrl(url, this.state.mode);
+        return true;
       }
-    });
+    }
+    return false;
   }
 
   render() {
@@ -215,7 +196,7 @@ export class Panel extends Component {
               icon={PlusIcon}
               iconSize={26}
               iconColor="#47b881"
-              onClick={this.addCurrentHostname}
+              onClick={this.addCurrentWebsite}
               hideOnClick={true}
               hideAnimationIcon={TickIcon}
               isVisible={this.state.isAddButtonVisible}

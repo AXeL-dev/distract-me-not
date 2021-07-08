@@ -54,6 +54,7 @@ export class Settings extends Component {
         misc: {
           enableLogs: false,
           hideReportIssueButton: false,
+          showAddWebsitePrompt: false,
           enableOnBrowserStartup: false,
         }
       }
@@ -70,6 +71,7 @@ export class Settings extends Component {
       redirectUrl: this.state.options.redirectToUrl.url,
       enableLogs: this.state.options.misc.enableLogs,
       hideReportIssueButton: this.state.options.misc.hideReportIssueButton,
+      showAddWebsitePrompt: this.state.options.misc.showAddWebsitePrompt,
       enableOnBrowserStartup: this.state.options.misc.enableOnBrowserStartup,
       schedule: this.state.options.schedule,
       password: this.state.options.password,
@@ -109,6 +111,7 @@ export class Settings extends Component {
           misc: {
             enableLogs: items.enableLogs,
             hideReportIssueButton: items.hideReportIssueButton,
+            showAddWebsitePrompt: items.showAddWebsitePrompt,
             enableOnBrowserStartup: items.enableOnBrowserStartup
           }
         });
@@ -204,6 +207,7 @@ export class Settings extends Component {
       redirectUrl: this.state.options.redirectToUrl.url,
       enableLogs: this.state.options.misc.enableLogs,
       hideReportIssueButton: this.state.options.misc.hideReportIssueButton,
+      showAddWebsitePrompt: this.state.options.misc.showAddWebsitePrompt,
       enableOnBrowserStartup: this.state.options.misc.enableOnBrowserStartup,
       schedule: this.state.options.schedule,
       blacklist: this.state.options.blacklist,
@@ -478,6 +482,12 @@ export class Settings extends Component {
                       label={translate('hideReportIssueButton')}
                       checked={this.state.options.misc.hideReportIssueButton}
                       onChange={event => this.setOptions('misc.hideReportIssueButton', event.target.checked)}
+                      marginBottom={16}
+                    />
+                    <SwitchField
+                      label={translate('showAddWebsitePrompt')}
+                      checked={this.state.options.misc.showAddWebsitePrompt}
+                      onChange={event => this.setOptions('misc.showAddWebsitePrompt', event.target.checked)}
                       marginBottom={16}
                     />
                     <SwitchField

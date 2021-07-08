@@ -315,5 +315,8 @@
   },
   "hideReportIssueButton": {
     "message": "Hide \"report an issue\" button on the main panel"
+  },
+  "showAddWebsitePrompt": {
+    "message": "Show \"add website\" prompt"
   }
 }

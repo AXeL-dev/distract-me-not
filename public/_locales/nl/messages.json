@@ -315,5 +315,8 @@
   },
   "hideReportIssueButton": {
     "message": "Verberg de knop \"een probleem melden\" op het hoofdpaneel"
+  },
+  "showAddWebsitePrompt": {
+    "message": "Toon \"website toevoegen\" prompt"
   }
 }

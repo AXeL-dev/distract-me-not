@@ -74,6 +74,21 @@ export function createTab(url, isActive = true) {
   });
 }
 
+export function createWindow(url, width = 600, height = 300, type = 'popup') {
+  try {
+    browser.windows.create({
+      url,
+      width,
+      height,
+      type,
+      left: screen.availLeft + Math.round((screen.availWidth - width) / 2),
+      top: screen.availTop + Math.round((screen.availHeight - height) / 2)
+    });
+  } catch (error) {
+    report.error(error);
+  }
+}
+
 /**
  * Send message to background script
  * 

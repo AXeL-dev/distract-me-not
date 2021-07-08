@@ -315,5 +315,8 @@
   },
   "hideReportIssueButton": {
     "message": "Masquer le bouton \"signaler un problème\" sur le panneau principal"
+  },
+  "showAddWebsitePrompt": {
+    "message": "Afficher l'invite d'ajout de site web"
   }
 }
