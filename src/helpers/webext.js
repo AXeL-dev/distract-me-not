@@ -1,4 +1,4 @@
-/* global browser, chrome */
+/* global browser, chrome, screen */
 
 import { report } from "./debug";
 
