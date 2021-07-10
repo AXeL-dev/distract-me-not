@@ -13,7 +13,8 @@ export class AddWebsitePrompt extends Component {
     const params = props.location ? queryString.parse(props.location.search) : {};
     this.mode = params.mode || Mode.blacklist;
     this.state = {
-      url: params.url || ''
+      url: params.url || '',
+      disabled: false,
     };
   }
 
@@ -35,12 +36,18 @@ export class AddWebsitePrompt extends Component {
     this.setState({ url: event.target.value });
   }
 
-  handleSubmit = () => {
+  handleSubmit = async () => {
     if (!isUrl(this.state.url)) {
       toaster.danger(translate('urlIsNotValid'), { id: 'add-website-toaster' });
     } else {
-      blockUrl(this.state.url, this.mode);
-      window.close();
+      this.setState({ disabled: true });
+      try {
+        await blockUrl(this.state.url, this.mode);
+        window.close();
+      } catch (error) {
+        toaster.danger(error.message, { id: 'add-website-toaster' });
+        this.setState({ disabled: false });
+      }
     }
   }
 
@@ -65,6 +72,7 @@ export class AddWebsitePrompt extends Component {
           buttonLabel={translate('add')}
           onSubmit={this.handleSubmit}
           onChange={this.handleChange}
+          disabled={this.state.disabled}
           required
         />
       </Pane>
