@@ -1,4 +1,4 @@
-/* global browser, chrome, screen */
+/* global browser, chrome */
 
 import { report } from "./debug";
 
@@ -81,8 +81,8 @@ export function createWindow(url, width = 600, height = 300, type = 'popup') {
       width,
       height,
       type,
-      left: screen.availLeft + Math.round((screen.availWidth - width) / 2),
-      top: screen.availTop + Math.round((screen.availHeight - height) / 2)
+      left: window.screen.availLeft + Math.round((window.screen.availWidth - width) / 2),
+      top: window.screen.availTop + Math.round((window.screen.availHeight - height) / 2)
     });
   } catch (error) {
     report.error(error);
