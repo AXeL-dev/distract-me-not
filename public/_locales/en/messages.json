@@ -318,5 +318,8 @@
   },
   "showAddWebsitePrompt": {
     "message": "Show \"add website\" prompt"
+  },
+  "showAddWebsitePromptTooltip": {
+    "message": "When adding websites via \"+\" button on the main panel"
   }
 }

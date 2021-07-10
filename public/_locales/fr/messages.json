@@ -318,5 +318,8 @@
   },
   "showAddWebsitePrompt": {
     "message": "Afficher l'invite d'ajout de site web"
+  },
+  "showAddWebsitePromptTooltip": {
+    "message": "Lors de l'ajout de sites web à partir du button \"+\" sur le panneau principal"
   }
 }

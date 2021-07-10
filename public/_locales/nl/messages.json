@@ -318,5 +318,8 @@
   },
   "showAddWebsitePrompt": {
     "message": "Toon \"website toevoegen\" prompt"
+  },
+  "showAddWebsitePromptTooltip": {
+    "message": "Bij het toevoegen van websites via de knop \"+\" op het hoofdpaneel"
   }
 }

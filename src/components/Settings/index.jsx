@@ -486,6 +486,7 @@ export class Settings extends Component {
                     />
                     <SwitchField
                       label={translate('showAddWebsitePrompt')}
+                      tooltip={translate('showAddWebsitePromptTooltip')}
                       checked={this.state.options.misc.showAddWebsitePrompt}
                       onChange={event => this.setOptions('misc.showAddWebsitePrompt', event.target.checked)}
                       marginBottom={16}
