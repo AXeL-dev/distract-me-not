@@ -35,6 +35,7 @@
     "package:edge": "npm run package -- --filename={name}-{version}-edge.zip",
     "package:all": "npm run postbuild:firefox && npm run package:firefox && npm run postbuild:chrome && npm run package:chrome && npm run package:edge",
     "package:source": "zip -r -FS distract_me_not-source.zip * .rescriptsrc.js .env.development .env.test -x build\\* node_modules\\* old\\* old-src\\* screenshots\\* *.zip",
+    "sign": "npx web-ext-submit --source-dir=build --channel=unlisted --api-key=$AMO_JWT_ISSUER --api-secret=$AMO_JWT_SECRET",
     "test": "rescripts test --verbose",
     "test:all": "npm test -- --watchAll --testMatch \"**/src/**/*.test.{js,jsx}\"",
     "eject": "react-scripts eject"
