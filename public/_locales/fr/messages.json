@@ -314,7 +314,7 @@
     "message": "Activer les journaux de suivi"
   },
   "logsLength": {
-    "message": "Taille des journaux"
+    "message": "Taille maximale des journaux"
   },
   "hideReportIssueButton": {
     "message": "Masquer le bouton \"signaler un problème\" sur le panneau principal"
@@ -323,6 +323,6 @@
     "message": "Afficher l'invite d'ajout de site web"
   },
   "showAddWebsitePromptTooltip": {
-    "message": "Lors de l'ajout de sites web à partir du button \"+\" sur le panneau principal"
+    "message": "Affiche une invite de confirmation lors de l'ajout d'un site web à partir du button \"+\" sur le panneau principal"
   }
 }
