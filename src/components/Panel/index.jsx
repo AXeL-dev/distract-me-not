@@ -25,7 +25,7 @@ export class Panel extends Component {
   componentDidMount() {
     sendMessage('getIsEnabled').then(isEnabled => this.setState({ isEnabled: !!isEnabled })); // !! used to cast null to boolean
     sendMessage('getSchedule').then(schedule => this.setState({ schedule: schedule || defaultSchedule }));
-    sendMessage('getEnableLogs').then(enableLogs => this.setState({ enableLogs: !!enableLogs }));
+    sendMessage('getLogsSettings').then(({ enableLogs }) => this.setState({ enableLogs: !!enableLogs }));
     sendMessage('getMode').then(mode => {
       this.setState({ mode: mode });
       this.toggleAddButton(mode);

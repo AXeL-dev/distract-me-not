@@ -107,7 +107,8 @@ export class Settings extends Component {
           },
           logs: {
             ...this.state.options.logs,
-            ...items.logs,
+            isEnabled: items.enableLogs,
+            maxLength: items.logsLength,
           },
           unblock: {
             ...this.state.options.unblock,
