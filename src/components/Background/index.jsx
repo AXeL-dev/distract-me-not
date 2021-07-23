@@ -130,7 +130,7 @@ export class Background extends Component {
 
   getLogsSettings = () => {
     return {
-      enableLogs: this.enableLogs,
+      isEnabled: this.enableLogs,
       maxLength: logger.maxLength,
     };
   }

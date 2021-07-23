@@ -4,6 +4,7 @@ import { translate } from 'helpers/i18n';
 import { sendMessage, getActiveTab, getActiveTabHostname, storage, createWindow, indexUrl } from 'helpers/webext';
 import { Mode, modes, defaultSchedule, isAccessible, blockUrl } from 'helpers/block';
 import { inToday } from 'helpers/date';
+import { defaultLogsSettings } from 'helpers/logger';
 import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton, LinkIconButton } from 'components';
 import './styles.scss';
 
@@ -25,7 +26,7 @@ export class Panel extends Component {
   componentDidMount() {
     sendMessage('getIsEnabled').then(isEnabled => this.setState({ isEnabled: !!isEnabled })); // !! used to cast null to boolean
     sendMessage('getSchedule').then(schedule => this.setState({ schedule: schedule || defaultSchedule }));
-    sendMessage('getLogsSettings').then(({ enableLogs }) => this.setState({ enableLogs: !!enableLogs }));
+    sendMessage('getLogsSettings').then(logs => this.setState({ enableLogs: (logs || defaultLogsSettings).isEnabled }));
     sendMessage('getMode').then(mode => {
       this.setState({ mode: mode });
       this.toggleAddButton(mode);
