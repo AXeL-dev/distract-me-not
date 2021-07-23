@@ -7,6 +7,7 @@ import { sendMessage, storage } from 'helpers/webext';
 import { DaysOfWeek } from 'helpers/date';
 import { hash } from 'helpers/crypt';
 import { Header, SwitchField, SegmentedControlField, TimeField, PasswordField, MultiSelectField, WebsiteList, NumberField } from 'components';
+import { defaultLogsSettings } from 'helpers/logger';
 import { version } from '../../../package.json';
 import _ from 'lodash';
 import './styles.scss';
@@ -26,6 +27,7 @@ export class Settings extends Component {
         { label: translate('blacklist'), id: 'blacklist', disabled: defaultMode === Mode.whitelist },
         { label: translate('whitelist'), id: 'whitelist', disabled: defaultMode === Mode.blacklist },
         { label: translate('password'), id: 'password' },
+        { label: translate('logs'), id: 'logs' },
         { label: translate('miscellaneous'), id: 'misc' },
         { label: translate('about'), id: 'about' },
       ],
@@ -51,8 +53,8 @@ export class Settings extends Component {
           value: '',
           hash: '',
         },
+        logs: defaultLogsSettings,
         misc: {
-          enableLogs: false,
           hideReportIssueButton: false,
           showAddWebsitePrompt: false,
           enableOnBrowserStartup: false,
@@ -69,7 +71,8 @@ export class Settings extends Component {
       message: this.state.options.blockTab.message,
       displayBlankPage: this.state.options.blockTab.displayBlankPage,
       redirectUrl: this.state.options.redirectToUrl.url,
-      enableLogs: this.state.options.misc.enableLogs,
+      enableLogs: this.state.options.logs.isEnabled,
+      logsLength: this.state.options.logs.maxLength,
       hideReportIssueButton: this.state.options.misc.hideReportIssueButton,
       showAddWebsitePrompt: this.state.options.misc.showAddWebsitePrompt,
       enableOnBrowserStartup: this.state.options.misc.enableOnBrowserStartup,
@@ -102,6 +105,10 @@ export class Settings extends Component {
             ...items.password,
             isSet: !!(items.password.hash && items.password.hash.length)
           },
+          logs: {
+            ...this.state.options.logs,
+            ...items.logs,
+          },
           unblock: {
             ...this.state.options.unblock,
             ...items.unblock,
@@ -109,7 +116,6 @@ export class Settings extends Component {
           blacklist: items.blacklist,
           whitelist: items.whitelist,
           misc: {
-            enableLogs: items.enableLogs,
             hideReportIssueButton: items.hideReportIssueButton,
             showAddWebsitePrompt: items.showAddWebsitePrompt,
             enableOnBrowserStartup: items.enableOnBrowserStartup
@@ -205,7 +211,8 @@ export class Settings extends Component {
       message: this.state.options.blockTab.message,
       displayBlankPage: this.state.options.blockTab.displayBlankPage,
       redirectUrl: this.state.options.redirectToUrl.url,
-      enableLogs: this.state.options.misc.enableLogs,
+      enableLogs: this.state.options.logs.isEnabled,
+      logsLength: this.state.options.logs.maxLength,
       hideReportIssueButton: this.state.options.misc.hideReportIssueButton,
       showAddWebsitePrompt: this.state.options.misc.showAddWebsitePrompt,
       enableOnBrowserStartup: this.state.options.misc.enableOnBrowserStartup,
@@ -238,7 +245,7 @@ export class Settings extends Component {
         sendMessage('setUnblockOnceTimeout', this.state.options.unblock.unblockOnceTimeout);
         sendMessage('setDisplayNotificationOnTimeout', this.state.options.unblock.displayNotificationOnTimeout);
         sendMessage('setAutoReblockOnTimeout', this.state.options.unblock.autoReblockOnTimeout);
-        sendMessage('setEnableLogs', this.state.options.misc.enableLogs);
+        sendMessage('setLogsSettings', this.state.options.logs);
       }
       // Show success message (keep out of success condition to ensure it's executed on unit tests & dev env.)
       toaster.success(translate('settingsSaved'), { id: 'settings-toaster' });
@@ -470,14 +477,30 @@ export class Settings extends Component {
                     />
                   </Fragment>
                 )}
-                {tab.id === 'misc' && (
+                {tab.id === 'logs' && (
                   <Fragment>
                     <SwitchField
                       label={translate('enableLogs')}
-                      checked={this.state.options.misc.enableLogs}
-                      onChange={event => this.setOptions('misc.enableLogs', event.target.checked)}
+                      labelSize={300}
+                      labelColor="muted"
+                      checked={this.state.options.logs.isEnabled}
+                      onChange={event => this.setOptions('logs.isEnabled', event.target.checked)}
                       marginBottom={16}
                     />
+                    <NumberField
+                      label={translate('logsLength')}
+                      min={1}
+                      max={10000}
+                      inputWidth={80}
+                      value={this.state.options.logs.maxLength}
+                      onChange={(value) => this.setOptions('logs.maxLength', value)}
+                      marginBottom={16}
+                      disabled={!this.state.options.logs.isEnabled}
+                    />
+                  </Fragment>
+                )}
+                {tab.id === 'misc' && (
+                  <Fragment>
                     <SwitchField
                       label={translate('hideReportIssueButton')}
                       checked={this.state.options.misc.hideReportIssueButton}

@@ -5,7 +5,7 @@ import { storage, nativeAPI, indexUrl, getTab, sendNotification } from 'helpers/
 import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule, unblockOptions, defaultUnblock, isAccessible } from 'helpers/block';
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
 import { transformList } from 'helpers/regex';
-import { logger } from 'helpers/logger';
+import { logger, defaultLogsSettings } from 'helpers/logger';
 import { inTime } from 'helpers/time';
 import { inToday, now } from 'helpers/date';
 import { translate } from 'helpers/i18n';
@@ -23,7 +23,7 @@ export class Background extends Component {
     this.redirectUrl = '';
     this.unblock = defaultUnblock;
     this.schedule = defaultSchedule;
-    this.enableLogs = false;
+    this.enableLogs = defaultLogsSettings.isEnabled;
     // private
     this.hasBeenEnabledOnStartup = false;
     this.enableLock = false;
@@ -123,12 +123,16 @@ export class Background extends Component {
     return this.unblock.autoReblockOnTimeout;
   }
 
-  setEnableLogs = (value) => {
-    this.enableLogs = value;
+  setLogsSettings = (logs) => {
+    this.enableLogs = logs.isEnabled;
+    logger.maxLength = logs.maxLength;
   }
 
-  getEnableLogs = () => {
-    return this.enableLogs;
+  getLogsSettings = () => {
+    return {
+      enableLogs: this.enableLogs,
+      maxLength: logger.maxLength,
+    };
   }
 
   //----- End getters & setters
@@ -145,7 +149,8 @@ export class Background extends Component {
       unblock: this.unblock,
       schedule: this.schedule,
       redirectUrl: this.redirectUrl,
-      enableLogs: this.enableLogs
+      enableLogs: this.enableLogs,
+      logsLength: defaultLogsSettings.maxLength,
     }).then((items) => {
       this.debug('items:', items);
       //----- Start backward compatibility with v1
@@ -172,6 +177,7 @@ export class Background extends Component {
       this.schedule = { ...this.schedule, ...items.schedule };
       this.redirectUrl = getValidUrl(items.redirectUrl);
       this.enableLogs = items.enableLogs;
+      logger.maxLength = items.logsLength;
       if (!this.hasBeenEnabledOnStartup) {
         this.isEnabled = items.isEnabled;
         if (this.isEnabled) {

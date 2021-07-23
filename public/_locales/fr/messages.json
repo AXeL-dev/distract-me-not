@@ -313,6 +313,9 @@
   "enableLogs": {
     "message": "Activer les journaux de suivi"
   },
+  "logsLength": {
+    "message": "Taille des journaux"
+  },
   "hideReportIssueButton": {
     "message": "Masquer le bouton \"signaler un problème\" sur le panneau principal"
   },

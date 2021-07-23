@@ -313,6 +313,9 @@
   "enableLogs": {
     "message": "Enable trace logs"
   },
+  "logsLength": {
+    "message": "Logs length"
+  },
   "hideReportIssueButton": {
     "message": "Hide \"report an issue\" button on the main panel"
   },

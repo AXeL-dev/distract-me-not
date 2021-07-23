@@ -1,12 +1,18 @@
 import { storage } from 'helpers/webext';
 
+export const defaultLogsSettings = {
+  isEnabled: false,
+  maxLength: 100,
+};
+
 export class logger {
+  static maxLength = defaultLogsSettings.maxLength;
 
   static async add(data) {
     const logs = await this.get();
     logs.unshift(data);
-    if (logs.length > 100) {
-      logs.splice(-1 * (logs.length - 100));
+    if (logs.length > this.maxLength) {
+      logs.splice(-1 * (logs.length - this.maxLength));
     }
     return storage.set({ logs });
   }
@@ -20,5 +26,4 @@ export class logger {
   static clear() {
     return storage.set({ logs: [] });
   }
-
 }

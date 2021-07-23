@@ -313,6 +313,9 @@
   "enableLogs": {
     "message": "Traceerlogboeken inschakelen"
   },
+  "logsLength": {
+    "message": "Logs lengte"
+  },
   "hideReportIssueButton": {
     "message": "Verberg de knop \"een probleem melden\" op het hoofdpaneel"
   },
