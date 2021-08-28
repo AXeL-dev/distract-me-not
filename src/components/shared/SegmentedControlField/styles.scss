@@ -13,9 +13,9 @@
     > :not([disabled="true"]):not([data-disabled="true"]) {
       cursor: not-allowed;
       opacity: 0.8;
-      background-image: none;
-      background-color: rgba(67, 90, 111, 0.06);
-      box-shadow: none;
+      background-image: none !important;
+      background-color: rgba(67, 90, 111, 0.06) !important;
+      box-shadow: none !important;
       color: rgba(67, 90, 111, 0.7);
       pointer-events: none;
       > label {
