@@ -180,7 +180,7 @@
     "message": "Appliquer les paramètres partout"
   },
   "confirmApplyScheduleSettings": {
-    "message": "Êtes-vous sûr de vouloir appliquer les paramètres de programmation actuels à tous les autres jours de la semaine?"
+    "message": "Êtes-vous sûr de vouloir appliquer les paramètres actuels à tous les autres jours de la semaine?"
   },
   "miscellaneous": {
     "message": "Divers"
