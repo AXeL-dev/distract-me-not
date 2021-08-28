@@ -152,17 +152,35 @@
   "scheduleDescription": {
     "message": "Planifier le temps de blocage"
   },
+  "scheduleTip": {
+    "message": "S'il n'y a pas d'horaire, le blocage sera actif pendant toute la journée."
+  },
   "scheduleStartTime": {
     "message": "Heure de début"
   },
   "scheduleEndTime": {
     "message": "Heure de fin"
   },
-  "scheduleDays": {
-    "message": "Jours"
+  "scheduleType": {
+    "message": "Type d'horaire"
   },
-  "scheduleDaysDescription": {
-    "message": "Jours où le blocage doit être activé pendant l'horaire défini. S'il n'y a pas d'horaire, le blocage sera actif pendant toute la journée."
+  "blockingTime": {
+    "message": "Temps de blocage"
+  },
+  "allowedTime": {
+    "message": "Temps autorisé"
+  },
+  "addScheduleRange": {
+    "message": "Ajouter un horaire"
+  },
+  "deleteLastScheduleRange": {
+    "message": "Supprimer le dernier horaire"
+  },
+  "applyScheduleSettings": {
+    "message": "Appliquer les paramètres partout"
+  },
+  "confirmApplyScheduleSettings": {
+    "message": "Êtes-vous sûr de vouloir appliquer les paramètres de programmation actuels à tous les autres jours de la semaine?"
   },
   "miscellaneous": {
     "message": "Divers"
@@ -245,6 +263,9 @@
   "cancel": {
     "message": "Annuler"
   },
+  "confirm": {
+    "message": "Confirmer"
+  },
   "monday": {
     "message": "Lundi"
   },
@@ -315,6 +336,9 @@
   },
   "logsLength": {
     "message": "Taille maximale des journaux"
+  },
+  "logsLengthDescription": {
+    "message": "Nombre de lignes à conserver dans la table des logs"
   },
   "hideReportIssueButton": {
     "message": "Masquer le bouton \"signaler un problème\" sur le panneau principal"

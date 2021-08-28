@@ -152,17 +152,35 @@
   "scheduleDescription": {
     "message": "Blokkeertijd inplannen"
   },
+  "scheduleTip": {
+    "message": "Als je geen tijd opgeeft, dan is de blokkade de hele dag actief."
+  },
   "scheduleStartTime": {
     "message": "Begintijd"
   },
   "scheduleEndTime": {
     "message": "Eindtijd"
   },
-  "scheduleDays": {
-    "message": "Dagen"
+  "scheduleType": {
+    "message": "Tijdtype plannen"
   },
-  "scheduleDaysDescription": {
-    "message": "De dagen waarop blokkering moet worden ingeschakeld. Als je geen tijd opgeeft, dan is de blokkade de hele dag actief."
+  "blockingTime": {
+    "message": "Blok tijd"
+  },
+  "allowedTime": {
+    "message": "Toegestane tijd"
+  },
+  "addScheduleRange": {
+    "message": "Tijdsbereik toevoegen"
+  },
+  "deleteLastScheduleRange": {
+    "message": "Laatste bereik verwijderen"
+  },
+  "applyScheduleSettings": {
+    "message": "Pas overal instellingen toe"
+  },
+  "confirmApplyScheduleSettings": {
+    "message": "Weet u zeker dat u de huidige schema-instellingen op alle andere dagen van de week wilt toepassen?"
   },
   "miscellaneous": {
     "message": "Overig"
@@ -245,6 +263,9 @@
   "cancel": {
     "message": "Annuleren"
   },
+  "confirm": {
+    "message": "Bevestigen"
+  },
   "monday": {
     "message": "maandag"
   },
@@ -315,6 +336,9 @@
   },
   "logsLength": {
     "message": "Logs lengte"
+  },
+  "logsLengthDescription": {
+    "message": "Aantal regels dat in de logtabel moet worden bewaard"
   },
   "hideReportIssueButton": {
     "message": "Verberg de knop \"een probleem melden\" op het hoofdpaneel"

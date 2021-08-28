@@ -152,17 +152,35 @@
   "scheduleDescription": {
     "message": "Schedule blocking time"
   },
+  "scheduleTip": {
+    "message": "If schedule time is not defined, the blocking will be active for the whole day."
+  },
   "scheduleStartTime": {
     "message": "Start time"
   },
   "scheduleEndTime": {
     "message": "End time"
   },
-  "scheduleDays": {
-    "message": "Days"
+  "scheduleType": {
+    "message": "Schedule type"
   },
-  "scheduleDaysDescription": {
-    "message": "Days where blocking should be enabled during the scheduled time. If schedule time is not defined, the blocking will be active for the whole day."
+  "blockingTime": {
+    "message": "Blocking time"
+  },
+  "allowedTime": {
+    "message": "Allowed time"
+  },
+  "addScheduleRange": {
+    "message": "Add time range"
+  },
+  "deleteLastScheduleRange": {
+    "message": "Delete last range"
+  },
+  "applyScheduleSettings": {
+    "message": "Apply settings everywhere"
+  },
+  "confirmApplyScheduleSettings": {
+    "message": "Are you sure that you want to apply the current schedule settings on all the other days of the week?"
   },
   "miscellaneous": {
     "message": "Miscellaneous"
@@ -245,6 +263,9 @@
   "cancel": {
     "message": "Cancel"
   },
+  "confirm": {
+    "message": "Confirm"
+  },
   "monday": {
     "message": "Monday"
   },
@@ -315,6 +336,9 @@
   },
   "logsLength": {
     "message": "Logs length"
+  },
+  "logsLengthDescription": {
+    "message": "Number of lines to keep on logs table"
   },
   "hideReportIssueButton": {
     "message": "Hide \"report an issue\" button on the main panel"

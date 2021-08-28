@@ -1,5 +1,6 @@
-import { DaysOfWeek } from './date';
+import { DaysOfWeek, today, inTime } from './date';
 import { translate } from './i18n';
+import { report } from './debug';
 import { sendMessage, storage } from 'helpers/webext';
 
 export const Mode = {
@@ -40,13 +41,25 @@ export const defaultWhitelist = [
   '*.wikipedia.org'
 ];
 
-export const defaultSchedule = {
-  isEnabled: false,
+export const scheduleType = {
+  blockingTime: 'blocking',
+  allowedTime: 'allowed'
+};
+
+export const newScheduleTimeRange = () => ({
   time: {
     start: '',
     end: ''
   },
-  days: DaysOfWeek
+  type: scheduleType.blockingTime
+});
+
+export const defaultSchedule = {
+  isEnabled: false,
+  days: DaysOfWeek.reduce((acc, cur) => ({
+    ...acc,
+    [cur]: [],
+  }), {}),
 };
 
 export const defaultUnblock = {
@@ -64,6 +77,33 @@ export const unblockOptions = {
 
 export function isAccessible(url) {
   return url && !url.startsWith("about:") && !/^(?:file|chrome|moz-extension|chrome-extension):\/\//i.test(url);
+}
+
+export function isTodayScheduleAllowed(schedule, detailedResults = false) {
+  let isSet = false;
+  let isAllowed = true;
+  let range = null;
+  try {
+    const todaySchedule = schedule.days[today()] || [];
+    isSet = todaySchedule.length > 0;
+    for (const currentRange of todaySchedule) {
+      if (!isAllowed) break;
+      const [startHour, startMinute] = currentRange.time.start.split(':');
+      const start = Number(startHour) * 60 + Number(startMinute);
+      const [endHour, endMinute] = currentRange.time.end.split(':');
+      const end = Number(endHour) * 60 + Number(endMinute);
+      const isInTime = inTime(start, end);
+      isAllowed = currentRange.type === scheduleType.allowedTime ? !start || isInTime : start && !isInTime;
+      range = currentRange;
+    }
+  } catch (error) {
+    report.error(error);
+  }
+  return detailedResults ? {
+    isSet,
+    isAllowed,
+    range,
+  } : isAllowed;
 }
 
 export function blockUrl(url, mode = Mode.blacklist) {

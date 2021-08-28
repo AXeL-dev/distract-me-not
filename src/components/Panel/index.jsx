@@ -1,9 +1,8 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Text, Position, Badge, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon, HistoryIcon, IssueNewIcon } from 'evergreen-ui';
+import { Pane, Text, Position, Badge, PlusIcon, TickIcon, DisableIcon, SmallMinusIcon, HistoryIcon, IssueNewIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { sendMessage, getActiveTab, getActiveTabHostname, storage, createWindow, indexUrl } from 'helpers/webext';
-import { Mode, modes, defaultSchedule, isAccessible, blockUrl } from 'helpers/block';
-import { inToday } from 'helpers/date';
+import { Mode, modes, defaultSchedule, isAccessible, blockUrl, isTodayScheduleAllowed, scheduleType } from 'helpers/block';
 import { defaultLogsSettings } from 'helpers/logger';
 import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton, LinkIconButton } from 'components';
 import './styles.scss';
@@ -14,7 +13,7 @@ export class Panel extends Component {
     super(props);
     this.state = {
       isEnabled: true,
-      mode: '',//defaultMode,
+      mode: '', //defaultMode,
       schedule: defaultSchedule,
       isAddButtonVisible: true,
       enableLogs: false,
@@ -113,6 +112,35 @@ export class Panel extends Component {
     return false;
   }
 
+  renderStatus = () => {
+    const { isSet, range } = isTodayScheduleAllowed(this.state.schedule, true);
+
+    return isSet ? (
+      <Fragment>
+        {range.time.start.length ? (
+          <Fragment>
+            {range.type === scheduleType.allowedTime ? (
+              <TickIcon color="#28a745" marginRight={10} />
+            ) : (
+              <DisableIcon color="#dc3545" marginRight={10} />
+            )}
+            <Text className="cursor-default" size={300}>{range.time.start}</Text>
+            <SmallMinusIcon color="#666" marginX={3} />
+            {range.time.end.length ? (
+              <Text className="cursor-default" size={300}>{range.time.end}</Text>
+            ) : (
+              <Badge color="blue" isSolid={false}>{translate('dayEnd')}</Badge>
+            )}
+          </Fragment>
+        ) : (
+          <Badge color="green" isSolid={false}>{translate('enabled')}</Badge>
+        )}
+      </Fragment>
+    ) : (
+      <Badge color="neutral" isSolid={false}>{translate('dayOff')}</Badge>
+    );
+  }
+
   render() {
     return (
       <Pane minWidth={350}>
@@ -123,26 +151,7 @@ export class Panel extends Component {
               <Text className="cursor-default">{translate('status')}</Text>
             </Pane>
             <Pane display="flex" alignItems="center" justifyContent="center">
-              {inToday(this.state.schedule.days) ? (
-                <Fragment>
-                  {this.state.schedule.time.start.length ? (
-                    <Fragment>
-                      <TimeIcon color="#3d8bd4" marginRight={10} />
-                      <Text className="cursor-default" size={300}>{this.state.schedule.time.start}</Text>
-                      <SmallMinusIcon color="#666" marginX={3} />
-                      {this.state.schedule.time.end.length ? (
-                        <Text className="cursor-default" size={300}>{this.state.schedule.time.end}</Text>
-                      ) : (
-                        <Badge color="blue" isSolid={false}>{translate('dayEnd')}</Badge>
-                      )}
-                    </Fragment>
-                  ) : (
-                    <Badge color="green" isSolid={false}>{translate('enabled')}</Badge>
-                  )}
-                </Fragment>
-              ) : (
-                <Badge color="neutral" isSolid={false}>{translate('dayOff')}</Badge>
-              )}
+              {this.renderStatus()}
             </Pane>
           </Pane>
         ) : (
