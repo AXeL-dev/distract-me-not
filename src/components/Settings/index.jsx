@@ -2,7 +2,8 @@ import React, { Component, Fragment } from 'react';
 import { Pane, Tablist, SidebarTab, SelectField, Checkbox, TextInputField, Button, TickIcon, PlusIcon, CrossIcon, DuplicateIcon, Paragraph, toaster, HeartIcon, Dialog } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv } from 'helpers/debug';
-import { Mode, Action, modes, actions, defaultAction, defaultMode, defaultBlacklist, defaultWhitelist, defaultSchedule, scheduleType, newScheduleTimeRange, defaultUnblock } from 'helpers/block';
+import { Mode, Action, modes, actions, defaultAction, defaultMode, defaultBlacklist, defaultWhitelist, defaultUnblock } from 'helpers/block';
+import { ScheduleType, defaultSchedule, newScheduleTimeRange } from 'helpers/schedule';
 import { sendMessage, storage } from 'helpers/webext';
 import { DaysOfWeek, today } from 'helpers/date';
 import { hash } from 'helpers/crypt';
@@ -102,7 +103,7 @@ export class Settings extends Component {
             schedule: {
               // merge both state & storage values
               ...this.state.options.schedule,
-              ...(!items.schedule.time ? items.schedule : {}), // omit old schedule options in version <= 2.3.0
+              ...(!items.schedule.time ? items.schedule : {}), // omit old schedule settings in version <= 2.3.0
             },
             password: {
               ...this.state.options.password,
@@ -462,11 +463,11 @@ export class Settings extends Component {
                       label={translate('scheduleType')}
                       options={[{
                         label: translate('blockingTime'),
-                        value: scheduleType.blockingTime,
+                        value: ScheduleType.blockingTime,
                         tooltip: translate('scheduleTip'),
                       }, {
                         label: translate('allowedTime'),
-                        value: scheduleType.allowedTime,
+                        value: ScheduleType.allowedTime,
                       }]}
                       value={range.type}
                       onChange={(value) => this.setOptions(`schedule.days['${day.value}'][${index}].type`, value)}

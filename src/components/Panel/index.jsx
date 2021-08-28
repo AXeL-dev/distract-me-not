@@ -2,7 +2,8 @@ import React, { Component, Fragment } from 'react';
 import { Pane, Text, Position, Badge, PlusIcon, TickIcon, DisableIcon, SmallMinusIcon, HistoryIcon, IssueNewIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { sendMessage, getActiveTab, getActiveTabHostname, storage, createWindow, indexUrl } from 'helpers/webext';
-import { Mode, modes, defaultSchedule, isAccessible, blockUrl, isTodayScheduleAllowed, scheduleType } from 'helpers/block';
+import { Mode, modes, isAccessible, blockUrl } from 'helpers/block';
+import { ScheduleType, defaultSchedule, getTodayScheduleRange } from 'helpers/schedule';
 import { defaultLogsSettings } from 'helpers/logger';
 import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton, LinkIconButton } from 'components';
 import './styles.scss';
@@ -113,13 +114,13 @@ export class Panel extends Component {
   }
 
   renderStatus = () => {
-    const { isSet, range } = isTodayScheduleAllowed(this.state.schedule, true);
+    const range = getTodayScheduleRange(this.state.schedule);
 
-    return isSet ? (
+    return range ? (
       <Fragment>
         {range.time.start.length ? (
           <Fragment>
-            {range.type === scheduleType.allowedTime ? (
+            {range.type === ScheduleType.allowedTime ? (
               <TickIcon color="#28a745" marginRight={10} />
             ) : (
               <DisableIcon color="#dc3545" marginRight={10} />

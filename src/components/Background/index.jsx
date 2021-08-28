@@ -2,7 +2,8 @@
 
 import React, { Component } from 'react';
 import { storage, nativeAPI, indexUrl, getTab, sendNotification } from 'helpers/webext';
-import { Mode, Action, defaultBlacklist, defaultWhitelist, defaultSchedule, unblockOptions, defaultUnblock, isAccessible, isTodayScheduleAllowed } from 'helpers/block';
+import { Mode, Action, defaultBlacklist, defaultWhitelist, UnblockOptions, defaultUnblock, isAccessible } from 'helpers/block';
+import { defaultSchedule, isTodayScheduleAllowed } from 'helpers/schedule';
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
 import { transformList } from 'helpers/regex';
 import { logger, defaultLogsSettings } from 'helpers/logger';
@@ -173,7 +174,7 @@ export class Background extends Component {
       this.mode = items.mode;
       this.action = items.action;
       this.unblock = { ...this.unblock, ...items.unblock }; // merge
-      this.schedule = { ...this.schedule, ...(!items.schedule.time ? items.schedule : {}) }; // omit old schedule options in version <= 2.3.0
+      this.schedule = { ...this.schedule, ...(!items.schedule.time ? items.schedule : {}) }; // omit old schedule settings in version <= 2.3.0
       this.redirectUrl = getValidUrl(items.redirectUrl);
       this.enableLogs = items.enableLogs;
       logger.maxLength = items.logsLength;
@@ -235,10 +236,10 @@ export class Background extends Component {
           const { url, option, time = 0 } = request.params[0];
           let timeout = 0;
           switch (option) {
-            case unblockOptions.unblockForWhile: 
+            case UnblockOptions.unblockForWhile: 
               timeout = time * 60000; // convert minutes to ms
               break;
-            case unblockOptions.unblockOnce:
+            case UnblockOptions.unblockOnce:
             default:
               timeout = this.unblock.unblockOnceTimeout * 1000; // convert seconds to ms
               break;

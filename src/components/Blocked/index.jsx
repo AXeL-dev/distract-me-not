@@ -4,7 +4,7 @@ import { translate } from 'helpers/i18n';
 import { storage, sendMessage } from 'helpers/webext';
 import { debug, isDevEnv } from 'helpers/debug';
 import { isUrl, getValidUrl } from 'helpers/url';
-import { unblockOptions } from 'helpers/block';
+import { UnblockOptions } from 'helpers/block';
 import { NumberInput, PasswordPrompt } from 'components';
 import queryString from 'query-string';
 import './styles.scss';
@@ -27,7 +27,7 @@ export class Blocked extends Component {
       unblockDialog: {
         isShown: false,
         options: this.getUnblockOptions(defaultUnblockTime),
-        selected: unblockOptions.unblockOnce,
+        selected: UnblockOptions.unblockOnce,
         time: defaultUnblockTime,
         requirePassword: props.requirePassword || false,
       }
@@ -38,7 +38,7 @@ export class Blocked extends Component {
     return [
       {
         label: translate('unblockOnce'),
-        value: unblockOptions.unblockOnce
+        value: UnblockOptions.unblockOnce
       },
       {
         label: (
@@ -49,12 +49,12 @@ export class Blocked extends Component {
               max={720}
               width={65}
               value={time}
-              onChange={(value) => this.updateUnblockDialogState({ selected: unblockOptions.unblockForWhile, time: value })}
+              onChange={(value) => this.updateUnblockDialogState({ selected: UnblockOptions.unblockForWhile, time: value })}
             />
             <span>{translate('minutes')}</span>
           </Pane>
         ),
-        value: unblockOptions.unblockForWhile
+        value: UnblockOptions.unblockForWhile
       }
     ];
   }
