@@ -16,10 +16,13 @@ export const newScheduleTimeRange = () => ({
 
 export const defaultSchedule = {
   isEnabled: false,
-  days: DaysOfWeek.reduce((acc, cur) => ({
-    ...acc,
-    [cur]: [],
-  }), {}),
+  days: DaysOfWeek.reduce(
+    (acc, cur) => ({
+      ...acc,
+      [cur]: [],
+    }),
+    {}
+  ),
 };
 
 export function parseTime(time) {

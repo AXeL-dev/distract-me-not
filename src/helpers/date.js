@@ -16,7 +16,7 @@ export const DayNumber = {
   thursday: 4,
   friday: 5,
   saturday: 6,
-  sunday: 0
+  sunday: 0,
 };
 
 export const DayString = {
@@ -26,7 +26,7 @@ export const DayString = {
   3: 'wednesday',
   4: 'thursday',
   5: 'friday',
-  6: 'saturday'
+  6: 'saturday',
 };
 
 export const WorkingDays = DaysOfWeek.slice(0, -2); // Monday to Friday
@@ -42,7 +42,7 @@ export function today(asNumber = false) {
 export function inToday(days) {
   const now = new Date();
   const day = today();
-  return !!days.find(d => d === day);
+  return !!days.find((d) => d === day);
 }
 
 export function now(asTimestamp = false) {

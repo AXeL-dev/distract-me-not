@@ -400,7 +400,7 @@ export class Background extends Component {
     if (this.schedule.isEnabled) {
       const todaySchedule = getTodaySchedule(this.schedule);
       if (isScheduleAllowed(todaySchedule)) {
-        this.debug('not in blocking schedule time:', todaySchedule);
+        this.debug('not in scheduled blocking time:', todaySchedule);
         return;
       }
     }

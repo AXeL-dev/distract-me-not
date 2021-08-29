@@ -1,6 +1,6 @@
 /* global browser, chrome */
 
-import { report } from "./debug";
+import { report } from './debug';
 
 function getNativeAPI() {
   try {
@@ -70,7 +70,7 @@ export function openExtensionPage(url, reloadIfExists = true) {
 export function createTab(url, isActive = true) {
   return browser.tabs.create({
     url: url,
-    active: isActive
+    active: isActive,
   });
 }
 
@@ -82,7 +82,7 @@ export function createWindow(url, width = 600, height = 300, type = 'popup') {
       height,
       type,
       left: window.screen.availLeft + Math.round((window.screen.availWidth - width) / 2),
-      top: window.screen.availTop + Math.round((window.screen.availHeight - height) / 2)
+      top: window.screen.availTop + Math.round((window.screen.availHeight - height) / 2),
     });
   } catch (error) {
     report.error(error);
@@ -91,16 +91,16 @@ export function createWindow(url, width = 600, height = 300, type = 'popup') {
 
 /**
  * Send message to background script
- * 
+ *
  * @param {string} message function to call (or variable)
  * @param  {...any} params function parameters
  */
 export function sendMessage(message, ...params) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     try {
       browser.runtime.sendMessage({
         message: message,
-        params: params
+        params: params,
       }).then(({ response }) => {
         resolve(response);
       });
@@ -112,12 +112,12 @@ export function sendMessage(message, ...params) {
 }
 
 export function getActiveTab() {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     try {
       browser.tabs.query({
         active: true,
-        lastFocusedWindow: true
-      }).then(tabs => {
+        lastFocusedWindow: true,
+      }).then((tabs) => {
         resolve(tabs[0]);
       });
     } catch (error) {
@@ -128,9 +128,9 @@ export function getActiveTab() {
 }
 
 export function getTab(tabId) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     try {
-      browser.tabs.get(tabId).then(tabInfo => {
+      browser.tabs.get(tabId).then((tabInfo) => {
         resolve(tabInfo);
       });
     } catch (error) {
@@ -141,10 +141,10 @@ export function getTab(tabId) {
 }
 
 export function getActiveTabHostname() {
-  return new Promise(resolve => {
-    getActiveTab().then(tab => {
+  return new Promise((resolve) => {
+    getActiveTab().then((tab) => {
       if (tab) {
-        const parser = document.createElement("a");
+        const parser = document.createElement('a');
         parser.href = tab.url;
         const host = parser.hostname.replace(/^www\./i, '');
         resolve(host);
@@ -171,9 +171,9 @@ export function sendNotification(message, title = 'Distract Me Not', type = 'bas
 export class storage {
 
   static get(items) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       try {
-        browser.storage.local.get(items).then(results => {
+        browser.storage.local.get(items).then((results) => {
           resolve(results);
         });
       } catch (error) {
@@ -184,7 +184,7 @@ export class storage {
   }
 
   static set(items) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       try {
         browser.storage.local.set(items).then(() => {
           resolve(true);
@@ -197,7 +197,7 @@ export class storage {
   }
 
   static remove(keys) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       try {
         browser.storage.local.remove(keys).then(() => {
           resolve(true);
