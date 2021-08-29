@@ -15,4 +15,6 @@ export * from './SwitchField';
 export * from './TextField';
 export * from './TimeField';
 export * from './TooltipLabel';
+export * from './TooltipBadge';
+export * from './TooltipIcon';
 export * from './WebsiteList';

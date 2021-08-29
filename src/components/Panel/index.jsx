@@ -1,11 +1,12 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Text, Position, Badge, PlusIcon, TickIcon, TimeIcon, SmallMinusIcon, HistoryIcon, IssueNewIcon } from 'evergreen-ui';
+import { Pane, Text, Position, Badge, PlusIcon, TickIcon, DisableIcon, SmallMinusIcon, SlashIcon, HistoryIcon, IssueNewIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { sendMessage, getActiveTab, getActiveTabHostname, storage, createWindow, indexUrl } from 'helpers/webext';
-import { Mode, modes, defaultSchedule, isAccessible, blockUrl } from 'helpers/block';
-import { inToday } from 'helpers/date';
+import { Mode, modes, isAccessible, blockUrl } from 'helpers/block';
+import { ScheduleType, defaultSchedule, getTodaySchedule } from 'helpers/schedule';
 import { defaultLogsSettings } from 'helpers/logger';
-import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton, LinkIconButton } from 'components';
+import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton, LinkIconButton, TooltipIcon } from 'components';
+import colors from 'helpers/color';
 import './styles.scss';
 
 export class Panel extends Component {
@@ -14,7 +15,7 @@ export class Panel extends Component {
     super(props);
     this.state = {
       isEnabled: true,
-      mode: '',//defaultMode,
+      mode: '', //defaultMode,
       schedule: defaultSchedule,
       isAddButtonVisible: true,
       enableLogs: false,
@@ -113,6 +114,53 @@ export class Panel extends Component {
     return false;
   }
 
+  renderScheduleRange = (range) => {
+    const start = range.time.start.length ? range.time.start : '00:00';
+    const end = range.time.end.length ? range.time.end : '23:59';
+
+    return (
+      <Fragment>
+        {range.type === ScheduleType.allowedTime ? (
+          <TooltipIcon
+            icon={TickIcon}
+            tooltip={translate('allowedTime')}
+            color={colors.green}
+            size={14}
+            marginRight={10}
+          />
+        ) : (
+          <TooltipIcon
+            icon={DisableIcon}
+            tooltip={translate('blockingTime')}
+            color={colors.red}
+            size={14}
+            marginRight={10}
+          />
+        )}
+        <Text className="cursor-default" size={300}>{start}</Text>
+        <SmallMinusIcon color={colors.grey} marginX={3} />
+        <Text className="cursor-default" size={300}>{end}</Text>
+      </Fragment>
+    );
+  }
+
+  renderScheduleStatus = () => {
+    const ranges = getTodaySchedule(this.state.schedule);
+
+    return ranges.length > 0 ? ranges.map((range, index) => (
+      <Fragment key={index}>
+        {index > 0 && (
+          <SlashIcon color={colors.grey} marginX={3} />
+        )}
+        {this.renderScheduleRange(range)}
+      </Fragment>
+    )) : (
+      <Badge color="neutral" isSolid={false}>
+        {translate('dayOff')}
+      </Badge>
+    );
+  }
+
   render() {
     return (
       <Pane minWidth={350}>
@@ -123,26 +171,7 @@ export class Panel extends Component {
               <Text className="cursor-default">{translate('status')}</Text>
             </Pane>
             <Pane display="flex" alignItems="center" justifyContent="center">
-              {inToday(this.state.schedule.days) ? (
-                <Fragment>
-                  {this.state.schedule.time.start.length ? (
-                    <Fragment>
-                      <TimeIcon color="#3d8bd4" marginRight={10} />
-                      <Text className="cursor-default" size={300}>{this.state.schedule.time.start}</Text>
-                      <SmallMinusIcon color="#666" marginX={3} />
-                      {this.state.schedule.time.end.length ? (
-                        <Text className="cursor-default" size={300}>{this.state.schedule.time.end}</Text>
-                      ) : (
-                        <Badge color="blue" isSolid={false}>{translate('dayEnd')}</Badge>
-                      )}
-                    </Fragment>
-                  ) : (
-                    <Badge color="green" isSolid={false}>{translate('enabled')}</Badge>
-                  )}
-                </Fragment>
-              ) : (
-                <Badge color="neutral" isSolid={false}>{translate('dayOff')}</Badge>
-              )}
+              {this.renderScheduleStatus()}
             </Pane>
           </Pane>
         ) : (

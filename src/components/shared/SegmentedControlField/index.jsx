@@ -24,10 +24,12 @@ export function SegmentedControlField(props) {
           className="custom-segmented-control"
           name={props.name}
           width={props.width}
+          height={props.height}
           options={options}
           value={props.value}
           onChange={props.onChange}
           disabled={props.disabled}
+          data-disabled={props.disabled}
         />
       </Pane>
     </OuterPane>

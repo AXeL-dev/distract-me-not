@@ -1,4 +1,3 @@
-import { DaysOfWeek } from './date';
 import { translate } from './i18n';
 import { sendMessage, storage } from 'helpers/webext';
 
@@ -12,6 +11,11 @@ export const Action = {
   blockTab: 'blockTab',
   redirectToUrl: 'redirectToUrl',
   closeTab: 'closeTab'
+};
+
+export const UnblockOptions = {
+  unblockOnce: 'unblock-once',
+  unblockForWhile: 'unblock-for-while'
 };
 
 export const modes = [
@@ -40,26 +44,12 @@ export const defaultWhitelist = [
   '*.wikipedia.org'
 ];
 
-export const defaultSchedule = {
-  isEnabled: false,
-  time: {
-    start: '',
-    end: ''
-  },
-  days: DaysOfWeek
-};
-
 export const defaultUnblock = {
   isEnabled: false,
   requirePassword: false,
   unblockOnceTimeout: 10, // seconds
   displayNotificationOnTimeout: true,
   autoReblockOnTimeout: false,
-};
-
-export const unblockOptions = {
-  unblockOnce: 'unblock-once',
-  unblockForWhile: 'unblock-for-while'
 };
 
 export function isAccessible(url) {
