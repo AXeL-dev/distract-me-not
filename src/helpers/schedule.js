@@ -3,15 +3,15 @@ import { report } from './debug';
 
 export const ScheduleType = {
   blockingTime: 'blocking',
-  allowedTime: 'allowed'
+  allowedTime: 'allowed',
 };
 
 export const newScheduleTimeRange = () => ({
   time: {
     start: '',
-    end: ''
+    end: '',
   },
-  type: ScheduleType.blockingTime
+  type: ScheduleType.blockingTime,
 });
 
 export const defaultSchedule = {
@@ -43,14 +43,26 @@ export function getTodaySchedule(schedule) {
   return schedule.days[today()] || [];
 }
 
-export function isTodayScheduleAllowed(schedule) {
+export function isScheduleAllowed(daySchedule) {
   let isAllowed = true;
   try {
-    const todaySchedule = getTodaySchedule(schedule);
-    for (const range of todaySchedule) {
-      if (!isAllowed) break;
+    for (const range of daySchedule) {
       const { start, end } = parseTime(range.time);
-      isAllowed = range.type === ScheduleType.allowedTime ? !start || inTime(start, end) : start && !inTime(start, end);
+      switch (range.type) {
+        case ScheduleType.allowedTime:
+          isAllowed = !start || inTime(start, end);
+          if (isAllowed) {
+            return true;
+          }
+          break;
+        case ScheduleType.blockingTime:
+        default:
+          isAllowed = start && !inTime(start, end);
+          if (!isAllowed) {
+            return false;
+          }
+          break;
+      }
     }
   } catch (error) {
     report.error(error);

@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import { storage, nativeAPI, indexUrl, getTab, sendNotification } from 'helpers/webext';
 import { Mode, Action, defaultBlacklist, defaultWhitelist, UnblockOptions, defaultUnblock, isAccessible } from 'helpers/block';
-import { defaultSchedule, isTodayScheduleAllowed } from 'helpers/schedule';
+import { defaultSchedule, getTodaySchedule, isScheduleAllowed } from 'helpers/schedule';
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
 import { transformList } from 'helpers/regex';
 import { logger, defaultLogsSettings } from 'helpers/logger';
@@ -398,8 +398,9 @@ export class Background extends Component {
     });
     // Handle schedule
     if (this.schedule.isEnabled) {
-      if (isTodayScheduleAllowed(this.schedule)) {
-        this.debug('not in blocking schedule time:', this.schedule);
+      const todaySchedule = getTodaySchedule(this.schedule);
+      if (isScheduleAllowed(todaySchedule)) {
+        this.debug('not in blocking schedule time:', todaySchedule);
         return;
       }
     }

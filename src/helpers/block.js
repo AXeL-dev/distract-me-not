@@ -4,18 +4,18 @@ import { sendMessage, storage } from 'helpers/webext';
 export const Mode = {
   blacklist: 'blacklist',
   whitelist: 'whitelist',
-  combined: 'combined'
+  combined: 'combined',
 };
 
 export const Action = {
   blockTab: 'blockTab',
   redirectToUrl: 'redirectToUrl',
-  closeTab: 'closeTab'
+  closeTab: 'closeTab',
 };
 
 export const UnblockOptions = {
   unblockOnce: 'unblock-once',
-  unblockForWhile: 'unblock-for-while'
+  unblockForWhile: 'unblock-for-while',
 };
 
 export const modes = [
@@ -37,11 +37,11 @@ export const defaultMode = Mode.blacklist;
 export const defaultBlacklist = [
   '*.facebook.com',
   '*.twitter.com',
-  '*.youtube.com'
+  '*.youtube.com',
 ];
 
 export const defaultWhitelist = [
-  '*.wikipedia.org'
+  '*.wikipedia.org',
 ];
 
 export const defaultUnblock = {
