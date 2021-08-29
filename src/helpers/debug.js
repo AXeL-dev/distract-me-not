@@ -12,6 +12,7 @@ export class debug {
   }
 
 }
+
 export class report {
 
   static error(message, ...params) {

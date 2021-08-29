@@ -9,7 +9,7 @@ export class PasswordInput extends Component {
     super(props);
     this.state = {
       value: props.value || '',
-      isShown: false
+      isShown: false,
     };
   }
 

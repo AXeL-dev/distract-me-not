@@ -30,7 +30,7 @@ export class Blocked extends Component {
         selected: UnblockOptions.unblockOnce,
         time: defaultUnblockTime,
         requirePassword: props.requirePassword || false,
-      }
+      },
     };
   }
 

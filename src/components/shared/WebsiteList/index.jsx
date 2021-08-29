@@ -32,7 +32,7 @@ import './styles.scss';
 const Order = {
   NONE: 'NONE',
   ASC: 'ASC',
-  DESC: 'DESC'
+  DESC: 'DESC',
 };
 
 export class WebsiteList extends Component {
@@ -82,8 +82,8 @@ export class WebsiteList extends Component {
       this.setState({
         favicons: {
           ...this.state.favicons,
-          ...{ [hostName]: null }
-        }
+          ...{ [hostName]: null },
+        },
       });
     }
     const faviconLink = getFaviconLink(url);
@@ -93,8 +93,8 @@ export class WebsiteList extends Component {
         this.setState({
           favicons: {
             ...this.state.favicons,
-            ...{ [hostName]: faviconLink }
-          }
+            ...{ [hostName]: faviconLink },
+          },
         });
       }
     });
@@ -228,8 +228,8 @@ export class WebsiteList extends Component {
       editDialog: {
         row: row,
         value: row.url,
-        isShown: true
-      }
+        isShown: true,
+      },
     });
   }
 
@@ -237,8 +237,8 @@ export class WebsiteList extends Component {
     this.setState({
       editDialog: {
         ...this.state.editDialog,
-        isShown: false
-      }
+        isShown: false,
+      },
     });
   }
 
@@ -277,7 +277,7 @@ export class WebsiteList extends Component {
               title={translate('order')}
               options={[
                 { label: translate('ascending'), value: Order.ASC },
-                { label: translate('descending'), value: Order.DESC }
+                { label: translate('descending'), value: Order.DESC },
               ]}
               selected={
                 this.state.orderedColumn === orderedColumn ? this.state.ordering : null
@@ -285,7 +285,7 @@ export class WebsiteList extends Component {
               onChange={value => {
                 this.setState({
                   orderedColumn,
-                  ordering: value
+                  ordering: value,
                 });
                 // Close the popover when you select a value.
                 close();

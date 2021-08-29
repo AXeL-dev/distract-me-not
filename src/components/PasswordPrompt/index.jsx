@@ -16,7 +16,7 @@ export class PasswordPrompt extends Component {
     this.redirectPath = this.props.path || '/';
     debug.log({ hash: this.hash, redirectPath: this.redirectPath });
     this.state = {
-      password: ''
+      password: '',
     };
   }
 

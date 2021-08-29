@@ -3,6 +3,7 @@ import { Pane, Position } from 'evergreen-ui';
 
 export function OuterPane(props) {
   const flexDirection = props.position === Position.LEFT ? 'row-reverse' : null;
+
   return (
     <Pane
       display={props.display}

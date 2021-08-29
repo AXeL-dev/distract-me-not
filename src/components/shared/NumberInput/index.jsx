@@ -6,7 +6,7 @@ export class NumberInput extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: props.value || props.min || null
+      value: props.value || props.min || null,
     };
   }
 

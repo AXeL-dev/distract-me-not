@@ -318,7 +318,7 @@ export class Background extends Component {
       case Action.closeTab:
         this.closeTab(data.tabId);
         return {
-          redirectUrl: 'javascript:window.close()' // eslint-disable-line
+          redirectUrl: 'javascript:window.close()', // eslint-disable-line
         };
     }
   }
@@ -394,7 +394,7 @@ export class Background extends Component {
       data: data,
       mode: this.mode,
       blacklist: this.blacklist,
-      whitelist: this.whitelist
+      whitelist: this.whitelist,
     });
     // Handle schedule
     if (this.schedule.isEnabled) {
@@ -457,8 +457,8 @@ export class Background extends Component {
   enableEventListeners = () => {
     browser.webRequest.onBeforeRequest.addListener(this.onBeforeRequestHandler, {
       urls: ['*://*/*'],
-      types: ['main_frame', 'sub_frame']
-    }, ["blocking"]);
+      types: ['main_frame', 'sub_frame'],
+    }, ['blocking']);
     browser.tabs.onUpdated.addListener(this.onUpdatedHandler);
     browser.tabs.onReplaced.addListener(this.onReplacedHandler);
   }
@@ -486,7 +486,7 @@ export class Background extends Component {
   enable = (debugMessage = 'enabled!') => {
     if (this.enableLock) {
       this.debug('already enabled!', {
-        enableLock: this.enableLock
+        enableLock: this.enableLock,
       });
     } else {
       this.checkAllTabs();
@@ -506,7 +506,7 @@ export class Background extends Component {
       this.enableLock = false;
     } else {
       this.debug('already disabled!', {
-        enableLock: this.enableLock
+        enableLock: this.enableLock,
       });
     }
   }

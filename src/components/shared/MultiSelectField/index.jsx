@@ -10,7 +10,7 @@ export class MultiSelectField extends Component {
     this.state = {
       options: props.options || [],
       selected: props.selected || [],
-      selectedLabels: []
+      selectedLabels: [],
     };
     this.setHeight(this.state.options.length);
   }
@@ -58,7 +58,7 @@ export class MultiSelectField extends Component {
   handleChange = (value) => {
     this.setState({
       selected: value,
-      selectedLabels: this.getSelectedLabels(value)
+      selectedLabels: this.getSelectedLabels(value),
     });
     if (this.props.onChange) {
       this.props.onChange(value);

@@ -27,7 +27,7 @@ import './styles.scss';
 const Order = {
   NONE: 'NONE',
   ASC: 'ASC',
-  DESC: 'DESC'
+  DESC: 'DESC',
 };
 
 export class Logs extends Component {
