@@ -1,4 +1,4 @@
-import { DaysOfWeek, today, inTime } from './date';
+import { DaysOfWeek, today } from './date';
 import { report } from './debug';
 
 export const ScheduleType = {
@@ -30,36 +30,27 @@ export function parseTime(time) {
   return { start, end };
 }
 
-export function getTodayScheduleRange(schedule) {
-  let todayRange = null;
-  try {
-    const todaySchedule = schedule.days[today()] || [];
-    for (const range of todaySchedule) {
-      if (!todayRange) {
-        todayRange = range;
-      } else {
-        const { start, end } = parseTime(range.time);
-        const isInTime = inTime(start, end);
-        if (isInTime) {
-          todayRange = range;
-        }
-      }
-    }
-  } catch (error) {
-    report.error(error);
+export function inTime(start, end) {
+  const now = new Date();
+  const time = now.getHours() * 60 + now.getMinutes();
+  return time >= start && (!end || time < end);
+}
+
+export function getTodaySchedule(schedule) {
+  if (!schedule || !schedule.days) {
+    return [];
   }
-  return todayRange;
+  return schedule.days[today()] || [];
 }
 
 export function isTodayScheduleAllowed(schedule) {
   let isAllowed = true;
   try {
-    const todaySchedule = schedule.days[today()] || [];
+    const todaySchedule = getTodaySchedule(schedule);
     for (const range of todaySchedule) {
       if (!isAllowed) break;
       const { start, end } = parseTime(range.time);
-      const isInTime = inTime(start, end);
-      isAllowed = range.type === ScheduleType.allowedTime ? !start || isInTime : start && !isInTime;
+      isAllowed = range.type === ScheduleType.allowedTime ? !start || inTime(start, end) : start && !inTime(start, end);
     }
   } catch (error) {
     report.error(error);

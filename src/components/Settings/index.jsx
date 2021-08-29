@@ -497,7 +497,7 @@ export class Settings extends Component {
                 </Button>
               )}
               {currentScheduleDayRanges.length > 0 && (
-                <>
+                <Fragment>
                   <Button
                     height={32}
                     className="overflow-ellipsis"
@@ -520,7 +520,7 @@ export class Settings extends Component {
                   >
                     {translate('applyScheduleSettings')}
                   </Button>
-                </>
+                </Fragment>
               )}
             </Pane>
           </Pane>
