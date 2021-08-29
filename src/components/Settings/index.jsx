@@ -411,7 +411,7 @@ export class Settings extends Component {
         <Pane display="flex">
           <Pane width={180}>
             <Tablist flexBasis={240} marginRight={16}>
-              {this.state.scheduleDays.map((day, index) => (
+              {this.state.scheduleDays.map((day) => (
                 <SidebarTab
                   key={day.value}
                   id={day.value}

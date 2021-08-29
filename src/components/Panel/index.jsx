@@ -148,7 +148,7 @@ export class Panel extends Component {
     const ranges = getTodaySchedule(this.state.schedule);
 
     return ranges.length > 0 ? ranges.map((range, index) => (
-      <Fragment>
+      <Fragment key={index}>
         {index > 0 && (
           <SlashIcon color={colors.grey} marginX={3} />
         )}
