@@ -60,9 +60,11 @@ export class Blocked extends Component {
   }
 
   componentDidMount() {
-    sendMessage('getIsEnabled').then(isEnabled => {
-      if (isEnabled === false && this.url) { // Redirect to url when status is disabled
+    sendMessage('isUrlStillBlocked', this.url).then(isUrlStillBlocked => {
+      // Redirect to blocked url if no longer blocked
+      if (isUrlStillBlocked === false && this.url) {
         sendMessage('redirectSenderTab', this.url);
+        return;
       }
     });
     storage.get({

@@ -46,10 +46,10 @@ export function getTodaySchedule(schedule) {
   return schedule.days[today()] || [];
 }
 
-export function isScheduleAllowed(daySchedule) {
+export function isScheduleAllowed(singleDaySchedule) {
   let isAllowed = true;
   try {
-    for (const range of daySchedule) {
+    for (const range of singleDaySchedule) {
       const { start, end } = parseTime(range.time);
       switch (range.type) {
         case ScheduleType.allowedTime:

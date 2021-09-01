@@ -388,6 +388,44 @@ export class Background extends Component {
     return false;
   }
 
+  isUrlBlocked = (url) => {
+    switch (this.mode) {
+      case Mode.blacklist:
+        return this.isBlacklisted(url);
+      case Mode.whitelist:
+        return !this.isWhitelisted(url);
+      case Mode.combined:
+        return !this.isWhitelisted(url) && this.isBlacklisted(url);
+      default:
+        return false;
+    }
+  };
+
+  parseTodaySchedule = () => {
+    let isAllowedTime = false;
+    let todaySchedule = null;
+    if (this.schedule.isEnabled) {
+      todaySchedule = getTodaySchedule(this.schedule);
+      isAllowedTime = isScheduleAllowed(todaySchedule);
+    }
+    return {
+      isAllowedTime,
+      todaySchedule,
+    };
+  }
+
+  isUrlStillBlocked = (url) => {
+    if (!this.isEnabled) {
+      return false;
+    } else {
+      const { isAllowedTime } = this.parseTodaySchedule();
+      if (isAllowedTime) {
+        return false;
+      }
+    }
+    return this.isUrlBlocked(url);
+  };
+
   parseUrl = (data, caller) => {
     this.debug('parsing url:', {
       caller: caller,
@@ -397,28 +435,13 @@ export class Background extends Component {
       whitelist: this.whitelist,
     });
     // Handle schedule
-    if (this.schedule.isEnabled) {
-      const todaySchedule = getTodaySchedule(this.schedule);
-      if (isScheduleAllowed(todaySchedule)) {
-        this.debug('not in scheduled blocking time:', todaySchedule);
-        return;
-      }
+    const { isAllowedTime, todaySchedule } = this.parseTodaySchedule();
+    if (isAllowedTime) {
+      this.debug('not in scheduled blocking time:', todaySchedule);
+      return;
     }
     // Handle blocking
-    let shouldBlock = false;
-    switch (this.mode) {
-      case Mode.blacklist:
-        shouldBlock = this.isBlacklisted(data.url);
-        break;
-      case Mode.whitelist:
-        shouldBlock = !this.isWhitelisted(data.url);
-        break;
-      case Mode.combined:
-        shouldBlock = !this.isWhitelisted(data.url) && this.isBlacklisted(data.url);
-        break;
-      default:
-        break;
-    }
+    const shouldBlock = this.isUrlBlocked(data.url);
     // Log url
     if (this.enableLogs) {
       logger.add({ url: data.url, blocked: shouldBlock, date: now(true) });
