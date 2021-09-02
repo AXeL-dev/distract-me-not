@@ -4,7 +4,7 @@ import { translate } from 'helpers/i18n';
 import { storage, sendMessage } from 'helpers/webext';
 import { debug, isDevEnv } from 'helpers/debug';
 import { isUrl, getValidUrl } from 'helpers/url';
-import { UnblockOptions } from 'helpers/block';
+import { UnblockOptions, isPageReloaded } from 'helpers/block';
 import { NumberInput, PasswordPrompt } from 'components';
 import queryString from 'query-string';
 import './styles.scss';
@@ -60,13 +60,16 @@ export class Blocked extends Component {
   }
 
   componentDidMount() {
-    sendMessage('isUrlStillBlocked', this.url).then(isUrlStillBlocked => {
-      // Redirect to blocked url if no longer blocked
-      if (isUrlStillBlocked === false && this.url) {
-        sendMessage('redirectSenderTab', this.url);
-        return;
-      }
-    });
+    if (isPageReloaded()) {
+      debug.log('page reloaded!');
+      sendMessage('isUrlStillBlocked', this.url).then(isUrlStillBlocked => {
+        // Redirect to blocked url if no longer blocked
+        if (isUrlStillBlocked === false && this.url) {
+          sendMessage('redirectSenderTab', this.url);
+          return;
+        }
+      });
+    }
     storage.get({
       message: this.state.message,
       displayBlankPage: this.state.isBlank,

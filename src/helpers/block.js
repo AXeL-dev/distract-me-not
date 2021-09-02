@@ -56,6 +56,18 @@ export function isAccessible(url) {
   return url && !url.startsWith('about:') && !/^(?:file|chrome|moz-extension|chrome-extension):\/\//i.test(url);
 }
 
+export function isPageReloaded() {
+  try {
+    return (window.performance.navigation && window.performance.navigation.type === 1) ||
+            window.performance
+              .getEntriesByType('navigation')
+              .map((nav) => nav.type)
+              .includes('reload');
+  } catch (error) {
+    return false;
+  }
+}
+
 export function blockUrl(url, mode = Mode.blacklist) {
   return new Promise((resolve, reject) => {
     switch (mode) {
