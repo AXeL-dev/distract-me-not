@@ -86,8 +86,8 @@
   "mode": {
     "message": "Mode"
   },
-  "defaultAction": {
-    "message": "Default action"
+  "action": {
+    "message": "Action"
   },
   "blockTab": {
     "message": "Block"
@@ -129,10 +129,10 @@
     "message": "Blocking"
   },
   "blockingBlacklistDescription": {
-    "message": "Choose an action to take for the blacklisted websites:"
+    "message": "Choose an action to take for the blacklisted websites"
   },
   "blockingWhitelistDescription": {
-    "message": "Choose an action to take for non whitelisted websites:"
+    "message": "Choose an action to take for non whitelisted websites"
   },
   "unblocking": {
     "message": "Unblocking"

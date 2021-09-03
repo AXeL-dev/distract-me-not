@@ -86,8 +86,8 @@
   "mode": {
     "message": "Mode"
   },
-  "defaultAction": {
-    "message": "Action par défaut"
+  "action": {
+    "message": "Action"
   },
   "blockTab": {
     "message": "Bloquer"
@@ -129,10 +129,10 @@
     "message": "Blocage"
   },
   "blockingBlacklistDescription": {
-    "message": "Veuillez choisir une action à entreprendre pour les sites web sur la liste noire:"
+    "message": "Veuillez choisir une action à entreprendre pour les sites web sur la liste noire"
   },
   "blockingWhitelistDescription": {
-    "message": "Veuillez choisir une action à entreprendre pour les sites web ne figurant pas sur la liste blanche:"
+    "message": "Veuillez choisir une action à entreprendre pour les sites web ne figurant pas sur la liste blanche"
   },
   "unblocking": {
     "message": "Déblocage"

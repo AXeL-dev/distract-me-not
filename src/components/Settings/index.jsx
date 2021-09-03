@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Tablist, SidebarTab, SelectField, Checkbox, TextInputField, Button, TickIcon, PlusIcon, CrossIcon, DuplicateIcon, Paragraph, toaster, HeartIcon, Dialog } from 'evergreen-ui';
+import { Pane, Tablist, SidebarTab, Checkbox, Button, TickIcon, PlusIcon, CrossIcon, DuplicateIcon, Paragraph, toaster, HeartIcon, Dialog } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv } from 'helpers/debug';
 import { Mode, Action, modes, actions, defaultAction, defaultMode, defaultBlacklist, defaultWhitelist, defaultUnblock } from 'helpers/block';
@@ -7,7 +7,7 @@ import { ScheduleType, defaultSchedule, newScheduleTimeRange } from 'helpers/sch
 import { sendMessage, storage } from 'helpers/webext';
 import { DaysOfWeek, today } from 'helpers/date';
 import { hash } from 'helpers/crypt';
-import { Header, SwitchField, SegmentedControlField, TimeField, PasswordField, WebsiteList, NumberField } from 'components';
+import { Header, SwitchField, SegmentedControlField, TimeField, PasswordField, WebsiteList, NumberField, SelectField, TextField } from 'components';
 import { defaultLogsSettings } from 'helpers/logger';
 import { version } from '../../../package.json';
 import _ from 'lodash';
@@ -296,57 +296,60 @@ export class Settings extends Component {
         value={this.state.options.mode}
         onChange={this.changeMode}
         width={300}
-        marginBottom={this.state.options.isEnabled ? 16 : 0}
+        marginBottom={16}
         showTooltips
       />
-      {this.state.options.isEnabled && (
+      <SelectField
+        label={translate('action')}
+        tooltip={translate(
+          this.state.options.mode === Mode.whitelist
+            ? 'blockingWhitelistDescription'
+            : 'blockingBlacklistDescription'
+        )}
+        value={this.state.options.action}
+        onChange={this.changeAction}
+        disabled={!this.state.options.isEnabled}
+        width={200}
+        marginBottom={[
+          Action.blockTab,
+          Action.redirectToUrl,
+        ].includes(this.state.options.action) ? 16 : 0}
+      >
+        {actions.map((action) => (
+          <option key={action.value} value={action.value}>
+            {action.label}
+          </option>
+        ))}
+      </SelectField>
+      {this.state.options.action === Action.blockTab && (
         <Fragment>
-          <Paragraph size={300} color="muted" marginBottom={16}>
-            {translate(
-              this.state.options.mode === Mode.whitelist
-                ? 'blockingWhitelistDescription'
-                : 'blockingBlacklistDescription'
-            )}
-          </Paragraph>
-          <SelectField
-            label={translate('defaultAction')}
-            value={this.state.options.action}
-            onChange={this.changeAction}
+          <TextField
+            label={translate('blockingMessage')}
+            placeholder={translate('defaultBlockingMessage')}
+            value={this.state.options.blockTab.message}
+            onChange={(event) => this.setOptions('blockTab.message', event.target.value)}
+            disabled={!this.state.options.isEnabled || this.state.options.blockTab.displayBlankPage}
+            width={500}
             marginBottom={16}
-          >
-            {actions.map((action) => (
-              <option key={action.value} value={action.value}>
-                {action.label}
-              </option>
-            ))}
-          </SelectField>
-          {this.state.options.action === Action.blockTab && (
-            <Fragment>
-              <TextInputField
-                label={translate('blockingMessage')}
-                placeholder={translate('defaultBlockingMessage')}
-                value={this.state.options.blockTab.message}
-                onChange={(event) => this.setOptions('blockTab.message', event.target.value)}
-                disabled={this.state.options.blockTab.displayBlankPage}
-                marginBottom={16}
-              />
-              <Checkbox
-                label={translate('displayBlankPage')}
-                checked={this.state.options.blockTab.displayBlankPage}
-                onChange={(event) => this.setOptions('blockTab.displayBlankPage', event.target.checked)}
-              />
-            </Fragment>
-          )}
-          {this.state.options.action === Action.redirectToUrl && (
-            <TextInputField
-              label={translate('url')}
-              placeholder={translate('redirectUrlExample')}
-              value={this.state.options.redirectToUrl.url}
-              onChange={(event) => this.setOptions('redirectToUrl.url', event.target.value)}
-              marginBottom={16}
-            />
-          )}
+          />
+          <Checkbox
+            label={translate('displayBlankPage')}
+            checked={this.state.options.blockTab.displayBlankPage}
+            onChange={(event) => this.setOptions('blockTab.displayBlankPage', event.target.checked)}
+            disabled={!this.state.options.isEnabled}
+            margin={0}
+          />
         </Fragment>
+      )}
+      {this.state.options.action === Action.redirectToUrl && (
+        <TextField
+          label={translate('url')}
+          placeholder={translate('redirectUrlExample')}
+          value={this.state.options.redirectToUrl.url}
+          onChange={(event) => this.setOptions('redirectToUrl.url', event.target.value)}
+          disabled={!this.state.options.isEnabled}
+          width={500}
+        />
       )}
     </Fragment>
   )

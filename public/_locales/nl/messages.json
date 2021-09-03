@@ -86,8 +86,8 @@
   "mode": {
     "message": "Modus"
   },
-  "defaultAction": {
-    "message": "Standaardactie"
+  "action": {
+    "message": "Actie"
   },
   "blockTab": {
     "message": "Blokkeren"
@@ -129,10 +129,10 @@
     "message": "Blokkering"
   },
   "blockingBlacklistDescription": {
-    "message": "Kies welke actie moet worden genomen bij websites op de zwarte lijst:"
+    "message": "Kies welke actie moet worden genomen bij websites op de zwarte lijst"
   },
   "blockingWhitelistDescription": {
-    "message": "Kies welke actie moet worden genomen bij websites op de witte lijst:"
+    "message": "Kies welke actie moet worden genomen bij websites op de witte lijst"
   },
   "unblocking": {
     "message": "Deblokkeren"
