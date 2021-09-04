@@ -22,6 +22,7 @@ export function PasswordField(props) {
           onChange={props.onChange}
           disabled={props.disabled}
           required={props.required}
+          hasRandomButton={props.hasRandomButton}
           //data-testid={props['data-testid']}
         />
       </Pane>

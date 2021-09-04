@@ -43,6 +43,7 @@ Or download it from [github releases](https://github.com/AXeL-dev/distract-me-no
 - [query-string](https://github.com/sindresorhus/query-string): URL query strings parsing library
 - [date-fns](https://date-fns.org): Date manipulation library
 - [lodash](https://lodash.com): Utility library
+- [omgopass](https://github.com/omgovich/omgopass): Password generator
 
 ### Scripts
 

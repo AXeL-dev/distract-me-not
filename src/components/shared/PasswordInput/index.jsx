@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Pane, TextInput, IconButton, Paragraph, EyeOpenIcon, EyeOffIcon } from 'evergreen-ui';
+import { Pane, TextInput, IconButton, Paragraph, Button, EyeOpenIcon, EyeOffIcon, RandomIcon } from 'evergreen-ui';
 import { RawHTML, OuterPane } from 'components';
+import generatePassword from 'omgopass';
 import './styles.scss';
 
 export class PasswordInput extends Component {
@@ -20,6 +21,15 @@ export class PasswordInput extends Component {
     }
   }
 
+  handleRandomButtonClick = () => {
+    const event = {
+      target: {
+        value: generatePassword(),
+      },
+    };
+    this.handleChange(event);
+  }
+
   toggle = (event) => {
     this.setState({ isShown: !this.state.isShown });
   }
@@ -28,6 +38,20 @@ export class PasswordInput extends Component {
     return (
       <OuterPane {...this.props}>
         <Pane display="flex">
+          {this.props.hasRandomButton &&
+            <Pane display="flex" alignItems="center" marginRight={-1}>
+              <Button
+                className="random-button"
+                appearance={this.props.randomButtonAppearance}
+                borderTopRightRadius={0}
+                borderBottomRightRadius={0}
+                onClick={this.handleRandomButtonClick}
+                disabled={this.props.disabled}
+              >
+                <RandomIcon size={14} />
+              </Button>
+            </Pane>
+          }
           <Pane display="flex" alignItems="center" flex={1} position="relative">
             <TextInput
               width="100%"
@@ -38,6 +62,8 @@ export class PasswordInput extends Component {
               disabled={this.props.disabled}
               required={this.props.required}
               //data-testid={this.props['data-testid']}
+              borderTopLeftRadius={this.props.hasRandomButton ? 0 : 3}
+              borderBottomLeftRadius={this.props.hasRandomButton ? 0 : 3}
               paddingRight={40}
             />
             <IconButton

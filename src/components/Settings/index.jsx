@@ -394,6 +394,7 @@ export class Settings extends Component {
         checked={this.state.options.unblock.requirePassword}
         onChange={(event) => this.setOptions('unblock.requirePassword', event.target.checked)}
         disabled={!this.state.options.unblock.isEnabled || !this.state.options.password.isEnabled}
+        margin={0}
       />
     </Fragment>
   )
@@ -579,6 +580,7 @@ export class Settings extends Component {
         onChange={(event) => this.setOptions('password.value', event.target.value)}
         disabled={!this.state.options.password.isEnabled}
         //data-testid="password"
+        hasRandomButton
       />
     </Fragment>
   )
