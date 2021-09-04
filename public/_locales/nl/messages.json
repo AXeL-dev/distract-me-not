@@ -206,6 +206,9 @@
   "passwordIsWrong": {
     "message": "Het wachtwoord is onjuist!"
   },
+  "allowAddingWebsitesWithoutPassword": {
+    "message": "Toestaan om websites toe te voegen zonder het wachtwoord in te voeren"
+  },
   "enable": {
     "message": "Inschakelen"
   },

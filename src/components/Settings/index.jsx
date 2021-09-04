@@ -55,6 +55,7 @@ export class Settings extends Component {
           isSet: false,
           value: '',
           hash: '',
+          allowAddingWebsitesWithoutPassword: false,
         },
         logs: defaultLogsSettings,
         misc: {
@@ -231,6 +232,7 @@ export class Settings extends Component {
         unblock: this.state.options.unblock,
         password: {
           isEnabled: this.state.options.password.isEnabled,
+          allowAddingWebsitesWithoutPassword: this.state.options.password.allowAddingWebsitesWithoutPassword,
           hash: this.state.options.password.isEnabled // if password protection is enabled
             ? this.state.options.password.value.length // + password length is > 0
               ? hash(this.state.options.password.value) // hash & save the new password
@@ -580,7 +582,15 @@ export class Settings extends Component {
         onChange={(event) => this.setOptions('password.value', event.target.value)}
         disabled={!this.state.options.password.isEnabled}
         //data-testid="password"
+        marginBottom={16}
         hasRandomButton
+      />
+      <Checkbox
+        label={translate('allowAddingWebsitesWithoutPassword')}
+        checked={this.state.options.password.allowAddingWebsitesWithoutPassword}
+        onChange={(event) => this.setOptions('password.allowAddingWebsitesWithoutPassword', event.target.checked)}
+        disabled={!this.state.options.password.isEnabled}
+        margin={0}
       />
     </Fragment>
   )

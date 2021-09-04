@@ -206,6 +206,9 @@
   "passwordIsWrong": {
     "message": "Wrong password!"
   },
+  "allowAddingWebsitesWithoutPassword": {
+    "message": "Allow adding websites without entering the password"
+  },
   "enable": {
     "message": "Enable"
   },

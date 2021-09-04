@@ -1,5 +1,5 @@
 import { translate } from './i18n';
-import { sendMessage, storage } from 'helpers/webext';
+import { sendMessage, storage, getActiveTabHostname, getActiveTab, createWindow, indexUrl } from 'helpers/webext';
 
 export const Mode = {
   blacklist: 'blacklist',
@@ -111,4 +111,47 @@ export function blockUrl(url, mode = Mode.blacklist) {
         break;
     }
   });
+}
+
+export async function addCurrentWebsite(mode, isPrompt = false) {
+  const hostname = await getActiveTabHostname();
+  if (hostname) {
+    const url = `*.${hostname}`;
+    if (isPrompt) {
+      createWindow(`${indexUrl}#addWebsitePrompt?url=${url}&mode=${mode}`, 600, 140);
+    } else {
+      blockUrl(url, mode);
+      return true;
+    }
+  }
+  return false;
+}
+
+export async function isActiveTabBlockable(mode) {
+  const tab = await getActiveTab();
+  if (!tab) {
+    return false;
+  }
+  if (!isAccessible(tab.url)) {
+    return false;
+  } else {
+    switch (mode) {
+      case Mode.blacklist:
+      case Mode.combined:
+        const isBlacklisted = await sendMessage('isBlacklisted', tab.url);
+        if (isBlacklisted) {
+          return false;
+        }
+        break;
+      case Mode.whitelist:
+        const isWhitelisted = await sendMessage('isWhitelisted', tab.url);
+        if (isWhitelisted) {
+          return false;
+        }
+        break;
+      default:
+        break;
+    }
+  }
+  return true;
 }

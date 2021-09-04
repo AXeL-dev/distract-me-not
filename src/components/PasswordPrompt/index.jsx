@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-import { Pane, TextInput, UnlockIcon, toaster, HistoryIcon } from 'evergreen-ui';
+import { Pane, TextInput, UnlockIcon, toaster, HistoryIcon, Position, PlusIcon, TickIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
-import { storage } from 'helpers/webext';
+import { storage, sendMessage } from 'helpers/webext';
 import { compare } from 'helpers/crypt';
 import { debug } from 'helpers/debug';
-import { Header, IconButton, SettingsButton, LinkIconButton } from 'components';
+import { defaultLogsSettings } from 'helpers/logger';
+import { Header, IconButton, SettingsButton, LinkIconButton, AnimatedIconButton } from 'components';
+import { defaultMode, Mode, addCurrentWebsite, isActiveTabBlockable } from 'helpers/block';
 
 const defaultHash = process.env.REACT_APP_HASH;
 
@@ -12,22 +14,35 @@ export class PasswordPrompt extends Component {
 
   constructor(props) {
     super(props);
+    this.mode = defaultMode;
     this.hash = defaultHash || null;
     this.redirectPath = this.props.path || '/';
+    this.showAddWebsitePrompt = false;
     debug.log({ hash: this.hash, redirectPath: this.redirectPath });
     this.state = {
       password: '',
+      isAddButtonVisible: false,
+      enableLogs: false,
     };
   }
 
   componentDidMount() {
+    sendMessage('getLogsSettings').then(logs => this.setState({ enableLogs: (logs || defaultLogsSettings).isEnabled }));
     storage.get({
+      mode: this.mode,
       password: {
-        hash: this.hash
-      }
+        hash: this.hash,
+        allowAddingWebsitesWithoutPassword: false,
+      },
+      showAddWebsitePrompt: this.showAddWebsitePrompt,
     }).then((items) => {
       if (items) {
+        this.mode = items.mode;
         this.hash = items.password.hash;
+        this.showAddWebsitePrompt = items.showAddWebsitePrompt;
+        if (items.password.allowAddingWebsitesWithoutPassword) {
+          this.toggleAddButton(this.mode);
+        }
       }
     });
   }
@@ -38,6 +53,15 @@ export class PasswordPrompt extends Component {
       debug.warn('path prop has changed:', this.props.path);
       this.redirectPath = this.props.path;
     }
+  }
+
+  toggleAddButton = async (mode) => {
+    const isVisible = await isActiveTabBlockable(mode);
+    this.setAddButtonVisibility(isVisible);
+  }
+
+  setAddButtonVisibility = (value) => {
+    this.setState({ isAddButtonVisible: value });
   }
 
   redirectTo = (path, state = null) => {
@@ -147,11 +171,29 @@ export class PasswordPrompt extends Component {
           <Pane display="flex" paddingX={16} paddingY={10} alignItems="start" justifyContent="space-between" borderTop>
             <Pane display="flex" gap={10}>
               <SettingsButton history={this.props.history} />
-              <LinkIconButton
-                icon={HistoryIcon}
-                link="/logs"
-                tooltip={translate('logs')}
-                history={this.props.history}
+              {this.state.enableLogs && (
+                <LinkIconButton
+                  icon={HistoryIcon}
+                  link="/logs"
+                  tooltip={translate('logs')}
+                  history={this.props.history}
+                />
+              )}
+            </Pane>
+            <Pane>
+              <AnimatedIconButton
+                appearance="minimal"
+                tooltip={this.mode === Mode.whitelist ? translate('addToWhitelist') : translate('addToBlacklist')}
+                tooltipPosition={Position.LEFT}
+                className="fill-green"
+                icon={PlusIcon}
+                iconSize={26}
+                iconColor="#47b881"
+                onClick={() => addCurrentWebsite(this.mode, this.showAddWebsitePrompt)}
+                hideOnClick={true}
+                hideAnimationIcon={TickIcon}
+                isVisible={this.state.isAddButtonVisible}
+                onVisibilityChange={this.setAddButtonVisibility}
               />
             </Pane>
           </Pane>

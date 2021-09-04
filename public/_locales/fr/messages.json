@@ -206,6 +206,9 @@
   "passwordIsWrong": {
     "message": "Mot de passe incorrect!"
   },
+  "allowAddingWebsitesWithoutPassword": {
+    "message": "Autoriser l'ajout de sites web sans entrer le mot de passe"
+  },
   "enable": {
     "message": "Activer"
   },

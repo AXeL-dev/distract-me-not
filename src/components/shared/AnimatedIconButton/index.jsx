@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { debug } from 'helpers/debug';
 import { IconButton } from 'components';
+import _ from 'lodash';
 import './styles.scss';
 
 export class AnimatedIconButton extends Component {
@@ -8,7 +9,7 @@ export class AnimatedIconButton extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isVisible: this.props.isVisible ? this.props.isVisible : true, // do not use || operator with boolean values that takes "true" by default
+      isVisible: _.isBoolean(this.props.isVisible) ? this.props.isVisible : true, // do not use || operator with boolean values that takes "true" by default
       className: '',
       icon: this.props.icon,
       hideOnClick: this.props.hideOnClick,

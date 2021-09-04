@@ -1,8 +1,8 @@
 import React, { Component, Fragment } from 'react';
 import { Pane, Text, Position, Badge, PlusIcon, TickIcon, DisableIcon, SmallMinusIcon, SlashIcon, HistoryIcon, IssueNewIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
-import { sendMessage, getActiveTab, getActiveTabHostname, storage, createWindow, indexUrl } from 'helpers/webext';
-import { Mode, modes, isAccessible, blockUrl } from 'helpers/block';
+import { sendMessage, storage } from 'helpers/webext';
+import { Mode, modes, addCurrentWebsite, isActiveTabBlockable } from 'helpers/block';
 import { ScheduleType, defaultSchedule, getTodaySchedule } from 'helpers/schedule';
 import { defaultLogsSettings } from 'helpers/logger';
 import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton, LinkIconButton, TooltipIcon } from 'components';
@@ -17,7 +17,7 @@ export class Panel extends Component {
       isEnabled: true,
       mode: '', //defaultMode,
       schedule: defaultSchedule,
-      isAddButtonVisible: true,
+      isAddButtonVisible: false,
       enableLogs: false,
       hideReportIssueButton: false,
       showAddWebsitePrompt: false,
@@ -43,44 +43,9 @@ export class Panel extends Component {
     });
   }
 
-  toggleAddButton = (mode) => {
-    getActiveTab().then(async (tab) => {
-      if (tab) {
-        if (!isAccessible(tab.url)) {
-          this.hideAddButton();
-        } else {
-          switch (mode) {
-            case Mode.blacklist:
-            case Mode.combined:
-              const isBlacklisted = await sendMessage('isBlacklisted', tab.url);
-              if (isBlacklisted) {
-                this.hideAddButton();
-                return; // exit
-              }
-              break;
-            case Mode.whitelist:
-              const isWhitelisted = await sendMessage('isWhitelisted', tab.url);
-              if (isWhitelisted) {
-                this.hideAddButton();
-                return;
-              }
-              break;
-            default:
-              break;
-          }
-          // finally, show add button if tab is not blacklisted nor whitelisted
-          this.showAddButton();
-        }
-      }
-    });
-  }
-
-  hideAddButton = () => {
-    this.setAddButtonVisibility(false);
-  }
-
-  showAddButton = () => {
-    this.setAddButtonVisibility(true);
+  toggleAddButton = async (mode) => {
+    const isVisible = await isActiveTabBlockable(mode);
+    this.setAddButtonVisibility(isVisible);
   }
 
   setAddButtonVisibility = (value) => {
@@ -98,20 +63,6 @@ export class Panel extends Component {
     sendMessage('setMode', value);
     storage.set({ mode: value });
     this.toggleAddButton(value);
-  }
-
-  addCurrentWebsite = async () => {
-    const hostname = await getActiveTabHostname();
-    if (hostname) {
-      const url = `*.${hostname}`;
-      if (this.state.showAddWebsitePrompt) {
-        createWindow(`${indexUrl}#addWebsitePrompt?url=${url}&mode=${this.state.mode}`, 600, 140);
-      } else {
-        blockUrl(url, this.state.mode);
-        return true;
-      }
-    }
-    return false;
   }
 
   renderScheduleRange = (range) => {
@@ -226,7 +177,7 @@ export class Panel extends Component {
               icon={PlusIcon}
               iconSize={26}
               iconColor="#47b881"
-              onClick={this.addCurrentWebsite}
+              onClick={() => addCurrentWebsite(this.state.mode, this.state.showAddWebsitePrompt)}
               hideOnClick={true}
               hideAnimationIcon={TickIcon}
               isVisible={this.state.isAddButtonVisible}
