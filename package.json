@@ -1,6 +1,6 @@
 {
   "name": "distract-me-not",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.6",
