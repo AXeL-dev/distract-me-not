@@ -1,9 +1,7 @@
 Describe your issue here.
 
 ### Your environment
-* version of npm
-* version of node.js
-* version of reactjs
+* version of the extension
 * which browser and its version
 
 ### Steps to reproduce
