@@ -69,7 +69,7 @@ export function openExtensionPage(url, reloadIfExists = true) {
 
 export function createTab(url, isActive = true) {
   return browser.tabs.create({
-    url: url,
+    url,
     active: isActive,
   });
 }
@@ -99,8 +99,8 @@ export function sendMessage(message, ...params) {
   return new Promise((resolve) => {
     try {
       browser.runtime.sendMessage({
-        message: message,
-        params: params,
+        message,
+        params,
       }).then(({ response }) => {
         resolve(response);
       });
