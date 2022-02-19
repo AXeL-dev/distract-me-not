@@ -66,4 +66,18 @@ describe('Regex helper', () => {
 
     expect(result).toEqual(expected);
   });
+
+  it('returns case insensitive regular expressions', () => {
+    const url = 'https://website.com';
+    const payload = [
+      '*.website.com',
+      '*.Website.com',
+      '*.WEBSITE.com',
+    ];
+
+    const result = transformList(payload).map((regex) => regex.test(url));
+    const expected = payload.map(() => true);
+
+    expect(result).toEqual(expected);
+  });
 });
