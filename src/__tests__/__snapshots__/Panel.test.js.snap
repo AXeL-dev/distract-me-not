@@ -133,9 +133,10 @@ exports[`renders panel correctly 1`] = `
           </div>
           <div
             class="css-3grw6g css-4b8qak ub-btrr_3px ub-bbrr_3px ub-box-szg_border-box"
-            data-active="false"
+            data-active="true"
           >
             <input
+              checked=""
               class="css-87b09r"
               id="SegmentedControl-12"
               name="mode"

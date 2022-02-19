@@ -334,7 +334,7 @@ export class WordList extends Component {
   renderRow = ({ row }) => (
     <Table.Row key={row.id}>
       <Table.Cell display="flex" alignItems="center">
-        <Text marginLeft={8} size={300} fontWeight={500} data-testid="word">
+        <Text marginLeft={8} size={300} fontWeight={500} data-testid="keyword">
           {row.word}
         </Text>
       </Table.Cell>
