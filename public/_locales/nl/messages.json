@@ -361,6 +361,9 @@
   "blacklistKeywordsDescription": {
     "message": "Wanneer de modus is ingesteld op blacklist, kunt u geen website url's bezoeken die de volgende trefwoorden bevatten:"
   },
+  "whitelistKeywordsDescription": {
+    "message": "Wanneer de modus is ingesteld op whitelist, kunt u alleen website url's bezoeken die de volgende trefwoorden bevatten:"
+  },
   "keywordExample": {
     "message": "Voorbeeld: foo, bar, ..."
   },

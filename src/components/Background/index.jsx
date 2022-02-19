@@ -18,6 +18,7 @@ export class Background extends Component {
     this.blacklist = [];
     this.whitelist = [];
     this.blacklistKeywords = [];
+    this.whitelistKeywords = [];
     this.isEnabled = false;
     this.mode = Mode.blacklist;
     this.action = Action.blockTab;
@@ -82,6 +83,14 @@ export class Background extends Component {
 
   getBlacklistKeywords = () => {
     return this.blacklistKeywords;
+  }
+
+  setWhitelistKeywords = (keywords) => {
+    this.whitelistKeywords = keywords;
+  }
+
+  getWhitelistKeywords = () => {
+    return this.whitelistKeywords;
   }
 
   setWhitelist = (wlist) => {
@@ -151,6 +160,7 @@ export class Background extends Component {
       blacklist: defaultBlacklist,
       whitelist: defaultWhitelist,
       blacklistKeywords: [],
+      whitelistKeywords: [],
       blackList: null, // for backward compatibility (with v1)
       whiteList: null,
       isEnabled: this.isEnabled,
@@ -182,6 +192,7 @@ export class Background extends Component {
       this.blacklist = transformList(items.blacklist);
       this.whitelist = transformList(items.whitelist);
       this.blacklistKeywords = items.blacklistKeywords;
+      this.whitelistKeywords = items.whitelistKeywords;
       this.mode = items.mode;
       this.action = items.action;
       this.unblock = { ...this.unblock, ...items.unblock }; // merge
@@ -399,6 +410,13 @@ export class Background extends Component {
     for (const rule of this.whitelist) {
       if (rule.test(url)) {
         this.debug('is whitelisted:', url);
+        return true;
+      }
+    }
+    for (const keyword of this.whitelistKeywords) {
+      const regex = new RegExp(keyword, 'i');
+      if (regex.test(url)) {
+        this.debug('found whitelisted keyword:', keyword, 'in:', url);
         return true;
       }
     }

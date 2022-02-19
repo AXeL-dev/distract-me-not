@@ -18,8 +18,9 @@ export class Settings extends Component {
   constructor(props) {
     super(props);
     this.blacklistComponentRef = React.createRef();
-    this.blacklistKeywordsComponentRef = React.createRef();
     this.whitelistComponentRef = React.createRef();
+    this.blacklistKeywordsComponentRef = React.createRef();
+    this.whitelistKeywordsComponentRef = React.createRef();
     this.state = {
       selectedTabIndex: 0,
       tabs: [
@@ -40,6 +41,11 @@ export class Settings extends Component {
         { label: translate('keywords'), id: 'keywords' },
       ],
       selectedBlacklistTabIndex: 0,
+      whitelistTabs: [
+        { label: translate('urls'), id: 'urls' },
+        { label: translate('keywords'), id: 'keywords' },
+      ],
+      selectedWhitelistTabIndex: 0,
       shownDialog: null,
       options: {
         isEnabled: true,
@@ -57,6 +63,7 @@ export class Settings extends Component {
         blacklist: isDevEnv ? defaultBlacklist : [],
         whitelist: isDevEnv ? defaultWhitelist : [],
         blacklistKeywords: [],
+        whitelistKeywords: [],
         password: {
           isEnabled: props.enablePassword || false,
           isSet: false,
@@ -94,6 +101,7 @@ export class Settings extends Component {
         blacklist: defaultBlacklist,
         whitelist: defaultWhitelist,
         blacklistKeywords: [],
+        whitelistKeywords: [],
       })
       .then(async (items) => {
         if (items) {
@@ -131,6 +139,7 @@ export class Settings extends Component {
             blacklist: items.blacklist,
             whitelist: items.whitelist,
             blacklistKeywords: items.blacklistKeywords,
+            whitelistKeywords: items.whitelistKeywords,
             misc: {
               hideReportIssueButton: items.hideReportIssueButton,
               showAddWebsitePrompt: items.showAddWebsitePrompt,
@@ -144,6 +153,7 @@ export class Settings extends Component {
           this.blacklistComponentRef.current.setList(items.blacklist);
           this.whitelistComponentRef.current.setList(items.whitelist);
           this.blacklistKeywordsComponentRef.current.setList(items.blacklistKeywords);
+          this.whitelistKeywordsComponentRef.current.setList(items.whitelistKeywords);
         }
       });
   }
@@ -240,6 +250,7 @@ export class Settings extends Component {
         blacklist: this.state.options.blacklist,
         whitelist: this.state.options.whitelist,
         blacklistKeywords: this.state.options.blacklistKeywords,
+        whitelistKeywords: this.state.options.whitelistKeywords,
         unblock: this.state.options.unblock,
         password: {
           isEnabled: this.state.options.password.isEnabled,
@@ -262,6 +273,7 @@ export class Settings extends Component {
           sendMessage('setBlacklist', this.state.options.blacklist);
           sendMessage('setWhitelist', this.state.options.whitelist);
           sendMessage('setBlacklistKeywords', this.state.options.blacklistKeywords);
+          sendMessage('setWhitelistKeywords', this.state.options.whitelistKeywords);
           sendMessage('setUnblockOnceTimeout', this.state.options.unblock.unblockOnceTimeout);
           sendMessage('setDisplayNotificationOnTimeout', this.state.options.unblock.displayNotificationOnTimeout);
           sendMessage('setAutoReblockOnTimeout', this.state.options.unblock.autoReblockOnTimeout);
@@ -613,7 +625,7 @@ export class Settings extends Component {
     </Pane>
   )
 
-  renderWhitelistTab = () => (
+  renderWhitelistUrls = () => (
     <Fragment>
       <Paragraph size={300} color="muted" marginBottom={16}>
         {translate('whitelistDescription')}
@@ -626,6 +638,57 @@ export class Settings extends Component {
         addNewItemsOnTop={true}
       />
     </Fragment>
+  )
+
+  renderWhitelistKeywords = () => (
+    <Fragment>
+      <Paragraph size={300} color="muted" marginBottom={16}>
+        {translate('whitelistKeywordsDescription')}
+      </Paragraph>
+      <WordList
+        ref={this.whitelistKeywordsComponentRef}
+        list={this.state.options.whitelistKeywords}
+        onChange={(list) => this.setOptions('whitelistKeywords', list)}
+        exportFilename="whitelist_keywords.txt"
+        addNewItemsOnTop={true}
+      />
+    </Fragment>
+  )
+
+  renderWhitelistTab = () => (
+    <Pane>
+      <Tablist marginBottom={16} flexBasis={240}>
+        {this.state.whitelistTabs.map((tab, index) => (
+          <Tab
+            key={tab.id}
+            id={tab.id}
+            onSelect={() => this.setState({ selectedWhitelistTabIndex: index })}
+            isSelected={index === this.state.selectedWhitelistTabIndex}
+            aria-controls={`whitelist-${tab.id}`}
+            fontSize={14}
+            marginLeft={0}
+            marginRight={8}
+          >
+            {tab.label}
+          </Tab>
+        ))}
+      </Tablist>
+      <Pane flex="1">
+        {this.state.whitelistTabs.map((tab, index) => (
+          <Pane
+            key={tab.id}
+            id={`whitelist-${tab.id}`}
+            role="tabpanel"
+            aria-labelledby={tab.label}
+            aria-hidden={index !== this.state.selectedWhitelistTabIndex}
+            display={index === this.state.selectedWhitelistTabIndex ? 'block' : 'none'}
+          >
+            {tab.id === 'urls' && this.renderWhitelistUrls()}
+            {tab.id === 'keywords' && this.renderWhitelistKeywords()}
+          </Pane>
+        ))}
+      </Pane>
+    </Pane>
   )
 
   renderPasswordTab = () => (

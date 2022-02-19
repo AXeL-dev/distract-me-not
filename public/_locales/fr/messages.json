@@ -361,6 +361,9 @@
   "blacklistKeywordsDescription": {
     "message": "Quand le mode liste noire est actif, vous ne pouvez pas visiter les liens contenant les mots-clés suivants:"
   },
+  "whitelistKeywordsDescription": {
+    "message": "Quand le mode liste blanche est actif, vous pouvez uniquement visiter les liens contenant les mots-clés suivants:"
+  },
   "keywordExample": {
     "message": "Exemple: foo, bar, ..."
   },

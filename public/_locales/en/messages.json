@@ -361,6 +361,9 @@
   "blacklistKeywordsDescription": {
     "message": "When mode is set to blacklist, you cannot visit website urls containing the following keywords:"
   },
+  "whitelistKeywordsDescription": {
+    "message": "When mode is set to whitelist, you can only visit website urls containing the following keywords:"
+  },
   "keywordExample": {
     "message": "Example: foo, bar, ..."
   },
