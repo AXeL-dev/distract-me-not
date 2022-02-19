@@ -37,7 +37,7 @@ export class Settings extends Component {
       shownDialog: null,
       options: {
         isEnabled: true,
-        mode: '', //defaultMode,
+        mode: defaultMode,
         action: defaultAction,
         blockTab: {
           message: '',

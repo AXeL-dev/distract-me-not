@@ -32,7 +32,7 @@ export const actions = [
 
 export const defaultAction = Action.blockTab;
 
-export const defaultMode = Mode.blacklist;
+export const defaultMode = Mode.combined;
 
 export const defaultBlacklist = [
   '*.facebook.com',
