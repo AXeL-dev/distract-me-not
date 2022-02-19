@@ -60,7 +60,7 @@ class TextField extends Component {
                 onClick={this.handleButtonClick}
                 disabled={this.props.disabled}
               >
-                {this.props.buttonLabel || '+'}
+                {this.props.buttonLabel || '+'}
               </Button>
             </Pane>
           }

@@ -17,6 +17,7 @@ export class Background extends Component {
     // public
     this.blacklist = [];
     this.whitelist = [];
+    this.blacklistKeywords = [];
     this.isEnabled = false;
     this.mode = Mode.blacklist;
     this.action = Action.blockTab;
@@ -73,6 +74,14 @@ export class Background extends Component {
 
   getBlacklist = () => {
     return this.blacklist;
+  }
+
+  setBlacklistKeywords = (keywords) => {
+    this.blacklistKeywords = keywords;
+  }
+
+  getBlacklistKeywords = () => {
+    return this.blacklistKeywords;
   }
 
   setWhitelist = (wlist) => {
@@ -141,6 +150,7 @@ export class Background extends Component {
     storage.get({
       blacklist: defaultBlacklist,
       whitelist: defaultWhitelist,
+      blacklistKeywords: [],
       blackList: null, // for backward compatibility (with v1)
       whiteList: null,
       isEnabled: this.isEnabled,
@@ -171,6 +181,7 @@ export class Background extends Component {
       //----- End backward compatibility with v1
       this.blacklist = transformList(items.blacklist);
       this.whitelist = transformList(items.whitelist);
+      this.blacklistKeywords = items.blacklistKeywords;
       this.mode = items.mode;
       this.action = items.action;
       this.unblock = { ...this.unblock, ...items.unblock }; // merge
@@ -367,6 +378,13 @@ export class Background extends Component {
     for (const rule of this.blacklist) {
       if (rule.test(url)) {
         this.debug('is blacklisted:', url);
+        return true;
+      }
+    }
+    for (const keyword of this.blacklistKeywords) {
+      const regex = new RegExp(keyword, 'i');
+      if (regex.test(url)) {
+        this.debug('found blacklisted keyword:', keyword, 'in:', url);
         return true;
       }
     }

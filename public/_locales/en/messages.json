@@ -351,5 +351,23 @@
   },
   "showAddWebsitePromptTooltip": {
     "message": "Display a prompt when adding websites via \"+\" button on the main panel"
+  },
+  "urls": {
+    "message": "Urls"
+  },
+  "keywords": {
+    "message": "Keywords"
+  },
+  "blacklistKeywordsDescription": {
+    "message": "When mode is set to blacklist, you cannot visit website urls containing the following keywords:"
+  },
+  "keywordExample": {
+    "message": "Example: foo, bar, ..."
+  },
+  "keywordIsNotValid": {
+    "message": "Keyword is not valid"
+  },
+  "keywordAlreadyExists": {
+    "message": "Keyword already exists!"
   }
 }

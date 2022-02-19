@@ -344,12 +344,30 @@
     "message": "Het aantal regels dat in het logboek moet worden bewaard"
   },
   "hideReportIssueButton": {
-    "message": "Knop ‘Probleem melden’ op het hoofdpaneel verbergen"
+    "message": "Knop \"Probleem melden\" op het hoofdpaneel verbergen"
   },
   "showAddWebsitePrompt": {
-    "message": "Venster ‘Website toevoegen’ tonen"
+    "message": "Venster \"Website toevoegen\" tonen"
   },
   "showAddWebsitePromptTooltip": {
-    "message": "Toon een venster bij het toevoegen van websites via de ‘+’-knop op het hoofdpaneel"
+    "message": "Toon een venster bij het toevoegen van websites via de \"+\"-knop op het hoofdpaneel"
+  },
+  "urls": {
+    "message": "Urls"
+  },
+  "keywords": {
+    "message": "Trefwoorden"
+  },
+  "blacklistKeywordsDescription": {
+    "message": "Wanneer de modus is ingesteld op blacklist, kunt u geen website url's bezoeken die de volgende trefwoorden bevatten:"
+  },
+  "keywordExample": {
+    "message": "Voorbeeld: foo, bar, ..."
+  },
+  "keywordIsNotValid": {
+    "message": "Trefwoord is ongeldig"
+  },
+  "keywordAlreadyExists": {
+    "message": "Trefwoord bestaat al!"
   }
 }

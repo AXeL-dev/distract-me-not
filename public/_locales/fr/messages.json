@@ -351,5 +351,23 @@
   },
   "showAddWebsitePromptTooltip": {
     "message": "Affiche une invite de confirmation lors de l'ajout d'un site web à partir du button \"+\" sur le panneau principal"
+  },
+  "urls": {
+    "message": "Liens"
+  },
+  "keywords": {
+    "message": "Mots clés"
+  },
+  "blacklistKeywordsDescription": {
+    "message": "Quand le mode liste noire est actif, vous ne pouvez pas visiter les liens contenant les mots-clés suivants:"
+  },
+  "keywordExample": {
+    "message": "Exemple: foo, bar, ..."
+  },
+  "keywordIsNotValid": {
+    "message": "Le mot-clé n'est pas valide"
+  },
+  "keywordAlreadyExists": {
+    "message": "Le mot-clé existe déjà!"
   }
 }

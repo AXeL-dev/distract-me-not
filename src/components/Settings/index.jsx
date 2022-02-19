@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Tablist, SidebarTab, Checkbox, Button, TickIcon, PlusIcon, CrossIcon, DuplicateIcon, Paragraph, toaster, HeartIcon, Dialog } from 'evergreen-ui';
+import { Pane, Tablist, SidebarTab, Tab, Checkbox, Button, TickIcon, PlusIcon, CrossIcon, DuplicateIcon, Paragraph, toaster, HeartIcon, Dialog } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv } from 'helpers/debug';
 import { Mode, Action, modes, actions, defaultAction, defaultMode, defaultBlacklist, defaultWhitelist, defaultUnblock } from 'helpers/block';
@@ -7,7 +7,7 @@ import { ScheduleType, defaultSchedule, newScheduleTimeRange } from 'helpers/sch
 import { sendMessage, storage } from 'helpers/webext';
 import { DaysOfWeek, today } from 'helpers/date';
 import { hash } from 'helpers/crypt';
-import { Header, SwitchField, SegmentedControlField, TimeField, PasswordField, WebsiteList, NumberField, SelectField, TextField } from 'components';
+import { Header, SwitchField, SegmentedControlField, TimeField, PasswordField, WebsiteList, NumberField, SelectField, TextField, WordList } from 'components';
 import { defaultLogsSettings } from 'helpers/logger';
 import { version } from '../../../package.json';
 import _ from 'lodash';
@@ -18,6 +18,7 @@ export class Settings extends Component {
   constructor(props) {
     super(props);
     this.blacklistComponentRef = React.createRef();
+    this.blacklistKeywordsComponentRef = React.createRef();
     this.whitelistComponentRef = React.createRef();
     this.state = {
       selectedTabIndex: 0,
@@ -34,6 +35,11 @@ export class Settings extends Component {
       ],
       scheduleDays: DaysOfWeek.map((day) => ({ label: translate(day), value: day })),
       selectedScheduleDay: today(),
+      blacklistTabs: [
+        { label: translate('urls'), id: 'urls' },
+        { label: translate('keywords'), id: 'keywords' },
+      ],
+      selectedBlacklistTabIndex: 0,
       shownDialog: null,
       options: {
         isEnabled: true,
@@ -50,6 +56,7 @@ export class Settings extends Component {
         schedule: defaultSchedule,
         blacklist: isDevEnv ? defaultBlacklist : [],
         whitelist: isDevEnv ? defaultWhitelist : [],
+        blacklistKeywords: [],
         password: {
           isEnabled: props.enablePassword || false,
           isSet: false,
@@ -86,6 +93,7 @@ export class Settings extends Component {
         unblock: this.state.options.unblock,
         blacklist: defaultBlacklist,
         whitelist: defaultWhitelist,
+        blacklistKeywords: [],
       })
       .then(async (items) => {
         if (items) {
@@ -122,6 +130,7 @@ export class Settings extends Component {
             },
             blacklist: items.blacklist,
             whitelist: items.whitelist,
+            blacklistKeywords: items.blacklistKeywords,
             misc: {
               hideReportIssueButton: items.hideReportIssueButton,
               showAddWebsitePrompt: items.showAddWebsitePrompt,
@@ -134,6 +143,7 @@ export class Settings extends Component {
           // Update WebsiteList components
           this.blacklistComponentRef.current.setList(items.blacklist);
           this.whitelistComponentRef.current.setList(items.whitelist);
+          this.blacklistKeywordsComponentRef.current.setList(items.blacklistKeywords);
         }
       });
   }
@@ -229,6 +239,7 @@ export class Settings extends Component {
         schedule: this.state.options.schedule,
         blacklist: this.state.options.blacklist,
         whitelist: this.state.options.whitelist,
+        blacklistKeywords: this.state.options.blacklistKeywords,
         unblock: this.state.options.unblock,
         password: {
           isEnabled: this.state.options.password.isEnabled,
@@ -250,6 +261,7 @@ export class Settings extends Component {
           sendMessage('setSchedule', this.state.options.schedule);
           sendMessage('setBlacklist', this.state.options.blacklist);
           sendMessage('setWhitelist', this.state.options.whitelist);
+          sendMessage('setBlacklistKeywords', this.state.options.blacklistKeywords);
           sendMessage('setUnblockOnceTimeout', this.state.options.unblock.unblockOnceTimeout);
           sendMessage('setDisplayNotificationOnTimeout', this.state.options.unblock.displayNotificationOnTimeout);
           sendMessage('setAutoReblockOnTimeout', this.state.options.unblock.autoReblockOnTimeout);
@@ -535,7 +547,7 @@ export class Settings extends Component {
     );
   }
 
-  renderBlacklistTab = () => (
+  renderBlacklistUrls = () => (
     <Fragment>
       <Paragraph size={300} color="muted" marginBottom={16}>
         {translate('blacklistDescription')}
@@ -548,6 +560,57 @@ export class Settings extends Component {
         addNewItemsOnTop={true}
       />
     </Fragment>
+  )
+
+  renderBlacklistKeywords = () => (
+    <Fragment>
+      <Paragraph size={300} color="muted" marginBottom={16}>
+        {translate('blacklistKeywordsDescription')}
+      </Paragraph>
+      <WordList
+        ref={this.blacklistKeywordsComponentRef}
+        list={this.state.options.blacklistKeywords}
+        onChange={(list) => this.setOptions('blacklistKeywords', list)}
+        exportFilename="blacklist_keywords.txt"
+        addNewItemsOnTop={true}
+      />
+    </Fragment>
+  )
+
+  renderBlacklistTab = () => (
+    <Pane>
+      <Tablist marginBottom={16} flexBasis={240}>
+        {this.state.blacklistTabs.map((tab, index) => (
+          <Tab
+            key={tab.id}
+            id={tab.id}
+            onSelect={() => this.setState({ selectedBlacklistTabIndex: index })}
+            isSelected={index === this.state.selectedBlacklistTabIndex}
+            aria-controls={`blacklist-${tab.id}`}
+            fontSize={14}
+            marginLeft={0}
+            marginRight={8}
+          >
+            {tab.label}
+          </Tab>
+        ))}
+      </Tablist>
+      <Pane flex="1">
+        {this.state.blacklistTabs.map((tab, index) => (
+          <Pane
+            key={tab.id}
+            id={`blacklist-${tab.id}`}
+            role="tabpanel"
+            aria-labelledby={tab.label}
+            aria-hidden={index !== this.state.selectedBlacklistTabIndex}
+            display={index === this.state.selectedBlacklistTabIndex ? 'block' : 'none'}
+          >
+            {tab.id === 'urls' && this.renderBlacklistUrls()}
+            {tab.id === 'keywords' && this.renderBlacklistKeywords()}
+          </Pane>
+        ))}
+      </Pane>
+    </Pane>
   )
 
   renderWhitelistTab = () => (
@@ -647,9 +710,9 @@ export class Settings extends Component {
       <h3 className="title">{translate('appName')}</h3>
       <div className="block">
         <div className="text">{translate('appDesc')}</div>
-        <a className="link" href="https://github.com/AXeL-dev/distract-me-not/releases" target="_blank">{`${translate('version')} ${version}`}</a>
-        <a className="link" href="https://github.com/AXeL-dev/distract-me-not/blob/master/LICENSE" target="_blank">{translate('license')}</a>
-        <a className="link" href="https://github.com/AXeL-dev/distract-me-not" target="_blank">Github</a>
+        <a className="link" href="https://github.com/AXeL-dev/distract-me-not/releases" target="_blank" rel="noreferrer">{`${translate('version')} ${version}`}</a>
+        <a className="link" href="https://github.com/AXeL-dev/distract-me-not/blob/master/LICENSE" target="_blank" rel="noreferrer">{translate('license')}</a>
+        <a className="link" href="https://github.com/AXeL-dev/distract-me-not" target="_blank" rel="noreferrer">Github</a>
       </div>
       <div className="small-text">{translate('supportDeveloper')}</div>
     </div>
