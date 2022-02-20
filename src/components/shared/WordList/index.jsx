@@ -381,6 +381,7 @@ export class WordList extends Component {
         </Table>
         <TextField
           placeholder={translate('keywordExample')}
+          hint={translate('addKeywordHint')}
           hasButton={true}
           buttonLabel={translate('add')}
           onSubmit={this.addToList}
@@ -402,6 +403,7 @@ export class WordList extends Component {
         >
           <TextField
             placeholder={translate('keywordExample')}
+            hint={translate('addKeywordHint')}
             value={this.state.editDialog.value}
             onChange={event => this.setState({ editDialog: { ...this.state.editDialog, value: event.target.value } })}
           />

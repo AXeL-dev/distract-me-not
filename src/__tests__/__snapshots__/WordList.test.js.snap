@@ -102,7 +102,7 @@ exports[`renders correctly 1`] = `
         style="overflow: auto; will-change: transform; height: 240px; width: 100%;"
       >
         <div
-          style="position: relative; width: 100%; min-height: 100%; height: 96px;"
+          style="position: relative; width: 100%; min-height: 100%; height: 144px;"
         >
           <div
             class="css-b5v4p5 css-nil ub-b-btm_1px-solid-EDF0F2 ub-dspl_flex ub-h_48px ub-box-szg_border-box"
@@ -186,6 +186,47 @@ exports[`renders correctly 1`] = `
               </button>
             </div>
           </div>
+          <div
+            class="css-b5v4p5 css-nil ub-b-btm_1px-solid-EDF0F2 ub-dspl_flex ub-h_48px ub-box-szg_border-box"
+            style="position: absolute; top: 96px; left: 0px; width: 100%; height: 48px;"
+          >
+            <div
+              class="css-saeo60 css-nil ub-pl_12px ub-pr_12px ub-box-szg_border-box ub-flx_1 ub-dspl_flex ub-algn-itms_center ub-flx-srnk_0 ub-ovflw-x_hidden ub-ovflw-y_hidden"
+            >
+              <span
+                class="ub-color_425A70 ub-fnt-fam_b77syt ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_16px ub-ltr-spc_0 ub-ml_8px ub-box-szg_border-box"
+                data-testid="keyword"
+              >
+                /doo.*/i
+              </span>
+            </div>
+            <div
+              class="css-saeo60 css-nil ub-pl_12px ub-pr_12px ub-box-szg_border-box ub-flx_none ub-dspl_flex ub-algn-itms_center ub-flx-srnk_0 ub-ovflw-x_hidden ub-ovflw-y_hidden ub-w_48px"
+            >
+              <button
+                aria-haspopup="true"
+                class="css-1ii3p2c ub-fnt-fam_b77syt ub-mt_0px ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_24px ub-ltr-spc_0 ub-btrr_3px ub-bbrr_3px ub-btlr_3px ub-bblr_3px ub-pt_0px ub-pb_0px ub-pr_0px ub-pl_0px ub-ml_0px ub-mr_0px ub-mb_0px ub-h_24px ub-pst_relative ub-dspl_flex ub-algn-itms_center ub-flx-wrap_nowrap ub-w_24px ub-just-cnt_center ub-box-szg_border-box"
+                data-testid="more-button"
+                role="button"
+              >
+                <div
+                  class="ub-dspl_inline-flex ub-box-szg_border-box"
+                >
+                  <svg
+                    class="ub-w_12px ub-h_12px ub-box-szg_border-box"
+                    data-icon="more"
+                    style="fill: #66788A;"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      d="M2 6.03a2 2 0 100 4 2 2 0 100-4zM14 6.03a2 2 0 100 4 2 2 0 100-4zM8 6.03a2 2 0 100 4 2 2 0 100-4z"
+                      fill-rule="evenodd"
+                    />
+                  </svg>
+                </div>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -219,6 +260,15 @@ exports[`renders correctly 1`] = `
         </button>
       </div>
     </div>
+    <p
+      class="ub-color_66788A ub-fnt-fam_b77syt ub-mt_6px ub-mb_0px ub-fnt-sze_12px ub-f-wght_400 ub-ln-ht_18px ub-ltr-spc_0 ub-box-szg_border-box"
+    >
+      <span
+        class=""
+      >
+        addKeywordHint
+      </span>
+    </p>
   </div>
   <input
     accept=".txt"

@@ -367,6 +367,9 @@
   "keywordExample": {
     "message": "Voorbeeld: foo, bar, ..."
   },
+  "addkeywordHint": {
+    "message": "Gebruik regexpatronen voor meer flexibiliteit, bijv.: <b>/foo.*/</b>, <b>/bar/i</b>, <b>/(foo|bar)/i</b>"
+  },
   "keywordIsNotValid": {
     "message": "Trefwoord is ongeldig"
   },

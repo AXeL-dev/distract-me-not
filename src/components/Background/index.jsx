@@ -5,7 +5,7 @@ import { storage, nativeAPI, indexUrl, getTab, sendNotification } from 'helpers/
 import { Mode, Action, defaultBlacklist, defaultWhitelist, UnblockOptions, defaultUnblock, isAccessible } from 'helpers/block';
 import { defaultSchedule, getTodaySchedule, isScheduleAllowed } from 'helpers/schedule';
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
-import { transformList } from 'helpers/regex';
+import { transformList, transformKeywords } from 'helpers/regex';
 import { logger, defaultLogsSettings } from 'helpers/logger';
 import { now } from 'helpers/date';
 import { translate } from 'helpers/i18n';
@@ -78,7 +78,7 @@ export class Background extends Component {
   }
 
   setBlacklistKeywords = (keywords) => {
-    this.blacklistKeywords = keywords;
+    this.blacklistKeywords = transformKeywords(keywords);
   }
 
   getBlacklistKeywords = () => {
@@ -86,7 +86,7 @@ export class Background extends Component {
   }
 
   setWhitelistKeywords = (keywords) => {
-    this.whitelistKeywords = keywords;
+    this.whitelistKeywords = transformKeywords(keywords);
   }
 
   getWhitelistKeywords = () => {
@@ -392,10 +392,9 @@ export class Background extends Component {
         return true;
       }
     }
-    for (const keyword of this.blacklistKeywords) {
-      const regex = new RegExp(keyword, 'i');
-      if (regex.test(url)) {
-        this.debug('found blacklisted keyword:', keyword, 'in:', url);
+    for (const rule of this.blacklistKeywords) {
+      if (rule.test(url)) {
+        this.debug('found blacklisted keyword in:', url);
         return true;
       }
     }
@@ -413,10 +412,9 @@ export class Background extends Component {
         return true;
       }
     }
-    for (const keyword of this.whitelistKeywords) {
-      const regex = new RegExp(keyword, 'i');
-      if (regex.test(url)) {
-        this.debug('found whitelisted keyword:', keyword, 'in:', url);
+    for (const rule of this.whitelistKeywords) {
+      if (rule.test(url)) {
+        this.debug('found whitelisted keyword in:', url);
         return true;
       }
     }

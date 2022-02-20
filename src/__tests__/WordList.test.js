@@ -7,6 +7,7 @@ import copy from 'copy-to-clipboard';
 const keywords = [
   'foo',
   'bar',
+  '/doo.*/i',
 ];
 
 it('renders correctly', () => {
