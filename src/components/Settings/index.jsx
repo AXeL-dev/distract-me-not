@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Tablist, SidebarTab, Tab, Checkbox, Button, TickIcon, PlusIcon, CrossIcon, DuplicateIcon, Paragraph, toaster, HeartIcon, Dialog } from 'evergreen-ui';
+import { Pane, Tablist, Tab, Checkbox, Button, TickIcon, PlusIcon, CrossIcon, DuplicateIcon, Paragraph, toaster, HeartIcon, Dialog } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv } from 'helpers/debug';
 import { Mode, Action, modes, actions, defaultAction, defaultMode, defaultBlacklist, defaultWhitelist, defaultUnblock } from 'helpers/block';
@@ -336,7 +336,6 @@ export class Settings extends Component {
         options={modes}
         value={this.state.options.mode}
         onChange={this.changeMode}
-        width={300}
         marginBottom={16}
         showTooltips
       />
@@ -350,7 +349,6 @@ export class Settings extends Component {
         value={this.state.options.action}
         onChange={this.changeAction}
         disabled={!this.state.options.isEnabled}
-        width={200}
         marginBottom={[
           Action.blockTab,
           Action.redirectToUrl,
@@ -457,17 +455,20 @@ export class Settings extends Component {
           <Pane width={180}>
             <Tablist flexBasis={240} marginRight={16}>
               {this.state.scheduleDays.map((day) => (
-                <SidebarTab
+                <Tab
+                  direction="vertical"
                   key={day.value}
                   id={day.value}
                   onSelect={() => this.setState({ selectedScheduleDay: day.value })}
                   isSelected={day.value === this.state.selectedScheduleDay}
                   aria-controls={`schedule-panel-${day.value}`}
                   fontSize={14}
+                  height={30}
+                  marginBottom={6}
                   disabled={!this.state.options.schedule.isEnabled}
                 >
                   {day.label}
-                </SidebarTab>
+                </Tab>
               ))}
             </Tablist>
           </Pane>
@@ -517,8 +518,6 @@ export class Settings extends Component {
                       value={range.type}
                       onChange={(value) => this.setOptions(`schedule.days['${day.value}'][${index}].type`, value)}
                       disabled={!this.state.options.schedule.isEnabled}
-                      width={240}
-                      height={28}
                       showTooltips
                     />
                   </Fragment>
@@ -808,17 +807,20 @@ export class Settings extends Component {
           />
           <Tablist flexBasis={240} marginRight={16}>
             {this.state.tabs.map((tab) => (
-              <SidebarTab
+              <Tab
+                direction="vertical"
                 key={tab.id}
                 id={tab.id}
                 onSelect={() => this.selectTab(tab.id)}
                 isSelected={tab.id === this.state.selectedTab}
                 aria-controls={`panel-${tab.id}`}
                 fontSize={14}
+                height={30}
+                marginBottom={6}
                 disabled={tab.disabled}
               >
                 {tab.label}
-              </SidebarTab>
+              </Tab>
             ))}
           </Tablist>
         </Pane>
@@ -847,7 +849,7 @@ export class Settings extends Component {
             ))}
           </Pane>
           <Pane display="flex" alignItems="center" justifyContent="center" marginTop={16}>
-            {this.state.selectedTabIndex === this.state.tabs.findIndex((tab) => tab.id === 'about') ? (
+            {this.state.selectedTab === 'about' ? (
               <Button
                 height={32}
                 appearance="primary"

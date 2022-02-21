@@ -25,7 +25,7 @@ import { TextField } from 'components';
 import { translate } from 'helpers/i18n';
 import { debug } from 'helpers/debug';
 import { download, readFile } from 'helpers/file';
-import './styles.scss';
+import '../WebsiteList/styles.scss';
 
 const Order = {
   NONE: 'NONE',
@@ -356,7 +356,7 @@ export class WordList extends Component {
     return (
       <Fragment>
         <Table border>
-          <Table.Head>
+          <Table.Head height={32} padding={0}>
             <Table.SearchHeaderCell
               onChange={this.handleFilterChange}
               value={this.state.searchQuery}
@@ -398,8 +398,11 @@ export class WordList extends Component {
             value: this.state.editDialog.value
           })}
           hasHeader={false}
-          topOffset="24vmin"
           shouldCloseOnOverlayClick={false}
+          topOffset="24vmin"
+          minHeightContent="auto"
+          contentContainerProps={{ padding: 16 }}
+          containerProps={{ className: 'edit-dialog' }}
         >
           <TextField
             placeholder={translate('keywordExample')}

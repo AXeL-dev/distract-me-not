@@ -14,6 +14,7 @@ $textColor: white;
   cursor: default;
 }
 .distract-select {
+  user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
 }
@@ -60,6 +61,7 @@ $textColor: white;
   font-size: 32px;
   line-height: 32px;
   cursor: default;
+  user-select: none;
   -webkit-user-select: none;
   position: absolute;
   margin: 0 auto;
@@ -99,15 +101,21 @@ button.unblock {
     border-color: transparent;
   }
 }
-.unblock-dialog > div:nth-child(1) { // dialog title
-  border: 0 !important;
-  position: absolute !important;
-  top: 0;
-  right: 0;
-  z-index: 1;
-  button {
-    &:hover, &:active, &:focus {
-      box-shadow: none !important;
+.unblock-dialog {
+  > div:first-child { // dialog title
+    border: 0 !important;
+    position: absolute !important;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    padding: 12px;
+    button {
+      &:hover, &:active, &:focus {
+        box-shadow: none !important;
+      }
     }
+  }
+  > div:last-child {
+    padding: 16px;
   }
 }

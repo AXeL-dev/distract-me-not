@@ -419,7 +419,7 @@ export class WebsiteList extends Component {
     return (
       <Fragment>
         <Table border>
-          <Table.Head>
+          <Table.Head height={32} padding={0}>
             <Table.SearchHeaderCell
               onChange={this.handleFilterChange}
               value={this.state.searchQuery}
@@ -461,8 +461,11 @@ export class WebsiteList extends Component {
             value: this.state.editDialog.value
           })}
           hasHeader={false}
-          topOffset="24vmin"
           shouldCloseOnOverlayClick={false}
+          topOffset="24vmin"
+          minHeightContent="auto"
+          contentContainerProps={{ padding: 16 }}
+          containerProps={{ className: 'edit-dialog' }}
         >
           <TextField
             placeholder={translate('urlExample')}

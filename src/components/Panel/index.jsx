@@ -143,7 +143,7 @@ export class Panel extends Component {
           options={modes}
           value={this.state.mode}
           onChange={this.changeMode}
-          width={260}
+          maxWidth={260}
           paddingX={16}
           paddingBottom={20}
         />

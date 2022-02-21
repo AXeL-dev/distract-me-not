@@ -1,6 +1,6 @@
 
 nav[role=menu] {
-  > div.ub-pt_8px.ub-pb_8px {
+  > div {
     padding-top: 4px !important;
     padding-bottom: 4px !important;
     > h2 {
@@ -9,7 +9,15 @@ nav[role=menu] {
     }
     div[role=menuitemradio], div[role=menuitem] {
       height: 34px !important;
+      padding: 0 !important;
     }
+  }
+}
+
+.edit-dialog {
+  > div:last-child {
+    border-top: 1px solid rgb(237, 240, 242);
+    padding: 16px;
   }
 }
 

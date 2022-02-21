@@ -257,7 +257,7 @@ export class Logs extends Component {
     return (
       <Pane padding={16} height="100%">
         <Table border height="100%">
-          <Table.Head padding={0}>
+          <Table.Head height={32} padding={0}>
             <Table.SearchHeaderCell
               onChange={this.handleFilterChange}
               value={this.state.searchQuery}
