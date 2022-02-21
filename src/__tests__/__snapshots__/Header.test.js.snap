@@ -3,7 +3,7 @@
 exports[`renders correctly 1`] = `
 <DocumentFragment>
   <div
-    class="css-nil ub-b-btm_1px-solid-E4E7EB ub-dspl_flex ub-algn-itms_center ub-just-cnt_center ub-h_62px ub-box-szg_border-box"
+    class="ub-b-btm_1px-solid-E6E8F0 ub-dspl_flex ub-algn-itms_center ub-just-cnt_center ub-h_62px ub-box-szg_border-box"
   >
     <img
       alt="logo"
@@ -11,7 +11,7 @@ exports[`renders correctly 1`] = `
       src="icons/magnet-256.png"
     />
     <h2
-      class="cursor-default ub-mt_0px ub-mb_0px ub-fnt-sze_20px ub-f-wght_bold ub-ln-ht_24px ub-ltr-spc_-0-07px ub-fnt-fam_v92vt9 ub-color_333 ub-box-szg_border-box"
+      class="cursor-default ub-mt_0px ub-mb_0px ub-color_333 ub-fnt-fam_v92vt9 ub-f-wght_bold ub-fnt-sze_18px ub-ln-ht_24px ub-ltr-spc_-0-07px ub-box-szg_border-box"
     >
       appName
     </h2>

@@ -3,10 +3,10 @@
 exports[`renders panel correctly 1`] = `
 <DocumentFragment>
   <div
-    class="css-nil ub-min-w_350px ub-box-szg_border-box"
+    class="ub-min-w_350px ub-box-szg_border-box"
   >
     <div
-      class="css-nil ub-b-btm_1px-solid-E4E7EB ub-dspl_flex ub-algn-itms_center ub-just-cnt_center ub-h_62px ub-box-szg_border-box"
+      class="ub-b-btm_1px-solid-E6E8F0 ub-dspl_flex ub-algn-itms_center ub-just-cnt_center ub-h_62px ub-box-szg_border-box"
     >
       <img
         alt="logo"
@@ -14,53 +14,41 @@ exports[`renders panel correctly 1`] = `
         src="icons/magnet-256.png"
       />
       <h2
-        class="cursor-default ub-mt_0px ub-mb_0px ub-fnt-sze_20px ub-f-wght_bold ub-ln-ht_24px ub-ltr-spc_-0-07px ub-fnt-fam_v92vt9 ub-color_333 ub-box-szg_border-box"
+        class="cursor-default ub-mt_0px ub-mb_0px ub-color_333 ub-fnt-fam_v92vt9 ub-f-wght_bold ub-fnt-sze_18px ub-ln-ht_24px ub-ltr-spc_-0-07px ub-box-szg_border-box"
       >
         appName
       </h2>
     </div>
     <div
-      class="css-nil ub-dspl_flex ub-pb_20px ub-pl_16px ub-pr_16px ub-pt_20px ub-box-szg_border-box"
+      class="ub-dspl_flex ub-pb_20px ub-pl_16px ub-pr_16px ub-pt_20px ub-box-szg_border-box"
     >
       <div
-        class="css-nil ub-dspl_flex ub-algn-itms_center ub-flx_1 ub-box-szg_border-box"
+        class="ub-dspl_flex ub-algn-itms_center ub-flx_1 ub-box-szg_border-box"
       >
         <span
-          class="cursor-default ub-color_425A70 ub-fnt-fam_b77syt ub-fnt-sze_14px ub-f-wght_400 ub-ln-ht_20px ub-ltr-spc_-0-05px ub-box-szg_border-box"
+          class="cursor-default ub-fnt-sze_14px ub-f-wght_400 ub-ln-ht_20px ub-ltr-spc_-0-05px ub-fnt-fam_b77syt ub-color_474d66 ub-box-szg_border-box"
         >
           status
         </span>
       </div>
       <div
-        class="css-nil ub-dspl_flex ub-algn-itms_center ub-mr_0px ub-box-szg_border-box"
+        class="ub-dspl_flex ub-algn-itms_center ub-mr_0px ub-box-szg_border-box"
       >
         <label
           class="ub-dspl_block ub-w_44px ub-pst_relative ub-box-szg_border-box"
         >
           <input
             checked=""
-            class="css-17gzcr6 ub-box-szg_border-box"
+            class="css-1yog12j ub-b-btm_0 ub-b-lft_0 ub-b-rgt_0 ub-b-top_0 ub-h_1px ub-ovflw-x_hidden ub-ovflw-y_hidden ub-pb_0 ub-pl_0 ub-pr_0 ub-pt_0 ub-pst_absolute ub-wht-spc_nowrap ub-w_1px ub-opct_0 ub-box-szg_border-box"
             type="checkbox"
           />
           <div
-            class="ub-h_22px ub-w_44px ub-box-szg_border-box"
+            class="ub-h_22px ub-w_44px ub-bblr_9999px ub-bbrr_9999px ub-btlr_9999px ub-btrr_9999px ub-crsr_pointer ub-box-szg_border-box"
           >
             <div
               class="css-17bhmw6 ub-h_22px ub-w_22px ub-box-szg_border-box"
               data-checked="true"
-            >
-              <svg
-                height="8"
-                viewBox="0 0 10 7"
-                width="10"
-              >
-                <path
-                  d="M4 4.586L1.707 2.293A1 1 0 1 0 .293 3.707l3 3a.997.997 0 0 0 1.414 0l5-5A1 1 0 1 0 8.293.293L4 4.586z"
-                  fill="currentColor"
-                  fill-rule="evenodd"
-                />
-              </svg>
-            </div>
+            />
             <div
               class="css-1rprxtl ub-w_44px ub-dspl_flex ub-box-szg_border-box"
               data-checked="true"
@@ -78,98 +66,61 @@ exports[`renders panel correctly 1`] = `
       </div>
     </div>
     <div
-      class="css-nil ub-dspl_flex ub-pb_20px ub-pl_16px ub-pr_16px ub-box-szg_border-box"
+      class="ub-dspl_flex ub-pb_20px ub-pl_16px ub-pr_16px ub-box-szg_border-box"
     >
       <div
-        class="css-nil ub-dspl_flex ub-algn-itms_center ub-flx_1 ub-box-szg_border-box"
+        class="ub-dspl_flex ub-algn-itms_center ub-flx_1 ub-box-szg_border-box"
       >
         <span
-          class="cursor-default ub-color_425A70 ub-fnt-fam_b77syt ub-fnt-sze_14px ub-f-wght_400 ub-ln-ht_20px ub-ltr-spc_-0-05px ub-box-szg_border-box"
+          class="cursor-default ub-fnt-sze_14px ub-f-wght_400 ub-ln-ht_20px ub-ltr-spc_-0-05px ub-fnt-fam_b77syt ub-color_474d66 ub-box-szg_border-box"
         >
           mode
         </span>
       </div>
       <div
-        class="css-nil ub-dspl_flex ub-algn-itms_center ub-box-szg_border-box"
+        class="ub-dspl_flex ub-algn-itms_center ub-box-szg_border-box"
       >
         <div
-          class="custom-segmented-control ub-dspl_flex ub-mr_-1px ub-h_32px ub-w_260px ub-box-szg_border-box"
+          class="css-l6zppx ub-dspl_inline-flex ub-max-w_260px ub-box-szg_border-box"
+          role="group"
         >
-          <div
-            class="css-3grw6g css-4b8qak ub-btlr_3px ub-bblr_3px ub-box-szg_border-box"
-            data-active="false"
+          <button
+            class="css-12b25td ub-pst_relative ub-f-wght_500 ub-dspl_inline-flex ub-algn-itms_center ub-flx-wrap_nowrap ub-just-cnt_center ub-txt-deco_none ub-ver-algn_middle ub-b-btm_1px-solid-c1c4d6 ub-b-lft_1px-solid-c1c4d6 ub-b-rgt_1px-solid-c1c4d6 ub-b-top_1px-solid-c1c4d6 ub-otln_iu2jf4 ub-usr-slct_none ub-crsr_pointer ub-wht-spc_nowrap ub-fnt-fam_b77syt ub-bblr_4px ub-bbrr_4px ub-btlr_4px ub-btrr_4px ub-color_474d66 ub-tstn_n1akt6 ub-h_32px ub-min-w_32px ub-fnt-sze_12px ub-ln-ht_32px ub-pl_16px ub-pr_16px ub-bg-clr_white ub-box-szg_border-box"
+            data-checked="false"
           >
-            <input
-              class="css-87b09r"
-              id="SegmentedControl-10"
-              name="mode"
-              type="radio"
-              value="blacklist"
-            />
-            <label
-              class="css-17kak1e ub-color_425A70 ub-fnt-fam_b77syt ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_16px ub-ltr-spc_0 ub-crsr_pointer ub-box-szg_border-box"
-              for="SegmentedControl-10"
-            >
-              blacklist
-            </label>
-          </div>
-          <div
-            class="css-3grw6g css-4b8qak ub-box-szg_border-box"
-            data-active="false"
+            blacklist
+          </button>
+          <button
+            class="css-12b25td ub-pst_relative ub-f-wght_500 ub-dspl_inline-flex ub-algn-itms_center ub-flx-wrap_nowrap ub-just-cnt_center ub-txt-deco_none ub-ver-algn_middle ub-b-btm_1px-solid-c1c4d6 ub-b-lft_1px-solid-c1c4d6 ub-b-rgt_1px-solid-c1c4d6 ub-b-top_1px-solid-c1c4d6 ub-otln_iu2jf4 ub-usr-slct_none ub-crsr_pointer ub-wht-spc_nowrap ub-fnt-fam_b77syt ub-bblr_4px ub-bbrr_4px ub-btlr_4px ub-btrr_4px ub-color_474d66 ub-tstn_n1akt6 ub-h_32px ub-min-w_32px ub-fnt-sze_12px ub-ln-ht_32px ub-pl_16px ub-pr_16px ub-bg-clr_white ub-box-szg_border-box"
+            data-checked="false"
           >
-            <input
-              class="css-87b09r"
-              id="SegmentedControl-11"
-              name="mode"
-              type="radio"
-              value="whitelist"
-            />
-            <label
-              class="css-17kak1e ub-color_425A70 ub-fnt-fam_b77syt ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_16px ub-ltr-spc_0 ub-crsr_pointer ub-box-szg_border-box"
-              for="SegmentedControl-11"
-            >
-              whitelist
-            </label>
-          </div>
-          <div
-            class="css-3grw6g css-4b8qak ub-btrr_3px ub-bbrr_3px ub-box-szg_border-box"
-            data-active="true"
+            whitelist
+          </button>
+          <button
+            class="css-elp417 ub-pst_relative ub-f-wght_500 ub-dspl_inline-flex ub-algn-itms_center ub-flx-wrap_nowrap ub-just-cnt_center ub-txt-deco_none ub-ver-algn_middle ub-b-btm_1px-solid-transparent ub-b-lft_1px-solid-transparent ub-b-rgt_1px-solid-transparent ub-b-top_1px-solid-transparent ub-otln_iu2jf4 ub-usr-slct_none ub-crsr_pointer ub-wht-spc_nowrap ub-fnt-fam_b77syt ub-bblr_4px ub-bbrr_4px ub-btlr_4px ub-btrr_4px ub-color_white ub-tstn_n1akt6 ub-h_32px ub-min-w_32px ub-fnt-sze_12px ub-ln-ht_32px ub-pl_16px ub-pr_16px ub-bg-clr_3366FF ub-b-btm-clr_3366FF ub-b-lft-clr_3366FF ub-b-rgt-clr_3366FF ub-b-top-clr_3366FF ub-box-szg_border-box"
+            data-checked="true"
           >
-            <input
-              checked=""
-              class="css-87b09r"
-              id="SegmentedControl-12"
-              name="mode"
-              type="radio"
-              value="combined"
-            />
-            <label
-              class="css-17kak1e ub-color_425A70 ub-fnt-fam_b77syt ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_16px ub-ltr-spc_0 ub-crsr_pointer ub-box-szg_border-box"
-              for="SegmentedControl-12"
-            >
-              combined
-            </label>
-          </div>
+            combined
+          </button>
         </div>
       </div>
     </div>
     <div
-      class="css-nil ub-b-top_1px-solid-E4E7EB ub-dspl_flex ub-pl_16px ub-pr_16px ub-pb_10px ub-pt_10px ub-algn-itms_center ub-just-cnt_space-between ub-box-szg_border-box"
+      class="ub-b-top_1px-solid-E6E8F0 ub-dspl_flex ub-pl_16px ub-pr_16px ub-pb_10px ub-pt_10px ub-algn-itms_center ub-just-cnt_space-between ub-box-szg_border-box"
     >
       <div
-        class="css-nil ub-dspl_flex ub-gap_10px ub-box-szg_border-box"
+        class="ub-dspl_flex ub-gap_10px ub-box-szg_border-box"
       >
         <button
-          aria-describedby="evergreen-tooltip-2"
-          class="css-1ii3p2c icon-button fill-grey ub-fnt-fam_b77syt ub-mt_0px ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_32px ub-ltr-spc_0 ub-btrr_3px ub-bbrr_3px ub-btlr_3px ub-bblr_3px ub-pt_0px ub-pb_0px ub-pr_0px ub-pl_0px ub-ml_0px ub-mr_0px ub-mb_0px ub-h_32px ub-pst_relative ub-dspl_flex ub-algn-itms_center ub-flx-wrap_nowrap ub-just-cnt_center ub-w_32px ub-box-szg_border-box"
+          aria-describedby="evergreen-tooltip-1"
+          class="css-1tyjqqv icon-button fill-grey ub-pst_relative ub-f-wght_400 ub-dspl_flex ub-algn-itms_center ub-flx-wrap_nowrap ub-just-cnt_center ub-txt-deco_none ub-ver-algn_middle ub-b-btm_1px-solid-transparent ub-b-lft_1px-solid-transparent ub-b-rgt_1px-solid-transparent ub-b-top_1px-solid-transparent ub-otln_iu2jf4 ub-usr-slct_none ub-crsr_pointer ub-wht-spc_nowrap ub-fnt-fam_b77syt ub-bblr_3px ub-bbrr_3px ub-btlr_3px ub-btrr_3px ub-color_474d66 ub-tstn_n1akt6 ub-h_32px ub-min-w_32px ub-fnt-sze_12px ub-ln-ht_16px ub-pl_0 ub-pr_0 ub-bg-clr_transparent ub-pb_0 ub-pt_0 ub-w_32px ub-ltr-spc_0 ub-box-szg_border-box"
         >
           <div
             class="ub-dspl_inline-flex ub-box-szg_border-box"
           >
             <svg
-              class="ub-w_20px ub-h_20px ub-box-szg_border-box"
+              class="css-1wyorxj ub-w_20px ub-h_20px ub-box-szg_border-box"
               data-icon="cog"
-              style="fill: #4E4E50;"
               viewBox="0 0 20 20"
             >
               <path
@@ -180,16 +131,15 @@ exports[`renders panel correctly 1`] = `
           </div>
         </button>
         <button
-          aria-describedby="evergreen-tooltip-3"
-          class="css-1ii3p2c icon-button fill-grey ub-fnt-fam_b77syt ub-mt_0px ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_32px ub-ltr-spc_0 ub-btrr_3px ub-bbrr_3px ub-btlr_3px ub-bblr_3px ub-pt_0px ub-pb_0px ub-pr_0px ub-pl_0px ub-ml_0px ub-mr_0px ub-mb_0px ub-h_32px ub-pst_relative ub-dspl_flex ub-algn-itms_center ub-flx-wrap_nowrap ub-just-cnt_center ub-w_32px ub-box-szg_border-box"
+          aria-describedby="evergreen-tooltip-2"
+          class="css-1tyjqqv icon-button fill-grey ub-pst_relative ub-f-wght_400 ub-dspl_flex ub-algn-itms_center ub-flx-wrap_nowrap ub-just-cnt_center ub-txt-deco_none ub-ver-algn_middle ub-b-btm_1px-solid-transparent ub-b-lft_1px-solid-transparent ub-b-rgt_1px-solid-transparent ub-b-top_1px-solid-transparent ub-otln_iu2jf4 ub-usr-slct_none ub-crsr_pointer ub-wht-spc_nowrap ub-fnt-fam_b77syt ub-bblr_3px ub-bbrr_3px ub-btlr_3px ub-btrr_3px ub-color_474d66 ub-tstn_n1akt6 ub-h_32px ub-min-w_32px ub-fnt-sze_12px ub-ln-ht_16px ub-pl_0 ub-pr_0 ub-bg-clr_transparent ub-pb_0 ub-pt_0 ub-w_32px ub-ltr-spc_0 ub-box-szg_border-box"
         >
           <div
             class="ub-dspl_inline-flex ub-box-szg_border-box"
           >
             <svg
-              class="ub-w_20px ub-h_20px ub-box-szg_border-box"
+              class="css-1wyorxj ub-w_20px ub-h_20px ub-box-szg_border-box"
               data-icon="issue-new"
-              style="fill: #4E4E50;"
               viewBox="0 0 20 20"
             >
               <path
@@ -201,7 +151,7 @@ exports[`renders panel correctly 1`] = `
         </button>
       </div>
       <div
-        class="css-nil ub-box-szg_border-box"
+        class="ub-box-szg_border-box"
       />
     </div>
   </div>

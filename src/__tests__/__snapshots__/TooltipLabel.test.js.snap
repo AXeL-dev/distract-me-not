@@ -3,7 +3,7 @@
 exports[`renders correctly 1`] = `
 <DocumentFragment>
   <span
-    class="ub-color_425A70 ub-fnt-fam_b77syt ub-fnt-sze_14px ub-f-wght_400 ub-ln-ht_20px ub-ltr-spc_-0-05px ub-box-szg_border-box"
+    class="ub-fnt-sze_14px ub-f-wght_400 ub-ln-ht_20px ub-ltr-spc_-0-05px ub-fnt-fam_b77syt ub-color_474d66 ub-box-szg_border-box"
   >
     some text
   </span>
@@ -14,7 +14,7 @@ exports[`renders correctly when tooltip prop is set 1`] = `
 <DocumentFragment>
   <span
     aria-describedby="evergreen-tooltip-1"
-    class="cursor-help  ub-color_425A70 ub-fnt-fam_b77syt ub-fnt-sze_14px ub-f-wght_400 ub-ln-ht_20px ub-ltr-spc_-0-05px ub-box-szg_border-box"
+    class="cursor-help  ub-fnt-sze_14px ub-f-wght_400 ub-ln-ht_20px ub-ltr-spc_-0-05px ub-fnt-fam_b77syt ub-color_474d66 ub-box-szg_border-box"
   >
     some text
   </span>

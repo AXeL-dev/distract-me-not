@@ -24,14 +24,14 @@ it('updates mode when changed to whitelist', () => {
   render(<Panel />);
   const whitelistMode = screen.getByText(/whitelist/i);
   fireEvent.click(whitelistMode);
-  const whitelistInput = screen.getByRole('radio', { name: 'whitelist' });
-  expect(whitelistInput).toBeChecked();
+  const whitelistButton = screen.getByRole('button', { name: 'whitelist' });
+  expect(whitelistButton.getAttribute('data-checked')).toEqual('true');
 });
 
 it('updates mode when changed to blacklist', () => {
   render(<Panel />);
   const blacklistMode = screen.getByText(/blacklist/i);
   fireEvent.click(blacklistMode);
-  const blacklistInput = screen.getByRole('radio', { name: 'blacklist' });
-  expect(blacklistInput).toBeChecked();
+  const blacklistButton = screen.getByRole('button', { name: 'blacklist' });
+  expect(blacklistButton.getAttribute('data-checked')).toEqual('true');
 });

@@ -60,4 +60,4 @@ it('accepts only passwords that contains at least 8 characters', async () => {
   fireEvent.click(saveButton);
   const saveSuccessText = await waitFor(() => screen.getByText(/settingsSaved/i));
   expect(saveSuccessText).toBeInTheDocument();
-});
+}, 30000);
