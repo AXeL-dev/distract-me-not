@@ -367,7 +367,7 @@
   "keywordExample": {
     "message": "Exemple: foo, bar, ..."
   },
-  "addkeywordHint": {
+  "addKeywordHint": {
     "message": "Vous pouvez utiliser des expressions régulières pour plus de flexibilité, par exemple: <b>/foo.*/</b>, <b>/bar/i</b>, <b>/(foo|bar)/i</b>"
   },
   "keywordIsNotValid": {
