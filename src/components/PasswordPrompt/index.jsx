@@ -16,14 +16,25 @@ export class PasswordPrompt extends Component {
     super(props);
     this.mode = defaultMode;
     this.hash = defaultHash || null;
-    this.redirectPath = this.props.path || '/';
+    this.redirectPath = this.getRedirectPath();
     this.showAddWebsitePrompt = false;
+    this.isWideScreen = ['/settings', '/logs'].includes(this.props.path);
     debug.log({ hash: this.hash, redirectPath: this.redirectPath });
     this.state = {
       password: '',
       isAddButtonVisible: false,
       enableLogs: false,
     };
+  }
+
+  getRedirectPath() {
+    if (this.props.path) {
+      const regex = new RegExp(`^#${this.props.path}`);
+      const search = window.location.hash.replace(regex, '');
+      return `${this.props.path}${search}`;
+    } else {
+      return '/';
+    }
   }
 
   componentDidMount() {
@@ -94,27 +105,27 @@ export class PasswordPrompt extends Component {
   }
 
   getMinWidth = () => {
-    return this.props.minWidth || (['/settings', '/logs'].includes(this.redirectPath) ? 580 : 350);
+    return this.props.minWidth || (this.isWideScreen ? 580 : 350);
   }
 
   getMinHeight = () => {
-    return this.props.minHeight || (['/settings', '/logs'].includes(this.redirectPath) ? 380 : 230);
+    return this.props.minHeight || (this.isWideScreen ? 380 : 230);
   }
 
   getInputWidth = () => {
-    return this.props.inputWidth || (['/settings', '/logs'].includes(this.redirectPath) ? 320 : '70%');
+    return this.props.inputWidth || (this.isWideScreen ? 320 : '70%');
   }
 
   getInputHeight = () => {
-    return this.props.inputHeight || (['/settings', '/logs'].includes(this.redirectPath) ? 36 : 32);
+    return this.props.inputHeight || (this.isWideScreen ? 36 : 32);
   }
 
   getButtonWidth = () => {
-    return this.props.buttonWidth || this.props.inputHeight || (['/settings', '/logs'].includes(this.redirectPath) ? 36 : 32);
+    return this.props.buttonWidth || this.props.inputHeight || (this.isWideScreen ? 36 : 32);
   }
 
   getButtonHeight = () => {
-    return this.props.buttonHeight || this.props.inputHeight || (['/settings', '/logs'].includes(this.redirectPath) ? 36 : 32);
+    return this.props.buttonHeight || this.props.inputHeight || (this.isWideScreen ? 36 : 32);
   }
 
   render() {

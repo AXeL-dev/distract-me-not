@@ -176,7 +176,7 @@ export class Blocked extends Component {
                     onSuccess={this.unblock}
                   />
                 ) : (
-                  <Pane display="flex" alignItems="center" justifyContent="center" marginTop={16}>
+                  <Pane display="flex" alignItems="center" justifyContent="center" marginTop={20}>
                     <Button
                       height={32}
                       appearance="primary"

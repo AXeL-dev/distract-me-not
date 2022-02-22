@@ -1,10 +1,13 @@
-import { regex, transformList } from 'helpers/regex';
+import { regex, transformList, transformKeywords } from 'helpers/regex';
 
 describe('Regex helper', () => {
   it('exposes needed functions', () => {
     expect(regex.wildcard).toBeInstanceOf(Function);
-    expect(regex.new).toBeInstanceOf(Function);
+    expect(regex.create).toBeInstanceOf(Function);
+    expect(regex.parseUrl).toBeInstanceOf(Function);
     expect(transformList).toBeInstanceOf(Function);
+    expect(regex.parseKeyword).toBeInstanceOf(Function);
+    expect(transformKeywords).toBeInstanceOf(Function);
   });
 
   it('transforms urls to regular expressions', () => {
@@ -62,6 +65,70 @@ describe('Regex helper', () => {
     ];
 
     const result = transformList(payload.map(({ url }) => url));
+    const expected = payload.map(({ expected }) => expected);
+
+    expect(result).toEqual(expected);
+  });
+
+  it('returns case insensitive regular expressions', () => {
+    const url = 'https://website.com';
+    const payload = [
+      '*.website.com',
+      '*.Website.com',
+      '*.WEBSITE.com',
+    ];
+
+    const result = transformList(payload).map((regex) => regex.test(url));
+    const expected = payload.map(() => true);
+
+    expect(result).toEqual(expected);
+  });
+
+  it('transforms keywords to regular expressions', () => {
+    const payload = [
+      {
+        keyword: 'foo',
+        expected: /foo/,
+      },
+      {
+        keyword: 'bar?',
+        expected: /bar\?/,
+      },
+      {
+        keyword: '/bar?/i',
+        expected: /bar?/i,
+      },
+      {
+        keyword: '/(foo|bar)/i',
+        expected: /(foo|bar)/i,
+      },
+      {
+        keyword: 'doo.*',
+        expected: /doo\.\*/,
+      },
+      {
+        keyword: '/doo.*/',
+        expected: /doo.*/,
+      },
+      {
+        keyword: '/doo.*/ig',
+        expected: /doo.*/ig,
+      },
+      {
+        keyword: '/doo.*/ii',
+        expected: /\/doo\.\*\/ii/,
+      },
+      {
+        keyword: '/doo.*/igig',
+        expected: /\/doo\.\*\/igig/,
+      },
+      {
+        keyword: '/doo.*/ii/iu',
+        expected: /doo.*\/ii/iu,
+      },
+    ];
+
+    const result = transformKeywords(payload.map(({ keyword }) => keyword));
     const expected = payload.map(({ expected }) => expected);
 
     expect(result).toEqual(expected);

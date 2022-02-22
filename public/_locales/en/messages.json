@@ -351,5 +351,29 @@
   },
   "showAddWebsitePromptTooltip": {
     "message": "Display a prompt when adding websites via \"+\" button on the main panel"
+  },
+  "urls": {
+    "message": "Urls"
+  },
+  "keywords": {
+    "message": "Keywords"
+  },
+  "blacklistKeywordsDescription": {
+    "message": "When mode is set to blacklist, you cannot visit website urls containing the following keywords:"
+  },
+  "whitelistKeywordsDescription": {
+    "message": "When mode is set to whitelist, you can only visit website urls containing the following keywords:"
+  },
+  "keywordExample": {
+    "message": "Example: foo, bar, ..."
+  },
+  "addKeywordHint": {
+    "message": "Use regex patterns for more flexibility, e.g.: <b>/foo.*/</b>, <b>/bar/i</b>, <b>/(foo|bar)/i</b>"
+  },
+  "keywordIsNotValid": {
+    "message": "Keyword is not valid"
+  },
+  "keywordAlreadyExists": {
+    "message": "Keyword already exists!"
   }
 }

@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Tablist, SidebarTab, Checkbox, Button, TickIcon, PlusIcon, CrossIcon, DuplicateIcon, Paragraph, toaster, HeartIcon, Dialog } from 'evergreen-ui';
+import { Pane, Tablist, Tab, Checkbox, Button, TickIcon, PlusIcon, CrossIcon, DuplicateIcon, Paragraph, toaster, HeartIcon, Dialog } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv } from 'helpers/debug';
 import { Mode, Action, modes, actions, defaultAction, defaultMode, defaultBlacklist, defaultWhitelist, defaultUnblock } from 'helpers/block';
@@ -7,7 +7,7 @@ import { ScheduleType, defaultSchedule, newScheduleTimeRange } from 'helpers/sch
 import { sendMessage, storage } from 'helpers/webext';
 import { DaysOfWeek, today } from 'helpers/date';
 import { hash } from 'helpers/crypt';
-import { Header, SwitchField, SegmentedControlField, TimeField, PasswordField, WebsiteList, NumberField, SelectField, TextField } from 'components';
+import { Header, SwitchField, SegmentedControlField, TimeField, PasswordField, WebsiteList, NumberField, SelectField, TextField, WordList } from 'components';
 import { defaultLogsSettings } from 'helpers/logger';
 import { version } from '../../../package.json';
 import _ from 'lodash';
@@ -19,25 +19,40 @@ export class Settings extends Component {
     super(props);
     this.blacklistComponentRef = React.createRef();
     this.whitelistComponentRef = React.createRef();
+    this.blacklistKeywordsComponentRef = React.createRef();
+    this.whitelistKeywordsComponentRef = React.createRef();
+    const tabs = [
+      { label: translate('blocking'), id: 'blocking' },
+      { label: translate('unblocking'), id: 'unblocking', disabled: defaultAction !== Action.blockTab },
+      { label: translate('schedule'), id: 'schedule' },
+      { label: translate('blacklist'), id: 'blacklist', disabled: defaultMode === Mode.whitelist },
+      { label: translate('whitelist'), id: 'whitelist', disabled: defaultMode === Mode.blacklist },
+      { label: translate('password'), id: 'password' },
+      { label: translate('logs'), id: 'logs' },
+      { label: translate('miscellaneous'), id: 'misc' },
+      { label: translate('about'), id: 'about' },
+    ];
+    const blacklistTabs = [
+      { label: translate('urls'), id: 'urls' },
+      { label: translate('keywords'), id: 'keywords' },
+    ];
+    const whitelistTabs = [
+      { label: translate('urls'), id: 'urls' },
+      { label: translate('keywords'), id: 'keywords' },
+    ];
     this.state = {
-      selectedTabIndex: 0,
-      tabs: [
-        { label: translate('blocking'), id: 'blocking' },
-        { label: translate('unblocking'), id: 'unblocking', disabled: defaultAction !== Action.blockTab },
-        { label: translate('schedule'), id: 'schedule' },
-        { label: translate('blacklist'), id: 'blacklist', disabled: defaultMode === Mode.whitelist },
-        { label: translate('whitelist'), id: 'whitelist', disabled: defaultMode === Mode.blacklist },
-        { label: translate('password'), id: 'password' },
-        { label: translate('logs'), id: 'logs' },
-        { label: translate('miscellaneous'), id: 'misc' },
-        { label: translate('about'), id: 'about' },
-      ],
+      tabs,
+      selectedTab: this.getSelectedTab() || tabs[0].id,
       scheduleDays: DaysOfWeek.map((day) => ({ label: translate(day), value: day })),
       selectedScheduleDay: today(),
+      blacklistTabs,
+      selectedBlacklistTab: blacklistTabs[0].id,
+      whitelistTabs,
+      selectedWhitelistTab: whitelistTabs[0].id,
       shownDialog: null,
       options: {
         isEnabled: true,
-        mode: '', //defaultMode,
+        mode: defaultMode,
         action: defaultAction,
         blockTab: {
           message: '',
@@ -50,6 +65,8 @@ export class Settings extends Component {
         schedule: defaultSchedule,
         blacklist: isDevEnv ? defaultBlacklist : [],
         whitelist: isDevEnv ? defaultWhitelist : [],
+        blacklistKeywords: [],
+        whitelistKeywords: [],
         password: {
           isEnabled: props.enablePassword || false,
           isSet: false,
@@ -86,6 +103,8 @@ export class Settings extends Component {
         unblock: this.state.options.unblock,
         blacklist: defaultBlacklist,
         whitelist: defaultWhitelist,
+        blacklistKeywords: [],
+        whitelistKeywords: [],
       })
       .then(async (items) => {
         if (items) {
@@ -122,6 +141,8 @@ export class Settings extends Component {
             },
             blacklist: items.blacklist,
             whitelist: items.whitelist,
+            blacklistKeywords: items.blacklistKeywords,
+            whitelistKeywords: items.whitelistKeywords,
             misc: {
               hideReportIssueButton: items.hideReportIssueButton,
               showAddWebsitePrompt: items.showAddWebsitePrompt,
@@ -134,6 +155,8 @@ export class Settings extends Component {
           // Update WebsiteList components
           this.blacklistComponentRef.current.setList(items.blacklist);
           this.whitelistComponentRef.current.setList(items.whitelist);
+          this.blacklistKeywordsComponentRef.current.setList(items.blacklistKeywords);
+          this.whitelistKeywordsComponentRef.current.setList(items.whitelistKeywords);
         }
       });
   }
@@ -176,6 +199,18 @@ export class Settings extends Component {
         return tab;
       }),
     });
+  }
+
+  getSelectedTab = () => {
+    const search = window.location.hash.replace(/^#\/settings/, '');
+    const urlParams = new URLSearchParams(search);
+    return urlParams.get('tab');
+  }
+
+  selectTab = (id) => {
+    this.setState({ selectedTab: id });
+    const url = `${window.location.protocol}//${window.location.host}${window.location.pathname}#/settings?tab=${id}`;
+    window.history.pushState({ path: url }, document.title, url);
   }
 
   /**
@@ -229,6 +264,8 @@ export class Settings extends Component {
         schedule: this.state.options.schedule,
         blacklist: this.state.options.blacklist,
         whitelist: this.state.options.whitelist,
+        blacklistKeywords: this.state.options.blacklistKeywords,
+        whitelistKeywords: this.state.options.whitelistKeywords,
         unblock: this.state.options.unblock,
         password: {
           isEnabled: this.state.options.password.isEnabled,
@@ -250,6 +287,8 @@ export class Settings extends Component {
           sendMessage('setSchedule', this.state.options.schedule);
           sendMessage('setBlacklist', this.state.options.blacklist);
           sendMessage('setWhitelist', this.state.options.whitelist);
+          sendMessage('setBlacklistKeywords', this.state.options.blacklistKeywords);
+          sendMessage('setWhitelistKeywords', this.state.options.whitelistKeywords);
           sendMessage('setUnblockOnceTimeout', this.state.options.unblock.unblockOnceTimeout);
           sendMessage('setDisplayNotificationOnTimeout', this.state.options.unblock.displayNotificationOnTimeout);
           sendMessage('setAutoReblockOnTimeout', this.state.options.unblock.autoReblockOnTimeout);
@@ -297,7 +336,6 @@ export class Settings extends Component {
         options={modes}
         value={this.state.options.mode}
         onChange={this.changeMode}
-        width={300}
         marginBottom={16}
         showTooltips
       />
@@ -311,7 +349,6 @@ export class Settings extends Component {
         value={this.state.options.action}
         onChange={this.changeAction}
         disabled={!this.state.options.isEnabled}
-        width={200}
         marginBottom={[
           Action.blockTab,
           Action.redirectToUrl,
@@ -418,17 +455,20 @@ export class Settings extends Component {
           <Pane width={180}>
             <Tablist flexBasis={240} marginRight={16}>
               {this.state.scheduleDays.map((day) => (
-                <SidebarTab
+                <Tab
+                  direction="vertical"
                   key={day.value}
                   id={day.value}
                   onSelect={() => this.setState({ selectedScheduleDay: day.value })}
                   isSelected={day.value === this.state.selectedScheduleDay}
                   aria-controls={`schedule-panel-${day.value}`}
                   fontSize={14}
+                  height={30}
+                  marginBottom={6}
                   disabled={!this.state.options.schedule.isEnabled}
                 >
                   {day.label}
-                </SidebarTab>
+                </Tab>
               ))}
             </Tablist>
           </Pane>
@@ -478,8 +518,6 @@ export class Settings extends Component {
                       value={range.type}
                       onChange={(value) => this.setOptions(`schedule.days['${day.value}'][${index}].type`, value)}
                       disabled={!this.state.options.schedule.isEnabled}
-                      width={240}
-                      height={28}
                       showTooltips
                     />
                   </Fragment>
@@ -535,7 +573,7 @@ export class Settings extends Component {
     );
   }
 
-  renderBlacklistTab = () => (
+  renderBlacklistUrls = () => (
     <Fragment>
       <Paragraph size={300} color="muted" marginBottom={16}>
         {translate('blacklistDescription')}
@@ -550,7 +588,58 @@ export class Settings extends Component {
     </Fragment>
   )
 
-  renderWhitelistTab = () => (
+  renderBlacklistKeywords = () => (
+    <Fragment>
+      <Paragraph size={300} color="muted" marginBottom={16}>
+        {translate('blacklistKeywordsDescription')}
+      </Paragraph>
+      <WordList
+        ref={this.blacklistKeywordsComponentRef}
+        list={this.state.options.blacklistKeywords}
+        onChange={(list) => this.setOptions('blacklistKeywords', list)}
+        exportFilename="blacklist_keywords.txt"
+        addNewItemsOnTop={true}
+      />
+    </Fragment>
+  )
+
+  renderBlacklistTab = () => (
+    <Pane>
+      <Tablist marginBottom={16} flexBasis={240}>
+        {this.state.blacklistTabs.map((tab) => (
+          <Tab
+            key={tab.id}
+            id={tab.id}
+            onSelect={() => this.setState({ selectedBlacklistTab: tab.id })}
+            isSelected={tab.id === this.state.selectedBlacklistTab}
+            aria-controls={`blacklist-${tab.id}`}
+            fontSize={14}
+            marginLeft={0}
+            marginRight={8}
+          >
+            {tab.label}
+          </Tab>
+        ))}
+      </Tablist>
+      <Pane flex="1">
+        {this.state.blacklistTabs.map((tab) => (
+          <Pane
+            key={tab.id}
+            id={`blacklist-${tab.id}`}
+            role="tabpanel"
+            aria-labelledby={tab.label}
+            aria-hidden={tab.id !== this.state.selectedBlacklistTab}
+            display={tab.id === this.state.selectedBlacklistTab ? 'block' : 'none'}
+          >
+            {tab.id === 'urls' && this.renderBlacklistUrls()}
+            {tab.id === 'keywords' && this.renderBlacklistKeywords()}
+          </Pane>
+        ))}
+      </Pane>
+    </Pane>
+  )
+
+  renderWhitelistUrls = () => (
     <Fragment>
       <Paragraph size={300} color="muted" marginBottom={16}>
         {translate('whitelistDescription')}
@@ -563,6 +652,57 @@ export class Settings extends Component {
         addNewItemsOnTop={true}
       />
     </Fragment>
+  )
+
+  renderWhitelistKeywords = () => (
+    <Fragment>
+      <Paragraph size={300} color="muted" marginBottom={16}>
+        {translate('whitelistKeywordsDescription')}
+      </Paragraph>
+      <WordList
+        ref={this.whitelistKeywordsComponentRef}
+        list={this.state.options.whitelistKeywords}
+        onChange={(list) => this.setOptions('whitelistKeywords', list)}
+        exportFilename="whitelist_keywords.txt"
+        addNewItemsOnTop={true}
+      />
+    </Fragment>
+  )
+
+  renderWhitelistTab = () => (
+    <Pane>
+      <Tablist marginBottom={16} flexBasis={240}>
+        {this.state.whitelistTabs.map((tab) => (
+          <Tab
+            key={tab.id}
+            id={tab.id}
+            onSelect={() => this.setState({ selectedWhitelistTab: tab.id })}
+            isSelected={tab.id === this.state.selectedWhitelistTab}
+            aria-controls={`whitelist-${tab.id}`}
+            fontSize={14}
+            marginLeft={0}
+            marginRight={8}
+          >
+            {tab.label}
+          </Tab>
+        ))}
+      </Tablist>
+      <Pane flex="1">
+        {this.state.whitelistTabs.map((tab) => (
+          <Pane
+            key={tab.id}
+            id={`whitelist-${tab.id}`}
+            role="tabpanel"
+            aria-labelledby={tab.label}
+            aria-hidden={tab.id !== this.state.selectedWhitelistTab}
+            display={tab.id === this.state.selectedWhitelistTab ? 'block' : 'none'}
+          >
+            {tab.id === 'urls' && this.renderWhitelistUrls()}
+            {tab.id === 'keywords' && this.renderWhitelistKeywords()}
+          </Pane>
+        ))}
+      </Pane>
+    </Pane>
   )
 
   renderPasswordTab = () => (
@@ -647,9 +787,9 @@ export class Settings extends Component {
       <h3 className="title">{translate('appName')}</h3>
       <div className="block">
         <div className="text">{translate('appDesc')}</div>
-        <a className="link" href="https://github.com/AXeL-dev/distract-me-not/releases" target="_blank">{`${translate('version')} ${version}`}</a>
-        <a className="link" href="https://github.com/AXeL-dev/distract-me-not/blob/master/LICENSE" target="_blank">{translate('license')}</a>
-        <a className="link" href="https://github.com/AXeL-dev/distract-me-not" target="_blank">Github</a>
+        <a className="link" href="https://github.com/AXeL-dev/distract-me-not/releases" target="_blank" rel="noreferrer">{`${translate('version')} ${version}`}</a>
+        <a className="link" href="https://github.com/AXeL-dev/distract-me-not/blob/master/LICENSE" target="_blank" rel="noreferrer">{translate('license')}</a>
+        <a className="link" href="https://github.com/AXeL-dev/distract-me-not" target="_blank" rel="noreferrer">Github</a>
       </div>
       <div className="small-text">{translate('supportDeveloper')}</div>
     </div>
@@ -666,31 +806,34 @@ export class Settings extends Component {
             noBorderBottom
           />
           <Tablist flexBasis={240} marginRight={16}>
-            {this.state.tabs.map((tab, index) => (
-              <SidebarTab
+            {this.state.tabs.map((tab) => (
+              <Tab
+                direction="vertical"
                 key={tab.id}
                 id={tab.id}
-                onSelect={() => this.setState({ selectedTabIndex: index })}
-                isSelected={index === this.state.selectedTabIndex}
+                onSelect={() => this.selectTab(tab.id)}
+                isSelected={tab.id === this.state.selectedTab}
                 aria-controls={`panel-${tab.id}`}
                 fontSize={14}
+                height={30}
+                marginBottom={6}
                 disabled={tab.disabled}
               >
                 {tab.label}
-              </SidebarTab>
+              </Tab>
             ))}
           </Tablist>
         </Pane>
         <Pane flex="1">
           <Pane padding={16} border="muted">
-            {this.state.tabs.map((tab, index) => (
+            {this.state.tabs.map((tab) => (
               <Pane
                 key={tab.id}
                 id={`panel-${tab.id}`}
                 role="tabpanel"
                 aria-labelledby={tab.label}
-                aria-hidden={index !== this.state.selectedTabIndex}
-                display={index === this.state.selectedTabIndex ? 'block' : 'none'}
+                aria-hidden={tab.id !== this.state.selectedTab}
+                display={tab.id === this.state.selectedTab ? 'block' : 'none'}
                 //maxWidth={500}
               >
                 {tab.id === 'blocking' && this.renderBlockingTab()}
@@ -706,7 +849,7 @@ export class Settings extends Component {
             ))}
           </Pane>
           <Pane display="flex" alignItems="center" justifyContent="center" marginTop={16}>
-            {this.state.selectedTabIndex === this.state.tabs.findIndex((tab) => tab.id === 'about') ? (
+            {this.state.selectedTab === 'about' ? (
               <Button
                 height={32}
                 appearance="primary"

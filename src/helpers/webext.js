@@ -55,7 +55,7 @@ export function openExtensionPage(url, reloadIfExists = true) {
   nativeAPI.tabs.query({}, (tabs) => {
     if (tabs.length > 0) {
       for (const tab of tabs) {
-        if (tab.url === pageUrl) {
+        if (tab.url.startsWith(pageUrl)) {
           nativeAPI.tabs.reload(tab.id);
           nativeAPI.tabs.update(tab.id, { active: true });
           return;

@@ -108,21 +108,11 @@ exports[`renders correctly 1`] = `
             <div
               class="css-ber32g ub-box-szg_border-box ub-flx_1 ub-dspl_flex ub-algn-itms_center ub-flx-srnk_0 ub-ovflw-x_hidden ub-ovflw-y_hidden ub-pl_12px ub-pr_12px"
             >
-              <div
-                class="ub-w_24px ub-h_24px ub-ovflw-x_hidden ub-ovflw-y_hidden ub-pst_relative ub-dspl_inline-flex ub-flx-srnk_0 ub-just-cnt_center ub-bblr_100prcnt ub-bbrr_100prcnt ub-btlr_100prcnt ub-btrr_100prcnt ub-color_6E62B6 ub-bg-clr_E7E4F9 ub-box-szg_border-box"
-                title="facebook.com"
-              >
-                <span
-                  class="css-1ktdej1 ub-fnt-sze_9px ub-f-wght_400 ub-ln-ht_9px ub-ltr-spc_-0-05px ub-fnt-fam_b77syt ub-color_inherit ub-w_24px ub-h_24px ub-box-szg_border-box"
-                >
-                  F
-                </span>
-              </div>
               <span
                 class="ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_16px ub-ltr-spc_0 ub-fnt-fam_b77syt ub-color_474d66 ub-ml_8px ub-box-szg_border-box"
-                data-testid="url"
+                data-testid="keyword"
               >
-                *.facebook.com
+                foo
               </span>
             </div>
             <div
@@ -158,21 +148,11 @@ exports[`renders correctly 1`] = `
             <div
               class="css-ber32g ub-box-szg_border-box ub-flx_1 ub-dspl_flex ub-algn-itms_center ub-flx-srnk_0 ub-ovflw-x_hidden ub-ovflw-y_hidden ub-pl_12px ub-pr_12px"
             >
-              <div
-                class="ub-w_24px ub-h_24px ub-ovflw-x_hidden ub-ovflw-y_hidden ub-pst_relative ub-dspl_inline-flex ub-flx-srnk_0 ub-just-cnt_center ub-bblr_100prcnt ub-bbrr_100prcnt ub-btlr_100prcnt ub-btrr_100prcnt ub-color_7D2828 ub-bg-clr_F9DADA ub-box-szg_border-box"
-                title="twitter.com"
-              >
-                <span
-                  class="css-1ktdej1 ub-fnt-sze_9px ub-f-wght_400 ub-ln-ht_9px ub-ltr-spc_-0-05px ub-fnt-fam_b77syt ub-color_inherit ub-w_24px ub-h_24px ub-box-szg_border-box"
-                >
-                  T
-                </span>
-              </div>
               <span
                 class="ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_16px ub-ltr-spc_0 ub-fnt-fam_b77syt ub-color_474d66 ub-ml_8px ub-box-szg_border-box"
-                data-testid="url"
+                data-testid="keyword"
               >
-                *.twitter.com
+                bar
               </span>
             </div>
             <div
@@ -208,21 +188,11 @@ exports[`renders correctly 1`] = `
             <div
               class="css-ber32g ub-box-szg_border-box ub-flx_1 ub-dspl_flex ub-algn-itms_center ub-flx-srnk_0 ub-ovflw-x_hidden ub-ovflw-y_hidden ub-pl_12px ub-pr_12px"
             >
-              <div
-                class="ub-w_24px ub-h_24px ub-ovflw-x_hidden ub-ovflw-y_hidden ub-pst_relative ub-dspl_inline-flex ub-flx-srnk_0 ub-just-cnt_center ub-bblr_100prcnt ub-bbrr_100prcnt ub-btlr_100prcnt ub-btrr_100prcnt ub-color_7D2828 ub-bg-clr_F9DADA ub-box-szg_border-box"
-                title="youtube.com"
-              >
-                <span
-                  class="css-1ktdej1 ub-fnt-sze_9px ub-f-wght_400 ub-ln-ht_9px ub-ltr-spc_-0-05px ub-fnt-fam_b77syt ub-color_inherit ub-w_24px ub-h_24px ub-box-szg_border-box"
-                >
-                  Y
-                </span>
-              </div>
               <span
                 class="ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_16px ub-ltr-spc_0 ub-fnt-fam_b77syt ub-color_474d66 ub-ml_8px ub-box-szg_border-box"
-                data-testid="url"
+                data-testid="keyword"
               >
-                *.youtube.com
+                /doo.*/i
               </span>
             </div>
             <div
@@ -267,7 +237,7 @@ exports[`renders correctly 1`] = `
         <input
           aria-invalid="false"
           class="css-12rdf6g ub-w_100prcnt ub-fnt-fam_b77syt ub-b-btm_1px-solid-transparent ub-b-lft_1px-solid-transparent ub-b-rgt_1px-solid-transparent ub-b-top_1px-solid-transparent ub-otln_iu2jf4 ub-txt-deco_none ub-bblr_4px ub-bbrr_0px ub-btlr_4px ub-btrr_0px ub-ln-ht_16px ub-fnt-sze_12px ub-color_474d66 ub-pl_12px ub-pr_12px ub-tstn_n1akt6 ub-h_32px ub-bg-clr_white ub-b-btm-clr_d8dae5 ub-b-lft-clr_d8dae5 ub-b-rgt-clr_d8dae5 ub-b-top-clr_d8dae5 ub-box-szg_border-box"
-          placeholder="urlExample"
+          placeholder="keywordExample"
           required=""
           spellcheck="true"
           type="text"
@@ -290,7 +260,7 @@ exports[`renders correctly 1`] = `
       <span
         class=""
       >
-        addWebsiteHint
+        addKeywordHint
       </span>
     </p>
   </div>

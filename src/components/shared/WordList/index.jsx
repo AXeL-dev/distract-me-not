@@ -5,7 +5,6 @@ import {
   Popover,
   Position,
   Menu,
-  Avatar,
   Text,
   IconButton,
   ArrowUpIcon,
@@ -26,8 +25,7 @@ import { TextField } from 'components';
 import { translate } from 'helpers/i18n';
 import { debug } from 'helpers/debug';
 import { download, readFile } from 'helpers/file';
-import { getHostName, getFaviconLink, checkFaviconLink, isUrl } from 'helpers/url';
-import './styles.scss';
+import '../WebsiteList/styles.scss';
 
 const Order = {
   NONE: 'NONE',
@@ -35,14 +33,13 @@ const Order = {
   DESC: 'DESC',
 };
 
-export class WebsiteList extends Component {
+export class WordList extends Component {
 
   constructor(props) {
     super(props);
     this.importFileInputRef = React.createRef();
     this.state = {
-      list: this.getOrderedList(props.list), // [{ id, url }]
-      favicons: {}, // { hostName: faviconUrl }
+      list: this.getOrderedList(props.list), // [{ id, word }]
       searchQuery: '',
       orderedColumn: 1,
       ordering: Order.NONE,
@@ -54,50 +51,13 @@ export class WebsiteList extends Component {
     };
   }
 
-  componentDidMount() {
-    for (let item of this.state.list) {
-      this.getFavicon(item.url);
-    }
-  }
-
   getOrderedList = (list) => {
-    return list ? list.map((url, index) => ({ id: index + 1, url: url })) : [];
+    return list ? list.map((word, index) => ({ id: index + 1, word: word })) : [];
   }
 
   setList = (list) => { // used to update list from parent component
     // Update state
     this.setState({ list: this.getOrderedList(list) });
-    // Get new favicons
-    for (let url of list) {
-      this.getFavicon(url);
-    }
-  }
-
-  getFavicon = (url) => {
-    // Get favicon by hostname
-    const hostName = getHostName(url);
-    if (this.state.favicons[hostName] !== undefined) {
-      return;
-    } else {
-      this.setState({
-        favicons: {
-          ...this.state.favicons,
-          ...{ [hostName]: null },
-        },
-      });
-    }
-    const faviconLink = getFaviconLink(url);
-    checkFaviconLink(faviconLink).then(result => {
-      if (result) {
-        debug.log('favicon:', faviconLink);
-        this.setState({
-          favicons: {
-            ...this.state.favicons,
-            ...{ [hostName]: faviconLink },
-          },
-        });
-      }
-    });
   }
 
   sort = items => {
@@ -106,8 +66,8 @@ export class WebsiteList extends Component {
     if (ordering === Order.NONE) return items;
 
     // Get the property to sort each item on.
-    // By default use the `url` property.
-    let propKey = 'url';
+    // By default use the `word` property.
+    let propKey = 'word';
 
     return items.sort((a, b) => {
       let aValue = a[propKey];
@@ -142,8 +102,8 @@ export class WebsiteList extends Component {
     if (searchQuery.length === 0) return items;
 
     return items.filter(item => {
-      // Use the filter from fuzzaldrin-plus to filter by url.
-      const result = filter([item.url], searchQuery);
+      // Use the filter from fuzzaldrin-plus to filter by word.
+      const result = filter([item.word], searchQuery);
       return result.length === 1;
     })
   }
@@ -163,24 +123,22 @@ export class WebsiteList extends Component {
     this.setState({ searchQuery: value });
   }
 
-  addToList = (url, setTextFieldValue) => {
-    debug.log('add to list:', url);
-    if (!isUrl(url)) {
-      toaster.danger(translate('urlIsNotValid'), { id: 'settings-toaster' });
-    } else if (this.state.list.find(item => item.url === url)) {
-      toaster.danger(translate('urlAlreadyExists'), { id: 'settings-toaster' });
+  addToList = (word, setTextFieldValue) => {
+    debug.log('add to list:', word);
+    if (!word) {
+      toaster.danger(translate('keywordIsNotValid'), { id: 'settings-toaster' });
+    } else if (this.state.list.find(item => item.word === word)) {
+      toaster.danger(translate('keywordAlreadyExists'), { id: 'settings-toaster' });
     } else {
-      // Add url
+      // Add word
       const list = [...this.state.list];
-      const newItem = { id: list.length + 1, url: url };
+      const newItem = { id: list.length + 1, word: word };
       if (this.props.addNewItemsOnTop) {
         list.splice(0, 0, newItem);
       } else {
         list.push(newItem);
       }
       this.setState({ list: list });
-      // Get favicon
-      this.getFavicon(url);
       // Empty text field
       setTextFieldValue('');
       // Submit changes
@@ -191,7 +149,7 @@ export class WebsiteList extends Component {
   submitChanges = (list, map = true) => {
     // Call onChange prop
     if (this.props.onChange) {
-      this.props.onChange(map ? list.map(item => item.url) : list);
+      this.props.onChange(map ? list.map(item => item.word) : list);
     }
   }
 
@@ -206,16 +164,14 @@ export class WebsiteList extends Component {
 
   edit = ({ row, value }) => {
     debug.log('edit:', { row: row, value: value });
-    if (!isUrl(value)) {
-      toaster.danger(translate('urlIsNotValid'), { id: 'settings-toaster' });
-    } else if (this.state.list.find(item => item.url === value && item.id !== row.id)) {
-      toaster.danger(translate('urlAlreadyExists'), { id: 'settings-toaster' });
+    if (!value) {
+      toaster.danger(translate('keywordIsNotValid'), { id: 'settings-toaster' });
+    } else if (this.state.list.find(item => item.word === value && item.id !== row.id)) {
+      toaster.danger(translate('keywordAlreadyExists'), { id: 'settings-toaster' });
     } else {
-      // Edit url
-      const list = this.state.list.map(item => (item.id === row.id ? { id: item.id, url: value } : item));
+      // Edit word
+      const list = this.state.list.map(item => (item.id === row.id ? { id: item.id, word: value } : item));
       this.setState({ list: list });
-      // Get favicon
-      this.getFavicon(value);
       // Close edit dialog
       this.closeEditDialog();
       // Submit changes
@@ -227,7 +183,7 @@ export class WebsiteList extends Component {
     this.setState({
       editDialog: {
         row: row,
-        value: row.url,
+        value: row.word,
         isShown: true,
       },
     });
@@ -249,14 +205,14 @@ export class WebsiteList extends Component {
   }
 
   export = () => {
-    const list = this.state.list.map(item => item.url),
+    const list = this.state.list.map(item => item.word),
           blob = new Blob([list.join("\n")], { type: 'text/plain' });
     download(blob, this.props.exportFilename || 'export.txt');
   }
 
   import = (file) => {
     readFile(file).then(content => {
-      const list = content && content.length ? content.split("\n").filter(url => isUrl(url)) : [];
+      const list = content && content.length ? content.split("\n").filter(word => word) : [];
       if (list.length) {
         // Update list
         this.setList(list);
@@ -351,7 +307,7 @@ export class WebsiteList extends Component {
           <Menu.Item
             icon={ClipboardIcon}
             onSelect={() => {
-              this.copyToClipboard(row.url);
+              this.copyToClipboard(row.word);
               close();
             }}
           >
@@ -375,43 +331,24 @@ export class WebsiteList extends Component {
     )
   }
 
-  renderRow = ({ row }) => {
-    const hostName = getHostName(row.url);
-
-    return (
-      <Table.Row key={row.id}>
-        <Table.Cell display="flex" alignItems="center">
-          {this.state.favicons[hostName] ? (
-            <Avatar
-              src={this.state.favicons[hostName]}
-              name={hostName}
-              size={16}
-              margin={4}
-              borderRadius={0}
-              backgroundColor="inherit"
-            />
-          ) : (
-            <Avatar
-              name={hostName}
-              size={24}
-            />
-          )}
-          <Text marginLeft={8} size={300} fontWeight={500} data-testid="url">
-            {row.url}
-          </Text>
-        </Table.Cell>
-        <Table.Cell width={48} flex="none">
-          <Popover
-            content={({ close }) => this.renderRowMenu({ row: row, close: close })}
-            position={Position.BOTTOM_RIGHT}
-            minWidth={160}
-          >
-            <IconButton icon={MoreIcon} height={24} appearance="minimal" data-testid="more-button" />
-          </Popover>
-        </Table.Cell>
-      </Table.Row>
-    )
-  }
+  renderRow = ({ row }) => (
+    <Table.Row key={row.id}>
+      <Table.Cell display="flex" alignItems="center">
+        <Text marginLeft={8} size={300} fontWeight={500} data-testid="keyword">
+          {row.word}
+        </Text>
+      </Table.Cell>
+      <Table.Cell width={48} flex="none">
+        <Popover
+          content={({ close }) => this.renderRowMenu({ row: row, close: close })}
+          position={Position.BOTTOM_RIGHT}
+          minWidth={160}
+        >
+          <IconButton icon={MoreIcon} height={24} appearance="minimal" data-testid="more-button" />
+        </Popover>
+      </Table.Cell>
+    </Table.Row>
+  )
 
   render() {
     const items = this.filter(this.sort(this.state.list));
@@ -443,8 +380,8 @@ export class WebsiteList extends Component {
           </Table.VirtualBody>
         </Table>
         <TextField
-          placeholder={translate('urlExample')}
-          hint={translate('addWebsiteHint')}
+          placeholder={translate('keywordExample')}
+          hint={translate('addKeywordHint')}
           hasButton={true}
           buttonLabel={translate('add')}
           onSubmit={this.addToList}
@@ -468,8 +405,8 @@ export class WebsiteList extends Component {
           containerProps={{ className: 'edit-dialog' }}
         >
           <TextField
-            placeholder={translate('urlExample')}
-            hint={translate('addWebsiteHint')}
+            placeholder={translate('keywordExample')}
+            hint={translate('addKeywordHint')}
             value={this.state.editDialog.value}
             onChange={event => this.setState({ editDialog: { ...this.state.editDialog, value: event.target.value } })}
           />

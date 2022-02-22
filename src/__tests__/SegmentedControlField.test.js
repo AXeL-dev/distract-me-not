@@ -16,7 +16,7 @@ it('renders correctly', () => {
 it('handles selected option change', () => {
   const handleChange = jest.fn();
   render(<SegmentedControlField options={options} onChange={handleChange} />);
-  const secondOption = screen.getByRole('radio', { name: 'Option 2' });
+  const secondOption = screen.getByRole('button', { name: 'Option 2' });
   fireEvent.click(secondOption);
   expect(handleChange).toHaveBeenCalledTimes(1);
 });

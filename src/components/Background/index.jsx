@@ -5,7 +5,7 @@ import { storage, nativeAPI, indexUrl, getTab, sendNotification } from 'helpers/
 import { Mode, Action, defaultBlacklist, defaultWhitelist, UnblockOptions, defaultUnblock, isAccessible } from 'helpers/block';
 import { defaultSchedule, getTodaySchedule, isScheduleAllowed } from 'helpers/schedule';
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
-import { transformList } from 'helpers/regex';
+import { transformList, transformKeywords } from 'helpers/regex';
 import { logger, defaultLogsSettings } from 'helpers/logger';
 import { now } from 'helpers/date';
 import { translate } from 'helpers/i18n';
@@ -17,6 +17,8 @@ export class Background extends Component {
     // public
     this.blacklist = [];
     this.whitelist = [];
+    this.blacklistKeywords = [];
+    this.whitelistKeywords = [];
     this.isEnabled = false;
     this.mode = Mode.blacklist;
     this.action = Action.blockTab;
@@ -73,6 +75,22 @@ export class Background extends Component {
 
   getBlacklist = () => {
     return this.blacklist;
+  }
+
+  setBlacklistKeywords = (keywords) => {
+    this.blacklistKeywords = transformKeywords(keywords);
+  }
+
+  getBlacklistKeywords = () => {
+    return this.blacklistKeywords;
+  }
+
+  setWhitelistKeywords = (keywords) => {
+    this.whitelistKeywords = transformKeywords(keywords);
+  }
+
+  getWhitelistKeywords = () => {
+    return this.whitelistKeywords;
   }
 
   setWhitelist = (wlist) => {
@@ -141,6 +159,8 @@ export class Background extends Component {
     storage.get({
       blacklist: defaultBlacklist,
       whitelist: defaultWhitelist,
+      blacklistKeywords: [],
+      whitelistKeywords: [],
       blackList: null, // for backward compatibility (with v1)
       whiteList: null,
       isEnabled: this.isEnabled,
@@ -171,6 +191,8 @@ export class Background extends Component {
       //----- End backward compatibility with v1
       this.blacklist = transformList(items.blacklist);
       this.whitelist = transformList(items.whitelist);
+      this.blacklistKeywords = items.blacklistKeywords;
+      this.whitelistKeywords = items.whitelistKeywords;
       this.mode = items.mode;
       this.action = items.action;
       this.unblock = { ...this.unblock, ...items.unblock }; // merge
@@ -370,6 +392,12 @@ export class Background extends Component {
         return true;
       }
     }
+    for (const rule of this.blacklistKeywords) {
+      if (rule.test(url)) {
+        this.debug('found blacklisted keyword in:', url);
+        return true;
+      }
+    }
     this.debug('not blacklisted:', url);
     return false;
   }
@@ -381,6 +409,12 @@ export class Background extends Component {
     for (const rule of this.whitelist) {
       if (rule.test(url)) {
         this.debug('is whitelisted:', url);
+        return true;
+      }
+    }
+    for (const rule of this.whitelistKeywords) {
+      if (rule.test(url)) {
+        this.debug('found whitelisted keyword in:', url);
         return true;
       }
     }

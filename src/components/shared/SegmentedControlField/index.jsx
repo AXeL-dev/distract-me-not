@@ -1,7 +1,6 @@
 import React from 'react';
-import { Pane, Text, SegmentedControl } from 'evergreen-ui';
+import { Pane, Text, Group, Button } from 'evergreen-ui';
 import { OuterPane, TooltipLabel } from 'components';
-import './styles.scss';
 
 export function SegmentedControlField(props) {
   const options = props.options.map((option) => ({
@@ -20,17 +19,23 @@ export function SegmentedControlField(props) {
         <Text className={props.labelClassName}>{props.label}</Text>
       </Pane>
       <Pane display="flex" alignItems="center">
-        <SegmentedControl
-          className="custom-segmented-control"
-          name={props.name}
-          width={props.width}
-          height={props.height}
-          options={options}
-          value={props.value}
-          onChange={props.onChange}
-          disabled={props.disabled}
-          data-disabled={props.disabled}
-        />
+        <Group maxWidth={props.maxWidth}>
+          {options.map(({ label, value }) => {
+            const checked = props.value === value;
+
+            return (
+              <Button
+                key={value}
+                appearance={checked ? 'primary' : 'default'}
+                disabled={props.disabled}
+                onClick={() => props.onChange && props.onChange(value)}
+                data-checked={checked}
+              >
+                {label}
+              </Button>
+            );
+          })}
+        </Group>
       </Pane>
     </OuterPane>
   );

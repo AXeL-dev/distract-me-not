@@ -3,17 +3,17 @@
 exports[`renders correctly 1`] = `
 <DocumentFragment>
   <div
-    class="css-nil ub-box-szg_border-box"
+    class="ub-box-szg_border-box"
   >
     <div
-      class="css-nil ub-dspl_flex ub-box-szg_border-box"
+      class="ub-dspl_flex ub-box-szg_border-box"
     >
       <div
-        class="css-nil ub-dspl_flex ub-algn-itms_center ub-flx_1 ub-box-szg_border-box"
+        class="ub-dspl_flex ub-algn-itms_center ub-flx_1 ub-box-szg_border-box"
       >
         <input
           aria-invalid="false"
-          class="css-5ljhhe ub-color_425A70 ub-fnt-fam_b77syt ub-fnt-sze_12px ub-f-wght_400 ub-ln-ht_16px ub-ltr-spc_0 ub-w_100prcnt ub-h_32px ub-pl_10px ub-pr_10px ub-bblr_3px ub-bbrr_3px ub-btlr_3px ub-btrr_3px ub-box-szg_border-box"
+          class="css-12rdf6g ub-w_100prcnt ub-fnt-fam_b77syt ub-b-btm_1px-solid-transparent ub-b-lft_1px-solid-transparent ub-b-rgt_1px-solid-transparent ub-b-top_1px-solid-transparent ub-otln_iu2jf4 ub-txt-deco_none ub-bblr_4px ub-bbrr_3px ub-btlr_4px ub-btrr_3px ub-ln-ht_16px ub-fnt-sze_12px ub-color_474d66 ub-pl_12px ub-pr_12px ub-tstn_n1akt6 ub-h_32px ub-bg-clr_white ub-b-btm-clr_d8dae5 ub-b-lft-clr_d8dae5 ub-b-rgt-clr_d8dae5 ub-b-top-clr_d8dae5 ub-box-szg_border-box"
           spellcheck="true"
           type="text"
           value=""
