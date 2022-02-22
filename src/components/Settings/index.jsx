@@ -52,7 +52,7 @@ export class Settings extends Component {
       shownDialog: null,
       options: {
         isEnabled: true,
-        mode: defaultMode,
+        mode: '', // don't use defaultMode to avoid annoying flickering when the mode is different from the default value
         action: defaultAction,
         blockTab: {
           message: '',
