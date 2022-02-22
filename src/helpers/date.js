@@ -40,7 +40,6 @@ export function today(asNumber = false) {
 }
 
 export function inToday(days) {
-  const now = new Date();
   const day = today();
   return !!days.find((d) => d === day);
 }
