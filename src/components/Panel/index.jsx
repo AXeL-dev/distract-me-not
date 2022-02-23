@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Pane, Text, Position, Badge, PlusIcon, TickIcon, DisableIcon, SmallMinusIcon, SlashIcon, HistoryIcon, IssueNewIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { sendMessage, storage } from 'helpers/webext';
-import { Mode, modes, addCurrentWebsite, isActiveTabBlockable } from 'helpers/block';
+import { Mode, modes, addCurrentWebsite, isActiveTabBlockable, defaultMode } from 'helpers/block';
 import { ScheduleType, defaultSchedule, getTodaySchedule } from 'helpers/schedule';
 import { defaultLogsSettings } from 'helpers/logger';
 import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton, LinkIconButton, TooltipIcon } from 'components';
@@ -14,8 +14,9 @@ export class Panel extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      ready: false,
       isEnabled: true,
-      mode: '', // don't use defaultMode to avoid annoying flickering when the mode is different from the default value
+      mode: defaultMode,
       schedule: defaultSchedule,
       isAddButtonVisible: false,
       enableLogs: false,
@@ -25,21 +26,25 @@ export class Panel extends Component {
   }
 
   componentDidMount() {
-    sendMessage('getIsEnabled').then(isEnabled => this.setState({ isEnabled: !!isEnabled })); // !! used to cast null to boolean
-    sendMessage('getSchedule').then(schedule => this.setState({ schedule: schedule || defaultSchedule }));
-    sendMessage('getLogsSettings').then(logs => this.setState({ enableLogs: (logs || defaultLogsSettings).isEnabled }));
-    sendMessage('getMode').then(mode => {
-      this.setState({ mode });
-      this.toggleAddButton(mode);
-    });
-    storage.get({
-      hideReportIssueButton: this.state.hideReportIssueButton,
-      showAddWebsitePrompt: this.state.showAddWebsitePrompt,
-    }).then(({ hideReportIssueButton, showAddWebsitePrompt }) => {
-      this.setState({
-        hideReportIssueButton,
-        showAddWebsitePrompt,
-      });
+    Promise.all([
+      sendMessage('getIsEnabled').then(isEnabled => this.setState({ isEnabled: !!isEnabled })), // !! used to cast null to boolean
+      sendMessage('getSchedule').then(schedule => this.setState({ schedule: schedule || defaultSchedule })),
+      sendMessage('getLogsSettings').then(logs => this.setState({ enableLogs: (logs || defaultLogsSettings).isEnabled })),
+      sendMessage('getMode').then(mode => {
+        this.setState({ mode });
+        this.toggleAddButton(mode);
+      }),
+      storage.get({
+        hideReportIssueButton: this.state.hideReportIssueButton,
+        showAddWebsitePrompt: this.state.showAddWebsitePrompt,
+      }).then(({ hideReportIssueButton, showAddWebsitePrompt }) => {
+        this.setState({
+          hideReportIssueButton,
+          showAddWebsitePrompt,
+        });
+      }),
+    ]).finally(() => {
+      this.setState({ ready: true });
     });
   }
 
@@ -113,6 +118,10 @@ export class Panel extends Component {
   }
 
   render() {
+    if (!this.state.ready) {
+      return null;
+    }
+
     return (
       <Pane minWidth={350}>
         <Header />
