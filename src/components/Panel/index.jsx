@@ -5,6 +5,7 @@ import { sendMessage, storage } from 'helpers/webext';
 import { Mode, modes, addCurrentWebsite, isActiveTabBlockable, defaultMode } from 'helpers/block';
 import { ScheduleType, defaultSchedule, getTodaySchedule } from 'helpers/schedule';
 import { defaultLogsSettings } from 'helpers/logger';
+import { isTestEnv } from 'helpers/debug';
 import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton, LinkIconButton, TooltipIcon } from 'components';
 import colors from 'helpers/color';
 import './styles.scss';
@@ -14,7 +15,7 @@ export class Panel extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ready: false,
+      ready: isTestEnv ? true : false,
       isEnabled: true,
       mode: defaultMode,
       schedule: defaultSchedule,
