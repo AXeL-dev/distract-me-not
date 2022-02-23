@@ -1,0 +1,15 @@
+{
+  "name": "release-it-update-manifest-plugin",
+  "version": "1.0.0",
+  "description": "A plugin to update manifest file(s) version on release",
+  "main": "index.js",
+  "peerDpendencies": {
+    "release-it": "^14.11.5"
+  },
+  "devDependencies": {
+    "release-it": "^14.11.5"
+  },
+  "dependencies": {
+    "glob": "^7.1.7"
+  }
+}

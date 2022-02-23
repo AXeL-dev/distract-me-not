@@ -1,0 +1,19 @@
+{
+  "src": {
+    "tagName": "v%s"
+  },
+  "npm": {
+    "publish": false
+  },
+  "git": {
+    "tagName": "v${version}",
+    "requireCleanWorkingDir": false,
+    "commitMessage": "release: v${version} :tada:"
+  },
+  "github": {
+    "release": true
+  },
+  "plugins": {
+    "./scripts/release-it/plugins/update-manifest/index.js": {}
+  }
+}
