@@ -3,6 +3,7 @@
   "version": "2.6.1",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^6.4.3",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.3",
     "@testing-library/user-event": "^13.5.0",
@@ -22,8 +23,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "rescripts start",
-    "build": "CI=false INLINE_RUNTIME_CHUNK=false GENERATE_SOURCEMAP=false rescripts build",
+    "start": "craco start",
+    "build": "CI=false INLINE_RUNTIME_CHUNK=false GENERATE_SOURCEMAP=false craco build",
     "build:firefox": "npm run build",
     "build:chrome": "npm run build",
     "build:edge": "npm run build",
@@ -35,9 +36,9 @@
     "package:chrome": "npm run package -- --filename={name}-{version}-chrome.zip",
     "package:edge": "npm run package -- --filename={name}-{version}-edge.zip",
     "package:all": "npm run postbuild:firefox && npm run package:firefox && npm run postbuild:chrome && npm run package:chrome && npm run package:edge",
-    "package:source": "zip -r -FS distract_me_not-source.zip * .rescriptsrc.js .env.development .env.test -x build\\* node_modules\\* old\\* old-src\\* web-ext-artifacts\\* screenshots\\* *.zip",
+    "package:source": "zip -r -FS distract_me_not-source.zip * .env.development .env.test -x build\\* node_modules\\* old\\* old-src\\* web-ext-artifacts\\* screenshots\\* *.zip",
     "sign": "node ./scripts/sign-addon.js",
-    "test": "rescripts test --verbose",
+    "test": "craco test --verbose",
     "test:all": "npm test -- --watchAll --testMatch \"**/src/**/*.test.{js,jsx}\"",
     "eject": "react-scripts eject",
     "release:major": "release-it major",
@@ -66,7 +67,6 @@
     ]
   },
   "devDependencies": {
-    "@rescripts/cli": "0.0.16",
     "@types/jest": "^27.4.0",
     "release-it": "^14.12.5",
     "sign-addon": "^3.11.0",
