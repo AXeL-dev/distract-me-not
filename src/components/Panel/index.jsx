@@ -141,7 +141,7 @@ export class Panel extends Component {
             labelClassName="cursor-default"
             checked={this.state.isEnabled}
             onChange={event => this.toggleStatus(event.target.checked)}
-            height={22}
+            height={20}
             paddingX={16}
             paddingY={20}
           />
@@ -185,7 +185,7 @@ export class Panel extends Component {
               tooltipPosition={Position.LEFT}
               className="fill-green"
               icon={PlusIcon}
-              iconSize={26}
+              iconSize={24}
               iconColor="#47b881"
               onClick={() => addCurrentWebsite(this.state.mode, this.state.showAddWebsitePrompt)}
               hideOnClick={true}

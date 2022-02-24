@@ -198,7 +198,7 @@ export class PasswordPrompt extends Component {
                 tooltipPosition={Position.LEFT}
                 className="fill-green"
                 icon={PlusIcon}
-                iconSize={26}
+                iconSize={24}
                 iconColor="#47b881"
                 onClick={() => addCurrentWebsite(this.mode, this.showAddWebsitePrompt)}
                 hideOnClick={true}
