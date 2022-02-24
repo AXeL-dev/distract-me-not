@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Tooltip, Button, Icon } from 'evergreen-ui';
+import { Button, Icon } from 'evergreen-ui';
+import { Tooltip } from '../';
 import './styles.scss';
 
 // Icon button component with support for custom icon color

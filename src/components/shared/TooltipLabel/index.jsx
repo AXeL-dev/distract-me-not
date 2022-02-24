@@ -1,5 +1,6 @@
 import React from 'react';
-import { Text, Tooltip, Position } from 'evergreen-ui';
+import { Text, Position } from 'evergreen-ui';
+import { Tooltip } from '../';
 import './styles.scss';
 
 export function TooltipLabel({ tooltip, tooltipPosition, ...props}) {

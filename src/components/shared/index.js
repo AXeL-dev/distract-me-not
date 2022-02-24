@@ -20,3 +20,4 @@ export * from './TooltipBadge';
 export * from './TooltipIcon';
 export * from './WebsiteList';
 export * from './WordList';
+export * from './Tooltip';

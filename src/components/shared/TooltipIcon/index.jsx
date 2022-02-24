@@ -1,5 +1,6 @@
 import React from 'react';
-import { Icon, Tooltip, Position } from 'evergreen-ui';
+import { Icon, Position } from 'evergreen-ui';
+import { Tooltip } from '../';
 
 export function TooltipIcon({ tooltip, tooltipPosition, ...props}) {
 
