@@ -1,40 +1,55 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
-  plugins: [
-    {
-      plugin: {
-        overrideWebpackConfig: ({ webpackConfig, context: { paths } }) => {
-          // allow public / non relative assets (like public/_locales) to be loaded
-          const folder = 'public';
-          const absolutePath = path.join(paths.appPath, folder);
-          const moduleScopePlugin = webpackConfig.resolve.plugins.find(
-            (plugin) => plugin.appSrcs && plugin.allowedFiles
-          );
+  webpack: {
+    plugins: [
+      new webpack.optimize.LimitChunkCountPlugin({
+        maxChunks: 1,
+      }),
+    ],
+    configure: (webpackConfig, { paths }) => {
+      // allow public / non relative assets (like public/_locales) to be loaded
+      const folder = 'public';
+      const absolutePath = path.join(paths.appPath, folder);
+      const moduleScopePlugin = webpackConfig.resolve.plugins.find(
+        ({ constructor }) => constructor && constructor.name === 'ModuleScopePlugin'
+      );
 
-          if (moduleScopePlugin) {
-            moduleScopePlugin.appSrcs.push(absolutePath);
+      if (moduleScopePlugin) {
+        moduleScopePlugin.appSrcs.push(absolutePath);
+      }
+
+      webpackConfig.resolve.alias = Object.assign(
+        webpackConfig.resolve.alias,
+        { [folder]: absolutePath }
+      );
+
+      // override output filenames (remove file hashes)
+      // it seems like build location can influence files hashes (even if files content doesn't change)
+      // @see https://github.com/facebook/create-react-app/issues/5526 & https://github.com/webpack/webpack/issues/8419
+      webpackConfig.output.filename = 'static/js/[name].js';
+      webpackConfig.output.chunkFilename = 'static/js/[name].chunk.js';
+
+      const miniCssExtractPlugin = webpackConfig.plugins.find(
+        ({ constructor }) => constructor && constructor.name === 'MiniCssExtractPlugin'
+      );
+      if (miniCssExtractPlugin) {
+        miniCssExtractPlugin.options.filename = 'static/css/[name].css';
+        miniCssExtractPlugin.options.chunkFilename = 'static/css/[name].chunk.css';
+      }
+
+      const rulesIndex = webpackConfig.module.rules.findIndex((rule) => rule.oneOf);
+      if (rulesIndex !== -1) {
+        webpackConfig.module.rules[rulesIndex].oneOf = webpackConfig.module.rules[rulesIndex].oneOf.map((rule) => {
+          if (rule.options && rule.options.name && rule.options.name.endsWith('.[ext]')) {
+            rule.options.name = rule.options.name.replace(/\.\[hash:\d+\]/, '');
           }
+          return rule;
+        });
+      }
 
-          webpackConfig.resolve.alias = Object.assign(
-            webpackConfig.resolve.alias,
-            { [folder]: absolutePath }
-          );
-
-          // override output filenames (removed file hashes)
-          // it seems like build location can influence files hashes (even if files content doesn't change)
-          // @see https://github.com/facebook/create-react-app/issues/5526 & https://github.com/webpack/webpack/issues/8419
-          webpackConfig.output.filename = 'static/js/[name].js';
-          webpackConfig.output.chunkFilename = 'static/js/[name].chunk.js';
-          webpackConfig.plugins[4].options.filename = 'static/css/[name].css';
-          webpackConfig.plugins[4].options.chunkFilename = 'static/css/[name].chunk.css';
-          webpackConfig.module.rules[1].oneOf[0].options.name = 'static/media/[name].[ext]';
-          webpackConfig.module.rules[1].oneOf[1].options.name = 'static/media/[name].[ext]';
-          webpackConfig.module.rules[1].oneOf[8].options.name = 'static/media/[name].[ext]';
-
-          return webpackConfig;
-        },
-      },
+      return webpackConfig;
     },
-  ],
+  },
 };
