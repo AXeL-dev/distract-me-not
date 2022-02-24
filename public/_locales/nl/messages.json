@@ -368,7 +368,7 @@
     "message": "Voorbeeld: foo, bar, …"
   },
   "addKeywordHint": {
-    "message": "Als je meer flexibiliteit wilt, kun je reguliere uitdrukkingen gebruiken. Voorbeeld: <b>/foo.*/</b>, <b>/bar/i</b>, <b>/(foo|bar)/i</b>"
+    "message": "Als je meer flexibiliteit wilt, kun je reguliere uitdrukkingen gebruiken. Voorbeeld: <b>/foo?/</b>, <b>/bar/i</b>, <b>/(foo|bar)/i</b>"
   },
   "keywordIsNotValid": {
     "message": "Dit trefwoord is ongeldig"

@@ -368,7 +368,7 @@
     "message": "Example: foo, bar, ..."
   },
   "addKeywordHint": {
-    "message": "Use regex patterns for more flexibility, e.g.: <b>/foo.*/</b>, <b>/bar/i</b>, <b>/(foo|bar)/i</b>"
+    "message": "Use regex patterns for more flexibility, e.g.: <b>/foo?/</b>, <b>/bar/i</b>, <b>/(foo|bar)/i</b>"
   },
   "keywordIsNotValid": {
     "message": "Keyword is not valid"
