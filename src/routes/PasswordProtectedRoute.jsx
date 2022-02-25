@@ -5,20 +5,43 @@ import { PasswordPrompt } from 'components';
 
 // Inspired from: https://blog.netcetera.com/how-to-create-guarded-routes-for-your-react-app-d2fe7c7b6122
 
-export const PasswordProtectedRoute = ({ component: Component, path, accessAllowed, showPromptHeader, showPromptFooter, ...rest }) => (
-  <Route path={path} {...rest} render={(props) => {
-    debug.log({ accessAllowed, location: props.location });
-    return accessAllowed === undefined || accessAllowed === null ? (
-      null
-    ) : accessAllowed === true || (props.location.state && props.location.state.accessAllowed === true) ? (
-      <Component {...props} />
-    ) : (
-      <PasswordPrompt
-        path={path}
-        hasHeader={showPromptHeader}
-        hasFooter={showPromptFooter}
-        {...props}
-      />
-    );
-  }} />
+function getFullRoute(path) {
+  if (path) {
+    // return path + hash parameters
+    const regex = new RegExp(`^#${path}`);
+    const params = window.location.hash.replace(regex, '');
+    return `${path}${params}`;
+  } else {
+    return '/';
+  }
+}
+
+export const PasswordProtectedRoute = ({
+  path,
+  component: Component,
+  accessAllowed,
+  showPromptHeader,
+  showPromptFooter,
+  ...rest
+}) => (
+  <Route
+    path={path}
+    {...rest}
+    render={(props) => {
+      debug.log({ accessAllowed, location: props.location });
+
+      return accessAllowed === undefined || accessAllowed === null ? (
+        null
+      ) : accessAllowed === true || (props.location.state && props.location.state.accessAllowed === true) ? (
+        <Component {...props} />
+      ) : (
+        <PasswordPrompt
+          path={getFullRoute(path)}
+          hasHeader={showPromptHeader}
+          hasFooter={showPromptFooter}
+          {...props}
+        />
+      );
+    }}
+  />
 );

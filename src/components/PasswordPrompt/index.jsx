@@ -16,26 +16,15 @@ export class PasswordPrompt extends Component {
     super(props);
     this.mode = defaultMode;
     this.hash = defaultHash || null;
-    this.redirectPath = this.getRedirectPath();
     this.showAddWebsitePrompt = false;
-    this.isWideScreen = ['/settings', '/logs'].includes(this.props.path);
-    debug.log({ hash: this.hash, redirectPath: this.redirectPath });
+    this.isWideScreen = ['/settings', '/logs'].some((route) => this.props.path.startsWith(route));
+    debug.log({ hash: this.hash, path: this.props.path });
     this.state = {
       password: '',
       isQuickActivationButtonVisible: false,
       isAddButtonVisible: false,
       enableLogs: false,
     };
-  }
-
-  getRedirectPath() {
-    if (this.props.path) {
-      const regex = new RegExp(`^#${this.props.path}`);
-      const search = window.location.hash.replace(regex, '');
-      return `${this.props.path}${search}`;
-    } else {
-      return '/';
-    }
   }
 
   componentDidMount() {
@@ -61,14 +50,6 @@ export class PasswordPrompt extends Component {
         }
       }
     });
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    //debug.log({ props: this.props, prevProps: prevProps, state: this.state, prevState: prevState });
-    if (this.props.path !== prevProps.path && this.props.path !== this.state.path) {
-      debug.warn('path prop has changed:', this.props.path);
-      this.redirectPath = this.props.path;
-    }
   }
 
   toggleQuickActivationButton = async () => {
@@ -98,7 +79,7 @@ export class PasswordPrompt extends Component {
   redirectTo = (path, state = null) => {
     debug.log('redirecting to:', path, state);
     this.props.history.location.state = state;
-    this.props.history.push(path);//, state); // passing state to history.push() doesn't work with hash router
+    this.props.history.push(path || '/');//, state); // passing state to history.push() doesn't work with hash router
   }
 
   checkPassword = () => {
@@ -109,7 +90,7 @@ export class PasswordPrompt extends Component {
       if (this.props.onSuccess) {
         this.props.onSuccess();
       } else {
-        this.redirectTo(this.redirectPath, { accessAllowed: true });
+        this.redirectTo(this.props.path, { accessAllowed: true });
       }
     }
   }
