@@ -16,15 +16,34 @@ export class PasswordPrompt extends Component {
     super(props);
     this.mode = defaultMode;
     this.hash = defaultHash || null;
+    this.hasHeader = this.props.hasHeader || this.getLocationProp('hasHeader');
+    this.hasFooter = this.props.hasFooter || this.getLocationProp('hasFooter');
     this.showAddWebsitePrompt = false;
-    this.isWideScreen = ['/settings', '/logs'].some((route) => this.props.path.startsWith(route));
-    debug.log({ hash: this.hash, path: this.props.path });
+    this.isWideScreen = this.getIsWideScreen();
+    debug.log({ hash: this.hash, props });
     this.state = {
       password: '',
-      isQuickActivationButtonVisible: false,
-      isAddButtonVisible: false,
       enableLogs: false,
+      isAddButtonVisible: false,
+      isQuickActivationButtonVisible: false,
     };
+  }
+
+  getLocationProp(prop, defaultValue = undefined) {
+    return this.props.location.state ? this.props.location.state[prop] : defaultValue;
+  }
+
+  getRedirectPath() {
+    return this.props.path || this.getLocationProp('path') || '/';
+  }
+
+  getQueryParams() {
+    return this.getLocationProp('search') || '';
+  }
+
+  getIsWideScreen() {
+    const redirectPath = this.getRedirectPath();
+    return ['/settings', '/logs'].includes(redirectPath);
   }
 
   componentDidMount() {
@@ -76,12 +95,6 @@ export class PasswordPrompt extends Component {
     }));
   }
 
-  redirectTo = (path, state = null) => {
-    debug.log('redirecting to:', path, state);
-    this.props.history.location.state = state;
-    this.props.history.push(path || '/');//, state); // passing state to history.push() doesn't work with hash router
-  }
-
   checkPassword = () => {
     if (!compare(this.state.password, this.hash)) {
       toaster.danger(translate('passwordIsWrong'), { id: 'pwd-toaster' });
@@ -90,7 +103,14 @@ export class PasswordPrompt extends Component {
       if (this.props.onSuccess) {
         this.props.onSuccess();
       } else {
-        this.redirectTo(this.props.path, { accessAllowed: true });
+        const pathname = this.getRedirectPath();
+        const search = this.getQueryParams();
+        debug.log(`redirecting to: ${[pathname, search].join()}`);
+        this.props.history.push({
+          pathname,
+          search,
+          state: { accessAllowed: true },
+        });
       }
     }
   }
@@ -143,7 +163,7 @@ export class PasswordPrompt extends Component {
         minWidth={this.getMinWidth()}
         minHeight={this.getMinHeight()}
       >
-        {this.props.hasHeader && (
+        {this.hasHeader && (
           <Header />
         )}
         <Pane
@@ -183,7 +203,7 @@ export class PasswordPrompt extends Component {
             </Pane>
           </Pane>
         </Pane>
-        {this.props.hasFooter && (
+        {this.hasFooter && (
           <Pane display="flex" paddingX={16} paddingY={10} alignItems="start" justifyContent="space-between" borderTop>
             <Pane display="flex" gap={10}>
               <SettingsButton history={this.props.history} />

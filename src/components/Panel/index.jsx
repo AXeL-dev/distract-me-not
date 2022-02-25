@@ -119,81 +119,81 @@ export class Panel extends Component {
   }
 
   render() {
-    if (!this.state.ready) {
-      return null;
-    }
-
     return (
       <Pane minWidth={350}>
         <Header />
-        {this.state.isEnabled && this.state.schedule.isEnabled ? (
-          <Pane display="flex" paddingX={16} paddingY={20}>
-            <Pane display="flex" alignItems="center" flex={1}>
-              <Text className="cursor-default">{translate('status')}</Text>
-            </Pane>
-            <Pane display="flex" alignItems="center" justifyContent="center">
-              {this.renderScheduleStatus()}
-            </Pane>
-          </Pane>
-        ) : (
-          <SwitchField
-            label={translate('status')}
-            labelClassName="cursor-default"
-            checked={this.state.isEnabled}
-            onChange={event => this.toggleStatus(event.target.checked)}
-            height={20}
-            paddingX={16}
-            paddingY={20}
-          />
-        )}
-        <SegmentedControlField
-          name="mode"
-          label={translate('mode')}
-          labelClassName="cursor-default"
-          options={modes}
-          value={this.state.mode}
-          onChange={this.changeMode}
-          maxWidth={260}
-          paddingX={16}
-          paddingBottom={20}
-        />
-        <Pane display="flex" paddingX={16} paddingY={10} alignItems="center" justifyContent="space-between" borderTop>
-          <Pane display="flex" gap={10}>
-            <SettingsButton history={this.props.history} />
-            {this.state.enableLogs && (
-              <LinkIconButton
-                icon={HistoryIcon}
-                link="/logs"
-                tooltip={translate('logs')}
-                history={this.props.history}
+        {!this.state.ready ? null : (
+          <>
+            {this.state.isEnabled && this.state.schedule.isEnabled ? (
+              <Pane display="flex" paddingX={16} paddingY={20}>
+                <Pane display="flex" alignItems="center" flex={1}>
+                  <Text className="cursor-default">{translate('status')}</Text>
+                </Pane>
+                <Pane display="flex" alignItems="center" justifyContent="center">
+                  {this.renderScheduleStatus()}
+                </Pane>
+              </Pane>
+            ) : (
+              <SwitchField
+                label={translate('status')}
+                labelClassName="cursor-default"
+                checked={this.state.isEnabled}
+                onChange={event => this.toggleStatus(event.target.checked)}
+                height={20}
+                paddingX={16}
+                paddingY={20}
               />
             )}
-            {!this.state.hideReportIssueButton && (
-              <LinkIconButton
-                icon={IssueNewIcon}
-                link="https://github.com/AXeL-dev/distract-me-not/issues"
-                external
-                tooltip={translate('reportIssue')}
-                history={this.props.history}
-              />
-            )}
-          </Pane>
-          <Pane>
-            <AnimatedIconButton
-              appearance="minimal"
-              tooltip={this.state.mode === Mode.whitelist ? translate('addToWhitelist') : translate('addToBlacklist')}
-              tooltipPosition={Position.LEFT}
-              icon={PlusIcon}
-              iconSize={22}
-              iconColor="#47b881"
-              onClick={() => addCurrentWebsite(this.state.mode, this.state.showAddWebsitePrompt)}
-              hideOnClick={true}
-              hideAnimationIcon={TickIcon}
-              isVisible={this.state.isAddButtonVisible}
-              onVisibilityChange={this.setAddButtonVisibility}
+            <SegmentedControlField
+              name="mode"
+              label={translate('mode')}
+              labelClassName="cursor-default"
+              options={modes}
+              value={this.state.mode}
+              onChange={this.changeMode}
+              maxWidth={260}
+              paddingX={16}
+              paddingBottom={20}
             />
-          </Pane>
-        </Pane>
+            <Pane display="flex" paddingX={16} paddingY={10} alignItems="center" justifyContent="space-between" borderTop>
+              <Pane display="flex" gap={10}>
+                <SettingsButton history={this.props.history} />
+                {this.state.enableLogs && (
+                  <LinkIconButton
+                    icon={HistoryIcon}
+                    link="/logs"
+                    tooltip={translate('logs')}
+                    history={this.props.history}
+                  />
+                )}
+                {!this.state.hideReportIssueButton && (
+                  <LinkIconButton
+                    icon={IssueNewIcon}
+                    link="https://github.com/AXeL-dev/distract-me-not/issues"
+                    external
+                    tooltip={translate('reportIssue')}
+                    history={this.props.history}
+                  />
+                )}
+              </Pane>
+              <Pane>
+                <AnimatedIconButton
+                  appearance="minimal"
+                  tooltip={this.state.mode === Mode.whitelist ? translate('addToWhitelist') : translate('addToBlacklist')}
+                  tooltipPosition={Position.LEFT}
+                  icon={PlusIcon}
+                  iconSize={22}
+                  iconColor="#47b881"
+                  onClick={() => addCurrentWebsite(this.state.mode, this.state.showAddWebsitePrompt)}
+                  hideOnClick={true}
+                  hideAnimationIcon={TickIcon}
+                  isVisible={this.state.isAddButtonVisible}
+                  onVisibilityChange={this.setAddButtonVisibility}
+                />
+              </Pane>
+            </Pane>
+          </>
+        )}
       </Pane>
     );
   }

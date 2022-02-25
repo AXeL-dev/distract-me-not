@@ -203,14 +203,13 @@ export class Settings extends Component {
   }
 
   getSelectedTab = () => {
-    const search = window.location.hash.replace(/^#\/settings/, '');
-    const urlParams = new URLSearchParams(search);
+    const urlParams = new URLSearchParams(this.props.location.search);
     return urlParams.get('tab');
   }
 
   selectTab = (id) => {
     this.setState({ selectedTab: id });
-    const url = `${window.location.protocol}//${window.location.host}${window.location.pathname}#/settings?tab=${id}`;
+    const url = `#${this.props.location.pathname}?tab=${id}`;
     window.history.pushState({ path: url }, document.title, url);
   }
 
