@@ -384,5 +384,8 @@
   },
   "quickActivation": {
     "message": "Activation rapide"
+  },
+  "openLogs": {
+    "message": "Consulter les journaux"
   }
 }

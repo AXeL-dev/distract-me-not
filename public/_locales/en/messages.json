@@ -384,5 +384,8 @@
   },
   "quickActivation": {
     "message": "Quick activation"
+  },
+  "openLogs": {
+    "message": "Open logs"
   }
 }

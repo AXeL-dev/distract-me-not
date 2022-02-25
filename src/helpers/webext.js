@@ -45,10 +45,15 @@ export function openOptionsPage() {
   }
 }
 
-export function openExtensionPage(url, reloadIfExists = true) {
+export function openExtensionPage(url, options = {}) {
+  options = {
+    reloadIfExists: true,
+    closeCurrent: true,
+    ...options,
+  };
   const pageUrl = `${browser.runtime.getURL('index.html')}#${url}`;
 
-  if (!reloadIfExists) {
+  if (!options.reloadIfExists) {
     return createTab(pageUrl);
   }
 
@@ -62,7 +67,9 @@ export function openExtensionPage(url, reloadIfExists = true) {
         }
       }
       createTab(pageUrl);
-      window.close();
+      if (options.closeCurrent) {
+        window.close();
+      }
     }
   });
 }

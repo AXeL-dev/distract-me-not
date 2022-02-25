@@ -1,10 +1,10 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Tablist, Tab, Checkbox, Button, TickIcon, PlusIcon, CrossIcon, DuplicateIcon, Paragraph, toaster, HeartIcon, Dialog } from 'evergreen-ui';
+import { Pane, Tablist, Tab, Checkbox, Button, TickIcon, PlusIcon, CrossIcon, DuplicateIcon, Paragraph, toaster, HeartIcon, Dialog, HistoryIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv } from 'helpers/debug';
 import { Mode, Action, modes, actions, defaultAction, defaultMode, defaultBlacklist, defaultWhitelist, defaultUnblock } from 'helpers/block';
 import { ScheduleType, defaultSchedule, newScheduleTimeRange } from 'helpers/schedule';
-import { sendMessage, storage } from 'helpers/webext';
+import { sendMessage, storage, isWebExtension, openExtensionPage } from 'helpers/webext';
 import { DaysOfWeek, today } from 'helpers/date';
 import { hash } from 'helpers/crypt';
 import { Header, SwitchField, SegmentedControlField, TimeField, PasswordField, WebsiteList, NumberField, SelectField, TextField, WordList, Tooltip } from 'components';
@@ -303,6 +303,16 @@ export class Settings extends Component {
 
   openDonationLink = () => {
     window.open('https://www.paypal.com/paypalme/axeldev', '_blank');
+  }
+
+  openPage = (page) => {
+    if (isWebExtension) {
+      openExtensionPage(page, {
+        closeCurrent: false,
+      });
+    } else {
+      window.open(`#${page}`, '_blank');
+    }
   }
 
   openDialog = (name) => {
@@ -768,7 +778,6 @@ export class Settings extends Component {
         inputWidth={80}
         value={this.state.options.logs.maxLength}
         onChange={(value) => this.setOptions('logs.maxLength', value)}
-        marginBottom={16}
         disabled={!this.state.options.logs.isEnabled}
       />
     </Fragment>
@@ -863,7 +872,7 @@ export class Settings extends Component {
               </Pane>
             ))}
           </Pane>
-          <Pane display="flex" alignItems="center" justifyContent="center" marginTop={16}>
+          <Pane display="flex" alignItems="center" justifyContent="center" gap={12} marginTop={16}>
             {this.state.selectedTab === 'about' ? (
               <Button
                 height={32}
@@ -874,14 +883,26 @@ export class Settings extends Component {
                 {translate('donate')}
               </Button>
             ) : (
-              <Button
-                height={32}
-                appearance="primary"
-                iconBefore={TickIcon}
-                onClick={this.save}
-              >
-                {translate('save')}
-              </Button>
+              <>
+                <Button
+                  height={32}
+                  appearance="primary"
+                  iconBefore={TickIcon}
+                  onClick={this.save}
+                >
+                  {translate('save')}
+                </Button>
+                {this.state.selectedTab === 'logs' && this.state.options.logs.isEnabled && (
+                  <Button
+                    height={32}
+                    appearance="primary"
+                    iconBefore={HistoryIcon}
+                    onClick={() => this.openPage('/logs')}
+                  >
+                    {translate('openLogs')}
+                  </Button>
+                )}
+              </>
             )}
           </Pane>
         </Pane>
