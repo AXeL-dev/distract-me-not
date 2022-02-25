@@ -375,5 +375,14 @@
   },
   "keywordAlreadyExists": {
     "message": "Dit trefwoord is al toegevoegd!"
+  },
+  "allowActivationWithoutPassword": {
+    "message": "Activering toestaan zonder het wachtwoord in te voeren"
+  },
+  "allowActivationWithoutPasswordDescription": {
+    "message": "Geeft een 'Snel activeren' knop weer op het hoofdpaneel"
+  },
+  "quickActivation": {
+    "message": "Snelle activering"
   }
 }

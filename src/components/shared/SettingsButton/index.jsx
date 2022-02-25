@@ -20,9 +20,7 @@ export class SettingsButton extends Component {
         appearance="minimal"
         tooltip={translate('settings')}
         tooltipPosition={Position.RIGHT}
-        className="fill-grey"
         icon={CogIcon}
-        iconSize={20}
         iconColor="#4E4E50"
         onClick={this.goToSettings}
       />

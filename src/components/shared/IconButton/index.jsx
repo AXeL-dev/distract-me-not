@@ -11,7 +11,7 @@ export class IconButton extends Component {
       <Button
         display="flex"
         justifyContent="center"
-        className={`icon-button ${this.props.className || ''}`}
+        className={['icon-button', this.props.className || ''].join(' ')}
         appearance={this.props.appearance}
         onClick={this.props.onClick}
         padding={this.props.padding || 0}
@@ -24,7 +24,7 @@ export class IconButton extends Component {
       >
         <Icon
           icon={this.props.icon}
-          size={this.props.iconSize}
+          size={this.props.iconSize || 18}
           color={this.props.iconColor}
         />
       </Button>

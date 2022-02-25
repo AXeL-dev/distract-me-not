@@ -183,9 +183,8 @@ export class Panel extends Component {
               appearance="minimal"
               tooltip={this.state.mode === Mode.whitelist ? translate('addToWhitelist') : translate('addToBlacklist')}
               tooltipPosition={Position.LEFT}
-              className="fill-green"
               icon={PlusIcon}
-              iconSize={24}
+              iconSize={22}
               iconColor="#47b881"
               onClick={() => addCurrentWebsite(this.state.mode, this.state.showAddWebsitePrompt)}
               hideOnClick={true}

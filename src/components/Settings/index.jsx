@@ -7,7 +7,7 @@ import { ScheduleType, defaultSchedule, newScheduleTimeRange } from 'helpers/sch
 import { sendMessage, storage } from 'helpers/webext';
 import { DaysOfWeek, today } from 'helpers/date';
 import { hash } from 'helpers/crypt';
-import { Header, SwitchField, SegmentedControlField, TimeField, PasswordField, WebsiteList, NumberField, SelectField, TextField, WordList } from 'components';
+import { Header, SwitchField, SegmentedControlField, TimeField, PasswordField, WebsiteList, NumberField, SelectField, TextField, WordList, Tooltip } from 'components';
 import { defaultLogsSettings } from 'helpers/logger';
 import { version } from '../../../package.json';
 import _ from 'lodash';
@@ -72,6 +72,7 @@ export class Settings extends Component {
           isSet: false,
           value: '',
           hash: '',
+          allowActivationWithoutPassword: false,
           allowAddingWebsitesWithoutPassword: false,
         },
         logs: defaultLogsSettings,
@@ -269,6 +270,7 @@ export class Settings extends Component {
         unblock: this.state.options.unblock,
         password: {
           isEnabled: this.state.options.password.isEnabled,
+          allowActivationWithoutPassword: this.state.options.password.allowActivationWithoutPassword,
           allowAddingWebsitesWithoutPassword: this.state.options.password.allowAddingWebsitesWithoutPassword,
           hash: this.state.options.password.isEnabled // if password protection is enabled
             ? this.state.options.password.value.length // + password length is > 0
@@ -427,12 +429,6 @@ export class Settings extends Component {
         checked={this.state.options.unblock.autoReblockOnTimeout}
         onChange={(event) => this.setOptions('unblock.autoReblockOnTimeout', event.target.checked)}
         disabled={!this.state.options.unblock.isEnabled}
-      />
-      <Checkbox
-        label={translate('requirePasswordToUnblockWebsites')}
-        checked={this.state.options.unblock.requirePassword}
-        onChange={(event) => this.setOptions('unblock.requirePassword', event.target.checked)}
-        disabled={!this.state.options.unblock.isEnabled || !this.state.options.password.isEnabled}
         margin={0}
       />
     </Fragment>
@@ -726,10 +722,29 @@ export class Settings extends Component {
         hasRandomButton
       />
       <Checkbox
+        label={
+          <Tooltip
+            content={translate('allowActivationWithoutPasswordDescription')}
+            disabled={!this.state.options.password.isEnabled}
+          >
+            <span>{translate('allowActivationWithoutPassword')}</span>
+          </Tooltip>
+        }
+        checked={this.state.options.password.allowActivationWithoutPassword}
+        onChange={(event) => this.setOptions('password.allowActivationWithoutPassword', event.target.checked)}
+        disabled={!this.state.options.password.isEnabled}
+      />
+      <Checkbox
         label={translate('allowAddingWebsitesWithoutPassword')}
         checked={this.state.options.password.allowAddingWebsitesWithoutPassword}
         onChange={(event) => this.setOptions('password.allowAddingWebsitesWithoutPassword', event.target.checked)}
         disabled={!this.state.options.password.isEnabled}
+      />
+      <Checkbox
+        label={translate('requirePasswordToUnblockWebsites')}
+        checked={this.state.options.unblock.requirePassword}
+        onChange={(event) => this.setOptions('unblock.requirePassword', event.target.checked)}
+        disabled={!this.state.options.unblock.isEnabled || !this.state.options.password.isEnabled}
         margin={0}
       />
     </Fragment>

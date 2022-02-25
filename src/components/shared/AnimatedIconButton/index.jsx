@@ -12,6 +12,7 @@ export class AnimatedIconButton extends Component {
       isVisible: _.isBoolean(this.props.isVisible) ? this.props.isVisible : true, // do not use || operator with boolean values that takes "true" by default
       className: '',
       icon: this.props.icon,
+      iconColor: this.props.iconColor,
       hideOnClick: this.props.hideOnClick,
     };
   }
@@ -40,6 +41,7 @@ export class AnimatedIconButton extends Component {
       isVisible: true,
       className: '', // reset class
       icon: this.props.icon, // reset icon
+      iconColor: this.props.iconColor,
     });
     this.setVisibilityProp(true);
   }
@@ -55,7 +57,13 @@ export class AnimatedIconButton extends Component {
       this.setState({ ...this.state, className: 'scale-0' }); // scale to 0
       setTimeout(() => {
         if (this.props.hideAnimationIcon) {
-          this.setState({ ...this.state, className: '', icon: this.props.hideAnimationIcon }); // change icon
+          // change icon + color
+          this.setState({
+            ...this.state,
+            className: '',
+            icon: this.props.hideAnimationIcon,
+            iconColor: this.props.hideAnimationIconColor || this.props.iconColor,
+          });
           setTimeout(() => {
             this.setState({ ...this.state, className: 'scale-0' }); // rescale to 0
             setTimeout(() => {
@@ -82,11 +90,11 @@ export class AnimatedIconButton extends Component {
   render() {
     return this.state.isVisible && (
       <IconButton
-        className={`animated-icon-button ${this.props.className || ''} ${this.state.className || ''}`}
+        className={['animated-icon-button', this.props.className || '', this.state.className || ''].join(' ')}
         appearance={this.props.appearance || 'minimal'}
         icon={this.state.icon}
-        iconSize={this.props.iconSize || 22}
-        iconColor={this.props.iconColor}
+        iconColor={this.state.iconColor}
+        iconSize={this.props.iconSize}
         tooltip={this.props.tooltip}
         tooltipPosition={this.props.tooltipPosition}
         onClick={this.handleClick}

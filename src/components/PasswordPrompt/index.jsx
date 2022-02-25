@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Pane, TextInput, UnlockIcon, toaster, HistoryIcon, Position, PlusIcon, TickIcon } from 'evergreen-ui';
+import { Pane, TextInput, UnlockIcon, toaster, HistoryIcon, Position, PlusIcon, TickIcon, PowerIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { storage, sendMessage } from 'helpers/webext';
 import { compare } from 'helpers/crypt';
@@ -22,6 +22,7 @@ export class PasswordPrompt extends Component {
     debug.log({ hash: this.hash, redirectPath: this.redirectPath });
     this.state = {
       password: '',
+      isQuickActivationButtonVisible: false,
       isAddButtonVisible: false,
       enableLogs: false,
     };
@@ -43,6 +44,7 @@ export class PasswordPrompt extends Component {
       mode: this.mode,
       password: {
         hash: this.hash,
+        allowActivationWithoutPassword: false,
         allowAddingWebsitesWithoutPassword: false,
       },
       showAddWebsitePrompt: this.showAddWebsitePrompt,
@@ -51,6 +53,9 @@ export class PasswordPrompt extends Component {
         this.mode = items.mode;
         this.hash = items.password.hash;
         this.showAddWebsitePrompt = items.showAddWebsitePrompt;
+        if (items.password.allowActivationWithoutPassword) {
+          this.toggleQuickActivationButton();
+        }
         if (items.password.allowAddingWebsitesWithoutPassword) {
           this.toggleAddButton(this.mode);
         }
@@ -66,13 +71,28 @@ export class PasswordPrompt extends Component {
     }
   }
 
+  toggleQuickActivationButton = async () => {
+    const isEnabled = await sendMessage('getIsEnabled');
+    this.setQuickActivationButtonVisibility(!isEnabled);
+  }
+
+  setQuickActivationButtonVisibility = (value) => {
+    this.setState((state) => ({
+      ...state,
+      isQuickActivationButtonVisible: value,
+    }));
+  }
+
   toggleAddButton = async (mode) => {
     const isVisible = await isActiveTabBlockable(mode);
     this.setAddButtonVisibility(isVisible);
   }
 
   setAddButtonVisibility = (value) => {
-    this.setState({ isAddButtonVisible: value });
+    this.setState((state) => ({
+      ...state,
+      isAddButtonVisible: value,
+    }));
   }
 
   redirectTo = (path, state = null) => {
@@ -92,6 +112,10 @@ export class PasswordPrompt extends Component {
         this.redirectTo(this.redirectPath, { accessAllowed: true });
       }
     }
+  }
+
+  activate = () => {
+    return sendMessage('setIsEnabled', true).then(() => true);
   }
 
   handleKeyDown = (event) => {
@@ -190,15 +214,27 @@ export class PasswordPrompt extends Component {
                   history={this.props.history}
                 />
               )}
+              <AnimatedIconButton
+                appearance="minimal"
+                tooltip={translate('quickActivation')}
+                tooltipPosition={Position.RIGHT}
+                icon={PowerIcon}
+                iconColor="#4E4E50"
+                onClick={this.activate}
+                hideOnClick={true}
+                hideAnimationIcon={TickIcon}
+                hideAnimationIconColor="#47b881"
+                isVisible={this.state.isQuickActivationButtonVisible}
+                onVisibilityChange={this.setQuickActivationButtonVisibility}
+              />
             </Pane>
             <Pane>
               <AnimatedIconButton
                 appearance="minimal"
                 tooltip={this.mode === Mode.whitelist ? translate('addToWhitelist') : translate('addToBlacklist')}
                 tooltipPosition={Position.LEFT}
-                className="fill-green"
                 icon={PlusIcon}
-                iconSize={24}
+                iconSize={22}
                 iconColor="#47b881"
                 onClick={() => addCurrentWebsite(this.mode, this.showAddWebsitePrompt)}
                 hideOnClick={true}

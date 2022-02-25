@@ -375,5 +375,14 @@
   },
   "keywordAlreadyExists": {
     "message": "Keyword already exists!"
+  },
+  "allowActivationWithoutPassword": {
+    "message": "Allow activation without entering the password"
+  },
+  "allowActivationWithoutPasswordDescription": {
+    "message": "Displays a 'Quick activation' button on the main panel"
+  },
+  "quickActivation": {
+    "message": "Quick activation"
   }
 }

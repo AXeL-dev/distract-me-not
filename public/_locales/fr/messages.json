@@ -207,7 +207,7 @@
     "message": "Mot de passe incorrect!"
   },
   "allowAddingWebsitesWithoutPassword": {
-    "message": "Autoriser l'ajout de sites web sans entrer le mot de passe"
+    "message": "Permettre l'ajout de sites web sans entrer le mot de passe"
   },
   "enable": {
     "message": "Activer"
@@ -375,5 +375,14 @@
   },
   "keywordAlreadyExists": {
     "message": "Le mot-clé existe déjà!"
+  },
+  "allowActivationWithoutPassword": {
+    "message": "Permettre l'activation sans entrer le mot de passe"
+  },
+  "allowActivationWithoutPasswordDescription": {
+    "message": "Affiche un bouton 'Activation rapide' sur le panneau principal"
+  },
+  "quickActivation": {
+    "message": "Activation rapide"
   }
 }
