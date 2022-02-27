@@ -42,6 +42,7 @@
     "sign": "node ./scripts/sign-addon.js",
     "test": "craco test --verbose",
     "test:all": "npm test -- --watchAll --testMatch \"**/src/**/*.test.{js,jsx}\"",
+    "test:update": "npm run test:all -- -u",
     "eject": "react-scripts eject",
     "release:major": "release-it major",
     "release:minor": "release-it minor",

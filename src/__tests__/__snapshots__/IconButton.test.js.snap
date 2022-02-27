@@ -9,7 +9,7 @@ exports[`renders correctly 1`] = `
       class="ub-dspl_inline-flex ub-box-szg_border-box"
     >
       <svg
-        class="css-c4d79v ub-w_16px ub-h_16px ub-box-szg_border-box"
+        class="css-c4d79v ub-w_18px ub-h_18px ub-box-szg_border-box"
         data-icon="cross"
         viewBox="0 0 16 16"
       >

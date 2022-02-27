@@ -43,7 +43,7 @@ export class Timer extends Component {
   }
 
   getLocationStateProp(prop) {
-    return this.props.location.state ? this.props.location.state[prop] : undefined;
+    return this.props.location && this.props.location.state ? this.props.location.state[prop] : undefined;
   }
 
   renderTime = ({ remainingTime }) => {

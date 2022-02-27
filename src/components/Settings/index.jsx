@@ -211,6 +211,9 @@ export class Settings extends Component {
   }
 
   getSelectedTab = () => {
+    if (!this.props.location) {
+      return undefined;
+    }
     const urlParams = new URLSearchParams(this.props.location.search);
     return urlParams.get('tab');
   }

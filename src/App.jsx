@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { storage } from './helpers/webext';
-import { isDevEnv } from './helpers/debug';
+import { isDevEnv, isTestEnv } from './helpers/debug';
 import { Main, Panel, Settings, Timer, Logs, Background, Blocked, PasswordPrompt, AddWebsitePrompt } from './components';
 import { PasswordProtectedRoute } from './routes';
 
@@ -16,6 +16,9 @@ export default class App extends Component {
   }
 
   componentDidMount() {
+    if (isTestEnv) {
+      return;
+    }
     storage.get({
       password: {
         isEnabled: false

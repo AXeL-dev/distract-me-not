@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import { sendMessage } from 'helpers/webext';
-import { isTestEnv } from 'helpers/debug';
 
 export class Main extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      ready: isTestEnv ? true : false,
+      ready: false,
       isTimerActive: false,
     };
   }

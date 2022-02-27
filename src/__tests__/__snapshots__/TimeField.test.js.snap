@@ -15,7 +15,7 @@ exports[`renders correctly 1`] = `
       </span>
     </div>
     <div
-      class="ub-dspl_flex ub-algn-itms_center ub-box-szg_border-box"
+      class="ub-dspl_flex ub-algn-itms_center ub-gap_10px ub-box-szg_border-box"
     >
       <input
         type="time"

@@ -36,7 +36,7 @@ export class PasswordPrompt extends Component {
   }
 
   getLocationStateProp(prop) {
-    return this.props.location.state ? this.props.location.state[prop] : undefined;
+    return this.props.location && this.props.location.state ? this.props.location.state[prop] : undefined;
   }
 
   getRedirectPath(defaultValue = '/') {
