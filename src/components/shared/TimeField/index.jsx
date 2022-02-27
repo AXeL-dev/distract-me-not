@@ -13,6 +13,7 @@ export function TimeField(props) {
           className={props.labelClassName}
           tooltip={props.tooltip}
           tooltipPosition={props.tooltipPosition}
+          disabled={props.changeLabelColorOnDisable && props.disabled}
         />
       </Pane>
       <Pane display="flex" alignItems="center" gap={10}>

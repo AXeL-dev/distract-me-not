@@ -508,14 +508,15 @@ export class Settings extends Component {
                       value={range.time.start}
                       onChange={(event) => this.setOptions(`schedule.days['${day.value}'][${index}].time.start`, event.target.value)}
                       disabled={!this.state.options.schedule.isEnabled}
+                      changeLabelColorOnDisable
                       marginBottom={16}
-                      borderTop
                     />
                     <TimeField
                       label={translate('scheduleEndTime')}
                       value={range.time.end}
                       onChange={(event) => this.setOptions(`schedule.days['${day.value}'][${index}].time.end`, event.target.value)}
                       disabled={!this.state.options.schedule.isEnabled}
+                      changeLabelColorOnDisable
                       marginBottom={16}
                     />
                     <SegmentedControlField
@@ -531,6 +532,7 @@ export class Settings extends Component {
                       value={range.type}
                       onChange={(value) => this.setOptions(`schedule.days['${day.value}'][${index}].type`, value)}
                       disabled={!this.state.options.schedule.isEnabled}
+                      changeLabelColorOnDisable
                       showTooltips
                     />
                   </Fragment>
