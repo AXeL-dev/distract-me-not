@@ -112,9 +112,9 @@ export class Timer extends Component {
   render() {
     return (
       <Pane minWidth={350}>
-        {/* <Header /> */}
         {!this.state.ready ? null : (
           <>
+            {/* <Header /> */}
             <Pane display="flex" minHeight={177} paddingX={16} paddingY={18} alignItems="center" justifyContent="center">
               <CountdownCircleTimer
                 key={this.state.key}

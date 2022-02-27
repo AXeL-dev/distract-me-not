@@ -124,10 +124,10 @@ export class Panel extends Component {
   render() {
     return (
       <Pane minWidth={350}>
-        <Header />
         {!this.state.ready ? null : (
           <>
-            <Pane display="flex" flexDirection="column" flex={1} minHeight={115} paddingX={16} paddingY={20}>
+            <Header />
+            <Pane display="flex" flexDirection="column" minHeight={115} paddingX={16} paddingY={20}>
               {this.state.isEnabled && this.state.schedule.isEnabled ? (
                 <Pane display="flex">
                   <Pane display="flex" alignItems="center" flex={1}>
