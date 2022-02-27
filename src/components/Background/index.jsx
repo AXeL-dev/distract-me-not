@@ -525,10 +525,12 @@ export class Background extends Component {
       whitelist: this.whitelist,
     });
     // Handle schedule
-    const { isAllowedTime, todaySchedule } = this.parseTodaySchedule();
-    if (isAllowedTime && !this.isTimerActive()) {
-      this.debug('not in scheduled blocking time:', todaySchedule);
-      return;
+    if (!this.isTimerActive()) {
+      const { isAllowedTime, todaySchedule } = this.parseTodaySchedule();
+      if (isAllowedTime) {
+        this.debug('not in scheduled blocking time:', todaySchedule);
+        return;
+      }
     }
     // Handle blocking
     const shouldBlock = this.isUrlBlocked(data.url);
