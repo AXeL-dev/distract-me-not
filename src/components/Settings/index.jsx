@@ -961,8 +961,11 @@ export class Settings extends Component {
           confirmLabel={translate('confirm')}
           onConfirm={this.applyScheduleSettings}
           hasHeader={false}
-          topOffset="24vmin"
           shouldCloseOnOverlayClick={false}
+          topOffset="24vmin"
+          minHeightContent="auto"
+          contentContainerProps={{ padding: 16 }}
+          containerProps={{ className: 'schedule-dialog' }}
         >
           {translate('confirmApplyScheduleSettings')}
         </Dialog>
