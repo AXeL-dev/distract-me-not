@@ -26,7 +26,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "CI=false INLINE_RUNTIME_CHUNK=false GENERATE_SOURCEMAP=false craco build",
+    "build": "INLINE_RUNTIME_CHUNK=false GENERATE_SOURCEMAP=false craco build",
     "build:firefox": "npm run build",
     "build:chrome": "npm run build",
     "build:edge": "npm run build",

@@ -1,5 +1,3 @@
-/* global browser */
-
 import React, { Component } from 'react';
 import { storage, nativeAPI, indexUrl, getTab, sendNotification } from 'helpers/webext';
 import { Mode, Action, defaultBlacklist, defaultWhitelist, UnblockOptions, defaultUnblock, isAccessible } from 'helpers/block';
