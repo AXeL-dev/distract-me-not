@@ -4,5 +4,7 @@ export * from './Panel';
 export * from './PasswordPrompt';
 export * from './AddWebsitePrompt';
 export * from './Settings';
+export * from './Timer';
 export * from './Logs';
+export * from './Main';
 export * from './shared';

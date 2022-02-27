@@ -1,10 +1,11 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Text, Position, Badge, PlusIcon, TickIcon, DisableIcon, SmallMinusIcon, SlashIcon, HistoryIcon, IssueNewIcon } from 'evergreen-ui';
+import { Pane, Text, Position, Badge, PlusIcon, TickIcon, DisableIcon, SmallMinusIcon, SlashIcon, HistoryIcon, IssueNewIcon, StopwatchIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { sendMessage, storage } from 'helpers/webext';
 import { Mode, modes, addCurrentWebsite, isActiveTabBlockable, defaultMode } from 'helpers/block';
 import { ScheduleType, defaultSchedule, getTodaySchedule } from 'helpers/schedule';
 import { defaultLogsSettings } from 'helpers/logger';
+import { defaultTimerSettings } from 'helpers/timer';
 import { isTestEnv } from 'helpers/debug';
 import { Header, SwitchField, SegmentedControlField, AnimatedIconButton, SettingsButton, LinkIconButton, TooltipIcon } from 'components';
 import colors from 'helpers/color';
@@ -21,6 +22,7 @@ export class Panel extends Component {
       schedule: defaultSchedule,
       isAddButtonVisible: false,
       enableLogs: false,
+      enableTimer: false,
       hideReportIssueButton: false,
       showAddWebsitePrompt: false,
     };
@@ -31,6 +33,7 @@ export class Panel extends Component {
       sendMessage('getIsEnabled').then(isEnabled => this.setState({ isEnabled: !!isEnabled })), // !! used to cast null to boolean
       sendMessage('getSchedule').then(schedule => this.setState({ schedule: schedule || defaultSchedule })),
       sendMessage('getLogsSettings').then(logs => this.setState({ enableLogs: (logs || defaultLogsSettings).isEnabled })),
+      sendMessage('getTimerSettings').then(timer => this.setState({ enableTimer: (timer || defaultTimerSettings).isEnabled })),
       sendMessage('getMode').then(mode => {
         this.setState({ mode });
         this.toggleAddButton(mode);
@@ -124,37 +127,36 @@ export class Panel extends Component {
         <Header />
         {!this.state.ready ? null : (
           <>
-            {this.state.isEnabled && this.state.schedule.isEnabled ? (
-              <Pane display="flex" paddingX={16} paddingY={20}>
-                <Pane display="flex" alignItems="center" flex={1}>
-                  <Text className="cursor-default">{translate('status')}</Text>
+            <Pane display="flex" flexDirection="column" flex={1} minHeight={115} paddingX={16} paddingY={20}>
+              {this.state.isEnabled && this.state.schedule.isEnabled ? (
+                <Pane display="flex">
+                  <Pane display="flex" alignItems="center" flex={1}>
+                    <Text className="cursor-default">{translate('status')}</Text>
+                  </Pane>
+                  <Pane display="flex" alignItems="center" justifyContent="center">
+                    {this.renderScheduleStatus()}
+                  </Pane>
                 </Pane>
-                <Pane display="flex" alignItems="center" justifyContent="center">
-                  {this.renderScheduleStatus()}
-                </Pane>
-              </Pane>
-            ) : (
-              <SwitchField
-                label={translate('status')}
+              ) : (
+                <SwitchField
+                  label={translate('status')}
+                  labelClassName="cursor-default"
+                  checked={this.state.isEnabled}
+                  onChange={event => this.toggleStatus(event.target.checked)}
+                  height={20}
+                />
+              )}
+              <SegmentedControlField
+                name="mode"
+                label={translate('mode')}
                 labelClassName="cursor-default"
-                checked={this.state.isEnabled}
-                onChange={event => this.toggleStatus(event.target.checked)}
-                height={20}
-                paddingX={16}
-                paddingY={20}
+                options={modes}
+                value={this.state.mode}
+                onChange={this.changeMode}
+                maxWidth={260}
+                paddingTop={20}
               />
-            )}
-            <SegmentedControlField
-              name="mode"
-              label={translate('mode')}
-              labelClassName="cursor-default"
-              options={modes}
-              value={this.state.mode}
-              onChange={this.changeMode}
-              maxWidth={260}
-              paddingX={16}
-              paddingBottom={20}
-            />
+            </Pane>
             <Pane display="flex" paddingX={16} paddingY={10} alignItems="center" justifyContent="space-between" borderTop>
               <Pane display="flex" gap={10}>
                 <SettingsButton history={this.props.history} />
@@ -163,6 +165,16 @@ export class Panel extends Component {
                     icon={HistoryIcon}
                     link="/logs"
                     tooltip={translate('logs')}
+                    history={this.props.history}
+                  />
+                )}
+                {this.state.enableTimer && (
+                  <LinkIconButton
+                    icon={StopwatchIcon}
+                    link="/timer"
+                    sameTab
+                    state={{ accessAllowed: true, referer: 'panel' }}
+                    tooltip={translate('timer')}
                     history={this.props.history}
                   />
                 )}

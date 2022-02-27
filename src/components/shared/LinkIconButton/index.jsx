@@ -11,10 +11,14 @@ export class LinkIconButton extends Component {
         window.open(this.props.link, '_blank');
         window.close();
       } else {
-        if (isWebExtension) {
+        if (isWebExtension && !this.props.sameTab) {
           openExtensionPage(this.props.link);
         } else if (this.props.history) {
-          this.props.history.push(this.props.link);
+          this.props.history.push({
+            pathname: this.props.link,
+            search: this.props.search || '',
+            state: this.props.state,
+          });
         }
       }
     }
@@ -29,6 +33,7 @@ export class LinkIconButton extends Component {
         icon={this.props.icon}
         iconColor="#4E4E50"
         onClick={this.handleClick}
+        disabled={this.props.disabled}
       />
     );
   }

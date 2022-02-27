@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pane, Text, Group, Button } from 'evergreen-ui';
+import { Pane, Group, Button } from 'evergreen-ui';
 import { OuterPane, TooltipLabel } from 'components';
 
 export function SegmentedControlField(props) {
@@ -16,7 +16,15 @@ export function SegmentedControlField(props) {
   return (
     <OuterPane display="flex" {...props}>
       <Pane display="flex" alignItems="center" flex={1}>
-        <Text className={props.labelClassName}>{props.label}</Text>
+        <TooltipLabel
+          text={props.label}
+          size={props.labelSize}
+          color={props.labelColor}
+          className={props.labelClassName}
+          tooltip={props.tooltip}
+          tooltipPosition={props.tooltipPosition}
+          disabled={props.changeLabelColorOnDisable && props.disabled}
+        />
       </Pane>
       <Pane display="flex" alignItems="center">
         <Group maxWidth={props.maxWidth}>

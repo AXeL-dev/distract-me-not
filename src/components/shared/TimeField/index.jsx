@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pane } from 'evergreen-ui';
+import { Pane, Text } from 'evergreen-ui';
 import { TooltipLabel, OuterPane } from 'components';
 
 export function TimeField(props) {
@@ -13,15 +13,19 @@ export function TimeField(props) {
           className={props.labelClassName}
           tooltip={props.tooltip}
           tooltipPosition={props.tooltipPosition}
+          disabled={props.changeLabelColorOnDisable && props.disabled}
         />
       </Pane>
-      <Pane display="flex" alignItems="center">
+      <Pane display="flex" alignItems="center" gap={10}>
         <input
           type="time"
           value={props.value}
           onChange={props.onChange}
           disabled={props.disabled}
         />
+        {props.suffix && (
+          <Text>{props.suffix}</Text>
+        )}
       </Pane>
     </OuterPane>
   );

@@ -23,6 +23,7 @@ export class SettingsButton extends Component {
         icon={CogIcon}
         iconColor="#4E4E50"
         onClick={this.goToSettings}
+        disabled={this.props.disabled}
       />
     );
   }

@@ -51,3 +51,10 @@
     color: #333;
   }
 }
+
+.schedule-dialog {
+  > div:last-child {
+    border-top: 1px solid rgb(237, 240, 242);
+    padding: 16px;
+  }
+}
