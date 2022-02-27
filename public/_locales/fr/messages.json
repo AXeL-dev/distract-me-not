@@ -344,13 +344,13 @@
     "message": "Nombre de lignes à conserver dans la table des logs"
   },
   "hideReportIssueButton": {
-    "message": "Masquer le bouton \"signaler un problème\" sur le panneau principal"
+    "message": "Masquer le bouton 'signaler un problème' sur le panneau principal"
   },
   "showAddWebsitePrompt": {
     "message": "Afficher l'invite d'ajout de site web"
   },
   "showAddWebsitePromptTooltip": {
-    "message": "Affiche une invite de confirmation lors de l'ajout d'un site web à partir du button \"+\" sur le panneau principal"
+    "message": "Affiche une invite de confirmation lors de l'ajout d'un site web à partir du button '+' sur le panneau principal"
   },
   "urls": {
     "message": "Liens"
@@ -387,5 +387,41 @@
   },
   "openLogs": {
     "message": "Consulter les journaux"
+  },
+  "timer": {
+    "message": "Minuteur"
+  },
+  "enableTimer": {
+    "message": "Activer le minuteur"
+  },
+  "enableTimerDescription": {
+    "message": "Affiche un bouton 'Minuteur' sur le panneau principal"
+  },
+  "defaultTimerValue": {
+    "message": "Valeur par défaut du minuteur"
+  },
+  "allowStoppingTimer": {
+    "message": "Permettre l'arrêt manuel du minuteur avant qu'il ne se termine"
+  },
+  "displayNotificationOnComplete": {
+    "message": "Afficher une notification lorsque le minuteur se termine"
+  },
+  "allowUsingTimerWithoutPassword": {
+    "message": "Permettre l'accès au minuteur sans entrer le mot de passe"
+  },
+  "mainPanel": {
+    "message": "Panneau principal"
+  },
+  "start": {
+    "message": "Démarrer"
+  },
+  "stop": {
+    "message": "Arrêter"
+  },
+  "remainingTime": {
+    "message": "Temps restant"
+  },
+  "timerCompleted": {
+    "message": "Minuteur terminé!"
   }
 }

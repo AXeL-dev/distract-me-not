@@ -13,6 +13,7 @@ export class IconButton extends Component {
         justifyContent="center"
         className={['icon-button', this.props.className || ''].join(' ')}
         appearance={this.props.appearance}
+        disabled={this.props.disabled}
         onClick={this.props.onClick}
         padding={this.props.padding || 0}
         width={this.props.width || 32}

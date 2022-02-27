@@ -387,5 +387,41 @@
   },
   "openLogs": {
     "message": "Open logboek"
+  },
+  "timer": {
+    "message": "Tijdklok"
+  },
+  "enableTimer": {
+    "message": "Tijdklok inschakelen"
+  },
+  "enableTimerDescription": {
+    "message": "Toont een 'Tijdklok' knop op het hoofdpaneel"
+  },
+  "defaultTimerValue": {
+    "message": "Standaard timerwaarde"
+  },
+  "allowStoppingTimer": {
+    "message": "Laat toe de timer te stoppen voor hij afloopt"
+  },
+  "displayNotificationOnComplete": {
+    "message": "Geef een melding wanneer de timer afloopt"
+  },
+  "allowUsingTimerWithoutPassword": {
+    "message": "Gebruik van de timer toestaan zonder het wachtwoord in te voeren"
+  },
+  "mainPanel": {
+    "message": "Hoofdpaneel"
+  },
+  "start": {
+    "message": "Start"
+  },
+  "stop": {
+    "message": "Stop"
+  },
+  "remainingTime": {
+    "message": "Resterende tijd"
+  },
+  "timerCompleted": {
+    "message": "Timer voltooid!"
   }
 }

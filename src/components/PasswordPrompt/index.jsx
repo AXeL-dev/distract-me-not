@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Pane, TextInput, UnlockIcon, toaster, HistoryIcon, Position, PlusIcon, TickIcon, PowerIcon } from 'evergreen-ui';
+import { Pane, TextInput, UnlockIcon, toaster, HistoryIcon, Position, PlusIcon, TickIcon, PowerIcon, StopwatchIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { storage, sendMessage } from 'helpers/webext';
 import { compare } from 'helpers/crypt';
 import { debug } from 'helpers/debug';
 import { defaultLogsSettings } from 'helpers/logger';
+import { defaultTimerSettings } from 'helpers/timer';
 import { Header, IconButton, SettingsButton, LinkIconButton, AnimatedIconButton } from 'components';
 import { defaultMode, Mode, addCurrentWebsite, isActiveTabBlockable } from 'helpers/block';
 
@@ -16,38 +17,47 @@ export class PasswordPrompt extends Component {
     super(props);
     this.mode = defaultMode;
     this.hash = defaultHash || null;
-    this.hasHeader = this.props.hasHeader || this.getLocationProp('hasHeader');
-    this.hasFooter = this.props.hasFooter || this.getLocationProp('hasFooter');
+    this.hasHeader = this.getProp('hasHeader');
+    this.hasFooter = this.getProp('hasFooter');
     this.showAddWebsitePrompt = false;
     this.isWideScreen = this.getIsWideScreen();
     debug.log({ hash: this.hash, props });
     this.state = {
       password: '',
       enableLogs: false,
+      enableTimer: false,
       isAddButtonVisible: false,
       isQuickActivationButtonVisible: false,
     };
   }
 
-  getLocationProp(prop, defaultValue = undefined) {
-    return this.props.location.state ? this.props.location.state[prop] : defaultValue;
+  getProp(prop) {
+    return this.props[prop] || this.getLocationStateProp(prop);
   }
 
-  getRedirectPath() {
-    return this.props.path || this.getLocationProp('path') || '/';
+  getLocationStateProp(prop) {
+    return this.props.location.state ? this.props.location.state[prop] : undefined;
   }
 
-  getQueryParams() {
-    return this.getLocationProp('search') || '';
+  getRedirectPath(defaultValue = '/') {
+    return this.getProp('path') || defaultValue;
+  }
+
+  getQueryParams(defaultValue = '') {
+    return this.getLocationStateProp('search') || defaultValue;
   }
 
   getIsWideScreen() {
-    const redirectPath = this.getRedirectPath();
-    return ['/settings', '/logs'].includes(redirectPath);
+    const redirectPath = this.getRedirectPath('/pwd');
+    return ['/settings', '/logs', '/pwd'].includes(redirectPath);
   }
 
   componentDidMount() {
     sendMessage('getLogsSettings').then(logs => this.setState({ enableLogs: (logs || defaultLogsSettings).isEnabled }));
+    sendMessage('getTimerSettings').then(timer => {
+      const settings = timer || defaultTimerSettings;
+      this.setState({ enableTimer: settings.isEnabled && settings.allowUsingTimerWithoutPassword });
+    });
     storage.get({
       mode: this.mode,
       password: {
@@ -228,6 +238,16 @@ export class PasswordPrompt extends Component {
                 isVisible={this.state.isQuickActivationButtonVisible}
                 onVisibilityChange={this.setQuickActivationButtonVisibility}
               />
+              {this.state.enableTimer && (
+                <LinkIconButton
+                  icon={StopwatchIcon}
+                  link="/timer"
+                  sameTab
+                  state={{ accessAllowed: true }}
+                  tooltip={translate('timer')}
+                  history={this.props.history}
+                />
+              )}
             </Pane>
             <Pane>
               <AnimatedIconButton

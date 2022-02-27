@@ -1,0 +1,23 @@
+.timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 80px;
+  gap: 4px;
+  &.off {
+    gap: 8px;
+  }
+  .text {
+    color: #aaa;
+    font-size: 12px;
+  }
+  .value {
+    font-size: 20px;
+  }
+  .button {
+    > div {
+      margin-right: 4px !important;
+    }
+  }
+}

@@ -7,6 +7,7 @@ import { defaultSchedule, getTodaySchedule, isScheduleAllowed } from 'helpers/sc
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
 import { transformList, transformKeywords } from 'helpers/regex';
 import { logger, defaultLogsSettings } from 'helpers/logger';
+import { defaultTimerSettings, unactiveTimerRuntimeSettings } from 'helpers/timer';
 import { now } from 'helpers/date';
 import { translate } from 'helpers/i18n';
 
@@ -25,11 +26,12 @@ export class Background extends Component {
     this.redirectUrl = '';
     this.unblock = defaultUnblock;
     this.schedule = defaultSchedule;
+    this.timer = defaultTimerSettings;
     this.enableLogs = defaultLogsSettings.isEnabled;
     // private
     this.hasBeenEnabledOnStartup = false;
-    this.enableLock = false;
     this.tmpAllowed = [];
+    this.timerTimeout = null;
 
     this.init();
   }
@@ -48,6 +50,21 @@ export class Background extends Component {
     return this.schedule;
   }
 
+  setTimerSettings = (value) => {
+    this.timer = value;
+  }
+
+  getTimerSettings = () => {
+    const ms = this.getTimerRemainingTime();
+    return {
+      ...this.timer,
+      runtime: {
+        ...this.timer.runtime,
+        remainingDuration: ms > 0 ? ms / 1000 : 0,
+      },
+    };
+  }
+
   setMode = (value) => {
     this.mode = value;
   }
@@ -57,8 +74,7 @@ export class Background extends Component {
   }
 
   setIsEnabled = (value) => {
-    this.isEnabled = value;
-    if (this.isEnabled) {
+    if (value) {
       this.enable();
     } else {
       this.disable();
@@ -166,6 +182,7 @@ export class Background extends Component {
       isEnabled: this.isEnabled,
       mode: this.mode,
       action: this.action,
+      timer: this.timer,
       unblock: this.unblock,
       schedule: this.schedule,
       redirectUrl: this.redirectUrl,
@@ -195,19 +212,20 @@ export class Background extends Component {
       this.whitelistKeywords = items.whitelistKeywords;
       this.mode = items.mode;
       this.action = items.action;
+      this.timer = { ...this.timer, ...items.timer };
       this.unblock = { ...this.unblock, ...items.unblock }; // merge
       this.schedule = { ...this.schedule, ...(!items.schedule.time ? items.schedule : {}) }; // omit old schedule settings in version <= 2.3.0
       this.redirectUrl = getValidUrl(items.redirectUrl);
       this.enableLogs = items.enableLogs;
       logger.maxLength = items.logsLength;
-      if (!this.hasBeenEnabledOnStartup) {
-        this.isEnabled = items.isEnabled;
-        if (this.isEnabled) {
-          this.enable();
-        }
+      if (!this.hasBeenEnabledOnStartup && items.isEnabled) {
+        this.enable();
       }
       if (!this.isEnabled) {
         this.updateIcon();
+      }
+      if (this.timer.isEnabled) {
+        this.resumeTimer();
       }
     });
     browser.runtime.onStartup.addListener(this.onBrowserStartup);
@@ -241,7 +259,6 @@ export class Background extends Component {
       enableOnBrowserStartup: false
     }).then(({ enableOnBrowserStartup }) => {
       if (enableOnBrowserStartup && !this.isEnabled) {
-        this.isEnabled = true;
         this.enable('enabled on startup!');
         this.hasBeenEnabledOnStartup = true;
       }
@@ -460,6 +477,47 @@ export class Background extends Component {
     return this.isUrlBlocked(url);
   };
 
+  getTimerRemainingTime = () => {
+    return this.timer.runtime.endDate - now(true);
+  }
+
+  isTimerActive = () => {
+    return this.timer.isEnabled && this.getTimerRemainingTime() > 0;
+  }
+
+  resumeTimer = (debugMessage = 'Timer resumed') => {
+    const ms = this.getTimerRemainingTime();
+    if (ms > 0) {
+      this.enable(debugMessage);
+      this.timerTimeout = setTimeout(() => {
+        this.disable('Timer completed');
+        if (this.timer.displayNotificationOnComplete) {
+          const title = translate('appName');
+          const message = translate('timerCompleted');
+          sendNotification(message, title);
+        }
+      }, ms);
+    }
+  }
+
+  startTimer = (duration) => {
+    this.timer.runtime = {
+      duration,
+      endDate: now(true) + (duration * 1000),
+    };
+    storage.set({ timer: this.timer });
+    this.resumeTimer('Timer started');
+  }
+
+  stopTimer = () => {
+    if (this.timerTimeout) {
+      clearTimeout(this.timerTimeout);
+      this.disable('Timer stopped');
+      this.timer.runtime = unactiveTimerRuntimeSettings;
+      storage.set({ timer: this.timer });
+    }
+  }
+
   parseUrl = (data, caller) => {
     this.debug('parsing url:', {
       caller: caller,
@@ -470,7 +528,7 @@ export class Background extends Component {
     });
     // Handle schedule
     const { isAllowedTime, todaySchedule } = this.parseTodaySchedule();
-    if (isAllowedTime) {
+    if (isAllowedTime && !this.isTimerActive()) {
       this.debug('not in scheduled blocking time:', todaySchedule);
       return;
     }
@@ -541,29 +599,29 @@ export class Background extends Component {
   }
 
   enable = (debugMessage = 'enabled!') => {
-    if (this.enableLock) {
+    if (this.isEnabled) {
       this.debug('already enabled!', {
-        enableLock: this.enableLock,
+        isEnabled: this.isEnabled,
       });
     } else {
+      this.isEnabled = true;
       this.checkAllTabs();
       this.enableEventListeners();
       this.updateIcon();
       this.debug(debugMessage);
-      this.enableLock = true;
     }
   }
 
   disable = (debugMessage = 'disabled!') => {
-    if (this.enableLock) {
+    if (this.isEnabled) {
+      this.isEnabled = false;
       this.disableEventListeners();
       this.checkAllTabs();
       this.updateIcon();
       this.debug(debugMessage);
-      this.enableLock = false;
     } else {
       this.debug('already disabled!', {
-        enableLock: this.enableLock,
+        isEnabled: this.isEnabled,
       });
     }
   }

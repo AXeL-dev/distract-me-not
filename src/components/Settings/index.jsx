@@ -9,6 +9,7 @@ import { DaysOfWeek, today } from 'helpers/date';
 import { hash } from 'helpers/crypt';
 import { Header, SwitchField, SegmentedControlField, TimeField, PasswordField, WebsiteList, NumberField, SelectField, TextField, WordList, Tooltip } from 'components';
 import { defaultLogsSettings } from 'helpers/logger';
+import { defaultTimerSettings } from 'helpers/timer';
 import { version } from '../../../package.json';
 import _ from 'lodash';
 import './styles.scss';
@@ -28,6 +29,7 @@ export class Settings extends Component {
       { label: translate('blacklist'), id: 'blacklist', disabled: defaultMode === Mode.whitelist },
       { label: translate('whitelist'), id: 'whitelist', disabled: defaultMode === Mode.blacklist },
       { label: translate('password'), id: 'password' },
+      { label: translate('timer'), id: 'timer' },
       { label: translate('logs'), id: 'logs' },
       { label: translate('miscellaneous'), id: 'misc' },
       { label: translate('about'), id: 'about' },
@@ -75,6 +77,7 @@ export class Settings extends Component {
           allowActivationWithoutPassword: false,
           allowAddingWebsitesWithoutPassword: false,
         },
+        timer: defaultTimerSettings,
         logs: defaultLogsSettings,
         misc: {
           hideReportIssueButton: false,
@@ -102,6 +105,7 @@ export class Settings extends Component {
         schedule: this.state.options.schedule,
         password: this.state.options.password,
         unblock: this.state.options.unblock,
+        timer: this.state.options.timer,
         blacklist: defaultBlacklist,
         whitelist: defaultWhitelist,
         blacklistKeywords: [],
@@ -130,6 +134,10 @@ export class Settings extends Component {
               ...this.state.options.password,
               ...items.password,
               isSet: !!(items.password.hash && items.password.hash.length),
+            },
+            timer: {
+              ...this.state.options.timer,
+              ...items.timer,
             },
             logs: {
               ...this.state.options.logs,
@@ -266,6 +274,7 @@ export class Settings extends Component {
         whitelist: this.state.options.whitelist,
         blacklistKeywords: this.state.options.blacklistKeywords,
         whitelistKeywords: this.state.options.whitelistKeywords,
+        timer: this.state.options.timer,
         unblock: this.state.options.unblock,
         password: {
           isEnabled: this.state.options.password.isEnabled,
@@ -294,6 +303,7 @@ export class Settings extends Component {
           sendMessage('setDisplayNotificationOnTimeout', this.state.options.unblock.displayNotificationOnTimeout);
           sendMessage('setAutoReblockOnTimeout', this.state.options.unblock.autoReblockOnTimeout);
           sendMessage('setLogsSettings', this.state.options.logs);
+          sendMessage('setTimerSettings', this.state.options.timer);
         }
         // Show success message (keep out of success condition to ensure it's executed on unit tests & dev env.)
         toaster.success(translate('settingsSaved'), { id: 'settings-toaster' });
@@ -428,9 +438,7 @@ export class Settings extends Component {
       <Checkbox
         label={translate('displayNotificationOnTimeout')}
         checked={this.state.options.unblock.displayNotificationOnTimeout}
-        onChange={(event) =>
-          this.setOptions('unblock.displayNotificationOnTimeout', event.target.checked)
-        }
+        onChange={(event) => this.setOptions('unblock.displayNotificationOnTimeout', event.target.checked)}
         disabled={!this.state.options.unblock.isEnabled}
       />
       <Checkbox
@@ -750,10 +758,50 @@ export class Settings extends Component {
         disabled={!this.state.options.password.isEnabled}
       />
       <Checkbox
+        label={translate('allowUsingTimerWithoutPassword')}
+        checked={this.state.options.timer.allowUsingTimerWithoutPassword}
+        onChange={(event) => this.setOptions('timer.allowUsingTimerWithoutPassword', event.target.checked)}
+        disabled={!this.state.options.timer.isEnabled || !this.state.options.password.isEnabled}
+      />
+      <Checkbox
         label={translate('requirePasswordToUnblockWebsites')}
         checked={this.state.options.unblock.requirePassword}
         onChange={(event) => this.setOptions('unblock.requirePassword', event.target.checked)}
         disabled={!this.state.options.unblock.isEnabled || !this.state.options.password.isEnabled}
+        margin={0}
+      />
+    </Fragment>
+  )
+
+  renderTimerTab = () => (
+    <Fragment>
+      <SwitchField
+        label={translate('enableTimer')}
+        tooltip={translate('enableTimerDescription')}
+        labelSize={300}
+        labelColor="muted"
+        checked={this.state.options.timer.isEnabled}
+        onChange={(event) => this.setOptions('timer.isEnabled', event.target.checked)}
+        marginBottom={16}
+      />
+      <TimeField
+        label={translate('defaultTimerValue')}
+        value={this.state.options.timer.defaultValue}
+        onChange={(event) => this.setOptions('timer.defaultValue', event.target.value)}
+        disabled={!this.state.options.timer.isEnabled}
+        marginBottom={16}
+      />
+      <Checkbox
+        label={translate('allowStoppingTimer')}
+        checked={this.state.options.timer.allowStoppingTimer}
+        onChange={(event) => this.setOptions('timer.allowStoppingTimer', event.target.checked)}
+        disabled={!this.state.options.timer.isEnabled}
+      />
+      <Checkbox
+        label={translate('displayNotificationOnComplete')}
+        checked={this.state.options.timer.displayNotificationOnComplete}
+        onChange={(event) => this.setOptions('timer.displayNotificationOnComplete', event.target.checked)}
+        disabled={!this.state.options.timer.isEnabled}
         margin={0}
       />
     </Fragment>
@@ -865,6 +913,7 @@ export class Settings extends Component {
                 {tab.id === 'blacklist' && this.renderBlacklistTab()}
                 {tab.id === 'whitelist' && this.renderWhitelistTab()}
                 {tab.id === 'password' && this.renderPasswordTab()}
+                {tab.id === 'timer' && this.renderTimerTab()}
                 {tab.id === 'logs' && this.renderLogsTab()}
                 {tab.id === 'misc' && this.renderMiscTab()}
                 {tab.id === 'about' && this.renderAboutTab()}

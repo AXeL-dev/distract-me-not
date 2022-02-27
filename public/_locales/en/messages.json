@@ -387,5 +387,41 @@
   },
   "openLogs": {
     "message": "Open logs"
+  },
+  "timer": {
+    "message": "Timer"
+  },
+  "enableTimer": {
+    "message": "Enable timer"
+  },
+  "enableTimerDescription": {
+    "message": "Displays a 'Timer' button on the main panel"
+  },
+  "defaultTimerValue": {
+    "message": "Default timer value"
+  },
+  "allowStoppingTimer": {
+    "message": "Allow stopping the timer before it ends"
+  },
+  "displayNotificationOnComplete": {
+    "message": "Display a notification when the timer ends"
+  },
+  "allowUsingTimerWithoutPassword": {
+    "message": "Allow using the timer without entering the password"
+  },
+  "mainPanel": {
+    "message": "Main panel"
+  },
+  "start": {
+    "message": "Start"
+  },
+  "stop": {
+    "message": "Stop"
+  },
+  "remainingTime": {
+    "message": "Remaining time"
+  },
+  "timerCompleted": {
+    "message": "Timer completed!"
   }
 }
