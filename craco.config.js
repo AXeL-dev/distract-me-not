@@ -1,9 +1,20 @@
 const path = require('path');
 const webpack = require('webpack');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   webpack: {
     plugins: [
+      new CopyPlugin([
+        {
+          from: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js',
+          to: 'static/js',
+        },
+        {
+          from: 'node_modules/bcryptjs/dist/bcrypt.min.js',
+          to: 'static/js',
+        },
+      ]),
       new webpack.optimize.LimitChunkCountPlugin({
         maxChunks: 1,
       }),
