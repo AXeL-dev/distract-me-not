@@ -11,7 +11,7 @@ import { Header, SwitchField, SegmentedControlField, TimeField, PasswordField, W
 import { defaultLogsSettings } from 'helpers/logger';
 import { defaultTimerSettings } from 'helpers/timer';
 import { version } from '../../../package.json';
-import _ from 'lodash';
+import { set, cloneDeep } from 'lodash';
 import './styles.scss';
 
 export class Settings extends Component {
@@ -243,7 +243,7 @@ export class Settings extends Component {
         });
         break;
       case 2:
-        const options = _.set(this.state.options, params[0], params[1]);
+        const options = set(this.state.options, params[0], params[1]);
         this.setState({ options });
         break;
     }
@@ -340,7 +340,7 @@ export class Settings extends Component {
       'schedule.days',
       DaysOfWeek.reduce((acc, cur) => ({
         ...acc,
-        [cur]: _.cloneDeep(this.state.options.schedule.days[this.state.selectedScheduleDay]),
+        [cur]: cloneDeep(this.state.options.schedule.days[this.state.selectedScheduleDay]),
       }), {})
     );
     this.closeDialog();
