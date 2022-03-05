@@ -1,7 +1,7 @@
 import { hasValidProtocol } from 'helpers/url';
 
 describe('Url helper', () => {
-  it('correctly detects urls with a valid protocol', () => {
+  it('detects urls with a valid protocol', () => {
     const urls = [
       'http://website.com',
       'https://website.com',
@@ -22,7 +22,7 @@ describe('Url helper', () => {
     }
   });
 
-  it('correctly detects urls with an invalid protocol', () => {
+  it('detects urls with an invalid protocol', () => {
     const urls = [
       'my_file.txt',
       'www.website.com',

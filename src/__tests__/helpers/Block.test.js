@@ -1,7 +1,7 @@
 import { isAccessible } from 'helpers/block';
 
 describe('Block helper', () => {
-  it('correctly detects accessible urls', () => {
+  it('detects accessible urls', () => {
     const urls = [
       'http://website.com',
       'https://website.com',
@@ -13,7 +13,7 @@ describe('Block helper', () => {
     }
   });
 
-  it('correctly detects inaccessible urls', () => {
+  it('detects inaccessible urls', () => {
     const urls = [
       'file://my_file.txt',
       'chrome://extensions',

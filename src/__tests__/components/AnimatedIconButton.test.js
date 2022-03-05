@@ -16,7 +16,7 @@ it('handles click', () => {
 });
 
 it('hides on click when hideOnClick prop is set', async () => {
-  const { container } = render(<AnimatedIconButton icon={CrossIcon} hideOnClick={true} />);
+  render(<AnimatedIconButton icon={CrossIcon} hideOnClick={true} />);
   const button = screen.getByRole('button'); // or container.firstChild (but it will not work once the button get removed from dom after click)
   fireEvent.click(button);
   await waitFor(() => expect(button).not.toBeInTheDocument(), { timeout: 2000 });
