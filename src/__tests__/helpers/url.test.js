@@ -1,6 +1,6 @@
 import { hasValidProtocol } from 'helpers/url';
 
-describe('Url helper', () => {
+describe('url helper', () => {
   it('detects urls with a valid protocol', () => {
     const urls = [
       'http://website.com',

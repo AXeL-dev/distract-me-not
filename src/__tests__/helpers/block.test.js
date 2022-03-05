@@ -1,6 +1,6 @@
 import { isAccessible } from 'helpers/block';
 
-describe('Block helper', () => {
+describe('block helper', () => {
   it('detects accessible urls', () => {
     const urls = [
       'http://website.com',

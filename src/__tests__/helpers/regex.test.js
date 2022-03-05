@@ -1,6 +1,6 @@
 import { regex, transformList, transformKeywords } from 'helpers/regex';
 
-describe('Regex helper', () => {
+describe('regex helper', () => {
   it('exposes needed functions', () => {
     expect(regex.wildcard).toBeInstanceOf(Function);
     expect(regex.create).toBeInstanceOf(Function);
