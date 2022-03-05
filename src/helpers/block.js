@@ -30,6 +30,8 @@ export const actions = [
   { label: translate('closeTab'), value: Action.closeTab },
 ];
 
+export const defaultIsEnabled = false;
+
 export const defaultAction = Action.blockTab;
 
 export const defaultMode = Mode.combined;

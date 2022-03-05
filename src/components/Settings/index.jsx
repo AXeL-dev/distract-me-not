@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Pane, Tablist, Tab, Checkbox, Button, TickIcon, PlusIcon, CrossIcon, DuplicateIcon, Paragraph, toaster, HeartIcon, Dialog, HistoryIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv } from 'helpers/debug';
-import { Mode, Action, modes, actions, defaultAction, defaultMode, defaultBlacklist, defaultWhitelist, defaultUnblock } from 'helpers/block';
+import { Mode, Action, modes, actions, defaultAction, defaultMode, defaultBlacklist, defaultWhitelist, defaultUnblock, defaultIsEnabled } from 'helpers/block';
 import { ScheduleType, defaultSchedule, newScheduleTimeRange } from 'helpers/schedule';
 import { sendMessage, storage, isWebExtension, openExtensionPage } from 'helpers/webext';
 import { DaysOfWeek, today } from 'helpers/date';
@@ -53,7 +53,7 @@ export class Settings extends Component {
       selectedWhitelistTab: whitelistTabs[0].id,
       shownDialog: null,
       options: {
-        isEnabled: true,
+        isEnabled: defaultIsEnabled,
         mode: '', // don't use defaultMode to avoid annoying flickering when the mode is different from the default value
         action: defaultAction,
         blockTab: {
@@ -92,7 +92,7 @@ export class Settings extends Component {
     storage
       .get({
         isEnabled: this.state.options.isEnabled,
-        mode: this.state.options.mode,
+        mode: this.state.options.mode || defaultMode,
         action: this.state.options.action,
         message: this.state.options.blockTab.message,
         displayBlankPage: this.state.options.blockTab.displayBlankPage,

@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Pane, Text, Position, Badge, PlusIcon, TickIcon, DisableIcon, SmallMinusIcon, SlashIcon, HistoryIcon, IssueNewIcon, StopwatchIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { sendMessage, storage } from 'helpers/webext';
-import { Mode, modes, addCurrentWebsite, isActiveTabBlockable, defaultMode } from 'helpers/block';
+import { Mode, modes, addCurrentWebsite, isActiveTabBlockable, defaultMode, defaultIsEnabled } from 'helpers/block';
 import { ScheduleType, defaultSchedule, getTodaySchedule } from 'helpers/schedule';
 import { defaultLogsSettings } from 'helpers/logger';
 import { defaultTimerSettings } from 'helpers/timer';
@@ -17,7 +17,7 @@ export class Panel extends Component {
     super(props);
     this.state = {
       ready: isTestEnv ? true : false,
-      isEnabled: true,
+      isEnabled: defaultIsEnabled,
       mode: defaultMode,
       schedule: defaultSchedule,
       isAddButtonVisible: false,

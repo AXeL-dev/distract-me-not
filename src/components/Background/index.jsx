@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { storage, nativeAPI, indexUrl, getTab, sendNotification } from 'helpers/webext';
-import { Mode, Action, defaultBlacklist, defaultWhitelist, UnblockOptions, defaultUnblock, isAccessible } from 'helpers/block';
+import { Mode, Action, defaultBlacklist, defaultWhitelist, UnblockOptions, defaultUnblock, isAccessible, defaultMode, defaultAction, defaultIsEnabled } from 'helpers/block';
 import { defaultSchedule, getTodaySchedule, isScheduleAllowed } from 'helpers/schedule';
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
 import { transformList, transformKeywords } from 'helpers/regex';
@@ -18,9 +18,9 @@ export class Background extends Component {
     this.whitelist = [];
     this.blacklistKeywords = [];
     this.whitelistKeywords = [];
-    this.isEnabled = false;
-    this.mode = Mode.blacklist;
-    this.action = Action.blockTab;
+    this.isEnabled = defaultIsEnabled;
+    this.mode = defaultMode;
+    this.action = defaultAction;
     this.redirectUrl = '';
     this.unblock = defaultUnblock;
     this.schedule = defaultSchedule;
