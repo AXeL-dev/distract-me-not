@@ -30,7 +30,7 @@ export function checkFaviconLink(faviconLink) {
 }
 
 export function hasValidProtocol(url) {
-  return /^(?:ftps?|https?|file):\/\//i.test(url) || url.startsWith("about:");
+  return /^(?:ftps?|https?|file|about|chrome|edge):\/\//i.test(url);
 }
 
 export function getValidUrl(url) {
