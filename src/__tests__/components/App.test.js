@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import App from '../App';
+import App from 'App';
 
 it('renders nothing when accessAllowed prop is not defined', () => {
   const { container } = render(<App />);
