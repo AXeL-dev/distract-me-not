@@ -16,6 +16,7 @@ const errors = [
   /browser is not defined/i,
   /The `value` prop is required for the `<Context\.Provider>`/i,
   /Not implemented: window.prompt/i,
+  /Warning: A component is changing a controlled input to be uncontrolled./i,
 ];
 
 const warnings = [

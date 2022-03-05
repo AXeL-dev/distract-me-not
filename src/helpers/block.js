@@ -55,7 +55,7 @@ export const defaultUnblock = {
 };
 
 export function isAccessible(url) {
-  return url && !/^(?:file|about|chrome|moz-extension|chrome-extension|edge):\/\//i.test(url);
+  return url && !/^(?:file|about|chrome|moz-extension|chrome-extension|extension|edge):\/\//i.test(url);
 }
 
 export function isPageReloaded() {

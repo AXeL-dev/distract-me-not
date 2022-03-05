@@ -4,7 +4,7 @@ import { translate } from 'helpers/i18n';
 import { storage, sendMessage } from 'helpers/webext';
 import { debug, isDevEnv } from 'helpers/debug';
 import { isUrl, getValidUrl } from 'helpers/url';
-import { UnblockOptions, isPageReloaded } from 'helpers/block';
+import { UnblockOptions, isPageReloaded, defaultUnblock } from 'helpers/block';
 import { NumberInput, PasswordPrompt } from 'components';
 import queryString from 'query-string';
 import './styles.scss';
@@ -72,10 +72,10 @@ export class Blocked extends Component {
     }
     storage.get({
       message: this.state.message,
-      displayBlankPage: this.state.isBlank,
+      displayBlankPage: false,
       unblock: {
-        isEnabled: false,
-        requirePassword: false,
+        isEnabled: defaultUnblock.isEnabled,
+        requirePassword: defaultUnblock.requirePassword,
       },
       password: {
         isEnabled: false,
