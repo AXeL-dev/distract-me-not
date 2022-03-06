@@ -1,4 +1,3 @@
-
 $backgroundColor: rgba(0, 0, 0, 0.9);
 $textColor: white;
 
@@ -44,7 +43,7 @@ $textColor: white;
   margin: 0;
 }
 .distract-overlay-fadeout {
-  opacity: 0.0;
+  opacity: 0;
   transition: opacity 0.3s;
 }
 .distract-info-container {
@@ -102,7 +101,8 @@ button.unblock {
   }
 }
 .unblock-dialog {
-  > div:first-child { // dialog title
+  > div:first-child {
+    // dialog title
     border: 0 !important;
     position: absolute !important;
     top: 0;
@@ -110,7 +110,9 @@ button.unblock {
     z-index: 1;
     padding: 12px;
     button {
-      &:hover, &:active, &:focus {
+      &:hover,
+      &:active,
+      &:focus {
         box-shadow: none !important;
       }
     }

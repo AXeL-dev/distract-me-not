@@ -4,12 +4,17 @@ import { OuterPane, TooltipLabel } from 'components';
 
 export function SegmentedControlField(props) {
   const options = props.options.map((option) => ({
-    label: props.showTooltips && option.tooltip ? <TooltipLabel
-      text={option.label}
-      tooltip={option.tooltip}
-      size={300}
-      color="inherit"
-    /> : option.label,
+    label:
+      props.showTooltips && option.tooltip ? (
+        <TooltipLabel
+          text={option.label}
+          tooltip={option.tooltip}
+          size={300}
+          color="inherit"
+        />
+      ) : (
+        option.label
+      ),
     value: option.value,
   }));
 

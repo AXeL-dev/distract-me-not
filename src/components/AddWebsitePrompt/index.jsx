@@ -7,7 +7,6 @@ import { isUrl } from 'helpers/url';
 import queryString from 'query-string';
 
 export class AddWebsitePrompt extends Component {
-
   constructor(props) {
     super(props);
     const params = props.location ? queryString.parse(props.location.search) : {};
@@ -30,15 +29,17 @@ export class AddWebsitePrompt extends Component {
     if (event.code === 'Escape') {
       window.close();
     }
-  }
+  };
 
   handleChange = (event) => {
     this.setState({ url: event.target.value });
-  }
+  };
 
   handleSubmit = async () => {
     if (!isUrl(this.state.url)) {
-      toaster.danger(translate('urlIsNotValid'), { id: 'add-website-toaster' });
+      toaster.danger(translate('urlIsNotValid'), {
+        id: 'add-website-toaster',
+      });
     } else {
       this.setState({ disabled: true });
       try {
@@ -49,7 +50,7 @@ export class AddWebsitePrompt extends Component {
         this.setState({ disabled: false });
       }
     }
-  }
+  };
 
   render() {
     return (
@@ -78,5 +79,4 @@ export class AddWebsitePrompt extends Component {
       </Pane>
     );
   }
-
 }

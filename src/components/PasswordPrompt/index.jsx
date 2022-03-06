@@ -1,18 +1,39 @@
 import React, { Component } from 'react';
-import { Pane, TextInput, UnlockIcon, toaster, HistoryIcon, Position, PlusIcon, TickIcon, PowerIcon, StopwatchIcon } from 'evergreen-ui';
+import {
+  Pane,
+  TextInput,
+  UnlockIcon,
+  toaster,
+  HistoryIcon,
+  Position,
+  PlusIcon,
+  TickIcon,
+  PowerIcon,
+  StopwatchIcon,
+} from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { storage, sendMessage } from 'helpers/webext';
 import { compare } from 'helpers/crypt';
 import { debug } from 'helpers/debug';
 import { defaultLogsSettings } from 'helpers/logger';
 import { defaultTimerSettings } from 'helpers/timer';
-import { Header, IconButton, SettingsButton, LinkIconButton, AnimatedIconButton } from 'components';
-import { defaultMode, Mode, addCurrentWebsite, isActiveTabBlockable } from 'helpers/block';
+import {
+  Header,
+  IconButton,
+  SettingsButton,
+  LinkIconButton,
+  AnimatedIconButton,
+} from 'components';
+import {
+  defaultMode,
+  Mode,
+  addCurrentWebsite,
+  isActiveTabBlockable,
+} from 'helpers/block';
 
 const defaultHash = process.env.REACT_APP_HASH;
 
 export class PasswordPrompt extends Component {
-
   constructor(props) {
     super(props);
     this.mode = defaultMode;
@@ -36,7 +57,9 @@ export class PasswordPrompt extends Component {
   }
 
   getLocationStateProp(prop) {
-    return this.props.location && this.props.location.state ? this.props.location.state[prop] : undefined;
+    return this.props.location && this.props.location.state
+      ? this.props.location.state[prop]
+      : undefined;
   }
 
   getRedirectPath(defaultValue = '/') {
@@ -53,61 +76,71 @@ export class PasswordPrompt extends Component {
   }
 
   componentDidMount() {
-    sendMessage('getLogsSettings').then(logs => this.setState({ enableLogs: (logs || defaultLogsSettings).isEnabled }));
-    sendMessage('getTimerSettings').then(timer => {
+    sendMessage('getLogsSettings').then((logs) =>
+      this.setState({
+        enableLogs: (logs || defaultLogsSettings).isEnabled,
+      })
+    );
+    sendMessage('getTimerSettings').then((timer) => {
       const settings = timer || defaultTimerSettings;
-      this.setState({ enableTimer: settings.isEnabled && settings.allowUsingTimerWithoutPassword });
+      this.setState({
+        enableTimer: settings.isEnabled && settings.allowUsingTimerWithoutPassword,
+      });
     });
-    storage.get({
-      mode: this.mode,
-      password: {
-        hash: this.hash,
-        allowActivationWithoutPassword: false,
-        allowAddingWebsitesWithoutPassword: false,
-      },
-      showAddWebsitePrompt: this.showAddWebsitePrompt,
-    }).then((items) => {
-      if (items) {
-        this.mode = items.mode;
-        this.hash = items.password.hash;
-        this.showAddWebsitePrompt = items.showAddWebsitePrompt;
-        if (items.password.allowActivationWithoutPassword) {
-          this.toggleQuickActivationButton();
+    storage
+      .get({
+        mode: this.mode,
+        password: {
+          hash: this.hash,
+          allowActivationWithoutPassword: false,
+          allowAddingWebsitesWithoutPassword: false,
+        },
+        showAddWebsitePrompt: this.showAddWebsitePrompt,
+      })
+      .then((items) => {
+        if (items) {
+          this.mode = items.mode;
+          this.hash = items.password.hash;
+          this.showAddWebsitePrompt = items.showAddWebsitePrompt;
+          if (items.password.allowActivationWithoutPassword) {
+            this.toggleQuickActivationButton();
+          }
+          if (items.password.allowAddingWebsitesWithoutPassword) {
+            this.toggleAddButton(this.mode);
+          }
         }
-        if (items.password.allowAddingWebsitesWithoutPassword) {
-          this.toggleAddButton(this.mode);
-        }
-      }
-    });
+      });
   }
 
   toggleQuickActivationButton = async () => {
     const isEnabled = await sendMessage('getIsEnabled');
     this.setQuickActivationButtonVisibility(!isEnabled);
-  }
+  };
 
   setQuickActivationButtonVisibility = (value) => {
     this.setState((state) => ({
       ...state,
       isQuickActivationButtonVisible: value,
     }));
-  }
+  };
 
   toggleAddButton = async (mode) => {
     const isVisible = await isActiveTabBlockable(mode);
     this.setAddButtonVisibility(isVisible);
-  }
+  };
 
   setAddButtonVisibility = (value) => {
     this.setState((state) => ({
       ...state,
       isAddButtonVisible: value,
     }));
-  }
+  };
 
   checkPassword = () => {
     if (!compare(this.state.password, this.hash)) {
-      toaster.danger(translate('passwordIsWrong'), { id: 'pwd-toaster' });
+      toaster.danger(translate('passwordIsWrong'), {
+        id: 'pwd-toaster',
+      });
     } else {
       toaster.closeAll();
       if (this.props.onSuccess) {
@@ -123,45 +156,49 @@ export class PasswordPrompt extends Component {
         });
       }
     }
-  }
+  };
 
   activate = () => {
     return sendMessage('setIsEnabled', true).then(() => true);
-  }
+  };
 
   handleKeyDown = (event) => {
     if (event.key === 'Enter') {
       this.checkPassword();
     }
-  }
+  };
 
   handleButtonClick = (event) => {
     this.checkPassword();
-  }
+  };
 
   getMinWidth = () => {
     return this.props.minWidth || (this.isWideScreen ? 580 : 350);
-  }
+  };
 
   getMinHeight = () => {
     return this.props.minHeight || (this.isWideScreen ? 380 : 230);
-  }
+  };
 
   getInputWidth = () => {
     return this.props.inputWidth || (this.isWideScreen ? 320 : '70%');
-  }
+  };
 
   getInputHeight = () => {
     return this.props.inputHeight || (this.isWideScreen ? 36 : 32);
-  }
+  };
 
   getButtonWidth = () => {
-    return this.props.buttonWidth || this.props.inputHeight || (this.isWideScreen ? 36 : 32);
-  }
+    return (
+      this.props.buttonWidth || this.props.inputHeight || (this.isWideScreen ? 36 : 32)
+    );
+  };
 
   getButtonHeight = () => {
-    return this.props.buttonHeight || this.props.inputHeight || (this.isWideScreen ? 36 : 32);
-  }
+    return (
+      this.props.buttonHeight || this.props.inputHeight || (this.isWideScreen ? 36 : 32)
+    );
+  };
 
   render() {
     return (
@@ -173,9 +210,7 @@ export class PasswordPrompt extends Component {
         minWidth={this.getMinWidth()}
         minHeight={this.getMinHeight()}
       >
-        {this.hasHeader && (
-          <Header />
-        )}
+        {this.hasHeader && <Header />}
         <Pane
           display="flex"
           flex={1}
@@ -214,7 +249,14 @@ export class PasswordPrompt extends Component {
           </Pane>
         </Pane>
         {this.hasFooter && (
-          <Pane display="flex" paddingX={16} paddingY={10} alignItems="start" justifyContent="space-between" borderTop>
+          <Pane
+            display="flex"
+            paddingX={16}
+            paddingY={10}
+            alignItems="start"
+            justifyContent="space-between"
+            borderTop
+          >
             <Pane display="flex" gap={10}>
               <SettingsButton history={this.props.history} />
               {this.state.enableLogs && (
@@ -252,7 +294,11 @@ export class PasswordPrompt extends Component {
             <Pane>
               <AnimatedIconButton
                 appearance="minimal"
-                tooltip={this.mode === Mode.whitelist ? translate('addToWhitelist') : translate('addToBlacklist')}
+                tooltip={
+                  this.mode === Mode.whitelist
+                    ? translate('addToWhitelist')
+                    : translate('addToBlacklist')
+                }
                 tooltipPosition={Position.LEFT}
                 icon={PlusIcon}
                 iconSize={22}
@@ -269,5 +315,4 @@ export class PasswordPrompt extends Component {
       </Pane>
     );
   }
-
 }

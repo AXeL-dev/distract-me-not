@@ -9,7 +9,7 @@ class UpdateManifestPlugin extends Plugin {
   }
 
   bump(version) {
-    glob.sync('./public/manifest*.json').forEach(file => {
+    glob.sync('./public/manifest*.json').forEach((file) => {
       const content = fs.readFileSync(file, 'utf8');
       const newContent = content.replace(/^(\s*"version": ").+(",$\s*)/gm, `$1${version}$2`);
       fs.writeFileSync(file, newContent);

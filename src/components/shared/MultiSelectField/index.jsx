@@ -4,7 +4,6 @@ import { debug } from 'helpers/debug';
 import { TooltipLabel, RawHTML, OuterPane } from 'components';
 
 export class MultiSelectField extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -17,7 +16,7 @@ export class MultiSelectField extends Component {
 
   componentDidMount() {
     this.setState({
-      selectedLabels: this.getSelectedLabels(this.state.selected)
+      selectedLabels: this.getSelectedLabels(this.state.selected),
     });
   }
 
@@ -25,17 +24,24 @@ export class MultiSelectField extends Component {
     //debug.log({ props: this.props, prevProps: prevProps, state: this.state, prevState: prevState });
     if (this.props.options && prevProps.options) {
       // check for options change
-      if (this.props.options.length !== prevProps.options.length && this.props.options.length !== this.state.options.length) {
+      if (
+        this.props.options.length !== prevProps.options.length &&
+        this.props.options.length !== this.state.options.length
+      ) {
         debug.warn('options has changed:', this.props.options);
         this.setState({ options: this.props.options });
         this.setHeight(this.props.options.length);
       }
       // check for selected change
-      if (this.props.selected && this.props.selected.length !== prevProps.selected.length && this.props.selected.length !== this.state.selected.length) {
+      if (
+        this.props.selected &&
+        this.props.selected.length !== prevProps.selected.length &&
+        this.props.selected.length !== this.state.selected.length
+      ) {
         debug.warn('selected has changed:', this.props.selected);
         this.setState({
           selected: this.props.selected,
-          selectedLabels: this.getSelectedLabels(this.props.selected)
+          selectedLabels: this.getSelectedLabels(this.props.selected),
         });
       }
     }
@@ -43,17 +49,18 @@ export class MultiSelectField extends Component {
 
   setHeight = (optionsCount) => {
     this.height = 33 * optionsCount;
-  }
+  };
 
   getSelectedLabels = (selected) => {
     const labels = [];
-    for (const option of this.state.options) { // looping on the options state to keep the same elements order
+    for (const option of this.state.options) {
+      // looping on the options state to keep the same elements order
       if (selected.indexOf(option.value) !== -1) {
         labels.push(option.label);
       }
     }
     return labels;
-  }
+  };
 
   handleChange = (value) => {
     this.setState({
@@ -63,7 +70,7 @@ export class MultiSelectField extends Component {
     if (this.props.onChange) {
       this.props.onChange(value);
     }
-  }
+  };
 
   render() {
     return (
@@ -88,13 +95,15 @@ export class MultiSelectField extends Component {
               position={this.props.position}
               options={this.state.options}
               selected={this.state.selected}
-              onSelect={item => {
+              onSelect={(item) => {
                 const selectedItems = [...this.state.selected, item.value];
                 this.handleChange(selectedItems);
               }}
-              onDeselect={item => {
+              onDeselect={(item) => {
                 const deselectedItemIndex = this.state.selected.indexOf(item.value);
-                const selectedItems = this.state.selected.filter((_item, i) => i !== deselectedItemIndex);
+                const selectedItems = this.state.selected.filter(
+                  (_item, i) => i !== deselectedItemIndex
+                );
                 this.handleChange(selectedItems);
               }}
             >
@@ -104,13 +113,12 @@ export class MultiSelectField extends Component {
             </SelectMenu>
           </Pane>
         </Pane>
-        {this.props.hint &&
+        {this.props.hint && (
           <Paragraph size={300} color="muted" marginTop={6}>
             <RawHTML>{this.props.hint}</RawHTML>
           </Paragraph>
-        }
+        )}
       </OuterPane>
     );
   }
-
 }

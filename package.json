@@ -47,7 +47,8 @@
     "eject": "react-scripts eject",
     "release:major": "release-it major",
     "release:minor": "release-it minor",
-    "release:patch": "release-it patch"
+    "release:patch": "release-it patch",
+    "format": "npx prettier --write \"src/**/*.{js,jsx,json,css,scss}\""
   },
   "eslintConfig": {
     "env": {

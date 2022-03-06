@@ -1,6 +1,4 @@
-
 export class regex {
-
   static wildcard(url) {
     if (url.indexOf('://') === -1 && !url.startsWith('^')) {
       return url.endsWith('$') ? `*://${url}` : `*://${url}/*`;
@@ -9,11 +7,12 @@ export class regex {
   }
 
   static escape(str) {
+    // prettier-ignore
     const specials = [
       // order matters for these
       '-', '[', ']',
       // order doesn't matter for any of these
-      '/', '{', '}', '(', ')', '*', '+', '?', '.', '\\', '^', '$', '|'
+      '/', '{', '}', '(', ')', '*', '+', '?', '.', '\\', '^', '$', '|',
     ];
     const regex = RegExp('[' + specials.join('\\') + ']', 'g');
     return str.replace(regex, '\\$&');
@@ -36,23 +35,23 @@ export class regex {
   }
 
   static parseUrl(url) {
-    if (url.startsWith('^')/* || url.endsWith('$')*/) {
+    if (url.startsWith('^') /* || url.endsWith('$')*/) {
       return this.create(url, 'i');
     }
-    const sanitize = pattern => {
-      return pattern.replace(/^\.\*:\\\/\\\/\.\*\\\./, '.*:\\/\\/(.*\\.)?') // If "*." wildcard is after the protocol (which is equivalent to ".*\." in regex), escape it
-                    .replace(/\\\/\.\*$/, '(\\/|$).*') // If "/*" wildcard is at the end (which is equivalent to "\/.*" in regex), escape it
-                    .replace(/\\\$$/, '(\\/|$)'); // If regex ends with "\$" it means that we want to match the exact url (including trailing slash after url)
+    const sanitize = (pattern) => {
+      return pattern
+        .replace(/^\.\*:\\\/\\\/\.\*\\\./, '.*:\\/\\/(.*\\.)?') // If "*." wildcard is after the protocol (which is equivalent to ".*\." in regex), escape it
+        .replace(/\\\/\.\*$/, '(\\/|$).*') // If "/*" wildcard is at the end (which is equivalent to "\/.*" in regex), escape it
+        .replace(/\\\$$/, '(\\/|$)'); // If regex ends with "\$" it means that we want to match the exact url (including trailing slash after url)
     };
     return this.create(`^${sanitize(url.split('*').map(this.escape).join('.*'))}$`, 'i');
   }
-
 }
 
 export function transformList(list) {
-  return list.map(url => regex.wildcard(url)).map(url => regex.parseUrl(url));
+  return list.map((url) => regex.wildcard(url)).map((url) => regex.parseUrl(url));
 }
 
 export function transformKeywords(list) {
-  return list.map(word => regex.parseKeyword(word));
+  return list.map((word) => regex.parseKeyword(word));
 }

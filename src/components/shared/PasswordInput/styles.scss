@@ -1,11 +1,12 @@
-
 .password-toggle {
   position: absolute !important;
   right: 0;
   bottom: 0;
   z-index: 2;
   background: transparent !important;
-  &:hover, &:focus, &:active {
+  &:hover,
+  &:focus,
+  &:active {
     box-shadow: none !important;
   }
 }

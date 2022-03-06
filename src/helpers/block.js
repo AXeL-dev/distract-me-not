@@ -1,5 +1,12 @@
 import { translate } from './i18n';
-import { sendMessage, storage, getActiveTabHostname, getActiveTab, createWindow, indexUrl } from 'helpers/webext';
+import {
+  sendMessage,
+  storage,
+  getActiveTabHostname,
+  getActiveTab,
+  createWindow,
+  indexUrl,
+} from 'helpers/webext';
 
 export const Mode = {
   blacklist: 'blacklist',
@@ -18,6 +25,7 @@ export const UnblockOptions = {
   unblockForWhile: 'unblock-for-while',
 };
 
+// prettier-ignore
 export const modes = [
   { label: translate('blacklist'), value: Mode.blacklist },
   { label: translate('whitelist'), value: Mode.whitelist },
@@ -36,12 +44,14 @@ export const defaultAction = Action.blockTab;
 
 export const defaultMode = Mode.combined;
 
+// prettier-ignore
 export const defaultBlacklist = [
   '*.facebook.com',
   '*.twitter.com',
   '*.youtube.com',
 ];
 
+// prettier-ignore
 export const defaultWhitelist = [
   '*.wikipedia.org',
 ];
@@ -54,17 +64,20 @@ export const defaultUnblock = {
   autoReblockOnTimeout: false,
 };
 
+// prettier-ignore
 export function isAccessible(url) {
   return url && !/^((file|chrome|edge|moz-extension|chrome-extension|extension):\/\/|about:)/i.test(url);
 }
 
 export function isPageReloaded() {
   try {
-    return (window.performance.navigation && window.performance.navigation.type === 1) ||
-            window.performance
-              .getEntriesByType('navigation')
-              .map((nav) => nav.type)
-              .includes('reload');
+    return (
+      (window.performance.navigation && window.performance.navigation.type === 1) ||
+      window.performance
+        .getEntriesByType('navigation')
+        .map((nav) => nav.type)
+        .includes('reload')
+    );
   } catch (error) {
     return false;
   }
@@ -75,39 +88,45 @@ export function blockUrl(url, mode = Mode.blacklist) {
     switch (mode) {
       case Mode.blacklist:
       case Mode.combined:
-        storage.get({
-          blacklist: defaultBlacklist
-        }).then(({ blacklist }) => {
-          for (const item of blacklist) {
-            if (item === url) {
-              return;
+        storage
+          .get({
+            blacklist: defaultBlacklist,
+          })
+          .then(({ blacklist }) => {
+            for (const item of blacklist) {
+              if (item === url) {
+                return;
+              }
             }
-          }
-          blacklist.splice(0, 0, url);
-          sendMessage('setBlacklist', blacklist);
-          storage.set({ blacklist: blacklist });
-          resolve();
-        }).catch((error) => {
-          reject(error)
-        });
+            blacklist.splice(0, 0, url);
+            sendMessage('setBlacklist', blacklist);
+            storage.set({ blacklist: blacklist });
+            resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
         break;
       case Mode.whitelist:
         // ToDo: merge common code (@see above)
-        storage.get({
-          whitelist: defaultWhitelist
-        }).then(({ whitelist }) => {
-          for (const item of whitelist) {
-            if (item === url) {
-              return;
+        storage
+          .get({
+            whitelist: defaultWhitelist,
+          })
+          .then(({ whitelist }) => {
+            for (const item of whitelist) {
+              if (item === url) {
+                return;
+              }
             }
-          }
-          whitelist.splice(0, 0, url);
-          sendMessage('setWhitelist', whitelist);
-          storage.set({ whitelist: whitelist });
-          resolve();
-        }).catch((error) => {
-          reject(error)
-        });
+            whitelist.splice(0, 0, url);
+            sendMessage('setWhitelist', whitelist);
+            storage.set({ whitelist: whitelist });
+            resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
         break;
       default:
         break;

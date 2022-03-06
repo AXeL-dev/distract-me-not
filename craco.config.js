@@ -31,10 +31,9 @@ module.exports = {
         moduleScopePlugin.appSrcs.push(absolutePath);
       }
 
-      webpackConfig.resolve.alias = Object.assign(
-        webpackConfig.resolve.alias,
-        { [folder]: absolutePath }
-      );
+      webpackConfig.resolve.alias = Object.assign(webpackConfig.resolve.alias, {
+        [folder]: absolutePath,
+      });
 
       // override output filenames (remove file hashes)
       // it seems like build location can influence files hashes (even if files content doesn't change)

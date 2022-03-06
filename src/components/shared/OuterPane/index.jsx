@@ -26,4 +26,4 @@ export function OuterPane(props) {
       {props.children}
     </Pane>
   );
-};
+}

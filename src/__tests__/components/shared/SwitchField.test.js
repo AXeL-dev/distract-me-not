@@ -1,6 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent } from "@testing-library/react";
-import { SwitchField } from "components";
+import { render, screen, fireEvent } from '@testing-library/react';
+import { SwitchField } from 'components';
 
 it('renders correctly', () => {
   const { asFragment } = render(<SwitchField />);

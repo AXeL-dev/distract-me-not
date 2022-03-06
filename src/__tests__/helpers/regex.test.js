@@ -72,6 +72,7 @@ describe('regex helper', () => {
 
   it('returns case insensitive regular expressions', () => {
     const url = 'https://website.com';
+    // prettier-ignore
     const payload = [
       '*.website.com',
       '*.Website.com',
@@ -111,16 +112,16 @@ describe('regex helper', () => {
         expected: /doo.*/,
       },
       {
-        keyword: '/doo.*/ig',
-        expected: /doo.*/ig,
+        keyword: '/doo.*/gi',
+        expected: /doo.*/gi,
       },
       {
         keyword: '/doo.*/ii',
         expected: /\/doo\.\*\/ii/,
       },
       {
-        keyword: '/doo.*/igig',
-        expected: /\/doo\.\*\/igig/,
+        keyword: '/doo.*/gigi',
+        expected: /\/doo\.\*\/gigi/,
       },
       {
         keyword: '/doo.*/ii/iu',

@@ -19,6 +19,7 @@ const errors = [
   /Warning: A component is changing a controlled input to be uncontrolled./i,
 ];
 
+// prettier-ignore
 const warnings = [
   /componentWillReceiveProps has been renamed/i,
 ];

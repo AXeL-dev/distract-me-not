@@ -1,5 +1,4 @@
-
-nav[role=menu] {
+nav[role='menu'] {
   > div {
     padding-top: 4px !important;
     padding-bottom: 4px !important;
@@ -7,7 +6,8 @@ nav[role=menu] {
       margin-top: 6px !important;
       margin-bottom: 6px !important;
     }
-    div[role=menuitemradio], div[role=menuitem] {
+    div[role='menuitemradio'],
+    div[role='menuitem'] {
       height: 34px !important;
       padding: 0 !important;
     }

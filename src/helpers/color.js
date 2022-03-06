@@ -1,4 +1,3 @@
-
 const colors = {
   green: '#28a745',
   blue: '#3d8bd4',

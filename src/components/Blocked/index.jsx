@@ -10,7 +10,6 @@ import queryString from 'query-string';
 import './styles.scss';
 
 export class Blocked extends Component {
-
   constructor(props) {
     super(props);
     this.url = props.location ? queryString.parse(props.location.search).url : null;
@@ -22,7 +21,7 @@ export class Blocked extends Component {
     const defaultUnblockTime = 10; // min
     this.state = {
       message: props.message || translate('defaultBlockingMessage'),
-      isBlank: props.isBlank === undefined ? (isDevEnv ? false : true) : props.isBlank,
+      isBlank: props.isBlank === undefined ? !isDevEnv : props.isBlank,
       hasUnblockButton: props.hasUnblockButton || isDevEnv, // == isDevEnv ? true : false
       unblockDialog: {
         isShown: false,
@@ -38,7 +37,7 @@ export class Blocked extends Component {
     return [
       {
         label: translate('unblockOnce'),
-        value: UnblockOptions.unblockOnce
+        value: UnblockOptions.unblockOnce,
       },
       {
         label: (
@@ -49,20 +48,25 @@ export class Blocked extends Component {
               max={720}
               width={65}
               value={time}
-              onChange={(value) => this.updateUnblockDialogState({ selected: UnblockOptions.unblockForWhile, time: value })}
+              onChange={(value) =>
+                this.updateUnblockDialogState({
+                  selected: UnblockOptions.unblockForWhile,
+                  time: value,
+                })
+              }
             />
             <span>{translate('minutes')}</span>
           </Pane>
         ),
-        value: UnblockOptions.unblockForWhile
-      }
+        value: UnblockOptions.unblockForWhile,
+      },
     ];
-  }
+  };
 
   componentDidMount() {
     if (isPageReloaded()) {
       debug.log('page reloaded!');
-      sendMessage('isUrlStillBlocked', this.url).then(isUrlStillBlocked => {
+      sendMessage('isUrlStillBlocked', this.url).then((isUrlStillBlocked) => {
         // Redirect to blocked url if no longer blocked
         if (isUrlStillBlocked === false && this.url) {
           sendMessage('redirectSenderTab', this.url);
@@ -70,61 +74,66 @@ export class Blocked extends Component {
         }
       });
     }
-    storage.get({
-      message: this.state.message,
-      displayBlankPage: false,
-      unblock: {
-        isEnabled: defaultUnblock.isEnabled,
-        requirePassword: defaultUnblock.requirePassword,
-      },
-      password: {
-        isEnabled: false,
-      },
-    }).then((items) => {
-      if (items) {
-        this.setState({
-          message: items.message.length ? items.message : this.state.message,
-          isBlank: items.displayBlankPage,
-          hasUnblockButton: items.unblock.isEnabled,
-          unblockDialog: {
-            ...this.state.unblockDialog,
-            requirePassword: items.unblock.isEnabled && items.unblock.requirePassword && items.password.isEnabled,
-          },
-        });
-      }
-    });
+    storage
+      .get({
+        message: this.state.message,
+        displayBlankPage: false,
+        unblock: {
+          isEnabled: defaultUnblock.isEnabled,
+          requirePassword: defaultUnblock.requirePassword,
+        },
+        password: {
+          isEnabled: false,
+        },
+      })
+      .then((items) => {
+        if (items) {
+          this.setState({
+            message: items.message.length ? items.message : this.state.message,
+            isBlank: items.displayBlankPage,
+            hasUnblockButton: items.unblock.isEnabled,
+            unblockDialog: {
+              ...this.state.unblockDialog,
+              requirePassword:
+                items.unblock.isEnabled &&
+                items.unblock.requirePassword &&
+                items.password.isEnabled,
+            },
+          });
+        }
+      });
   }
 
   updateUnblockDialogState = (state) => {
     this.setState({
       unblockDialog: {
         ...this.state.unblockDialog,
-        ...state
-      }
+        ...state,
+      },
     });
-  }
+  };
 
   closeUnblockDialog = () => {
     this.updateUnblockDialogState({ isShown: false });
-  }
+  };
 
   openUnblockDialog = () => {
     this.updateUnblockDialogState({ isShown: true });
-  }
+  };
 
   unblock = () => {
     this.closeUnblockDialog();
     const params = {
       url: this.url,
       option: this.state.unblockDialog.selected,
-      time: this.state.unblockDialog.time
+      time: this.state.unblockDialog.time,
     };
     debug.log('unblocking:', params);
     if (this.url) {
       //window.location.replace(this.url);
       sendMessage('unblockSenderTab', params);
     }
-  }
+  };
 
   render() {
     return (
@@ -155,7 +164,7 @@ export class Blocked extends Component {
               topOffset="40vmin"
               width={400}
               containerProps={{
-                className: "unblock-dialog"
+                className: 'unblock-dialog',
               }}
             >
               <Pane width="95%" margin="auto">
@@ -163,7 +172,11 @@ export class Blocked extends Component {
                   size={16}
                   value={this.state.unblockDialog.selected}
                   options={this.state.unblockDialog.options}
-                  onChange={event => this.updateUnblockDialogState({ selected: event.target.value })}
+                  onChange={(event) =>
+                    this.updateUnblockDialogState({
+                      selected: event.target.value,
+                    })
+                  }
                 />
                 {this.state.unblockDialog.requirePassword ? (
                   <PasswordPrompt
@@ -176,7 +189,12 @@ export class Blocked extends Component {
                     onSuccess={this.unblock}
                   />
                 ) : (
-                  <Pane display="flex" alignItems="center" justifyContent="center" marginTop={20}>
+                  <Pane
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    marginTop={20}
+                  >
                     <Button
                       height={32}
                       appearance="primary"

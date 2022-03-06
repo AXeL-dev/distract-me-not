@@ -18,6 +18,7 @@ export class logger {
   }
 
   static get() {
+    // prettier-ignore
     return storage
       .get({ logs: [] })
       .then(({ logs = [] } = {}) => logs);

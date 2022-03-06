@@ -15,7 +15,6 @@ const StoppedState = {
 };
 
 export class Timer extends Component {
-
   constructor(props) {
     super(props);
     this.referer = this.getLocationStateProp('referer');
@@ -29,7 +28,7 @@ export class Timer extends Component {
   }
 
   componentDidMount() {
-    sendMessage('getTimerSettings').then(timer => {
+    sendMessage('getTimerSettings').then((timer) => {
       const settings = timer || defaultTimerSettings;
       this.setState({
         settings,
@@ -43,7 +42,9 @@ export class Timer extends Component {
   }
 
   getLocationStateProp(prop) {
-    return this.props.location && this.props.location.state ? this.props.location.state[prop] : undefined;
+    return this.props.location && this.props.location.state
+      ? this.props.location.state[prop]
+      : undefined;
   }
 
   renderTime = ({ remainingTime }) => {
@@ -80,7 +81,7 @@ export class Timer extends Component {
         </div>
       );
     }
-  
+
     return (
       <div className="timer ub-fnt-fam_b77syt">
         {!this.state.settings.allowStoppingTimer ? (
@@ -107,7 +108,7 @@ export class Timer extends Component {
         ) : null}
       </div>
     );
-  }
+  };
 
   render() {
     return (
@@ -115,7 +116,14 @@ export class Timer extends Component {
         {!this.state.ready ? null : (
           <>
             {/* <Header /> */}
-            <Pane display="flex" minHeight={177} paddingX={16} paddingY={18} alignItems="center" justifyContent="center">
+            <Pane
+              display="flex"
+              minHeight={177}
+              paddingX={16}
+              paddingY={18}
+              alignItems="center"
+              justifyContent="center"
+            >
               <CountdownCircleTimer
                 key={this.state.key}
                 isPlaying={this.state.isPlaying}
@@ -131,7 +139,14 @@ export class Timer extends Component {
                 {this.renderTime}
               </CountdownCircleTimer>
             </Pane>
-            <Pane display="flex" paddingX={16} paddingY={10} alignItems="center" justifyContent="space-between" borderTop>
+            <Pane
+              display="flex"
+              paddingX={16}
+              paddingY={10}
+              alignItems="center"
+              justifyContent="space-between"
+              borderTop
+            >
               <Pane display="flex" gap={10}>
                 <LinkIconButton
                   icon={HomeIcon}
@@ -147,13 +162,11 @@ export class Timer extends Component {
                   disabled={this.state.isPlaying}
                 />
               </Pane>
-              <Pane>
-                {/* right space */}
-              </Pane>
+              <Pane>{/* right space */}</Pane>
             </Pane>
           </>
         )}
       </Pane>
-    )
+    );
   }
 }

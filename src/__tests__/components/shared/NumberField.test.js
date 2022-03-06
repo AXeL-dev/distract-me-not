@@ -1,10 +1,10 @@
 import React from 'react';
-import { render, screen, fireEvent } from "@testing-library/react";
-import { NumberField } from "components";
+import { render, screen, fireEvent } from '@testing-library/react';
+import { NumberField } from 'components';
 
 const input = {
   label: 'My number field',
-  value: 5
+  value: 5,
 };
 
 it('renders correctly', () => {

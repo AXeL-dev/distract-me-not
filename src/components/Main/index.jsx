@@ -3,7 +3,6 @@ import { Redirect } from 'react-router-dom';
 import { sendMessage } from 'helpers/webext';
 
 export class Main extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -13,7 +12,7 @@ export class Main extends Component {
   }
 
   componentDidMount() {
-    sendMessage('isTimerActive').then(isTimerActive => {
+    sendMessage('isTimerActive').then((isTimerActive) => {
       this.setState({
         isTimerActive: !!isTimerActive, // cast null to boolean
         ready: true,
@@ -28,11 +27,15 @@ export class Main extends Component {
 
     const pathname = this.state.isTimerActive ? '/timer' : '/panel';
 
-    return <Redirect to={{
-      pathname,
-      state: {
-        accessAllowed: pathname === '/timer',
-      },
-    }} />;
+    return (
+      <Redirect
+        to={{
+          pathname,
+          state: {
+            accessAllowed: pathname === '/timer',
+          },
+        }}
+      />
+    );
   }
 }

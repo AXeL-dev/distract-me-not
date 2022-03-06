@@ -1,8 +1,8 @@
 import React from 'react';
-import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
-import { defaultBlacklist } from "helpers/block";
-import * as fileHelper from "helpers/file";
-import { WebsiteList } from "components";
+import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
+import { defaultBlacklist } from 'helpers/block';
+import * as fileHelper from 'helpers/file';
+import { WebsiteList } from 'components';
 import copy from 'copy-to-clipboard';
 
 it('renders correctly', () => {
@@ -18,7 +18,9 @@ it('adds a url to list', () => {
   const { container } = render(<WebsiteList list={[]} />);
   const list = container.querySelector('div[data-evergreen-table-body="true"]');
   // add url
-  const addInput = screen.getByPlaceholderText('urlExample', { selector: 'input[type="text"]' });
+  const addInput = screen.getByPlaceholderText('urlExample', {
+    selector: 'input[type="text"]',
+  });
   fireEvent.change(addInput, { target: { value: url } });
   fireEvent.keyDown(addInput, { key: 'Enter' });
   // verify
@@ -28,7 +30,7 @@ it('adds a url to list', () => {
 it('edits a url', async () => {
   const url = {
     value: 'www.google.com',
-    replacement: 'www.bing.com'
+    replacement: 'www.bing.com',
   };
   const { container } = render(<WebsiteList list={[url.value]} />);
   const list = container.querySelector('div[data-evergreen-table-body="true"]');
@@ -39,7 +41,9 @@ it('edits a url', async () => {
   const editButton = await waitFor(() => screen.getByRole('menuitem', { name: /edit/i }));
   fireEvent.click(editButton);
   // change url value
-  const editDialog = await waitFor(() => screen.getByRole('dialog', { selector: '[data-state="entered"]' }));
+  const editDialog = await waitFor(() =>
+    screen.getByRole('dialog', { selector: '[data-state="entered"]' })
+  );
   const editInput = within(editDialog).getByPlaceholderText('urlExample');
   fireEvent.change(editInput, { target: { value: url.replacement } });
   // save
@@ -59,7 +63,9 @@ it('deletes a url', async () => {
   const moreButton = screen.getByTestId('more-button');
   fireEvent.click(moreButton);
   // click on delete button
-  const deleteButton = await waitFor(() => screen.getByRole('menuitem', { name: /delete/i }));
+  const deleteButton = await waitFor(() =>
+    screen.getByRole('menuitem', { name: /delete/i })
+  );
   fireEvent.click(deleteButton);
   // verify
   expect(list).not.toHaveTextContent(url);
@@ -82,7 +88,9 @@ it('filters urls', () => {
   const { container } = render(<WebsiteList list={defaultBlacklist} />);
   const list = container.querySelector('div[data-evergreen-table-body="true"]');
   // filter by url
-  const filterInput = screen.getByPlaceholderText('filter...', { selector: 'input[type="text"]' });
+  const filterInput = screen.getByPlaceholderText('filter...', {
+    selector: 'input[type="text"]',
+  });
   fireEvent.change(filterInput, { target: { value: filter } });
   // verify
   for (let url of defaultBlacklist) {
@@ -99,10 +107,14 @@ it('sorts urls in ascending order', async () => {
   const sortButton = screen.getByTestId('sort-button');
   fireEvent.click(sortButton);
   // choose asc order
-  const ascButton = await waitFor(() => screen.getByRole('menuitemradio', { name: /ascending/i }));
+  const ascButton = await waitFor(() =>
+    screen.getByRole('menuitemradio', { name: /ascending/i })
+  );
   fireEvent.click(ascButton);
   // verify
-  const listOrder = within(list).getAllByTestId('url').map(url => url.innerHTML);
+  const listOrder = within(list)
+    .getAllByTestId('url')
+    .map((url) => url.innerHTML);
   const expectedOrder = defaultBlacklist.slice().sort((a, b) => a.localeCompare(b)); // asc
   expect(listOrder).toEqual(expectedOrder);
 });
@@ -114,10 +126,14 @@ it('sorts urls in descending order', async () => {
   const sortButton = screen.getByTestId('sort-button');
   fireEvent.click(sortButton);
   // choose desc order
-  const descButton = await waitFor(() => screen.getByRole('menuitemradio', { name: /descending/i }));
+  const descButton = await waitFor(() =>
+    screen.getByRole('menuitemradio', { name: /descending/i })
+  );
   fireEvent.click(descButton);
   // verify
-  const listOrder = within(list).getAllByTestId('url').map(url => url.innerHTML);
+  const listOrder = within(list)
+    .getAllByTestId('url')
+    .map((url) => url.innerHTML);
   const expectedOrder = defaultBlacklist.slice().sort((a, b) => b.localeCompare(a)); // desc
   expect(listOrder).toEqual(expectedOrder);
 });
@@ -127,7 +143,9 @@ it('imports urls', async () => {
   const list = container.querySelector('div[data-evergreen-table-body="true"]');
   // trigger file input change event
   const fileInput = screen.getByTestId('file-input');
-  const file = new File(defaultBlacklist, 'blacklist.txt', { type: 'text/plain' });
+  const file = new File(defaultBlacklist, 'blacklist.txt', {
+    type: 'text/plain',
+  });
   fireEvent.change(fileInput, { target: { files: [file] } });
   // verify
   for (let url of defaultBlacklist) {
@@ -141,26 +159,29 @@ it('exports urls', async () => {
   // spy on file helper download function
   const downloadFn = jest.spyOn(fileHelper, 'download');
   global.URL.createObjectURL = jest.fn(); // fix error: URL.createObjectURL is not a function
-  global.Blob = function(content, options) { // allow us to compare Blobs
+  global.Blob = function (content, options) {
+    // allow us to compare Blobs
     return {
-      content: content[0].split("\n"),
-      options
+      content: content[0].split('\n'),
+      options,
     };
   };
   // click on more button
   const moreButton = screen.getByTestId('list-more-button');
   fireEvent.click(moreButton);
   // click on export button
-  const exportButton = await waitFor(() => screen.getByRole('menuitem', { name: /export/i }));
+  const exportButton = await waitFor(() =>
+    screen.getByRole('menuitem', { name: /export/i })
+  );
   fireEvent.click(exportButton);
   // verify
   expect(downloadFn).toHaveBeenCalledWith(
     {
       content: defaultBlacklist,
       options: {
-        type: 'text/plain'
-      }
-    }, 
+        type: 'text/plain',
+      },
+    },
     exportFilename
   );
 });

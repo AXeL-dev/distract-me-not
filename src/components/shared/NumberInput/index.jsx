@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { debug } from 'helpers/debug';
 
 export class NumberInput extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -15,7 +14,7 @@ export class NumberInput extends Component {
     if (this.props.value !== prevProps.value && this.props.value !== this.state.value) {
       debug.warn('value prop has changed:', this.props.value);
       this.setState({
-        value: this.validateValue(this.props.value)
+        value: this.validateValue(this.props.value),
       });
     }
   }
@@ -30,7 +29,7 @@ export class NumberInput extends Component {
       return max;
     }
     return intValue;
-  }
+  };
 
   handleChange = (event) => {
     const value = this.validateValue(event.target.value);
@@ -38,7 +37,7 @@ export class NumberInput extends Component {
     if (this.props.onChange) {
       this.props.onChange(value);
     }
-  }
+  };
 
   render() {
     return (
@@ -52,8 +51,7 @@ export class NumberInput extends Component {
         onChange={this.handleChange}
         disabled={this.props.disabled}
         required={this.props.required}
-      /> 
+      />
     );
   }
-
 }

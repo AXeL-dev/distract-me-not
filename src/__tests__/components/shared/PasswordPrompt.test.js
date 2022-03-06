@@ -1,10 +1,10 @@
 import React from 'react';
-import { render, screen, fireEvent } from "@testing-library/react";
-import { PasswordPrompt } from "components";
+import { render, screen, fireEvent } from '@testing-library/react';
+import { PasswordPrompt } from 'components';
 
 const password = {
   correct: 'test1234',
-  wrong: 'pass1234'
+  wrong: 'pass1234',
 };
 
 it('renders password input', () => {

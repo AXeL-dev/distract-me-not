@@ -30,5 +30,5 @@ export function hmsToSeconds(str) {
   const minute = parseInt(mm, 10) || 0;
   const second = parseInt(ss, 10) || 0;
 
-  return (hour*3600) + (minute*60) + second;
+  return hour * 3600 + minute * 60 + second;
 }

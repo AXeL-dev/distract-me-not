@@ -1,14 +1,10 @@
 import React from 'react';
-import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
-import * as fileHelper from "helpers/file";
-import { WordList } from "components";
+import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
+import * as fileHelper from 'helpers/file';
+import { WordList } from 'components';
 import copy from 'copy-to-clipboard';
 
-const keywords = [
-  'foo',
-  'bar',
-  '/doo.*/i',
-];
+const keywords = ['foo', 'bar', '/doo.*/i'];
 
 it('renders correctly', () => {
   const { container, asFragment } = render(<WordList list={keywords} />);
@@ -23,7 +19,9 @@ it('adds a keyword to list', () => {
   const { container } = render(<WordList list={[]} />);
   const list = container.querySelector('div[data-evergreen-table-body="true"]');
   // add keyword
-  const addInput = screen.getByPlaceholderText('keywordExample', { selector: 'input[type="text"]' });
+  const addInput = screen.getByPlaceholderText('keywordExample', {
+    selector: 'input[type="text"]',
+  });
   fireEvent.change(addInput, { target: { value: keyword } });
   fireEvent.keyDown(addInput, { key: 'Enter' });
   // verify
@@ -33,7 +31,7 @@ it('adds a keyword to list', () => {
 it('edits a keyword', async () => {
   const keyword = {
     value: 'foo',
-    replacement: 'bar'
+    replacement: 'bar',
   };
   const { container } = render(<WordList list={[keyword.value]} />);
   const list = container.querySelector('div[data-evergreen-table-body="true"]');
@@ -44,9 +42,13 @@ it('edits a keyword', async () => {
   const editButton = await waitFor(() => screen.getByRole('menuitem', { name: /edit/i }));
   fireEvent.click(editButton);
   // change keyword value
-  const editDialog = await waitFor(() => screen.getByRole('dialog', { selector: '[data-state="entered"]' }));
+  const editDialog = await waitFor(() =>
+    screen.getByRole('dialog', { selector: '[data-state="entered"]' })
+  );
   const editInput = within(editDialog).getByPlaceholderText('keywordExample');
-  fireEvent.change(editInput, { target: { value: keyword.replacement } });
+  fireEvent.change(editInput, {
+    target: { value: keyword.replacement },
+  });
   // save
   const saveButton = screen.getByRole('button', { name: /edit/i });
   fireEvent.click(saveButton);
@@ -64,7 +66,9 @@ it('deletes a keyword', async () => {
   const moreButton = screen.getByTestId('more-button');
   fireEvent.click(moreButton);
   // click on delete button
-  const deleteButton = await waitFor(() => screen.getByRole('menuitem', { name: /delete/i }));
+  const deleteButton = await waitFor(() =>
+    screen.getByRole('menuitem', { name: /delete/i })
+  );
   fireEvent.click(deleteButton);
   // verify
   expect(list).not.toHaveTextContent(keyword);
@@ -87,7 +91,9 @@ it('filters keywords', () => {
   const { container } = render(<WordList list={keywords} />);
   const list = container.querySelector('div[data-evergreen-table-body="true"]');
   // filter by keyword
-  const filterInput = screen.getByPlaceholderText('filter...', { selector: 'input[type="text"]' });
+  const filterInput = screen.getByPlaceholderText('filter...', {
+    selector: 'input[type="text"]',
+  });
   fireEvent.change(filterInput, { target: { value: filter } });
   // verify
   for (let keyword of keywords) {
@@ -104,10 +110,14 @@ it('sorts keywords in ascending order', async () => {
   const sortButton = screen.getByTestId('sort-button');
   fireEvent.click(sortButton);
   // choose asc order
-  const ascButton = await waitFor(() => screen.getByRole('menuitemradio', { name: /ascending/i }));
+  const ascButton = await waitFor(() =>
+    screen.getByRole('menuitemradio', { name: /ascending/i })
+  );
   fireEvent.click(ascButton);
   // verify
-  const listOrder = within(list).getAllByTestId('keyword').map(keyword => keyword.innerHTML);
+  const listOrder = within(list)
+    .getAllByTestId('keyword')
+    .map((keyword) => keyword.innerHTML);
   const expectedOrder = keywords.slice().sort((a, b) => a.localeCompare(b)); // asc
   expect(listOrder).toEqual(expectedOrder);
 });
@@ -119,10 +129,14 @@ it('sorts keywords in descending order', async () => {
   const sortButton = screen.getByTestId('sort-button');
   fireEvent.click(sortButton);
   // choose desc order
-  const descButton = await waitFor(() => screen.getByRole('menuitemradio', { name: /descending/i }));
+  const descButton = await waitFor(() =>
+    screen.getByRole('menuitemradio', { name: /descending/i })
+  );
   fireEvent.click(descButton);
   // verify
-  const listOrder = within(list).getAllByTestId('keyword').map(keyword => keyword.innerHTML);
+  const listOrder = within(list)
+    .getAllByTestId('keyword')
+    .map((keyword) => keyword.innerHTML);
   const expectedOrder = keywords.slice().sort((a, b) => b.localeCompare(a)); // desc
   expect(listOrder).toEqual(expectedOrder);
 });
@@ -132,7 +146,9 @@ it('imports keywords', async () => {
   const list = container.querySelector('div[data-evergreen-table-body="true"]');
   // trigger file input change event
   const fileInput = screen.getByTestId('file-input');
-  const file = new File(keywords, 'blacklist.txt', { type: 'text/plain' });
+  const file = new File(keywords, 'blacklist.txt', {
+    type: 'text/plain',
+  });
   fireEvent.change(fileInput, { target: { files: [file] } });
   // verify
   for (let keyword of keywords) {
@@ -146,26 +162,29 @@ it('exports keywords', async () => {
   // spy on file helper download function
   const downloadFn = jest.spyOn(fileHelper, 'download');
   global.URL.createObjectURL = jest.fn(); // fix error: URL.createObjectURL is not a function
-  global.Blob = function(content, options) { // allow us to compare Blobs
+  global.Blob = function (content, options) {
+    // allow us to compare Blobs
     return {
-      content: content[0].split("\n"),
-      options
+      content: content[0].split('\n'),
+      options,
     };
   };
   // click on more button
   const moreButton = screen.getByTestId('list-more-button');
   fireEvent.click(moreButton);
   // click on export button
-  const exportButton = await waitFor(() => screen.getByRole('menuitem', { name: /export/i }));
+  const exportButton = await waitFor(() =>
+    screen.getByRole('menuitem', { name: /export/i })
+  );
   fireEvent.click(exportButton);
   // verify
   expect(downloadFn).toHaveBeenCalledWith(
     {
       content: keywords,
       options: {
-        type: 'text/plain'
-      }
-    }, 
+        type: 'text/plain',
+      },
+    },
     exportFilename
   );
 });

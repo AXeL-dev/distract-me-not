@@ -15,7 +15,11 @@ function TextField(props) {
           tooltipPosition={props.tooltipPosition}
         />
       </Pane>
-      <Pane display="flex" alignItems="center" marginRight={props.position === Position.LEFT ? 12 : 0}>
+      <Pane
+        display="flex"
+        alignItems="center"
+        marginRight={props.position === Position.LEFT ? 12 : 0}
+      >
         <TextInput
           width={props.width}
           value={props.value}

@@ -1,6 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent } from "@testing-library/react";
-import { TextField } from "components";
+import { render, screen, fireEvent } from '@testing-library/react';
+import { TextField } from 'components';
 
 it('renders correctly', () => {
   const { asFragment } = render(<TextField />);
@@ -11,7 +11,7 @@ it('handles value change', () => {
   const handleChange = jest.fn();
   render(<TextField value="some text" onChange={handleChange} />);
   const input = screen.getByRole('textbox');
-  fireEvent.change(input, { target: { value: 'some other text' } })
+  fireEvent.change(input, { target: { value: 'some other text' } });
   expect(handleChange).toHaveBeenCalledTimes(1);
 });
 

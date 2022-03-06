@@ -3,7 +3,6 @@ import { Pane, TextInput, Button, Paragraph } from 'evergreen-ui';
 import { RawHTML, OuterPane } from 'components';
 
 class TextField extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -16,24 +15,24 @@ class TextField extends Component {
     if (this.props.onChange) {
       this.props.onChange(event);
     }
-  }
+  };
 
   handleKeyDown = (event) => {
     if (event.key === 'Enter') {
       this.submit();
     }
-  }
+  };
 
   handleButtonClick = (event) => {
     this.submit();
-  }
+  };
 
   submit = () => {
     if (this.props.onSubmit && !this.props.disabled) {
       const callback = (value) => this.setState({ value: value });
       this.props.onSubmit(this.state.value, callback);
     }
-  }
+  };
 
   render() {
     return (
@@ -51,7 +50,7 @@ class TextField extends Component {
               borderBottomRightRadius={this.props.hasButton ? 0 : 3}
             />
           </Pane>
-          {this.props.hasButton &&
+          {this.props.hasButton && (
             <Pane display="flex" alignItems="center" marginLeft={-1}>
               <Button
                 appearance={this.props.buttonAppearance || 'primary'}
@@ -63,13 +62,13 @@ class TextField extends Component {
                 {this.props.buttonLabel || '+'}
               </Button>
             </Pane>
-          }
+          )}
         </Pane>
-        {this.props.hint &&
+        {this.props.hint && (
           <Paragraph size={300} color="muted" marginTop={6}>
             <RawHTML>{this.props.hint}</RawHTML>
           </Paragraph>
-        }
+        )}
       </OuterPane>
     );
   }

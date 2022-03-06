@@ -23,6 +23,7 @@ describe('url helper', () => {
   });
 
   it('detects urls with an invalid protocol', () => {
+    // prettier-ignore
     const urls = [
       'my_file.txt',
       'www.website.com',

@@ -4,7 +4,6 @@ import { isWebExtension, openExtensionPage } from 'helpers/webext';
 import { IconButton } from 'components';
 
 export class LinkIconButton extends Component {
-
   handleClick = () => {
     if (this.props.link) {
       if (this.props.external) {
@@ -22,7 +21,7 @@ export class LinkIconButton extends Component {
         }
       }
     }
-  }
+  };
 
   render() {
     return (

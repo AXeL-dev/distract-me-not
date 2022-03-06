@@ -1,6 +1,6 @@
 import React from 'react';
-import { render } from "@testing-library/react";
-import { OuterPane } from "components";
+import { render } from '@testing-library/react';
+import { OuterPane } from 'components';
 
 it('renders correctly', () => {
   const { asFragment } = render(

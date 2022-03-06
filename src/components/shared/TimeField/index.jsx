@@ -23,9 +23,7 @@ export function TimeField(props) {
           onChange={props.onChange}
           disabled={props.disabled}
         />
-        {props.suffix && (
-          <Text>{props.suffix}</Text>
-        )}
+        {props.suffix && <Text>{props.suffix}</Text>}
       </Pane>
     </OuterPane>
   );

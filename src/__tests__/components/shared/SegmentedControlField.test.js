@@ -1,6 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent } from "@testing-library/react";
-import { SegmentedControlField } from "components";
+import { render, screen, fireEvent } from '@testing-library/react';
+import { SegmentedControlField } from 'components';
 
 const options = [
   { label: 'Option 1', value: 'option-1' },
@@ -16,7 +16,9 @@ it('renders correctly', () => {
 it('handles selected option change', () => {
   const handleChange = jest.fn();
   render(<SegmentedControlField options={options} onChange={handleChange} />);
-  const secondOption = screen.getByRole('button', { name: 'Option 2' });
+  const secondOption = screen.getByRole('button', {
+    name: 'Option 2',
+  });
   fireEvent.click(secondOption);
   expect(handleChange).toHaveBeenCalledTimes(1);
 });

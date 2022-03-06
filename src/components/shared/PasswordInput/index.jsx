@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
-import { Pane, TextInput, IconButton, Paragraph, Button, EyeOpenIcon, EyeOffIcon, RandomIcon } from 'evergreen-ui';
+import {
+  Pane,
+  TextInput,
+  IconButton,
+  Paragraph,
+  Button,
+  EyeOpenIcon,
+  EyeOffIcon,
+  RandomIcon,
+} from 'evergreen-ui';
 import { RawHTML, OuterPane } from 'components';
 import generatePassword from 'omgopass';
 import './styles.scss';
 
 export class PasswordInput extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -19,7 +27,7 @@ export class PasswordInput extends Component {
     if (this.props.onChange) {
       this.props.onChange(event);
     }
-  }
+  };
 
   handleRandomButtonClick = () => {
     const event = {
@@ -28,17 +36,17 @@ export class PasswordInput extends Component {
       },
     };
     this.handleChange(event);
-  }
+  };
 
   toggle = (event) => {
     this.setState({ isShown: !this.state.isShown });
-  }
+  };
 
   render() {
     return (
       <OuterPane {...this.props}>
         <Pane display="flex">
-          {this.props.hasRandomButton &&
+          {this.props.hasRandomButton && (
             <Pane display="flex" alignItems="center" marginRight={-1}>
               <Button
                 className="random-button"
@@ -51,7 +59,7 @@ export class PasswordInput extends Component {
                 <RandomIcon size={14} />
               </Button>
             </Pane>
-          }
+          )}
           <Pane display="flex" alignItems="center" flex={1} position="relative">
             <TextInput
               width="100%"
@@ -77,13 +85,12 @@ export class PasswordInput extends Component {
             />
           </Pane>
         </Pane>
-        {this.props.hint &&
+        {this.props.hint && (
           <Paragraph size={300} color="muted" marginTop={6}>
             <RawHTML>{this.props.hint}</RawHTML>
           </Paragraph>
-        }
+        )}
       </OuterPane>
     );
   }
-
 }

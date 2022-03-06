@@ -26,9 +26,7 @@ export function NumberField(props) {
           disabled={props.disabled}
           required={props.required}
         />
-        {props.suffix && (
-          <Text>{props.suffix}</Text>
-        )}
+        {props.suffix && <Text>{props.suffix}</Text>}
       </Pane>
     </OuterPane>
   );

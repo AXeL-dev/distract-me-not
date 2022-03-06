@@ -103,12 +103,14 @@ export function createWindow(url, width = 600, height = 300, type = 'popup') {
 export function sendMessage(message, ...params) {
   return new Promise((resolve) => {
     try {
-      browser.runtime.sendMessage({
-        message,
-        params,
-      }).then(({ response }) => {
-        resolve(response);
-      });
+      browser.runtime
+        .sendMessage({
+          message,
+          params,
+        })
+        .then(({ response }) => {
+          resolve(response);
+        });
     } catch (error) {
       report.error(error);
       resolve(null);
@@ -119,12 +121,14 @@ export function sendMessage(message, ...params) {
 export function getActiveTab() {
   return new Promise((resolve) => {
     try {
-      browser.tabs.query({
-        active: true,
-        lastFocusedWindow: true,
-      }).then((tabs) => {
-        resolve(tabs[0]);
-      });
+      browser.tabs
+        .query({
+          active: true,
+          lastFocusedWindow: true,
+        })
+        .then((tabs) => {
+          resolve(tabs[0]);
+        });
     } catch (error) {
       report.error(error);
       resolve(null);
@@ -160,7 +164,12 @@ export function getActiveTabHostname() {
   });
 }
 
-export function sendNotification(message, title = 'Distract Me Not', type = 'basic', id = undefined) {
+export function sendNotification(
+  message,
+  title = 'Distract Me Not',
+  type = 'basic',
+  id = undefined
+) {
   try {
     browser.notifications.create(id, {
       type,
@@ -174,7 +183,6 @@ export function sendNotification(message, title = 'Distract Me Not', type = 'bas
 }
 
 export class storage {
-
   static get(items) {
     return new Promise((resolve) => {
       try {
@@ -213,5 +221,4 @@ export class storage {
       }
     });
   }
-
 }

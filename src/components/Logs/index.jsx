@@ -31,7 +31,6 @@ const Order = {
 };
 
 export class Logs extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -52,16 +51,20 @@ export class Logs extends Component {
     logger.get().then((logs) => {
       this.setState({
         list: this.getOrderedList(logs),
-        scrollToIndex: scrollToTop ? (logs.length > 0 ? 0 : null) : this.state.scrollToIndex,
+        scrollToIndex: scrollToTop
+          ? logs.length > 0
+            ? 0
+            : null
+          : this.state.scrollToIndex,
       });
     });
-  }
+  };
 
   getOrderedList = (list) => {
     return list ? list.map((item, index) => ({ id: index + 1, ...item })) : [];
-  }
+  };
 
-  sort = items => {
+  sort = (items) => {
     const { ordering } = this.state;
     // Return if there's no ordering.
     if (ordering === Order.NONE) return items;
@@ -92,24 +95,24 @@ export class Logs extends Component {
 
       // Order descending (Order.DESC)
       return bValue === aValue ? 0 : sortTable[bValue > aValue];
-    })
-  }
+    });
+  };
 
   // Filter the items based on the name property.
-  filter = items => {
+  filter = (items) => {
     const searchQuery = this.state.searchQuery.trim();
 
     // If the searchQuery is empty, return the items as is.
     if (searchQuery.length === 0) return items;
 
-    return items.filter(item => {
+    return items.filter((item) => {
       // Use the filter from fuzzaldrin-plus to filter by url.
       const result = filter([item.url], searchQuery);
       return result.length === 1;
-    })
-  }
+    });
+  };
 
-  getIconForOrder = order => {
+  getIconForOrder = (order) => {
     switch (order) {
       case Order.ASC:
         return ArrowUpIcon;
@@ -118,11 +121,11 @@ export class Logs extends Component {
       default:
         return CaretDownIcon;
     }
-  }
+  };
 
-  handleFilterChange = value => {
+  handleFilterChange = (value) => {
     this.setState({ searchQuery: value });
-  }
+  };
 
   renderColumnSortButton = ({ orderedColumn, label }) => {
     return (
@@ -135,15 +138,15 @@ export class Logs extends Component {
               title={translate('order')}
               options={[
                 { label: translate('ascending'), value: Order.ASC },
-                { label: translate('descending'), value: Order.DESC }
+                { label: translate('descending'), value: Order.DESC },
               ]}
               selected={
                 this.state.orderedColumn === orderedColumn ? this.state.ordering : null
               }
-              onChange={value => {
+              onChange={(value) => {
                 this.setState({
                   orderedColumn,
-                  ordering: value
+                  ordering: value,
                 });
                 // Close the popover when you select a value.
                 close();
@@ -163,8 +166,8 @@ export class Logs extends Component {
           {label}
         </TextDropdownButton>
       </Popover>
-    )
-  }
+    );
+  };
 
   renderColumnDateButton = ({ label } = {}) => {
     return (
@@ -177,10 +180,10 @@ export class Logs extends Component {
               title={translate('date')}
               options={[
                 { label: translate('show'), value: true },
-                { label: translate('hide'), value: false }
+                { label: translate('hide'), value: false },
               ]}
               selected={this.state.showDate}
-              onChange={value => {
+              onChange={(value) => {
                 this.setState({ showDate: value });
                 // Close the popover when you select a value.
                 close();
@@ -193,8 +196,8 @@ export class Logs extends Component {
           {label}
         </TextDropdownButton>
       </Popover>
-    )
-  }
+    );
+  };
 
   renderHeaderMenu = ({ close }) => {
     return (
@@ -221,8 +224,8 @@ export class Logs extends Component {
           </Menu.Item>
         </Menu.Group>
       </Menu>
-    )
-  }
+    );
+  };
 
   renderRow = ({ row }) => {
     return (
@@ -248,8 +251,8 @@ export class Logs extends Component {
           </Text>
         </Table.Cell>
       </Table.Row>
-    )
-  }
+    );
+  };
 
   render() {
     const items = this.filter(this.sort(this.state.list));
@@ -275,15 +278,23 @@ export class Logs extends Component {
                 position={Position.BOTTOM_RIGHT}
                 minWidth={160}
               >
-                <IconButton icon={MoreIcon} height={24} appearance="minimal" data-testid="list-more-button" />
+                <IconButton
+                  icon={MoreIcon}
+                  height={24}
+                  appearance="minimal"
+                  data-testid="list-more-button"
+                />
               </Popover>
             </Table.HeaderCell>
           </Table.Head>
-          <Table.VirtualBody scrollToIndex={this.state.scrollToIndex} height="calc(100% - 32px)">
-            {items.map(item => this.renderRow({ row: item }))}
+          <Table.VirtualBody
+            scrollToIndex={this.state.scrollToIndex}
+            height="calc(100% - 32px)"
+          >
+            {items.map((item) => this.renderRow({ row: item }))}
           </Table.VirtualBody>
         </Table>
       </Pane>
-    )
+    );
   }
 }

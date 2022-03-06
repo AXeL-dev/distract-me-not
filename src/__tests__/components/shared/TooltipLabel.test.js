@@ -1,6 +1,6 @@
 import React from 'react';
-import { render, screen } from "@testing-library/react";
-import { TooltipLabel } from "components";
+import { render, screen } from '@testing-library/react';
+import { TooltipLabel } from 'components';
 
 it('renders correctly', () => {
   const text = 'some text';
@@ -10,6 +10,8 @@ it('renders correctly', () => {
 });
 
 it('renders correctly when tooltip prop is set', () => {
-  const { asFragment } = render(<TooltipLabel text="some text" tooltip="this is a tooltip" />);
+  const { asFragment } = render(
+    <TooltipLabel text="some text" tooltip="this is a tooltip" />
+  );
   expect(asFragment()).toMatchSnapshot();
 });

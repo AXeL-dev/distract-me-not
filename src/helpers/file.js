@@ -1,4 +1,3 @@
-
 export function download(blob, filename) {
   if (window.navigator.msSaveOrOpenBlob) {
     // IE10+
@@ -6,7 +5,7 @@ export function download(blob, filename) {
   } else {
     // Others
     const a = document.createElement('a'),
-          url = URL.createObjectURL(blob);
+      url = URL.createObjectURL(blob);
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);

@@ -1,13 +1,51 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Tablist, Tab, Checkbox, Button, TickIcon, PlusIcon, CrossIcon, DuplicateIcon, Paragraph, toaster, HeartIcon, Dialog, HistoryIcon } from 'evergreen-ui';
+import {
+  Pane,
+  Tablist,
+  Tab,
+  Checkbox,
+  Button,
+  TickIcon,
+  PlusIcon,
+  CrossIcon,
+  DuplicateIcon,
+  Paragraph,
+  toaster,
+  HeartIcon,
+  Dialog,
+  HistoryIcon,
+} from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv } from 'helpers/debug';
-import { Mode, Action, modes, actions, defaultAction, defaultMode, defaultBlacklist, defaultWhitelist, defaultUnblock, defaultIsEnabled } from 'helpers/block';
+import {
+  Mode,
+  Action,
+  modes,
+  actions,
+  defaultAction,
+  defaultMode,
+  defaultBlacklist,
+  defaultWhitelist,
+  defaultUnblock,
+  defaultIsEnabled,
+} from 'helpers/block';
 import { ScheduleType, defaultSchedule, newScheduleTimeRange } from 'helpers/schedule';
 import { sendMessage, storage, isWebExtension, openExtensionPage } from 'helpers/webext';
 import { DaysOfWeek, today } from 'helpers/date';
 import { hash } from 'helpers/crypt';
-import { Header, SwitchField, SegmentedControlField, TimeField, PasswordField, WebsiteList, NumberField, SelectField, TextField, WordList, Tooltip } from 'components';
+import {
+  Header,
+  SwitchField,
+  SegmentedControlField,
+  TimeField,
+  PasswordField,
+  WebsiteList,
+  NumberField,
+  SelectField,
+  TextField,
+  WordList,
+  Tooltip,
+} from 'components';
 import { defaultLogsSettings } from 'helpers/logger';
 import { defaultTimerSettings } from 'helpers/timer';
 import { version } from '../../../package.json';
@@ -15,13 +53,13 @@ import { set, cloneDeep } from 'lodash';
 import './styles.scss';
 
 export class Settings extends Component {
-
   constructor(props) {
     super(props);
     this.blacklistComponentRef = React.createRef();
     this.whitelistComponentRef = React.createRef();
     this.blacklistKeywordsComponentRef = React.createRef();
     this.whitelistKeywordsComponentRef = React.createRef();
+    // prettier-ignore
     const tabs = [
       { label: translate('blocking'), id: 'blocking' },
       { label: translate('unblocking'), id: 'unblocking', disabled: defaultAction !== Action.blockTab },
@@ -45,7 +83,10 @@ export class Settings extends Component {
     this.state = {
       tabs,
       selectedTab: this.getSelectedTab() || tabs[0].id,
-      scheduleDays: DaysOfWeek.map((day) => ({ label: translate(day), value: day })),
+      scheduleDays: DaysOfWeek.map((day) => ({
+        label: translate(day),
+        value: day,
+      })),
       selectedScheduleDay: today(),
       blacklistTabs,
       selectedBlacklistTab: blacklistTabs[0].id,
@@ -174,7 +215,7 @@ export class Settings extends Component {
     const action = event.target.value;
     this.setOptions('action', action);
     this.toggleTab('unblocking', action !== Action.blockTab);
-  }
+  };
 
   toggleTab = (id, disabled) => {
     this.setState({
@@ -185,12 +226,12 @@ export class Settings extends Component {
         return tab;
       }),
     });
-  }
+  };
 
   changeMode = (value) => {
     this.setOptions('mode', value);
     this.toggleListTabs(value);
-  }
+  };
 
   toggleListTabs = (mode) => {
     this.setState({
@@ -208,7 +249,7 @@ export class Settings extends Component {
         return tab;
       }),
     });
-  }
+  };
 
   getSelectedTab = () => {
     if (!this.props.location) {
@@ -216,13 +257,13 @@ export class Settings extends Component {
     }
     const urlParams = new URLSearchParams(this.props.location.search);
     return urlParams.get('tab');
-  }
+  };
 
   selectTab = (id) => {
     this.setState({ selectedTab: id });
     const url = `#${this.props.location.pathname}?tab=${id}`;
     window.history.pushState({ path: url }, document.title, url);
-  }
+  };
 
   /**
    * Set option(s) in options state
@@ -247,7 +288,7 @@ export class Settings extends Component {
         this.setState({ options });
         break;
     }
-  }
+  };
 
   save = () => {
     debug.log('save:', this.state.options);
@@ -256,7 +297,9 @@ export class Settings extends Component {
       this.state.options.password.value.length < 8 &&
       (!this.state.options.password.isSet || this.state.options.password.value.length)
     ) {
-      toaster.danger(translate('passwordIsShort'), { id: 'settings-toaster' });
+      toaster.danger(translate('passwordIsShort'), {
+        id: 'settings-toaster',
+      });
       return;
     }
     storage
@@ -281,8 +324,10 @@ export class Settings extends Component {
         unblock: this.state.options.unblock,
         password: {
           isEnabled: this.state.options.password.isEnabled,
-          allowActivationWithoutPassword: this.state.options.password.allowActivationWithoutPassword,
-          allowAddingWebsitesWithoutPassword: this.state.options.password.allowAddingWebsitesWithoutPassword,
+          allowActivationWithoutPassword:
+            this.state.options.password.allowActivationWithoutPassword,
+          allowAddingWebsitesWithoutPassword:
+            this.state.options.password.allowAddingWebsitesWithoutPassword,
           hash: this.state.options.password.isEnabled // if password protection is enabled
             ? this.state.options.password.value.length // + password length is > 0
               ? hash(this.state.options.password.value) // hash & save the new password
@@ -302,20 +347,31 @@ export class Settings extends Component {
           sendMessage('setWhitelist', this.state.options.whitelist);
           sendMessage('setBlacklistKeywords', this.state.options.blacklistKeywords);
           sendMessage('setWhitelistKeywords', this.state.options.whitelistKeywords);
-          sendMessage('setUnblockOnceTimeout', this.state.options.unblock.unblockOnceTimeout);
-          sendMessage('setDisplayNotificationOnTimeout', this.state.options.unblock.displayNotificationOnTimeout);
-          sendMessage('setAutoReblockOnTimeout', this.state.options.unblock.autoReblockOnTimeout);
+          sendMessage(
+            'setUnblockOnceTimeout',
+            this.state.options.unblock.unblockOnceTimeout
+          );
+          sendMessage(
+            'setDisplayNotificationOnTimeout',
+            this.state.options.unblock.displayNotificationOnTimeout
+          );
+          sendMessage(
+            'setAutoReblockOnTimeout',
+            this.state.options.unblock.autoReblockOnTimeout
+          );
           sendMessage('setLogsSettings', this.state.options.logs);
           sendMessage('setTimerSettings', this.state.options.timer);
         }
         // Show success message (keep out of success condition to ensure it's executed on unit tests & dev env.)
-        toaster.success(translate('settingsSaved'), { id: 'settings-toaster' });
+        toaster.success(translate('settingsSaved'), {
+          id: 'settings-toaster',
+        });
       });
-  }
+  };
 
   openDonationLink = () => {
     window.open('https://www.paypal.com/paypalme/axeldev', '_blank');
-  }
+  };
 
   openPage = (page) => {
     if (isWebExtension) {
@@ -325,26 +381,31 @@ export class Settings extends Component {
     } else {
       window.open(`#${page}`, '_blank');
     }
-  }
+  };
 
   openDialog = (name) => {
     this.setState({ shownDialog: name });
-  }
+  };
 
   closeDialog = () => {
     this.setState({ shownDialog: null });
-  }
+  };
 
   applyScheduleSettings = () => {
     this.setOptions(
       'schedule.days',
-      DaysOfWeek.reduce((acc, cur) => ({
-        ...acc,
-        [cur]: cloneDeep(this.state.options.schedule.days[this.state.selectedScheduleDay]),
-      }), {})
+      DaysOfWeek.reduce(
+        (acc, cur) => ({
+          ...acc,
+          [cur]: cloneDeep(
+            this.state.options.schedule.days[this.state.selectedScheduleDay]
+          ),
+        }),
+        {}
+      )
     );
     this.closeDialog();
-  }
+  };
 
   renderBlockingTab = () => (
     <Fragment>
@@ -373,10 +434,11 @@ export class Settings extends Component {
         value={this.state.options.action}
         onChange={this.changeAction}
         disabled={!this.state.options.isEnabled}
-        marginBottom={[
-          Action.blockTab,
-          Action.redirectToUrl,
-        ].includes(this.state.options.action) ? 16 : 0}
+        marginBottom={
+          [Action.blockTab, Action.redirectToUrl].includes(this.state.options.action)
+            ? 16
+            : 0
+        }
       >
         {actions.map((action) => (
           <option key={action.value} value={action.value}>
@@ -391,14 +453,19 @@ export class Settings extends Component {
             placeholder={translate('defaultBlockingMessage')}
             value={this.state.options.blockTab.message}
             onChange={(event) => this.setOptions('blockTab.message', event.target.value)}
-            disabled={!this.state.options.isEnabled || this.state.options.blockTab.displayBlankPage}
+            disabled={
+              !this.state.options.isEnabled ||
+              this.state.options.blockTab.displayBlankPage
+            }
             width={500}
             marginBottom={16}
           />
           <Checkbox
             label={translate('displayBlankPage')}
             checked={this.state.options.blockTab.displayBlankPage}
-            onChange={(event) => this.setOptions('blockTab.displayBlankPage', event.target.checked)}
+            onChange={(event) =>
+              this.setOptions('blockTab.displayBlankPage', event.target.checked)
+            }
             disabled={!this.state.options.isEnabled}
             margin={0}
           />
@@ -415,7 +482,7 @@ export class Settings extends Component {
         />
       )}
     </Fragment>
-  )
+  );
 
   renderUnblockingTab = () => (
     <Fragment>
@@ -441,21 +508,26 @@ export class Settings extends Component {
       <Checkbox
         label={translate('displayNotificationOnTimeout')}
         checked={this.state.options.unblock.displayNotificationOnTimeout}
-        onChange={(event) => this.setOptions('unblock.displayNotificationOnTimeout', event.target.checked)}
+        onChange={(event) =>
+          this.setOptions('unblock.displayNotificationOnTimeout', event.target.checked)
+        }
         disabled={!this.state.options.unblock.isEnabled}
       />
       <Checkbox
         label={translate('autoReblockOnTimeout')}
         checked={this.state.options.unblock.autoReblockOnTimeout}
-        onChange={(event) => this.setOptions('unblock.autoReblockOnTimeout', event.target.checked)}
+        onChange={(event) =>
+          this.setOptions('unblock.autoReblockOnTimeout', event.target.checked)
+        }
         disabled={!this.state.options.unblock.isEnabled}
         margin={0}
       />
     </Fragment>
-  )
+  );
 
-  renderScheduleTab = () =>  {
-    const currentScheduleDayRanges = this.state.options.schedule.days[this.state.selectedScheduleDay];
+  renderScheduleTab = () => {
+    const currentScheduleDayRanges =
+      this.state.options.schedule.days[this.state.selectedScheduleDay];
 
     return (
       <Fragment>
@@ -464,7 +536,9 @@ export class Settings extends Component {
           labelSize={300}
           labelColor="muted"
           checked={this.state.options.schedule.isEnabled}
-          onChange={(event) => this.setOptions('schedule.isEnabled', event.target.checked)}
+          onChange={(event) =>
+            this.setOptions('schedule.isEnabled', event.target.checked)
+          }
           marginBottom={16}
         />
         <Pane display="flex">
@@ -489,70 +563,96 @@ export class Settings extends Component {
             </Tablist>
           </Pane>
           <Pane flex="1">
-            {this.state.scheduleDays.map((day) => 
+            {this.state.scheduleDays.map((day) =>
               this.state.options.schedule.days[day.value].length === 0 ? null : (
-              <Pane
-                key={day.value}
-                id={`schedule-panel-${day.value}`}
-                role="tabpanel"
-                aria-labelledby={day.label}
-                aria-hidden={day.value !== this.state.selectedScheduleDay}
-                display={day.value === this.state.selectedScheduleDay ? 'block' : 'none'}
-                padding={16}
-                border="muted"
-              >
-                {this.state.options.schedule.days[day.value].map((range, index) => (
-                  <Fragment key={`schedule-range-${day.value}-${index}`}>
-                    {index > 0 && (
-                      <Pane marginTop={16} height={16} borderTop></Pane>
-                    )}
-                    <TimeField
-                      label={translate('scheduleStartTime')}
-                      value={range.time.start}
-                      onChange={(event) => this.setOptions(`schedule.days['${day.value}'][${index}].time.start`, event.target.value)}
-                      disabled={!this.state.options.schedule.isEnabled}
-                      changeLabelColorOnDisable
-                      marginBottom={16}
-                    />
-                    <TimeField
-                      label={translate('scheduleEndTime')}
-                      value={range.time.end}
-                      onChange={(event) => this.setOptions(`schedule.days['${day.value}'][${index}].time.end`, event.target.value)}
-                      disabled={!this.state.options.schedule.isEnabled}
-                      changeLabelColorOnDisable
-                      marginBottom={16}
-                    />
-                    <SegmentedControlField
-                      label={translate('scheduleType')}
-                      options={[{
-                        label: translate('blockingTime'),
-                        value: ScheduleType.blockingTime,
-                        tooltip: translate('scheduleTip'),
-                      }, {
-                        label: translate('allowedTime'),
-                        value: ScheduleType.allowedTime,
-                      }]}
-                      value={range.type}
-                      onChange={(value) => this.setOptions(`schedule.days['${day.value}'][${index}].type`, value)}
-                      disabled={!this.state.options.schedule.isEnabled}
-                      changeLabelColorOnDisable
-                      showTooltips
-                    />
-                  </Fragment>
-                ))}
-              </Pane>
-            ))}
-            <Pane display="flex" alignItems="center" justifyContent="center" marginTop={16}>
+                <Pane
+                  key={day.value}
+                  id={`schedule-panel-${day.value}`}
+                  role="tabpanel"
+                  aria-labelledby={day.label}
+                  aria-hidden={day.value !== this.state.selectedScheduleDay}
+                  display={
+                    day.value === this.state.selectedScheduleDay ? 'block' : 'none'
+                  }
+                  padding={16}
+                  border="muted"
+                >
+                  {this.state.options.schedule.days[day.value].map((range, index) => (
+                    <Fragment key={`schedule-range-${day.value}-${index}`}>
+                      {index > 0 && <Pane marginTop={16} height={16} borderTop></Pane>}
+                      <TimeField
+                        label={translate('scheduleStartTime')}
+                        value={range.time.start}
+                        onChange={(event) =>
+                          this.setOptions(
+                            `schedule.days['${day.value}'][${index}].time.start`,
+                            event.target.value
+                          )
+                        }
+                        disabled={!this.state.options.schedule.isEnabled}
+                        changeLabelColorOnDisable
+                        marginBottom={16}
+                      />
+                      <TimeField
+                        label={translate('scheduleEndTime')}
+                        value={range.time.end}
+                        onChange={(event) =>
+                          this.setOptions(
+                            `schedule.days['${day.value}'][${index}].time.end`,
+                            event.target.value
+                          )
+                        }
+                        disabled={!this.state.options.schedule.isEnabled}
+                        changeLabelColorOnDisable
+                        marginBottom={16}
+                      />
+                      <SegmentedControlField
+                        label={translate('scheduleType')}
+                        options={[
+                          {
+                            label: translate('blockingTime'),
+                            value: ScheduleType.blockingTime,
+                            tooltip: translate('scheduleTip'),
+                          },
+                          {
+                            label: translate('allowedTime'),
+                            value: ScheduleType.allowedTime,
+                          },
+                        ]}
+                        value={range.type}
+                        onChange={(value) =>
+                          this.setOptions(
+                            `schedule.days['${day.value}'][${index}].type`,
+                            value
+                          )
+                        }
+                        disabled={!this.state.options.schedule.isEnabled}
+                        changeLabelColorOnDisable
+                        showTooltips
+                      />
+                    </Fragment>
+                  ))}
+                </Pane>
+              )
+            )}
+            <Pane
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              marginTop={16}
+            >
               {currentScheduleDayRanges.length < 2 && (
                 <Button
                   height={32}
                   className="overflow-ellipsis"
                   iconBefore={PlusIcon}
                   marginRight={16}
-                  onClick={() => this.setOptions(
-                    `schedule.days['${this.state.selectedScheduleDay}']`,
-                    [...currentScheduleDayRanges, newScheduleTimeRange()]
-                  )}
+                  onClick={() =>
+                    this.setOptions(
+                      `schedule.days['${this.state.selectedScheduleDay}']`,
+                      [...currentScheduleDayRanges, newScheduleTimeRange()]
+                    )
+                  }
                   disabled={!this.state.options.schedule.isEnabled}
                 >
                   {translate('addScheduleRange')}
@@ -565,10 +665,12 @@ export class Settings extends Component {
                     className="overflow-ellipsis"
                     iconBefore={CrossIcon}
                     marginRight={16}
-                    onClick={() => this.setOptions(
-                      `schedule.days['${this.state.selectedScheduleDay}']`,
-                      currentScheduleDayRanges.slice(0, -1)
-                    )}
+                    onClick={() =>
+                      this.setOptions(
+                        `schedule.days['${this.state.selectedScheduleDay}']`,
+                        currentScheduleDayRanges.slice(0, -1)
+                      )
+                    }
                     disabled={!this.state.options.schedule.isEnabled}
                   >
                     {translate('deleteLastScheduleRange')}
@@ -589,7 +691,7 @@ export class Settings extends Component {
         </Pane>
       </Fragment>
     );
-  }
+  };
 
   renderBlacklistUrls = () => (
     <Fragment>
@@ -604,7 +706,7 @@ export class Settings extends Component {
         addNewItemsOnTop={true}
       />
     </Fragment>
-  )
+  );
 
   renderBlacklistKeywords = () => (
     <Fragment>
@@ -619,7 +721,7 @@ export class Settings extends Component {
         addNewItemsOnTop={true}
       />
     </Fragment>
-  )
+  );
 
   renderBlacklistTab = () => (
     <Pane>
@@ -655,7 +757,7 @@ export class Settings extends Component {
         ))}
       </Pane>
     </Pane>
-  )
+  );
 
   renderWhitelistUrls = () => (
     <Fragment>
@@ -670,7 +772,7 @@ export class Settings extends Component {
         addNewItemsOnTop={true}
       />
     </Fragment>
-  )
+  );
 
   renderWhitelistKeywords = () => (
     <Fragment>
@@ -685,7 +787,7 @@ export class Settings extends Component {
         addNewItemsOnTop={true}
       />
     </Fragment>
-  )
+  );
 
   renderWhitelistTab = () => (
     <Pane>
@@ -721,7 +823,7 @@ export class Settings extends Component {
         ))}
       </Pane>
     </Pane>
-  )
+  );
 
   renderPasswordTab = () => (
     <Fragment>
@@ -735,8 +837,12 @@ export class Settings extends Component {
         marginBottom={16}
       />
       <PasswordField
-        label={`${translate(this.state.options.password.isSet ? 'changePassword' : 'password')}`}
-        tooltip={this.state.options.password.isSet ? translate('changePasswordTooltip') : null}
+        label={`${translate(
+          this.state.options.password.isSet ? 'changePassword' : 'password'
+        )}`}
+        tooltip={
+          this.state.options.password.isSet ? translate('changePasswordTooltip') : null
+        }
         onChange={(event) => this.setOptions('password.value', event.target.value)}
         disabled={!this.state.options.password.isEnabled}
         //data-testid="password"
@@ -753,30 +859,45 @@ export class Settings extends Component {
           </Tooltip>
         }
         checked={this.state.options.password.allowActivationWithoutPassword}
-        onChange={(event) => this.setOptions('password.allowActivationWithoutPassword', event.target.checked)}
+        onChange={(event) =>
+          this.setOptions('password.allowActivationWithoutPassword', event.target.checked)
+        }
         disabled={!this.state.options.password.isEnabled}
       />
       <Checkbox
         label={translate('allowAddingWebsitesWithoutPassword')}
         checked={this.state.options.password.allowAddingWebsitesWithoutPassword}
-        onChange={(event) => this.setOptions('password.allowAddingWebsitesWithoutPassword', event.target.checked)}
+        onChange={(event) =>
+          this.setOptions(
+            'password.allowAddingWebsitesWithoutPassword',
+            event.target.checked
+          )
+        }
         disabled={!this.state.options.password.isEnabled}
       />
       <Checkbox
         label={translate('allowUsingTimerWithoutPassword')}
         checked={this.state.options.timer.allowUsingTimerWithoutPassword}
-        onChange={(event) => this.setOptions('timer.allowUsingTimerWithoutPassword', event.target.checked)}
-        disabled={!this.state.options.timer.isEnabled || !this.state.options.password.isEnabled}
+        onChange={(event) =>
+          this.setOptions('timer.allowUsingTimerWithoutPassword', event.target.checked)
+        }
+        disabled={
+          !this.state.options.timer.isEnabled || !this.state.options.password.isEnabled
+        }
       />
       <Checkbox
         label={translate('requirePasswordToUnblockWebsites')}
         checked={this.state.options.unblock.requirePassword}
-        onChange={(event) => this.setOptions('unblock.requirePassword', event.target.checked)}
-        disabled={!this.state.options.unblock.isEnabled || !this.state.options.password.isEnabled}
+        onChange={(event) =>
+          this.setOptions('unblock.requirePassword', event.target.checked)
+        }
+        disabled={
+          !this.state.options.unblock.isEnabled || !this.state.options.password.isEnabled
+        }
         margin={0}
       />
     </Fragment>
-  )
+  );
 
   renderTimerTab = () => (
     <Fragment>
@@ -799,18 +920,22 @@ export class Settings extends Component {
       <Checkbox
         label={translate('allowStoppingTimer')}
         checked={this.state.options.timer.allowStoppingTimer}
-        onChange={(event) => this.setOptions('timer.allowStoppingTimer', event.target.checked)}
+        onChange={(event) =>
+          this.setOptions('timer.allowStoppingTimer', event.target.checked)
+        }
         disabled={!this.state.options.timer.isEnabled}
       />
       <Checkbox
         label={translate('displayNotificationOnComplete')}
         checked={this.state.options.timer.displayNotificationOnComplete}
-        onChange={(event) => this.setOptions('timer.displayNotificationOnComplete', event.target.checked)}
+        onChange={(event) =>
+          this.setOptions('timer.displayNotificationOnComplete', event.target.checked)
+        }
         disabled={!this.state.options.timer.isEnabled}
         margin={0}
       />
     </Fragment>
-  )
+  );
 
   renderLogsTab = () => (
     <Fragment>
@@ -833,54 +958,74 @@ export class Settings extends Component {
         disabled={!this.state.options.logs.isEnabled}
       />
     </Fragment>
-  )
+  );
 
   renderMiscTab = () => (
     <Fragment>
       <SwitchField
         label={translate('hideReportIssueButton')}
         checked={this.state.options.misc.hideReportIssueButton}
-        onChange={(event) => this.setOptions('misc.hideReportIssueButton', event.target.checked)}
+        onChange={(event) =>
+          this.setOptions('misc.hideReportIssueButton', event.target.checked)
+        }
         marginBottom={16}
       />
       <SwitchField
         label={translate('showAddWebsitePrompt')}
         tooltip={translate('showAddWebsitePromptTooltip')}
         checked={this.state.options.misc.showAddWebsitePrompt}
-        onChange={(event) => this.setOptions('misc.showAddWebsitePrompt', event.target.checked)}
+        onChange={(event) =>
+          this.setOptions('misc.showAddWebsitePrompt', event.target.checked)
+        }
         marginBottom={16}
       />
       <SwitchField
         label={translate('enableOnBrowserStartup')}
         checked={this.state.options.misc.enableOnBrowserStartup}
-        onChange={(event) => this.setOptions('misc.enableOnBrowserStartup', event.target.checked)}
+        onChange={(event) =>
+          this.setOptions('misc.enableOnBrowserStartup', event.target.checked)
+        }
       />
     </Fragment>
-  )
+  );
 
   renderAboutTab = () => (
     <div className="about">
       <h3 className="title">{translate('appName')}</h3>
       <div className="block">
         <div className="text">{translate('appDesc')}</div>
-        <a className="link" href="https://github.com/AXeL-dev/distract-me-not/releases" target="_blank" rel="noreferrer">{`${translate('version')} ${version}`}</a>
-        <a className="link" href="https://github.com/AXeL-dev/distract-me-not/blob/master/LICENSE" target="_blank" rel="noreferrer">{translate('license')}</a>
-        <a className="link" href="https://github.com/AXeL-dev/distract-me-not" target="_blank" rel="noreferrer">Github</a>
+        <a
+          className="link"
+          href="https://github.com/AXeL-dev/distract-me-not/releases"
+          target="_blank"
+          rel="noreferrer"
+        >{`${translate('version')} ${version}`}</a>
+        <a
+          className="link"
+          href="https://github.com/AXeL-dev/distract-me-not/blob/master/LICENSE"
+          target="_blank"
+          rel="noreferrer"
+        >
+          {translate('license')}
+        </a>
+        <a
+          className="link"
+          href="https://github.com/AXeL-dev/distract-me-not"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Github
+        </a>
       </div>
       <div className="small-text">{translate('supportDeveloper')}</div>
     </div>
-  )
+  );
 
   render() {
     return (
       <Pane display="flex" padding={16} minWidth={960} width={1080}>
         <Pane width={250}>
-          <Header
-            height={50}
-            justifyContent="start"
-            marginBottom={10}
-            noBorderBottom
-          />
+          <Header height={50} justifyContent="start" marginBottom={10} noBorderBottom />
           <Tablist flexBasis={240} marginRight={16}>
             {this.state.tabs.map((tab) => (
               <Tab
@@ -925,7 +1070,13 @@ export class Settings extends Component {
               </Pane>
             ))}
           </Pane>
-          <Pane display="flex" alignItems="center" justifyContent="center" gap={12} marginTop={16}>
+          <Pane
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            gap={12}
+            marginTop={16}
+          >
             {this.state.selectedTab === 'about' ? (
               <Button
                 height={32}

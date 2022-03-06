@@ -2,6 +2,7 @@ import { isAccessible } from 'helpers/block';
 
 describe('block helper', () => {
   it('detects accessible urls', () => {
+    // prettier-ignore
     const urls = [
       'http://website.com',
       'https://website.com',

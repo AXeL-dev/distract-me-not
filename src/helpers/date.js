@@ -1,4 +1,3 @@
-
 export const DaysOfWeek = [
   'monday',
   'tuesday',
@@ -6,7 +5,7 @@ export const DaysOfWeek = [
   'thursday',
   'friday',
   'saturday',
-  'sunday'
+  'sunday',
 ];
 
 export const DayNumber = {
