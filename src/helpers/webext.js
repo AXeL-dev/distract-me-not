@@ -157,21 +157,6 @@ export function getTab(tabId) {
   });
 }
 
-export function getActiveTabHostname() {
-  return new Promise((resolve) => {
-    getActiveTab().then((tab) => {
-      if (tab) {
-        const parser = document.createElement('a');
-        parser.href = tab.url;
-        const host = parser.hostname.replace(/^www\./i, '');
-        resolve(host);
-      } else {
-        resolve(null);
-      }
-    });
-  });
-}
-
 export function sendNotification(
   message,
   title = 'Distract Me Not',

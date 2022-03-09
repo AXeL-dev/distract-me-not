@@ -20,7 +20,6 @@ import {
   defaultAction,
   defaultIsEnabled,
   addCurrentWebsite,
-  addCurrentUrl,
 } from 'helpers/block';
 import { defaultSchedule, getTodaySchedule, isScheduleAllowed } from 'helpers/schedule';
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
@@ -412,12 +411,9 @@ export class Background extends Component {
   handleContextMenusClick = (info, tab) => {
     switch (info.menuItemId) {
       case 'block_current_domain':
-        this.contextMenusSettings.ignoreNextTabEvents = true;
-        addCurrentWebsite(this.mode, true, tab.id);
-        break;
       case 'block_current_url':
         this.contextMenusSettings.ignoreNextTabEvents = true;
-        addCurrentUrl(this.mode, true, tab.id);
+        addCurrentWebsite(this.mode, true, info.menuItemId === 'block_current_url');
         break;
       case 'settings':
         openExtensionPage('/settings');

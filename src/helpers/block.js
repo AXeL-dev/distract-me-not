@@ -2,7 +2,6 @@ import { translate } from './i18n';
 import {
   sendMessage,
   storage,
-  getActiveTabHostname,
   getActiveTab,
   createWindow,
   indexUrl,
@@ -136,28 +135,24 @@ export function blockUrl(url, mode = Mode.blacklist, tabId = null) {
   });
 }
 
-export async function addCurrentWebsite(mode, isPrompt = false, tabId = null) {
-  const hostname = await getActiveTabHostname();
-  if (hostname) {
-    const url = `*.${hostname}`;
-    if (isPrompt) {
-      createWindow(`${indexUrl}#addWebsitePrompt?url=${url}&mode=${mode}&tabId=${tabId}`, 600, 140);
-    } else {
-      blockUrl(url, mode);
-      return true;
-    }
+function getHostname(url) {
+  try {
+    const parser = document.createElement('a');
+    parser.href = url;
+    return parser.hostname.replace(/^www\./i, '');
+  } catch (error) {
+    return url.replace(/.*:\/\/(?:www.)?([^/]+).*/, '$1');
   }
-  return false;
 }
 
-export async function addCurrentUrl(mode, isPrompt = false, tabId = null) {
+export async function addCurrentWebsite(mode, isPrompt = false, exactUrl = false) {
   const tab = await getActiveTab();
   if (tab) {
-    const url = `${tab.url}$`;
+    const url = exactUrl ? `${tab.url}$` : `*.${getHostname(tab.url)}`;
     if (isPrompt) {
-      createWindow(`${indexUrl}#addWebsitePrompt?url=${encodeURIComponent(url)}&mode=${mode}&tabId=${tabId}`, 600, 140);
+      createWindow(`${indexUrl}#addWebsitePrompt?url=${encodeURIComponent(url)}&mode=${mode}&tabId=${tab.id}`, 600, 140);
     } else {
-      blockUrl(url, mode);
+      blockUrl(url, mode, tab.id);
       return true;
     }
   }
