@@ -11,6 +11,7 @@ export class AddWebsitePrompt extends Component {
     super(props);
     const params = props.location ? queryString.parse(props.location.search) : {};
     this.mode = params.mode || Mode.blacklist;
+    this.tabId = +params.tabId || null;
     this.state = {
       url: params.url || '',
       disabled: false,
@@ -43,8 +44,12 @@ export class AddWebsitePrompt extends Component {
     } else {
       this.setState({ disabled: true });
       try {
-        await blockUrl(this.state.url, this.mode);
-        window.close();
+        const blocked = await blockUrl(this.state.url, this.mode, this.tabId);
+        if (blocked) {
+          window.close();
+        } else {
+          throw new Error(translate('urlAlreadyExists'));
+        }
       } catch (error) {
         toaster.danger(error.message, { id: 'add-website-toaster' });
         this.setState({ disabled: false });

@@ -1,5 +1,13 @@
 import React, { Component } from 'react';
-import { storage, nativeAPI, indexUrl, getTab, sendNotification } from 'helpers/webext';
+import {
+  storage,
+  nativeAPI,
+  indexUrl,
+  getTab,
+  sendNotification,
+  openExtensionPage,
+  getActiveTab,
+} from 'helpers/webext';
 import {
   Mode,
   Action,
@@ -11,6 +19,8 @@ import {
   defaultMode,
   defaultAction,
   defaultIsEnabled,
+  addCurrentWebsite,
+  addCurrentUrl,
 } from 'helpers/block';
 import { defaultSchedule, getTodaySchedule, isScheduleAllowed } from 'helpers/schedule';
 import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
@@ -19,6 +29,39 @@ import { logger, defaultLogsSettings } from 'helpers/logger';
 import { defaultTimerSettings, unactiveTimerRuntimeSettings } from 'helpers/timer';
 import { now } from 'helpers/date';
 import { translate } from 'helpers/i18n';
+
+const contextMenus = [
+  {
+    title: translate('blockCurrentDomain'),
+    id: 'block_current_domain',
+    enabled: false,
+    contexts: ['page'],
+  },
+  {
+    title: translate('blockCurrentUrl'),
+    id: 'block_current_url',
+    enabled: false,
+    contexts: ['page'],
+  },
+  {
+    title: translate('settings'),
+    id: 'settings',
+    enabled: true,
+    contexts: ['page'],
+  },
+  {
+    title: translate('blacklistSettings'),
+    id: 'blacklist_settings',
+    enabled: true,
+    contexts: ['page'],
+  },
+  {
+    title: translate('whitelistSettings'),
+    id: 'whitelist_settings',
+    enabled: true,
+    contexts: ['page'],
+  },
+];
 
 export class Background extends Component {
   constructor(props) {
@@ -40,6 +83,9 @@ export class Background extends Component {
     this.hasBeenEnabledOnStartup = false;
     this.tmpAllowed = [];
     this.timerTimeout = null;
+    this.contextMenusSettings = {
+      ignoreNextTabEvents: false,
+    };
 
     this.init();
   }
@@ -93,8 +139,11 @@ export class Background extends Component {
     return this.isEnabled;
   };
 
-  setBlacklist = (blist) => {
+  setBlacklist = (blist, tabId = null) => {
     this.blacklist = transformList(blist);
+    if (tabId && this.isEnabled) {
+      this.checkTabById(tabId, 'setBlacklist');
+    }
   };
 
   getBlacklist = () => {
@@ -117,8 +166,11 @@ export class Background extends Component {
     return this.whitelistKeywords;
   };
 
-  setWhitelist = (wlist) => {
+  setWhitelist = (wlist, tabId = null) => {
     this.whitelist = transformList(wlist);
+    if (tabId && this.isEnabled) {
+      this.checkTabById(tabId, 'setWhitelist');
+    }
   };
 
   getWhitelist = () => {
@@ -226,8 +278,8 @@ export class Background extends Component {
         this.unblock = { ...this.unblock, ...items.unblock }; // merge
         this.schedule = {
           ...this.schedule,
-          ...(!items.schedule.time ? items.schedule : {}),
-        }; // omit old schedule settings in version <= 2.3.0
+          ...(!items.schedule.time ? items.schedule : {}), // omit old schedule settings in version <= 2.3.0
+        };
         this.redirectUrl = getValidUrl(items.redirectUrl);
         this.enableLogs = items.enableLogs;
         logger.maxLength = items.logsLength;
@@ -243,6 +295,44 @@ export class Background extends Component {
       });
     browser.runtime.onStartup.addListener(this.onBrowserStartup);
     browser.runtime.onMessage.addListener(this.handleMessage);
+    browser.contextMenus.onClicked.addListener(this.handleContextMenusClick);
+    this.initContextMenus();
+  };
+
+  initContextMenus = async () => {
+    const activeTab = await getActiveTab();
+    for (const menu of contextMenus) {
+      browser.contextMenus.create({
+        ...menu,
+        enabled: this.isContextMenuEnablable(menu, activeTab),
+      });
+    }
+    browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+      if (changeInfo.status === 'complete') {
+        if (this.contextMenusSettings.ignoreNextTabEvents) {
+          this.contextMenusSettings.ignoreNextTabEvents = false;
+        } else {
+          this.updateContextMenus(tab);
+        }
+      }
+    });
+    browser.tabs.onReplaced.addListener((addedTabId, removedTabId) => {
+      browser.tabs.get(addedTabId).then((tab) => {
+        if (tab) {
+          this.updateContextMenus(tab);
+        }
+      });
+    });
+    browser.tabs.onActivated.addListener((activeInfo) => {
+      if (this.contextMenusSettings.ignoreNextTabEvents) {
+        return;
+      }
+      browser.tabs.get(activeInfo.tabId).then((tab) => {
+        if (tab) {
+          this.updateContextMenus(tab);
+        }
+      });
+    });
   };
 
   updateIcon = () => {
@@ -317,6 +407,53 @@ export class Background extends Component {
       this.debug('response:', response);
       resolve({ response });
     });
+  };
+
+  handleContextMenusClick = (info, tab) => {
+    switch (info.menuItemId) {
+      case 'block_current_domain':
+        this.contextMenusSettings.ignoreNextTabEvents = true;
+        addCurrentWebsite(this.mode, true, tab.id);
+        break;
+      case 'block_current_url':
+        this.contextMenusSettings.ignoreNextTabEvents = true;
+        addCurrentUrl(this.mode, true, tab.id);
+        break;
+      case 'settings':
+        openExtensionPage('/settings');
+        break;
+      case 'blacklist_settings':
+        openExtensionPage('/settings?tab=blacklist');
+        break;
+      case 'whitelist_settings':
+        openExtensionPage('/settings?tab=whitelist');
+        break;
+      default:
+        this.debug('unknown context menu action:', info, tab);
+        break;
+    }
+  };
+
+  isContextMenuEnablable = (menu, tab) => {
+    switch (menu.id) {
+      case 'block_current_domain':
+      case 'block_current_url':
+        return tab ? isAccessible(tab.url) : false;
+      default:
+        return true;
+    }
+  };
+
+  updateContextMenus = (tab) => {
+    for (const menu of contextMenus) {
+      try {
+        browser.contextMenus.update(menu.id, {
+          enabled: this.isContextMenuEnablable(menu, tab),
+        });
+      } catch (error) {
+        this.debug(error);
+      }
+    }
   };
 
   unblockTab = (tabId, url, timeout) => {
@@ -580,7 +717,11 @@ export class Background extends Component {
   };
 
   onUpdatedHandler = (tabId, changeInfo, tab) => {
-    if (changeInfo.url && hasValidProtocol(changeInfo.url)) {
+    if (
+      changeInfo.status === 'loading' &&
+      changeInfo.url &&
+      hasValidProtocol(changeInfo.url)
+    ) {
       this.checkTab({ ...changeInfo, tabId: tabId }, 'onUpdatedHandler');
     }
   };
@@ -597,6 +738,13 @@ export class Background extends Component {
     const results = this.parseUrl(data, caller);
     if (results && results.redirectUrl) {
       this.redirectTab(data.tabId, results.redirectUrl);
+    }
+  };
+
+  checkTabById = async (tabId, caller) => {
+    const tab = await getTab(tabId);
+    if (tab) {
+      this.checkTab({ url: tab.url, tabId }, caller);
     }
   };
 

@@ -43,10 +43,14 @@ export function openOptionsPage() {
   }
 }
 
+function stripUrl(url) {
+  return url.split('?')[0];
+}
+
 export function openExtensionPage(url, options = {}) {
   options = {
     reloadIfExists: true,
-    closeCurrent: true,
+    closeCurrent: false,
     ...options,
   };
   const pageUrl = `${browser.runtime.getURL('index.html')}#${url}`;
@@ -58,9 +62,13 @@ export function openExtensionPage(url, options = {}) {
   nativeAPI.tabs.query({}, (tabs) => {
     if (tabs.length > 0) {
       for (const tab of tabs) {
-        if (tab.url.startsWith(pageUrl)) {
-          nativeAPI.tabs.reload(tab.id);
-          nativeAPI.tabs.update(tab.id, { active: true });
+        if (stripUrl(tab.url) === stripUrl(pageUrl)) {
+          nativeAPI.tabs.update(tab.id, {
+            url: pageUrl,
+            active: true,
+          }, () => {
+            nativeAPI.tabs.reload(tab.id);
+          });
           return;
         }
       }

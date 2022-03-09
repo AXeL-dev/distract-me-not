@@ -7,7 +7,9 @@ import { IconButton } from 'components';
 export class SettingsButton extends Component {
   goToSettings = () => {
     if (isWebExtension) {
-      openExtensionPage('/settings');
+      openExtensionPage('/settings', {
+        closeCurrent: true,
+      });
     } else {
       this.props.history.push('/settings');
     }

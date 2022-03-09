@@ -152,11 +152,11 @@ export class Settings extends Component {
         blacklistKeywords: [],
         whitelistKeywords: [],
       })
-      .then(async (items) => {
+      .then((items) => {
         if (items) {
           // Update state
           this.setOptions({
-            isEnabled: items.isEnabled || (await sendMessage('getIsEnabled')),
+            isEnabled: items.isEnabled,
             mode: items.mode,
             action: items.action,
             blockTab: {
@@ -375,9 +375,7 @@ export class Settings extends Component {
 
   openPage = (page) => {
     if (isWebExtension) {
-      openExtensionPage(page, {
-        closeCurrent: false,
-      });
+      openExtensionPage(page);
     } else {
       window.open(`#${page}`, '_blank');
     }

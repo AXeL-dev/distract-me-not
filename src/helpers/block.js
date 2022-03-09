@@ -66,7 +66,7 @@ export const defaultUnblock = {
 
 // prettier-ignore
 export function isAccessible(url) {
-  return url && !/^((file|chrome|edge|moz-extension|chrome-extension|extension):\/\/|about:)/i.test(url);
+  return !!url && !/^((file|chrome|edge|moz-extension|chrome-extension|extension):\/\/|about:)/i.test(url);
 }
 
 export function isPageReloaded() {
@@ -83,7 +83,7 @@ export function isPageReloaded() {
   }
 }
 
-export function blockUrl(url, mode = Mode.blacklist) {
+export function blockUrl(url, mode = Mode.blacklist, tabId = null) {
   return new Promise((resolve, reject) => {
     switch (mode) {
       case Mode.blacklist:
@@ -95,13 +95,14 @@ export function blockUrl(url, mode = Mode.blacklist) {
           .then(({ blacklist }) => {
             for (const item of blacklist) {
               if (item === url) {
+                resolve(false);
                 return;
               }
             }
             blacklist.splice(0, 0, url);
-            sendMessage('setBlacklist', blacklist);
+            sendMessage('setBlacklist', blacklist, tabId);
             storage.set({ blacklist: blacklist });
-            resolve();
+            resolve(true);
           })
           .catch((error) => {
             reject(error);
@@ -116,13 +117,14 @@ export function blockUrl(url, mode = Mode.blacklist) {
           .then(({ whitelist }) => {
             for (const item of whitelist) {
               if (item === url) {
+                resolve(false);
                 return;
               }
             }
             whitelist.splice(0, 0, url);
-            sendMessage('setWhitelist', whitelist);
+            sendMessage('setWhitelist', whitelist, tabId);
             storage.set({ whitelist: whitelist });
-            resolve();
+            resolve(true);
           })
           .catch((error) => {
             reject(error);
@@ -134,12 +136,26 @@ export function blockUrl(url, mode = Mode.blacklist) {
   });
 }
 
-export async function addCurrentWebsite(mode, isPrompt = false) {
+export async function addCurrentWebsite(mode, isPrompt = false, tabId = null) {
   const hostname = await getActiveTabHostname();
   if (hostname) {
     const url = `*.${hostname}`;
     if (isPrompt) {
-      createWindow(`${indexUrl}#addWebsitePrompt?url=${url}&mode=${mode}`, 600, 140);
+      createWindow(`${indexUrl}#addWebsitePrompt?url=${url}&mode=${mode}&tabId=${tabId}`, 600, 140);
+    } else {
+      blockUrl(url, mode);
+      return true;
+    }
+  }
+  return false;
+}
+
+export async function addCurrentUrl(mode, isPrompt = false, tabId = null) {
+  const tab = await getActiveTab();
+  if (tab) {
+    const url = `${tab.url}$`;
+    if (isPrompt) {
+      createWindow(`${indexUrl}#addWebsitePrompt?url=${encodeURIComponent(url)}&mode=${mode}&tabId=${tabId}`, 600, 140);
     } else {
       blockUrl(url, mode);
       return true;
@@ -153,19 +169,32 @@ export async function isActiveTabBlockable(mode) {
   if (!tab) {
     return false;
   }
-  if (!isAccessible(tab.url)) {
+  const isBlockable = await isTabBlockable(tab, mode);
+  return isBlockable;
+}
+
+export async function isTabBlockable(
+  tab,
+  mode,
+  { isBlacklistedCallback, isWhitelistedCallback } = {}
+) {
+  if (!tab || !isAccessible(tab.url)) {
     return false;
   } else {
     switch (mode) {
       case Mode.blacklist:
       case Mode.combined:
-        const isBlacklisted = await sendMessage('isBlacklisted', tab.url);
+        const isBlacklisted = isBlacklistedCallback
+          ? isBlacklistedCallback(tab.url)
+          : await sendMessage('isBlacklisted', tab.url);
         if (isBlacklisted) {
           return false;
         }
         break;
       case Mode.whitelist:
-        const isWhitelisted = await sendMessage('isWhitelisted', tab.url);
+        const isWhitelisted = isWhitelistedCallback
+          ? isWhitelistedCallback(tab.url)
+          : await sendMessage('isWhitelisted', tab.url);
         if (isWhitelisted) {
           return false;
         }
