@@ -82,9 +82,6 @@ export class Background extends Component {
     this.hasBeenEnabledOnStartup = false;
     this.tmpAllowed = [];
     this.timerTimeout = null;
-    this.contextMenusSettings = {
-      ignoreNextTabEvents: false,
-    };
 
     this.init();
   }
@@ -308,49 +305,50 @@ export class Background extends Component {
     }
     browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       if (changeInfo.status === 'complete') {
-        if (this.contextMenusSettings.ignoreNextTabEvents) {
-          this.contextMenusSettings.ignoreNextTabEvents = false;
-        } else {
-          this.updateContextMenus(tab);
-        }
+        this.updateContextMenus(tab);
       }
     });
     browser.tabs.onReplaced.addListener((addedTabId, removedTabId) => {
-      browser.tabs.get(addedTabId).then((tab) => {
+      getTab(addedTabId).then((tab) => {
         if (tab) {
           this.updateContextMenus(tab);
         }
       });
     });
     browser.tabs.onActivated.addListener((activeInfo) => {
-      if (this.contextMenusSettings.ignoreNextTabEvents) {
-        return;
-      }
-      browser.tabs.get(activeInfo.tabId).then((tab) => {
+      getTab(activeInfo.tabId).then((tab) => {
         if (tab) {
           this.updateContextMenus(tab);
         }
       });
     });
+    browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
+      setTimeout(() => {
+        getActiveTab().then((tab) => {
+          if (tab) {
+            this.updateContextMenus(tab);
+          }
+        });
+      }, 100);
+    });
   };
 
   updateIcon = () => {
     browser.browserAction.setIcon({
-      path: this.isEnabled
-        ? {
-            16: 'icons/magnet-16.png',
-            32: 'icons/magnet-32.png',
-            48: 'icons/magnet-48.png',
-            64: 'icons/magnet-64.png',
-            128: 'icons/magnet-128.png',
-          }
-        : {
-            16: 'icons/magnet-grayscale-16.png',
-            32: 'icons/magnet-grayscale-32.png',
-            48: 'icons/magnet-grayscale-48.png',
-            64: 'icons/magnet-grayscale-64.png',
-            128: 'icons/magnet-grayscale-128.png',
-          },
+      // prettier-ignore
+      path: this.isEnabled ? {
+        16: 'icons/magnet-16.png',
+        32: 'icons/magnet-32.png',
+        48: 'icons/magnet-48.png',
+        64: 'icons/magnet-64.png',
+        128: 'icons/magnet-128.png',
+      } : {
+        16: 'icons/magnet-grayscale-16.png',
+        32: 'icons/magnet-grayscale-32.png',
+        48: 'icons/magnet-grayscale-48.png',
+        64: 'icons/magnet-grayscale-64.png',
+        128: 'icons/magnet-grayscale-128.png',
+      },
     });
   };
 
@@ -412,7 +410,6 @@ export class Background extends Component {
     switch (info.menuItemId) {
       case 'block_current_domain':
       case 'block_current_url':
-        this.contextMenusSettings.ignoreNextTabEvents = true;
         addCurrentWebsite(this.mode, true, info.menuItemId === 'block_current_url');
         break;
       case 'settings':
@@ -723,7 +720,7 @@ export class Background extends Component {
   };
 
   onReplacedHandler = (addedTabId, removedTabId) => {
-    browser.tabs.get(addedTabId).then((tab) => {
+    getTab(addedTabId).then((tab) => {
       if (tab) {
         this.checkTab({ url: tab.url, tabId: tab.id }, 'onReplacedHandler');
       }
@@ -737,11 +734,12 @@ export class Background extends Component {
     }
   };
 
-  checkTabById = async (tabId, caller) => {
-    const tab = await getTab(tabId);
-    if (tab) {
-      this.checkTab({ url: tab.url, tabId }, caller);
-    }
+  checkTabById = (tabId, caller) => {
+    getTab(tabId).then((tab) => {
+      if (tab) {
+        this.checkTab({ url: tab.url, tabId }, caller);
+      }
+    });
   };
 
   enableEventListeners = () => {

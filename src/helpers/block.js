@@ -1,12 +1,6 @@
 import { translate } from './i18n';
 import { getHostname } from './url';
-import {
-  sendMessage,
-  storage,
-  getActiveTab,
-  createWindow,
-  indexUrl,
-} from './webext';
+import { sendMessage, storage, getActiveTab, createWindow, indexUrl } from './webext';
 
 export const Mode = {
   blacklist: 'blacklist',
