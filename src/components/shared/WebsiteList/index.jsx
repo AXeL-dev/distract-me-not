@@ -26,7 +26,7 @@ import { TextField } from 'components';
 import { translate } from 'helpers/i18n';
 import { debug } from 'helpers/debug';
 import { download, readFile } from 'helpers/file';
-import { getHostName, getFaviconLink, checkFaviconLink, isUrl } from 'helpers/url';
+import { getHostname, getFaviconLink, checkFaviconLink, isUrl } from 'helpers/url';
 import './styles.scss';
 
 const Order = {
@@ -75,7 +75,7 @@ export class WebsiteList extends Component {
 
   getFavicon = (url) => {
     // Get favicon by hostname
-    const hostName = getHostName(url);
+    const hostName = getHostname(url);
     if (this.state.favicons[hostName] !== undefined) {
       return;
     } else {
@@ -389,7 +389,7 @@ export class WebsiteList extends Component {
   };
 
   renderRow = ({ row }) => {
-    const hostName = getHostName(row.url);
+    const hostName = getHostname(row.url);
 
     return (
       <Table.Row key={row.id}>

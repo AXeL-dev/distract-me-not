@@ -4,17 +4,16 @@ export function isUrl(url) {
   );
 }
 
-export function getHostName(url) {
-  return getDomainName(url).split('.').slice(-2).join('.'); //.replace(/^w+\./i, '');
+export function stripUrl(url) {
+  return url.split('?')[0];
 }
 
-export function getDomainName(url) {
-  const matches = url.match(/^(?:https?:)?(?:\/\/)?([^/?]+)/i); // or: /^https?\:\/\/([^/?#]+)(?:[/?#]|$)/i
-  return matches ? matches[1] : url;
+export function getHostname(url) {
+  return url.replace(/^(?:.*:\/\/)?(?:(?:www|\*)\.)?([^/]+).*/i, '$1');
 }
 
 export function getFaviconLink(url) {
-  return `https://${getHostName(url).replace(/\$$/, '')}/favicon.ico`;
+  return `https://${getHostname(url)}/favicon.ico`;
 }
 
 export function checkFaviconLink(faviconLink) {

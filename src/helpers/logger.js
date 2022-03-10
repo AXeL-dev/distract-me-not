@@ -1,4 +1,4 @@
-import { storage } from 'helpers/webext';
+import { storage } from './webext';
 
 export const defaultLogsSettings = {
   isEnabled: false,

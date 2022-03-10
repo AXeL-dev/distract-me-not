@@ -22,7 +22,7 @@ import {
   addCurrentWebsite,
 } from 'helpers/block';
 import { defaultSchedule, getTodaySchedule, isScheduleAllowed } from 'helpers/schedule';
-import { hasValidProtocol, getValidUrl, getHostName } from 'helpers/url';
+import { hasValidProtocol, getValidUrl, getHostname } from 'helpers/url';
 import { transformList, transformKeywords } from 'helpers/regex';
 import { logger, defaultLogsSettings } from 'helpers/logger';
 import { defaultTimerSettings, unactiveTimerRuntimeSettings } from 'helpers/timer';
@@ -457,7 +457,7 @@ export class Background extends Component {
       this.tmpAllowed.push({
         time: timeout,
         startedAt: new Date().getTime(),
-        hostname: getHostName(url),
+        hostname: getHostname(url),
       });
 
       if (
@@ -546,7 +546,7 @@ export class Background extends Component {
   isTmpAllowed = (url) => {
     if (this.tmpAllowed.length) {
       this.removeOutdatedTmpAllowed();
-      const hostname = getHostName(url);
+      const hostname = getHostname(url);
       const index = this.tmpAllowed.map((allowed) => allowed.hostname).indexOf(hostname);
       if (index !== -1) {
         this.debug('tmp allowed:', url);

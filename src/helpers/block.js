@@ -1,11 +1,12 @@
 import { translate } from './i18n';
+import { getHostname } from './url';
 import {
   sendMessage,
   storage,
   getActiveTab,
   createWindow,
   indexUrl,
-} from 'helpers/webext';
+} from './webext';
 
 export const Mode = {
   blacklist: 'blacklist',
@@ -133,16 +134,6 @@ export function blockUrl(url, mode = Mode.blacklist, tabId = null) {
         break;
     }
   });
-}
-
-function getHostname(url) {
-  try {
-    const parser = document.createElement('a');
-    parser.href = url;
-    return parser.hostname.replace(/^www\./i, '');
-  } catch (error) {
-    return url.replace(/.*:\/\/(?:www.)?([^/]+).*/, '$1');
-  }
 }
 
 export async function addCurrentWebsite(mode, isPrompt = false, exactUrl = false) {

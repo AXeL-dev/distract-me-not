@@ -1,4 +1,5 @@
 import { report } from './debug';
+import { stripUrl } from './url';
 
 function getNativeAPI() {
   try {
@@ -41,10 +42,6 @@ export function openOptionsPage() {
   } catch (error) {
     report.error(error);
   }
-}
-
-function stripUrl(url) {
-  return url.split('?')[0];
 }
 
 export function openExtensionPage(url, options = {}) {
