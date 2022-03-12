@@ -22,7 +22,7 @@ export function SegmentedControlField(props) {
   const isSmallScreen = isSmallDevice();
 
   return (
-    <OuterPane display="flex" gap={10} {...props}>
+    <OuterPane display="flex" gap={props.gap || 10} {...props}>
       <Pane display="flex" alignItems="center" flex={1}>
         <TooltipLabel
           text={props.label}

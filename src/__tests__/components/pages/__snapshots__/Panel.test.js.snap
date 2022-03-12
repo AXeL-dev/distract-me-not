@@ -68,7 +68,7 @@ exports[`renders panel correctly 1`] = `
         </div>
       </div>
       <div
-        class="ub-dspl_flex ub-pt_20px ub-gap_10px ub-box-szg_border-box"
+        class="ub-dspl_flex ub-pt_20px ub-gap_20px ub-box-szg_border-box"
       >
         <div
           class="ub-dspl_flex ub-algn-itms_center ub-flx_1 ub-box-szg_border-box"
@@ -83,7 +83,7 @@ exports[`renders panel correctly 1`] = `
           class="ub-dspl_flex ub-algn-itms_center ub-min-w_0px ub-box-szg_border-box"
         >
           <div
-            class="css-l6zppx ub-dspl_inline-flex ub-max-w_260px ub-box-szg_border-box"
+            class="css-l6zppx ub-dspl_inline-flex ub-max-w_100prcnt ub-box-szg_border-box"
             role="group"
           >
             <button
