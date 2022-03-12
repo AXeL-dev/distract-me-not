@@ -42,7 +42,7 @@ export class PasswordPrompt extends Component {
     this.hasHeader = this.getProp('hasHeader');
     this.hasFooter = this.getProp('hasFooter');
     this.showAddWebsitePrompt = false;
-    this.isWideScreen = this.getIsWideScreenPage() && !isSmallDevice();
+    this.isSmallScreen = isSmallDevice();
     debug.log({ hash: this.hash, props });
     this.state = {
       password: '',
@@ -69,11 +69,6 @@ export class PasswordPrompt extends Component {
 
   getQueryParams(defaultValue = '') {
     return this.getLocationStateProp('search') || defaultValue;
-  }
-
-  getIsWideScreenPage() {
-    const redirectPath = this.getRedirectPath('/pwd');
-    return ['/settings', '/logs', '/pwd'].includes(redirectPath);
   }
 
   componentDidMount() {
@@ -173,34 +168,6 @@ export class PasswordPrompt extends Component {
     this.checkPassword();
   };
 
-  getMinWidth = () => {
-    return this.props.minWidth || (this.isWideScreen ? 580 : 350);
-  };
-
-  getMinHeight = () => {
-    return this.props.minHeight || (this.isWideScreen ? 380 : 230);
-  };
-
-  getInputWidth = () => {
-    return this.props.inputWidth || (this.isWideScreen ? 320 : '70%');
-  };
-
-  getInputHeight = () => {
-    return this.props.inputHeight || (this.isWideScreen ? 36 : 32);
-  };
-
-  getButtonWidth = () => {
-    return (
-      this.props.buttonWidth || this.props.inputHeight || (this.isWideScreen ? 36 : 32)
-    );
-  };
-
-  getButtonHeight = () => {
-    return (
-      this.props.buttonHeight || this.props.inputHeight || (this.isWideScreen ? 36 : 32)
-    );
-  };
-
   render() {
     return (
       <Pane
@@ -208,8 +175,8 @@ export class PasswordPrompt extends Component {
         flexDirection="column"
         width="100%"
         height="100%"
-        minWidth={this.getMinWidth()}
-        minHeight={this.getMinHeight()}
+        minWidth={this.props.minWidth || 350}
+        minHeight={this.props.minHeight || 230}
       >
         {this.hasHeader && <Header />}
         <Pane
@@ -220,11 +187,11 @@ export class PasswordPrompt extends Component {
           alignItems="center"
           justifyContent="center"
         >
-          <Pane display="flex" width={this.getInputWidth()}>
+          <Pane display="flex" width="70%" maxWidth={320}>
             <Pane display="flex" alignItems="center" flex={1}>
               <TextInput
                 width="100%"
-                height={this.getInputHeight()}
+                height={this.isSmallScreen ? 32 : 36}
                 type="password"
                 value={this.state.password}
                 onChange={(event) => this.setState({ password: event.target.value })}
@@ -243,8 +210,8 @@ export class PasswordPrompt extends Component {
                 borderTopLeftRadius={0}
                 borderBottomLeftRadius={0}
                 onClick={this.handleButtonClick}
-                width={this.getButtonWidth()}
-                height={this.getButtonHeight()}
+                width={this.isSmallScreen ? 32 : 36}
+                height={this.isSmallScreen ? 32 : 36}
               />
             </Pane>
           </Pane>

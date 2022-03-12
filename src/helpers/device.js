@@ -1,3 +1,3 @@
 export function isSmallDevice() {
-  return window.innerWidth < 1000;
+  return window.innerWidth < 900;
 }

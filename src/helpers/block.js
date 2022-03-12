@@ -1,5 +1,6 @@
 import { translate } from './i18n';
-import { getHostname } from './url';
+import { isSmallDevice } from './device';
+import { getHostname, isUrl } from './url';
 import { sendMessage, storage, getActiveTab, createWindow, indexUrl } from './webext';
 
 export const Mode = {
@@ -135,7 +136,14 @@ export async function addCurrentWebsite(mode, isPrompt = false, exactUrl = false
   if (tab) {
     const url = exactUrl ? `${tab.url}$` : `*.${getHostname(tab.url)}`;
     if (isPrompt) {
-      createWindow(`${indexUrl}#addWebsitePrompt?url=${encodeURIComponent(url)}&mode=${mode}&tabId=${tab.id}`, 600, 140);
+      if (isSmallDevice()) {
+        const response = window.prompt(translate('addWebsite'), url);
+        if (response !== null && isUrl(response)) {
+          blockUrl(response, mode, tab.id);
+        }
+      } else {
+        createWindow(`${indexUrl}#addWebsitePrompt?url=${encodeURIComponent(url)}&mode=${mode}&tabId=${tab.id}`, 600, 140);
+      }
     } else {
       blockUrl(url, mode, tab.id);
       return true;
