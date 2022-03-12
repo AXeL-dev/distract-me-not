@@ -194,7 +194,6 @@ export class Panel extends Component {
                   labelClassName="cursor-default"
                   checked={this.state.isEnabled}
                   onChange={(event) => this.toggleStatus(event.target.checked)}
-                  height={20}
                 />
               )}
               <SegmentedControlField

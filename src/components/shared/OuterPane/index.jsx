@@ -22,6 +22,7 @@ export function OuterPane(props) {
       marginBottom={props.marginBottom || props.marginY}
       marginLeft={props.marginLeft || props.marginX}
       marginRight={props.marginRight || props.marginX}
+      gap={props.gap}
     >
       {props.children}
     </Pane>

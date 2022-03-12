@@ -121,3 +121,16 @@ button.unblock {
     padding: 16px;
   }
 }
+
+@media screen and (max-width: 600px) {
+  .distract-overlay-top-text {
+    font-size: 24px;
+  }
+  .distract-overlay-img {
+    width: 100px;
+    height: 100px;
+  }
+  button.unblock {
+    font-size: 12px;
+  }
+}

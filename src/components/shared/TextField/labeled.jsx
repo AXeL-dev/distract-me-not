@@ -18,6 +18,7 @@ function TextField(props) {
       <Pane
         display="flex"
         alignItems="center"
+        width={props.width}
         marginRight={props.position === Position.LEFT ? 12 : 0}
       >
         <TextInput

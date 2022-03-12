@@ -45,9 +45,11 @@ import {
   TextField,
   WordList,
   Tooltip,
+  TruncatedText,
 } from 'components';
 import { defaultLogsSettings } from 'helpers/logger';
 import { defaultTimerSettings } from 'helpers/timer';
+import { isSmallDevice } from 'helpers/device';
 import { version } from '../../../package.json';
 import { set, cloneDeep } from 'lodash';
 import './styles.scss';
@@ -59,6 +61,7 @@ export class Settings extends Component {
     this.whitelistComponentRef = React.createRef();
     this.blacklistKeywordsComponentRef = React.createRef();
     this.whitelistKeywordsComponentRef = React.createRef();
+    this.isSmallScreen = isSmallDevice();
     // prettier-ignore
     const tabs = [
       { label: translate('blocking'), id: 'blocking' },
@@ -455,8 +458,9 @@ export class Settings extends Component {
               !this.state.options.isEnabled ||
               this.state.options.blockTab.displayBlankPage
             }
-            width={500}
+            width={this.isSmallScreen ? '100%' : 500}
             marginBottom={16}
+            gap={10}
           />
           <Checkbox
             label={translate('displayBlankPage')}
@@ -539,12 +543,22 @@ export class Settings extends Component {
           }
           marginBottom={16}
         />
-        <Pane display="flex">
-          <Pane width={180}>
-            <Tablist flexBasis={240} marginRight={16}>
+        <Pane display="flex" flexDirection={this.isSmallScreen ? 'column' : 'row'}>
+          <Pane width={this.isSmallScreen ? '100%' : 180}>
+            <Tablist
+              display="flex"
+              flexDirection={this.isSmallScreen ? 'row' : 'column'}
+              flexBasis={this.isSmallScreen ? 'auto' : 240}
+              marginRight={this.isSmallScreen ? 0 : 16}
+              marginBottom={this.isSmallScreen ? 16 : 0}
+              overflow={this.isSmallScreen ? 'auto' : 'initial'}
+              padding={this.isSmallScreen ? 2 : 0}
+              gap={this.isSmallScreen ? 5 : 0}
+            >
               {this.state.scheduleDays.map((day) => (
                 <Tab
                   direction="vertical"
+                  whiteSpace="nowrap"
                   key={day.value}
                   id={day.value}
                   onSelect={() => this.setState({ selectedScheduleDay: day.value })}
@@ -642,7 +656,6 @@ export class Settings extends Component {
               {currentScheduleDayRanges.length < 2 && (
                 <Button
                   height={32}
-                  className="overflow-ellipsis"
                   iconBefore={PlusIcon}
                   marginRight={16}
                   onClick={() =>
@@ -653,14 +666,13 @@ export class Settings extends Component {
                   }
                   disabled={!this.state.options.schedule.isEnabled}
                 >
-                  {translate('addScheduleRange')}
+                  <TruncatedText>{translate('addScheduleRange')}</TruncatedText>
                 </Button>
               )}
               {currentScheduleDayRanges.length > 0 && (
                 <Fragment>
                   <Button
                     height={32}
-                    className="overflow-ellipsis"
                     iconBefore={CrossIcon}
                     marginRight={16}
                     onClick={() =>
@@ -671,16 +683,15 @@ export class Settings extends Component {
                     }
                     disabled={!this.state.options.schedule.isEnabled}
                   >
-                    {translate('deleteLastScheduleRange')}
+                    <TruncatedText>{translate('deleteLastScheduleRange')}</TruncatedText>
                   </Button>
                   <Button
                     height={32}
-                    className="overflow-ellipsis"
                     iconBefore={DuplicateIcon}
                     onClick={() => this.openDialog('applyScheduleSettings')}
                     disabled={!this.state.options.schedule.isEnabled}
                   >
-                    {translate('applyScheduleSettings')}
+                    <TruncatedText>{translate('applyScheduleSettings')}</TruncatedText>
                   </Button>
                 </Fragment>
               )}
@@ -726,6 +737,7 @@ export class Settings extends Component {
       <Tablist marginBottom={16} flexBasis={240}>
         {this.state.blacklistTabs.map((tab) => (
           <Tab
+            whiteSpace="nowrap"
             key={tab.id}
             id={tab.id}
             onSelect={() => this.setState({ selectedBlacklistTab: tab.id })}
@@ -792,6 +804,7 @@ export class Settings extends Component {
       <Tablist marginBottom={16} flexBasis={240}>
         {this.state.whitelistTabs.map((tab) => (
           <Tab
+            whiteSpace="nowrap"
             key={tab.id}
             id={tab.id}
             onSelect={() => this.setState({ selectedWhitelistTab: tab.id })}
@@ -845,6 +858,7 @@ export class Settings extends Component {
         disabled={!this.state.options.password.isEnabled}
         //data-testid="password"
         marginBottom={16}
+        gap={10}
         hasRandomButton
       />
       <Checkbox
@@ -1021,13 +1035,29 @@ export class Settings extends Component {
 
   render() {
     return (
-      <Pane display="flex" padding={16} minWidth={960} width={1080}>
-        <Pane width={250}>
+      <Pane
+        display="flex"
+        padding={16}
+        minWidth={this.isSmallScreen ? 'auto' : 960}
+        width={this.isSmallScreen ? '100%' : 1080}
+        flexDirection={this.isSmallScreen ? 'column' : 'row'}
+      >
+        <Pane width={this.isSmallScreen ? '100%' : 250}>
           <Header height={50} justifyContent="start" marginBottom={10} noBorderBottom />
-          <Tablist flexBasis={240} marginRight={16}>
+          <Tablist
+            display="flex"
+            flexDirection={this.isSmallScreen ? 'row' : 'column'}
+            flexBasis={this.isSmallScreen ? 'auto' : 240}
+            marginRight={this.isSmallScreen ? 0 : 16}
+            marginBottom={this.isSmallScreen ? 16 : 0}
+            overflow={this.isSmallScreen ? 'auto' : 'initial'}
+            padding={this.isSmallScreen ? 2 : 0}
+            gap={this.isSmallScreen ? 5 : 0}
+          >
             {this.state.tabs.map((tab) => (
               <Tab
                 direction="vertical"
+                whiteSpace="nowrap"
                 key={tab.id}
                 id={tab.id}
                 onSelect={() => this.selectTab(tab.id)}

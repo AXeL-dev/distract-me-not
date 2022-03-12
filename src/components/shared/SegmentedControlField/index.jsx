@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pane, Group, Button } from 'evergreen-ui';
-import { OuterPane, TooltipLabel } from 'components';
+import { OuterPane, TooltipLabel, TruncatedText } from 'components';
+import { isSmallDevice } from 'helpers/device';
 
 export function SegmentedControlField(props) {
   const options = props.options.map((option) => ({
@@ -18,8 +19,10 @@ export function SegmentedControlField(props) {
     value: option.value,
   }));
 
+  const isSmallScreen = isSmallDevice();
+
   return (
-    <OuterPane display="flex" {...props}>
+    <OuterPane display="flex" gap={10} {...props}>
       <Pane display="flex" alignItems="center" flex={1}>
         <TooltipLabel
           text={props.label}
@@ -31,8 +34,8 @@ export function SegmentedControlField(props) {
           disabled={props.changeLabelColorOnDisable && props.disabled}
         />
       </Pane>
-      <Pane display="flex" alignItems="center">
-        <Group maxWidth={props.maxWidth}>
+      <Pane display="flex" alignItems="center" minWidth={0}>
+        <Group maxWidth={props.maxWidth || '100%'}>
           {options.map(({ label, value }) => {
             const checked = props.value === value;
 
@@ -42,9 +45,11 @@ export function SegmentedControlField(props) {
                 appearance={checked ? 'primary' : 'default'}
                 disabled={props.disabled}
                 onClick={() => props.onChange && props.onChange(value)}
+                paddingLeft={isSmallScreen ? 12 : 16}
+                paddingRight={isSmallScreen ? 12 : 16}
                 data-checked={checked}
               >
-                {label}
+                <TruncatedText>{label}</TruncatedText>
               </Button>
             );
           })}

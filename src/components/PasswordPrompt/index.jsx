@@ -30,6 +30,7 @@ import {
   addCurrentWebsite,
   isActiveTabBlockable,
 } from 'helpers/block';
+import { isSmallDevice } from 'helpers/device';
 
 const defaultHash = process.env.REACT_APP_HASH;
 
@@ -41,7 +42,7 @@ export class PasswordPrompt extends Component {
     this.hasHeader = this.getProp('hasHeader');
     this.hasFooter = this.getProp('hasFooter');
     this.showAddWebsitePrompt = false;
-    this.isWideScreen = this.getIsWideScreen();
+    this.isWideScreen = this.getIsWideScreenPage() && !isSmallDevice();
     debug.log({ hash: this.hash, props });
     this.state = {
       password: '',
@@ -70,7 +71,7 @@ export class PasswordPrompt extends Component {
     return this.getLocationStateProp('search') || defaultValue;
   }
 
-  getIsWideScreen() {
+  getIsWideScreenPage() {
     const redirectPath = this.getRedirectPath('/pwd');
     return ['/settings', '/logs', '/pwd'].includes(redirectPath);
   }
