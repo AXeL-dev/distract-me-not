@@ -56,6 +56,14 @@ describe('url helper', () => {
         expected: 'website.com',
       },
       {
+        url: 'https://www.website.com',
+        expected: 'website.com',
+      },
+      {
+        url: 'https://m.website.com',
+        expected: 'website.com',
+      },
+      {
         url: '*.website.com',
         expected: 'website.com',
       },

@@ -140,6 +140,7 @@ export async function addCurrentWebsite(mode, isPrompt = false, exactUrl = false
         const response = window.prompt(translate('addWebsite'), url);
         if (response !== null && isUrl(response)) {
           blockUrl(response, mode, tab.id);
+          return true;
         }
       } else {
         createWindow(`${indexUrl}#addWebsitePrompt?url=${encodeURIComponent(url)}&mode=${mode}&tabId=${tab.id}`, 600, 140);
