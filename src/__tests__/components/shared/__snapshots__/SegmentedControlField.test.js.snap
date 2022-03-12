@@ -3,7 +3,7 @@
 exports[`renders correctly 1`] = `
 <DocumentFragment>
   <div
-    class="ub-dspl_flex ub-box-szg_border-box"
+    class="ub-dspl_flex ub-gap_10px ub-box-szg_border-box"
   >
     <div
       class="ub-dspl_flex ub-algn-itms_center ub-flx_1 ub-box-szg_border-box"
@@ -13,29 +13,41 @@ exports[`renders correctly 1`] = `
       />
     </div>
     <div
-      class="ub-dspl_flex ub-algn-itms_center ub-box-szg_border-box"
+      class="ub-dspl_flex ub-algn-itms_center ub-min-w_0px ub-box-szg_border-box"
     >
       <div
-        class="css-l6zppx ub-dspl_inline-flex ub-box-szg_border-box"
+        class="css-l6zppx ub-dspl_inline-flex ub-max-w_100prcnt ub-box-szg_border-box"
         role="group"
       >
         <button
           class="css-12b25td ub-pst_relative ub-f-wght_500 ub-dspl_inline-flex ub-algn-itms_center ub-flx-wrap_nowrap ub-just-cnt_center ub-txt-deco_none ub-ver-algn_middle ub-b-btm_1px-solid-c1c4d6 ub-b-lft_1px-solid-c1c4d6 ub-b-rgt_1px-solid-c1c4d6 ub-b-top_1px-solid-c1c4d6 ub-otln_iu2jf4 ub-usr-slct_none ub-crsr_pointer ub-wht-spc_nowrap ub-fnt-fam_b77syt ub-bblr_4px ub-bbrr_4px ub-btlr_4px ub-btrr_4px ub-color_474d66 ub-tstn_n1akt6 ub-h_32px ub-min-w_32px ub-fnt-sze_12px ub-ln-ht_32px ub-pl_16px ub-pr_16px ub-bg-clr_white ub-box-szg_border-box"
           data-checked="false"
         >
-          Option 1
+          <span
+            class="overflow-ellipsis"
+          >
+            Option 1
+          </span>
         </button>
         <button
           class="css-12b25td ub-pst_relative ub-f-wght_500 ub-dspl_inline-flex ub-algn-itms_center ub-flx-wrap_nowrap ub-just-cnt_center ub-txt-deco_none ub-ver-algn_middle ub-b-btm_1px-solid-c1c4d6 ub-b-lft_1px-solid-c1c4d6 ub-b-rgt_1px-solid-c1c4d6 ub-b-top_1px-solid-c1c4d6 ub-otln_iu2jf4 ub-usr-slct_none ub-crsr_pointer ub-wht-spc_nowrap ub-fnt-fam_b77syt ub-bblr_4px ub-bbrr_4px ub-btlr_4px ub-btrr_4px ub-color_474d66 ub-tstn_n1akt6 ub-h_32px ub-min-w_32px ub-fnt-sze_12px ub-ln-ht_32px ub-pl_16px ub-pr_16px ub-bg-clr_white ub-box-szg_border-box"
           data-checked="false"
         >
-          Option 2
+          <span
+            class="overflow-ellipsis"
+          >
+            Option 2
+          </span>
         </button>
         <button
           class="css-12b25td ub-pst_relative ub-f-wght_500 ub-dspl_inline-flex ub-algn-itms_center ub-flx-wrap_nowrap ub-just-cnt_center ub-txt-deco_none ub-ver-algn_middle ub-b-btm_1px-solid-c1c4d6 ub-b-lft_1px-solid-c1c4d6 ub-b-rgt_1px-solid-c1c4d6 ub-b-top_1px-solid-c1c4d6 ub-otln_iu2jf4 ub-usr-slct_none ub-crsr_pointer ub-wht-spc_nowrap ub-fnt-fam_b77syt ub-bblr_4px ub-bbrr_4px ub-btlr_4px ub-btrr_4px ub-color_474d66 ub-tstn_n1akt6 ub-h_32px ub-min-w_32px ub-fnt-sze_12px ub-ln-ht_32px ub-pl_16px ub-pr_16px ub-bg-clr_white ub-box-szg_border-box"
           data-checked="false"
         >
-          Option 3
+          <span
+            class="overflow-ellipsis"
+          >
+            Option 3
+          </span>
         </button>
       </div>
     </div>

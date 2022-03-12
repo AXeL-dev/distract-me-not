@@ -45,11 +45,13 @@ import {
   TextField,
   WordList,
   Tooltip,
+  TruncatedText,
 } from 'components';
 import { defaultLogsSettings } from 'helpers/logger';
 import { defaultTimerSettings } from 'helpers/timer';
+import { isSmallDevice } from 'helpers/device';
 import { version } from '../../../package.json';
-import { set, cloneDeep } from 'lodash';
+import { set, cloneDeep, debounce } from 'lodash';
 import './styles.scss';
 
 export class Settings extends Component {
@@ -126,6 +128,7 @@ export class Settings extends Component {
           enableOnBrowserStartup: false,
         },
       },
+      isSmallScreen: isSmallDevice(),
     };
   }
 
@@ -209,7 +212,16 @@ export class Settings extends Component {
           this.whitelistKeywordsComponentRef.current.setList(items.whitelistKeywords);
         }
       });
+    window.addEventListener('resize', this.handleResize);
   }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
+  }
+
+  handleResize = debounce(() => {
+    this.setState({ isSmallScreen: isSmallDevice() });
+  }, 200);
 
   changeAction = (event) => {
     const action = event.target.value;
@@ -455,8 +467,9 @@ export class Settings extends Component {
               !this.state.options.isEnabled ||
               this.state.options.blockTab.displayBlankPage
             }
-            width={500}
+            width={this.state.isSmallScreen ? '100%' : 500}
             marginBottom={16}
+            gap={20}
           />
           <Checkbox
             label={translate('displayBlankPage')}
@@ -539,12 +552,22 @@ export class Settings extends Component {
           }
           marginBottom={16}
         />
-        <Pane display="flex">
-          <Pane width={180}>
-            <Tablist flexBasis={240} marginRight={16}>
+        <Pane display="flex" flexDirection={this.state.isSmallScreen ? 'column' : 'row'}>
+          <Pane width={this.state.isSmallScreen ? '100%' : 180}>
+            <Tablist
+              display="flex"
+              flexDirection={this.state.isSmallScreen ? 'row' : 'column'}
+              flexBasis={this.state.isSmallScreen ? 'auto' : 240}
+              marginRight={this.state.isSmallScreen ? 0 : 16}
+              marginBottom={this.state.isSmallScreen ? 16 : 0}
+              overflow={this.state.isSmallScreen ? 'auto' : 'initial'}
+              padding={this.state.isSmallScreen ? 2 : 0}
+              gap={this.state.isSmallScreen ? 5 : 0}
+            >
               {this.state.scheduleDays.map((day) => (
                 <Tab
                   direction="vertical"
+                  whiteSpace="nowrap"
                   key={day.value}
                   id={day.value}
                   onSelect={() => this.setState({ selectedScheduleDay: day.value })}
@@ -552,7 +575,7 @@ export class Settings extends Component {
                   aria-controls={`schedule-panel-${day.value}`}
                   fontSize={14}
                   height={30}
-                  marginBottom={6}
+                  marginBottom={this.state.isSmallScreen ? 0 : 6}
                   disabled={!this.state.options.schedule.isEnabled}
                 >
                   {day.label}
@@ -642,7 +665,6 @@ export class Settings extends Component {
               {currentScheduleDayRanges.length < 2 && (
                 <Button
                   height={32}
-                  className="overflow-ellipsis"
                   iconBefore={PlusIcon}
                   marginRight={16}
                   onClick={() =>
@@ -653,14 +675,13 @@ export class Settings extends Component {
                   }
                   disabled={!this.state.options.schedule.isEnabled}
                 >
-                  {translate('addScheduleRange')}
+                  <TruncatedText>{translate('addScheduleRange')}</TruncatedText>
                 </Button>
               )}
               {currentScheduleDayRanges.length > 0 && (
                 <Fragment>
                   <Button
                     height={32}
-                    className="overflow-ellipsis"
                     iconBefore={CrossIcon}
                     marginRight={16}
                     onClick={() =>
@@ -671,16 +692,15 @@ export class Settings extends Component {
                     }
                     disabled={!this.state.options.schedule.isEnabled}
                   >
-                    {translate('deleteLastScheduleRange')}
+                    <TruncatedText>{translate('deleteLastScheduleRange')}</TruncatedText>
                   </Button>
                   <Button
                     height={32}
-                    className="overflow-ellipsis"
                     iconBefore={DuplicateIcon}
                     onClick={() => this.openDialog('applyScheduleSettings')}
                     disabled={!this.state.options.schedule.isEnabled}
                   >
-                    {translate('applyScheduleSettings')}
+                    <TruncatedText>{translate('applyScheduleSettings')}</TruncatedText>
                   </Button>
                 </Fragment>
               )}
@@ -726,6 +746,7 @@ export class Settings extends Component {
       <Tablist marginBottom={16} flexBasis={240}>
         {this.state.blacklistTabs.map((tab) => (
           <Tab
+            whiteSpace="nowrap"
             key={tab.id}
             id={tab.id}
             onSelect={() => this.setState({ selectedBlacklistTab: tab.id })}
@@ -792,6 +813,7 @@ export class Settings extends Component {
       <Tablist marginBottom={16} flexBasis={240}>
         {this.state.whitelistTabs.map((tab) => (
           <Tab
+            whiteSpace="nowrap"
             key={tab.id}
             id={tab.id}
             onSelect={() => this.setState({ selectedWhitelistTab: tab.id })}
@@ -845,6 +867,7 @@ export class Settings extends Component {
         disabled={!this.state.options.password.isEnabled}
         //data-testid="password"
         marginBottom={16}
+        gap={10}
         hasRandomButton
       />
       <Checkbox
@@ -1021,13 +1044,28 @@ export class Settings extends Component {
 
   render() {
     return (
-      <Pane display="flex" padding={16} minWidth={960} width={1080}>
-        <Pane width={250}>
+      <Pane
+        display="flex"
+        padding={16}
+        maxWidth={this.state.isSmallScreen ? '100%' : 1080}
+        flexDirection={this.state.isSmallScreen ? 'column' : 'row'}
+      >
+        <Pane minWidth={this.state.isSmallScreen ? '100%' : 250}>
           <Header height={50} justifyContent="start" marginBottom={10} noBorderBottom />
-          <Tablist flexBasis={240} marginRight={16}>
+          <Tablist
+            display="flex"
+            flexDirection={this.state.isSmallScreen ? 'row' : 'column'}
+            flexBasis={this.state.isSmallScreen ? 'auto' : 240}
+            marginRight={this.state.isSmallScreen ? 0 : 16}
+            marginBottom={this.state.isSmallScreen ? 16 : 0}
+            overflow={this.state.isSmallScreen ? 'auto' : 'initial'}
+            padding={this.state.isSmallScreen ? 2 : 0}
+            gap={this.state.isSmallScreen ? 5 : 0}
+          >
             {this.state.tabs.map((tab) => (
               <Tab
                 direction="vertical"
+                whiteSpace="nowrap"
                 key={tab.id}
                 id={tab.id}
                 onSelect={() => this.selectTab(tab.id)}
@@ -1035,7 +1073,7 @@ export class Settings extends Component {
                 aria-controls={`panel-${tab.id}`}
                 fontSize={14}
                 height={30}
-                marginBottom={6}
+                marginBottom={this.state.isSmallScreen ? 0 : 6}
                 disabled={tab.disabled}
               >
                 {tab.label}
