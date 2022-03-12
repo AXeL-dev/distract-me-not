@@ -1,5 +1,5 @@
 import { translate } from './i18n';
-import { isSmallDevice } from './device';
+import { isAndroidDevice } from './device';
 import { getHostname, isUrl } from './url';
 import { sendMessage, storage, getActiveTab, createWindow, indexUrl } from './webext';
 
@@ -136,7 +136,8 @@ export async function addCurrentWebsite(mode, isPrompt = false, exactUrl = false
   if (tab) {
     const url = exactUrl ? `${tab.url}$` : `*.${getHostname(tab.url)}`;
     if (isPrompt) {
-      if (isSmallDevice()) {
+      const isAndroid = await isAndroidDevice();
+      if (isAndroid) {
         const response = window.prompt(translate('addWebsite'), url);
         if (response !== null && isUrl(response)) {
           blockUrl(response, mode, tab.id);
