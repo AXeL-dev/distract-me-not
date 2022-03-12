@@ -38,28 +38,28 @@ exports[`renders panel correctly 1`] = `
           class="ub-dspl_flex ub-algn-itms_center ub-mr_0px ub-box-szg_border-box"
         >
           <label
-            class="ub-dspl_block ub-w_40px ub-pst_relative ub-box-szg_border-box"
+            class="ub-dspl_block ub-w_36px ub-pst_relative ub-box-szg_border-box"
           >
             <input
               class="css-1yog12j ub-b-btm_0 ub-b-lft_0 ub-b-rgt_0 ub-b-top_0 ub-h_1px ub-ovflw-x_hidden ub-ovflw-y_hidden ub-pb_0 ub-pl_0 ub-pr_0 ub-pt_0 ub-pst_absolute ub-wht-spc_nowrap ub-w_1px ub-opct_0 ub-box-szg_border-box"
               type="checkbox"
             />
             <div
-              class="ub-h_20px ub-w_40px ub-bblr_9999px ub-bbrr_9999px ub-btlr_9999px ub-btrr_9999px ub-crsr_pointer ub-box-szg_border-box"
+              class="ub-h_18px ub-w_36px ub-bblr_9999px ub-bbrr_9999px ub-btlr_9999px ub-btrr_9999px ub-crsr_pointer ub-box-szg_border-box"
             >
               <div
-                class="css-17bhmw6 ub-h_20px ub-w_20px ub-box-szg_border-box"
+                class="css-17bhmw6 ub-h_18px ub-w_18px ub-box-szg_border-box"
                 data-checked="false"
               />
               <div
-                class="css-1rprxtl ub-w_40px ub-dspl_flex ub-box-szg_border-box"
+                class="css-1rprxtl ub-w_36px ub-dspl_flex ub-box-szg_border-box"
                 data-checked="false"
               >
                 <div
                   class="ub-flx_1 ub-pb_2px ub-pl_2px ub-pr_2px ub-pt_2px ub-box-szg_border-box"
                 >
                   <div
-                    class="css-13qcn8a ub-w_16px ub-h_16px ub-box-szg_border-box"
+                    class="css-13qcn8a ub-w_14px ub-h_14px ub-box-szg_border-box"
                   />
                 </div>
               </div>
@@ -68,7 +68,7 @@ exports[`renders panel correctly 1`] = `
         </div>
       </div>
       <div
-        class="ub-dspl_flex ub-pt_20px ub-box-szg_border-box"
+        class="ub-dspl_flex ub-pt_20px ub-gap_10px ub-box-szg_border-box"
       >
         <div
           class="ub-dspl_flex ub-algn-itms_center ub-flx_1 ub-box-szg_border-box"
@@ -80,7 +80,7 @@ exports[`renders panel correctly 1`] = `
           </span>
         </div>
         <div
-          class="ub-dspl_flex ub-algn-itms_center ub-box-szg_border-box"
+          class="ub-dspl_flex ub-algn-itms_center ub-min-w_0px ub-box-szg_border-box"
         >
           <div
             class="css-l6zppx ub-dspl_inline-flex ub-max-w_260px ub-box-szg_border-box"
@@ -90,19 +90,31 @@ exports[`renders panel correctly 1`] = `
               class="css-12b25td ub-pst_relative ub-f-wght_500 ub-dspl_inline-flex ub-algn-itms_center ub-flx-wrap_nowrap ub-just-cnt_center ub-txt-deco_none ub-ver-algn_middle ub-b-btm_1px-solid-c1c4d6 ub-b-lft_1px-solid-c1c4d6 ub-b-rgt_1px-solid-c1c4d6 ub-b-top_1px-solid-c1c4d6 ub-otln_iu2jf4 ub-usr-slct_none ub-crsr_pointer ub-wht-spc_nowrap ub-fnt-fam_b77syt ub-bblr_4px ub-bbrr_4px ub-btlr_4px ub-btrr_4px ub-color_474d66 ub-tstn_n1akt6 ub-h_32px ub-min-w_32px ub-fnt-sze_12px ub-ln-ht_32px ub-pl_16px ub-pr_16px ub-bg-clr_white ub-box-szg_border-box"
               data-checked="false"
             >
-              blacklist
+              <span
+                class="overflow-ellipsis"
+              >
+                blacklist
+              </span>
             </button>
             <button
               class="css-12b25td ub-pst_relative ub-f-wght_500 ub-dspl_inline-flex ub-algn-itms_center ub-flx-wrap_nowrap ub-just-cnt_center ub-txt-deco_none ub-ver-algn_middle ub-b-btm_1px-solid-c1c4d6 ub-b-lft_1px-solid-c1c4d6 ub-b-rgt_1px-solid-c1c4d6 ub-b-top_1px-solid-c1c4d6 ub-otln_iu2jf4 ub-usr-slct_none ub-crsr_pointer ub-wht-spc_nowrap ub-fnt-fam_b77syt ub-bblr_4px ub-bbrr_4px ub-btlr_4px ub-btrr_4px ub-color_474d66 ub-tstn_n1akt6 ub-h_32px ub-min-w_32px ub-fnt-sze_12px ub-ln-ht_32px ub-pl_16px ub-pr_16px ub-bg-clr_white ub-box-szg_border-box"
               data-checked="false"
             >
-              whitelist
+              <span
+                class="overflow-ellipsis"
+              >
+                whitelist
+              </span>
             </button>
             <button
               class="css-elp417 ub-pst_relative ub-f-wght_500 ub-dspl_inline-flex ub-algn-itms_center ub-flx-wrap_nowrap ub-just-cnt_center ub-txt-deco_none ub-ver-algn_middle ub-b-btm_1px-solid-transparent ub-b-lft_1px-solid-transparent ub-b-rgt_1px-solid-transparent ub-b-top_1px-solid-transparent ub-otln_iu2jf4 ub-usr-slct_none ub-crsr_pointer ub-wht-spc_nowrap ub-fnt-fam_b77syt ub-bblr_4px ub-bbrr_4px ub-btlr_4px ub-btrr_4px ub-color_white ub-tstn_n1akt6 ub-h_32px ub-min-w_32px ub-fnt-sze_12px ub-ln-ht_32px ub-pl_16px ub-pr_16px ub-bg-clr_3366FF ub-b-btm-clr_3366FF ub-b-lft-clr_3366FF ub-b-rgt-clr_3366FF ub-b-top-clr_3366FF ub-box-szg_border-box"
               data-checked="true"
             >
-              combined
+              <span
+                class="overflow-ellipsis"
+              >
+                combined
+              </span>
             </button>
           </div>
         </div>
