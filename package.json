@@ -1,6 +1,6 @@
 {
   "name": "distract-me-not",
-  "version": "2.6.3",
+  "version": "2.6.4",
   "private": true,
   "dependencies": {
     "@craco/craco": "^6.4.3",
