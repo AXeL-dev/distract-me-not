@@ -781,12 +781,12 @@ export class Settings extends Component {
     <Pane display="flex" alignItems="center" gap={4}>
       <TimeIcon size={14} color="muted" />
       <Paragraph size={300} paddingTop={2} color="muted">
-        Last modified:{' '}
+        {translate('lastModified')}{' '}
         {date ? (
           <strong>{format(new Date(date), 'dd/MM/yyyy HH:mm:ss')}</strong>
         ) : (
           <Badge color="neutral" textTransform="capitalize">
-            never
+            {translate('never')}
           </Badge>
         )}
       </Paragraph>
