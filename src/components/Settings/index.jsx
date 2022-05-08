@@ -15,6 +15,8 @@ import {
   Dialog,
   HistoryIcon,
   Pill,
+  TimeIcon,
+  Badge,
 } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv } from 'helpers/debug';
@@ -53,6 +55,7 @@ import { defaultTimerSettings } from 'helpers/timer';
 import { isSmallDevice } from 'helpers/device';
 import { version } from '../../../package.json';
 import { set, cloneDeep, debounce } from 'lodash';
+import { format } from 'date-fns';
 import './styles.scss';
 
 export class Settings extends Component {
@@ -75,29 +78,15 @@ export class Settings extends Component {
       { label: translate('miscellaneous'), id: 'misc' },
       { label: translate('about'), id: 'about' },
     ];
+    // prettier-ignore
     const blacklistTabs = [
-      {
-        label: translate('urls'),
-        id: 'urls',
-        getCount: () => this.state.options.blacklist.length,
-      },
-      {
-        label: translate('keywords'),
-        id: 'keywords',
-        getCount: () => this.state.options.blacklistKeywords.length,
-      },
+      { label: translate('urls'), id: 'urls', getCount: () => this.state.options.blacklist.length },
+      { label: translate('keywords'), id: 'keywords', getCount: () => this.state.options.blacklistKeywords.length },
     ];
+    // prettier-ignore
     const whitelistTabs = [
-      {
-        label: translate('urls'),
-        id: 'urls',
-        getCount: () => this.state.options.whitelist.length,
-      },
-      {
-        label: translate('keywords'),
-        id: 'keywords',
-        getCount: () => this.state.options.whitelistKeywords.length,
-      },
+      { label: translate('urls'), id: 'urls', getCount: () => this.state.options.whitelist.length },
+      { label: translate('keywords'), id: 'keywords', getCount: () => this.state.options.whitelistKeywords.length },
     ];
     this.state = {
       tabs,
@@ -129,6 +118,10 @@ export class Settings extends Component {
         whitelist: isDevEnv ? defaultWhitelist : [],
         blacklistKeywords: [],
         whitelistKeywords: [],
+        blacklistLastModifiedDate: null,
+        whitelistLastModifiedDate: null,
+        blacklistKeywordsLastModifiedDate: null,
+        whitelistKeywordsLastModifiedDate: null,
         password: {
           isEnabled: props.enablePassword || false,
           isSet: false,
@@ -171,6 +164,12 @@ export class Settings extends Component {
         whitelist: defaultWhitelist,
         blacklistKeywords: [],
         whitelistKeywords: [],
+        blacklistLastModifiedDate: this.state.options.blacklistLastModifiedDate,
+        whitelistLastModifiedDate: this.state.options.whitelistLastModifiedDate,
+        blacklistKeywordsLastModifiedDate:
+          this.state.options.blacklistKeywordsLastModifiedDate,
+        whitelistKeywordsLastModifiedDate:
+          this.state.options.whitelistKeywordsLastModifiedDate,
       })
       .then((items) => {
         if (items) {
@@ -213,6 +212,10 @@ export class Settings extends Component {
             whitelist: items.whitelist,
             blacklistKeywords: items.blacklistKeywords,
             whitelistKeywords: items.whitelistKeywords,
+            blacklistLastModifiedDate: items.blacklistLastModifiedDate,
+            whitelistLastModifiedDate: items.whitelistLastModifiedDate,
+            blacklistKeywordsLastModifiedDate: items.blacklistKeywordsLastModifiedDate,
+            whitelistKeywordsLastModifiedDate: items.whitelistKeywordsLastModifiedDate,
             misc: {
               hideReportIssueButton: items.hideReportIssueButton,
               showAddWebsitePrompt: items.showAddWebsitePrompt,
@@ -349,6 +352,12 @@ export class Settings extends Component {
         whitelist: this.state.options.whitelist,
         blacklistKeywords: this.state.options.blacklistKeywords,
         whitelistKeywords: this.state.options.whitelistKeywords,
+        blacklistLastModifiedDate: this.state.options.blacklistLastModifiedDate,
+        whitelistLastModifiedDate: this.state.options.whitelistLastModifiedDate,
+        blacklistKeywordsLastModifiedDate:
+          this.state.options.blacklistKeywordsLastModifiedDate,
+        whitelistKeywordsLastModifiedDate:
+          this.state.options.whitelistKeywordsLastModifiedDate,
         timer: this.state.options.timer,
         unblock: this.state.options.unblock,
         password: {
@@ -736,7 +745,12 @@ export class Settings extends Component {
       <WebsiteList
         ref={this.blacklistComponentRef}
         list={this.state.options.blacklist}
-        onChange={(list) => this.setOptions('blacklist', list)}
+        onChange={(list) =>
+          this.setOptions({
+            blacklist: list,
+            blacklistLastModifiedDate: new Date().getTime(),
+          })
+        }
         exportFilename="blacklist.txt"
         addNewItemsOnTop={true}
       />
@@ -751,38 +765,71 @@ export class Settings extends Component {
       <WordList
         ref={this.blacklistKeywordsComponentRef}
         list={this.state.options.blacklistKeywords}
-        onChange={(list) => this.setOptions('blacklistKeywords', list)}
+        onChange={(list) =>
+          this.setOptions({
+            blacklistKeywords: list,
+            blacklistKeywordsLastModifiedDate: new Date().getTime(),
+          })
+        }
         exportFilename="blacklist_keywords.txt"
         addNewItemsOnTop={true}
       />
     </Fragment>
   );
 
+  renderLastModifiedDate = (date) => (
+    <Pane display="flex" alignItems="center" gap={4}>
+      <TimeIcon size={14} color="muted" />
+      <Paragraph size={300} paddingTop={2} color="muted">
+        Last modified:{' '}
+        {date ? (
+          <strong>{format(new Date(date), 'dd/MM/yyyy HH:mm:ss')}</strong>
+        ) : (
+          <Badge color="neutral" textTransform="capitalize">
+            never
+          </Badge>
+        )}
+      </Paragraph>
+    </Pane>
+  );
+
   renderBlacklistTab = () => (
     <Pane>
-      <Tablist marginBottom={16} flexBasis={240}>
-        {this.state.blacklistTabs.map((tab) => (
-          <Tab
-            whiteSpace="nowrap"
-            key={tab.id}
-            id={tab.id}
-            onSelect={() => this.setState({ selectedBlacklistTab: tab.id })}
-            isSelected={tab.id === this.state.selectedBlacklistTab}
-            aria-controls={`blacklist-${tab.id}`}
-            fontSize={14}
-            marginLeft={0}
-            marginRight={8}
-          >
-            {tab.label}
-            <Pill
-              marginLeft={8}
-              color={tab.id === this.state.selectedBlacklistTab ? 'blue' : 'neutral'}
+      <Pane
+        display="flex"
+        flexDirection={this.state.isSmallScreen ? 'column' : 'row'}
+        justifyContent={this.state.isSmallScreen ? 'initial' : 'space-between'}
+        marginBottom={16}
+      >
+        <Tablist marginBottom={this.state.isSmallScreen ? 16 : 0}>
+          {this.state.blacklistTabs.map((tab) => (
+            <Tab
+              whiteSpace="nowrap"
+              key={tab.id}
+              id={tab.id}
+              onSelect={() => this.setState({ selectedBlacklistTab: tab.id })}
+              isSelected={tab.id === this.state.selectedBlacklistTab}
+              aria-controls={`blacklist-${tab.id}`}
+              fontSize={14}
+              marginLeft={0}
+              marginRight={8}
             >
-              {tab.getCount ? tab.getCount() : 0}
-            </Pill>
-          </Tab>
-        ))}
-      </Tablist>
+              {tab.label}
+              <Pill
+                marginLeft={8}
+                color={tab.id === this.state.selectedBlacklistTab ? 'blue' : 'neutral'}
+              >
+                {tab.getCount ? tab.getCount() : 0}
+              </Pill>
+            </Tab>
+          ))}
+        </Tablist>
+        {this.renderLastModifiedDate(
+          this.state.selectedBlacklistTab === 'keywords'
+            ? this.state.options.blacklistKeywordsLastModifiedDate
+            : this.state.options.blacklistLastModifiedDate
+        )}
+      </Pane>
       <Pane flex="1">
         {this.state.blacklistTabs.map((tab) => (
           <Pane
@@ -809,7 +856,12 @@ export class Settings extends Component {
       <WebsiteList
         ref={this.whitelistComponentRef}
         list={this.state.options.whitelist}
-        onChange={(list) => this.setOptions('whitelist', list)}
+        onChange={(list) =>
+          this.setOptions({
+            whitelist: list,
+            whitelistLastModifiedDate: new Date().getTime(),
+          })
+        }
         exportFilename="whitelist.txt"
         addNewItemsOnTop={true}
       />
@@ -824,7 +876,12 @@ export class Settings extends Component {
       <WordList
         ref={this.whitelistKeywordsComponentRef}
         list={this.state.options.whitelistKeywords}
-        onChange={(list) => this.setOptions('whitelistKeywords', list)}
+        onChange={(list) =>
+          this.setOptions({
+            whitelistKeywords: list,
+            whitelistKeywordsLastModifiedDate: new Date().getTime(),
+          })
+        }
         exportFilename="whitelist_keywords.txt"
         addNewItemsOnTop={true}
       />
@@ -833,29 +890,41 @@ export class Settings extends Component {
 
   renderWhitelistTab = () => (
     <Pane>
-      <Tablist marginBottom={16} flexBasis={240}>
-        {this.state.whitelistTabs.map((tab) => (
-          <Tab
-            whiteSpace="nowrap"
-            key={tab.id}
-            id={tab.id}
-            onSelect={() => this.setState({ selectedWhitelistTab: tab.id })}
-            isSelected={tab.id === this.state.selectedWhitelistTab}
-            aria-controls={`whitelist-${tab.id}`}
-            fontSize={14}
-            marginLeft={0}
-            marginRight={8}
-          >
-            {tab.label}
-            <Pill
-              marginLeft={8}
-              color={tab.id === this.state.selectedWhitelistTab ? 'blue' : 'neutral'}
+      <Pane
+        display="flex"
+        flexDirection={this.state.isSmallScreen ? 'column' : 'row'}
+        justifyContent={this.state.isSmallScreen ? 'initial' : 'space-between'}
+        marginBottom={16}
+      >
+        <Tablist marginBottom={this.state.isSmallScreen ? 16 : 0}>
+          {this.state.whitelistTabs.map((tab) => (
+            <Tab
+              whiteSpace="nowrap"
+              key={tab.id}
+              id={tab.id}
+              onSelect={() => this.setState({ selectedWhitelistTab: tab.id })}
+              isSelected={tab.id === this.state.selectedWhitelistTab}
+              aria-controls={`whitelist-${tab.id}`}
+              fontSize={14}
+              marginLeft={0}
+              marginRight={8}
             >
-              {tab.getCount ? tab.getCount() : 0}
-            </Pill>
-          </Tab>
-        ))}
-      </Tablist>
+              {tab.label}
+              <Pill
+                marginLeft={8}
+                color={tab.id === this.state.selectedWhitelistTab ? 'blue' : 'neutral'}
+              >
+                {tab.getCount ? tab.getCount() : 0}
+              </Pill>
+            </Tab>
+          ))}
+        </Tablist>
+        {this.renderLastModifiedDate(
+          this.state.selectedWhitelistTab === 'keywords'
+            ? this.state.options.whitelistKeywordsLastModifiedDate
+            : this.state.options.whitelistLastModifiedDate
+        )}
+      </Pane>
       <Pane flex="1">
         {this.state.whitelistTabs.map((tab) => (
           <Pane
