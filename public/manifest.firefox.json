@@ -9,7 +9,7 @@
   },
 
   "name": "__MSG_appName__",
-  "version": "2.6.4",
+  "version": "2.6.5",
 
   "default_locale": "en",
   "description": "__MSG_appDesc__",
