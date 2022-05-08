@@ -14,6 +14,7 @@ import {
   HeartIcon,
   Dialog,
   HistoryIcon,
+  Pill,
 } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv } from 'helpers/debug';
@@ -75,12 +76,28 @@ export class Settings extends Component {
       { label: translate('about'), id: 'about' },
     ];
     const blacklistTabs = [
-      { label: translate('urls'), id: 'urls' },
-      { label: translate('keywords'), id: 'keywords' },
+      {
+        label: translate('urls'),
+        id: 'urls',
+        getCount: () => this.state.options.blacklist.length,
+      },
+      {
+        label: translate('keywords'),
+        id: 'keywords',
+        getCount: () => this.state.options.blacklistKeywords.length,
+      },
     ];
     const whitelistTabs = [
-      { label: translate('urls'), id: 'urls' },
-      { label: translate('keywords'), id: 'keywords' },
+      {
+        label: translate('urls'),
+        id: 'urls',
+        getCount: () => this.state.options.whitelist.length,
+      },
+      {
+        label: translate('keywords'),
+        id: 'keywords',
+        getCount: () => this.state.options.whitelistKeywords.length,
+      },
     ];
     this.state = {
       tabs,
@@ -757,6 +774,12 @@ export class Settings extends Component {
             marginRight={8}
           >
             {tab.label}
+            <Pill
+              marginLeft={8}
+              color={tab.id === this.state.selectedBlacklistTab ? 'blue' : 'neutral'}
+            >
+              {tab.getCount ? tab.getCount() : 0}
+            </Pill>
           </Tab>
         ))}
       </Tablist>
@@ -824,6 +847,12 @@ export class Settings extends Component {
             marginRight={8}
           >
             {tab.label}
+            <Pill
+              marginLeft={8}
+              color={tab.id === this.state.selectedWhitelistTab ? 'blue' : 'neutral'}
+            >
+              {tab.getCount ? tab.getCount() : 0}
+            </Pill>
           </Tab>
         ))}
       </Tablist>
