@@ -25,7 +25,7 @@ Distract Me Not is a lightweight website blocker with a user friendly interface.
 
 ## Installation
 
-[![Get it for Firefox!](https://addons.cdn.mozilla.net/static/img/addons-buttons/AMO-button_1.png)](https://addons.mozilla.org/firefox/addon/distract-me-not/?src=external-github-download)
+[![Get it for Firefox!](https://i.imgur.com/2jJOtTI.png)](https://addons.mozilla.org/firefox/addon/distract-me-not/?src=external-github-download)
 [![Get it for Edge!](https://i.imgur.com/n49Wiu2.png)](https://microsoftedge.microsoft.com/addons/detail/distract-me-not/bonjdhkkkokfmnmnkpgkakhkiccnllba)
 [![Get it for Chrome!](https://i.imgur.com/B0i5sn3.png)](https://chrome.google.com/webstore/detail/distract-me-not/lkmfokajfoplgdkdifijpffkjeejainc)
 
