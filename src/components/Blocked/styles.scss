@@ -54,23 +54,63 @@ $textColor: white;
   width: 100%;
 }
 .distract-overlay-top-text {
+  display: block;
+  margin: 0 auto;
   font-family: OpenSansFont !important;
-  vertical-align: middle;
   color: $textColor;
   font-size: 32px;
   line-height: 32px;
   cursor: default;
   user-select: none;
   -webkit-user-select: none;
-  position: absolute;
+}
+.distract-blocked-link {
+  position: relative;
+  display: flex;
+  align-items: center;
   margin: 0 auto;
-  left: 0;
-  right: 0;
-  top: 10px;
+  width: 40%;
+  margin-top: 50px;
+  > input {
+    font-family: OpenSansFont !important;
+    font-size: 14px;
+    color: $textColor;
+    background-color: transparent;
+    border: 2px solid #db9d61;
+    border-radius: 4px;
+    padding: 10px 48px 10px 20px;
+    width: 100%;
+    &:hover,
+    &:active,
+    &:focus {
+      outline: none;
+    }
+  }
+  > button.copy {
+    position: absolute;
+    // top: 10px;
+    right: 10px;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    display: flex;
+    cursor: pointer;
+    opacity: 0.5;
+    &:hover {
+      opacity: 1;
+    }
+    svg {
+      path {
+        fill: #d0d0d0;
+      }
+      width: 20px;
+      height: 20px;
+    }
+  }
 }
 .distract-overlay-img {
   margin: 0 auto;
-  margin-top: 100px;
+  margin-top: 50px;
   width: 128px;
   height: 128px;
   background-image: url(../../../public/icons/magnet-256.png);
@@ -125,6 +165,9 @@ button.unblock {
 @media screen and (max-width: 600px) {
   .distract-overlay-top-text {
     font-size: 24px;
+  }
+  .distract-blocked-link {
+    width: 80%;
   }
   .distract-overlay-img {
     width: 100px;

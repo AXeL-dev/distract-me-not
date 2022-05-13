@@ -29,7 +29,8 @@ import {
   defaultMode,
   defaultBlacklist,
   defaultWhitelist,
-  defaultUnblock,
+  defaultBlockSettings,
+  defaultUnblockSettings,
   defaultIsEnabled,
 } from 'helpers/block';
 import { ScheduleType, defaultSchedule, newScheduleTimeRange } from 'helpers/schedule';
@@ -105,14 +106,11 @@ export class Settings extends Component {
         isEnabled: defaultIsEnabled,
         mode: '', // don't use defaultMode to avoid annoying flickering when the mode is different from the default value
         action: defaultAction,
-        blockTab: {
-          message: '',
-          displayBlankPage: false,
-        },
+        blockTab: defaultBlockSettings,
         redirectToUrl: {
           url: '',
         },
-        unblock: defaultUnblock,
+        unblock: defaultUnblockSettings,
         schedule: defaultSchedule,
         blacklist: isDevEnv ? defaultBlacklist : [],
         whitelist: isDevEnv ? defaultWhitelist : [],
@@ -150,6 +148,7 @@ export class Settings extends Component {
         action: this.state.options.action,
         message: this.state.options.blockTab.message,
         displayBlankPage: this.state.options.blockTab.displayBlankPage,
+        displayBlockedLink: this.state.options.blockTab.displayBlockedLink,
         redirectUrl: this.state.options.redirectToUrl.url,
         enableLogs: this.state.options.logs.isEnabled,
         logsLength: this.state.options.logs.maxLength,
@@ -181,6 +180,7 @@ export class Settings extends Component {
             blockTab: {
               message: items.message,
               displayBlankPage: items.displayBlankPage,
+              displayBlockedLink: items.displayBlockedLink,
             },
             redirectToUrl: {
               url: items.redirectUrl,
@@ -341,6 +341,7 @@ export class Settings extends Component {
         action: this.state.options.action,
         message: this.state.options.blockTab.message,
         displayBlankPage: this.state.options.blockTab.displayBlankPage,
+        displayBlockedLink: this.state.options.blockTab.displayBlockedLink,
         redirectUrl: this.state.options.redirectToUrl.url,
         enableLogs: this.state.options.logs.isEnabled,
         logsLength: this.state.options.logs.maxLength,
@@ -505,6 +506,17 @@ export class Settings extends Component {
             }
             disabled={!this.state.options.isEnabled}
             margin={0}
+          />
+          <Checkbox
+            label={translate('displayBlockedLink')}
+            checked={this.state.options.blockTab.displayBlockedLink}
+            onChange={(event) =>
+              this.setOptions('blockTab.displayBlockedLink', event.target.checked)
+            }
+            disabled={
+              !this.state.options.isEnabled ||
+              this.state.options.blockTab.displayBlankPage
+            }
           />
         </Fragment>
       )}

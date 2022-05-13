@@ -1,12 +1,19 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Dialog, RadioGroup, Button, UnlockIcon } from 'evergreen-ui';
+import { Pane, Dialog, RadioGroup, Button, UnlockIcon, toaster } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { storage, sendMessage } from 'helpers/webext';
 import { debug, isDevEnv } from 'helpers/debug';
 import { isUrl, getValidUrl } from 'helpers/url';
-import { UnblockOptions, isPageReloaded, defaultUnblock } from 'helpers/block';
+import {
+  UnblockOptions,
+  isPageReloaded,
+  defaultUnblockSettings,
+  defaultBlockSettings,
+} from 'helpers/block';
 import { NumberInput, PasswordPrompt } from 'components';
 import queryString from 'query-string';
+import copy from 'copy-to-clipboard';
+import { ReactComponent as CopyIcon } from '../../../public/icons/copy.svg';
 import './styles.scss';
 
 export class Blocked extends Component {
@@ -17,12 +24,16 @@ export class Blocked extends Component {
       this.url = decodeURIComponent(this.url);
       this.url = getValidUrl(this.url);
     }
+    if (isDevEnv && !this.url) {
+      this.url = 'https://www.example.com';
+    }
     debug.log('url', this.url);
     const defaultUnblockTime = 10; // min
     this.state = {
       message: props.message || translate('defaultBlockingMessage'),
       isBlank: props.isBlank === undefined ? !isDevEnv : props.isBlank,
       hasUnblockButton: props.hasUnblockButton || isDevEnv, // == isDevEnv ? true : false
+      displayBlockedLink: props.displayBlockedLink || isDevEnv,
       unblockDialog: {
         isShown: false,
         options: this.getUnblockOptions(defaultUnblockTime),
@@ -77,10 +88,12 @@ export class Blocked extends Component {
     storage
       .get({
         message: this.state.message,
-        displayBlankPage: false,
+        displayBlankPage: defaultBlockSettings.displayBlankPage,
+        displayBlockedLink:
+          this.state.displayBlockedLink || defaultBlockSettings.displayBlockedLink,
         unblock: {
-          isEnabled: defaultUnblock.isEnabled,
-          requirePassword: defaultUnblock.requirePassword,
+          isEnabled: defaultUnblockSettings.isEnabled,
+          requirePassword: defaultUnblockSettings.requirePassword,
         },
         password: {
           isEnabled: false,
@@ -91,7 +104,8 @@ export class Blocked extends Component {
           this.setState({
             message: items.message.length ? items.message : this.state.message,
             isBlank: items.displayBlankPage,
-            hasUnblockButton: items.unblock.isEnabled,
+            displayBlockedLink: items.displayBlockedLink,
+            hasUnblockButton: isDevEnv || items.unblock.isEnabled,
             unblockDialog: {
               ...this.state.unblockDialog,
               requirePassword:
@@ -135,6 +149,14 @@ export class Blocked extends Component {
     }
   };
 
+  copyBlockedLink = () => {
+    if (copy(this.url)) {
+      toaster.success(translate('copiedToClipboard'), {
+        id: 'settings-toaster',
+      });
+    }
+  };
+
   render() {
     return (
       <Fragment>
@@ -146,6 +168,18 @@ export class Blocked extends Component {
                   <span className="distract-cursor distract-select distract-overlay-top-text">
                     {this.state.message}
                   </span>
+                  {this.state.displayBlockedLink && (
+                    <span className="distract-blocked-link">
+                      <input type="text" value={this.url} readOnly />
+                      <button
+                        className="copy"
+                        title={translate('copy')}
+                        onClick={this.copyBlockedLink}
+                      >
+                        <CopyIcon />
+                      </button>
+                    </span>
+                  )}
                   <div className="distract-cursor distract-select distract-overlay-img"></div>
                   {this.state.hasUnblockButton && (
                     <button className="unblock" onClick={this.openUnblockDialog}>

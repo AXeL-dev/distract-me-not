@@ -14,7 +14,7 @@ import {
   defaultBlacklist,
   defaultWhitelist,
   UnblockOptions,
-  defaultUnblock,
+  defaultUnblockSettings,
   isAccessible,
   defaultMode,
   defaultAction,
@@ -74,7 +74,7 @@ export class Background extends Component {
     this.mode = defaultMode;
     this.action = defaultAction;
     this.redirectUrl = '';
-    this.unblock = defaultUnblock;
+    this.unblock = defaultUnblockSettings;
     this.schedule = defaultSchedule;
     this.timer = defaultTimerSettings;
     this.enableLogs = defaultLogsSettings.isEnabled;
@@ -380,11 +380,13 @@ export class Background extends Component {
           let timeout = 0;
           switch (option) {
             case UnblockOptions.unblockForWhile:
-              timeout = time * 60000; // convert minutes to ms
+              // convert minutes to ms
+              timeout = time * 60000;
               break;
             case UnblockOptions.unblockOnce:
             default:
-              timeout = this.unblock.unblockOnceTimeout * 1000; // convert seconds to ms
+              // convert seconds to ms
+              timeout = this.unblock.unblockOnceTimeout * 1000;
               break;
           }
           this.unblockTab(sender.tab.id, url, timeout);

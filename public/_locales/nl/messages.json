@@ -441,5 +441,8 @@
   },
   "never": {
     "message": "Nooit"
+  },
+  "displayBlockedLink": {
+    "message": "Geblokkeerde link weergeven"
   }
 }

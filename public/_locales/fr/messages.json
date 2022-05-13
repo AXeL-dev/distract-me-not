@@ -441,5 +441,8 @@
   },
   "never": {
     "message": "Jamais"
+  },
+  "displayBlockedLink": {
+    "message": "Afficher le lien bloqué"
   }
 }

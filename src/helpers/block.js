@@ -51,7 +51,13 @@ export const defaultWhitelist = [
   '*.wikipedia.org',
 ];
 
-export const defaultUnblock = {
+export const defaultBlockSettings = {
+  message: '',
+  displayBlankPage: false,
+  displayBlockedLink: false,
+};
+
+export const defaultUnblockSettings = {
   isEnabled: false,
   requirePassword: false,
   unblockOnceTimeout: 10, // seconds
