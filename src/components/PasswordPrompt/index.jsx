@@ -201,7 +201,11 @@ export class PasswordPrompt extends Component {
           alignItems="center"
           justifyContent="center"
         >
-          <Pane display="flex" width="70%" maxWidth={320}>
+          <Pane
+            display="flex"
+            width={this.props.inputWidth || '70%'}
+            maxWidth={this.props.maxInputWidth || 320}
+          >
             <Pane display="flex" alignItems="center" flex={1}>
               <TextInput
                 width="100%"

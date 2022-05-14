@@ -219,7 +219,7 @@ export class Blocked extends Component {
                     minWidth="auto"
                     minHeight={50}
                     inputWidth="100%"
-                    inputHeight={36}
+                    maxInputWidth="auto"
                     onSuccess={this.unblock}
                   />
                 ) : (
