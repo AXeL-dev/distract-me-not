@@ -444,5 +444,11 @@
   },
   "displayBlockedLink": {
     "message": "Geblokkeerde link weergeven"
+  },
+  "blockAccessToExtensionsPage": {
+    "message": "Toegang tot extensiepagina blokkeren"
+  },
+  "blockAccessToExtensionsPageWarning": {
+    "message": "Zorg ervoor dat u uw wachtwoord op een veilige plaats opslaat voordat u deze functie inschakelt"
   }
 }

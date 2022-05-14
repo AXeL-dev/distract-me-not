@@ -444,5 +444,11 @@
   },
   "displayBlockedLink": {
     "message": "Afficher le lien bloqué"
+  },
+  "blockAccessToExtensionsPage": {
+    "message": "Bloquer l'accès à la page des extensions"
+  },
+  "blockAccessToExtensionsPageWarning": {
+    "message": "Assurez-vous d'enregistrer votre mot de passe dans un endroit sûr avant d'activer cette fonctionnalité"
   }
 }

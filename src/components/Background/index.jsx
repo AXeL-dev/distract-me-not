@@ -20,6 +20,8 @@ import {
   defaultAction,
   defaultIsEnabled,
   addCurrentWebsite,
+  isExtensionsPage,
+  defaultPasswordSettings,
 } from 'helpers/block';
 import { defaultSchedule, getTodaySchedule, isScheduleAllowed } from 'helpers/schedule';
 import { hasValidProtocol, getValidUrl, getHostname } from 'helpers/url';
@@ -28,6 +30,7 @@ import { logger, defaultLogsSettings } from 'helpers/logger';
 import { defaultTimerSettings, unactiveTimerRuntimeSettings } from 'helpers/timer';
 import { now } from 'helpers/date';
 import { translate } from 'helpers/i18n';
+import queryString from 'query-string';
 
 const contextMenus = [
   {
@@ -78,10 +81,15 @@ export class Background extends Component {
     this.schedule = defaultSchedule;
     this.timer = defaultTimerSettings;
     this.enableLogs = defaultLogsSettings.isEnabled;
+    this.blockAccessToExtensionsPage = false;
+    this.isPasswordEnabled = false;
     // private
     this.hasBeenEnabledOnStartup = false;
+    this.isEventListenersEnabled = false;
+    this.isEventListenersActive = false;
     this.tmpAllowed = [];
     this.timerTimeout = null;
+    this.accessTokens = [];
 
     this.init();
   }
@@ -225,6 +233,22 @@ export class Background extends Component {
     };
   };
 
+  setBlockAccessToExtensionsPage = (value) => {
+    this.blockAccessToExtensionsPage = value;
+  };
+
+  getBlockAccessToExtensionsPage = () => {
+    return this.blockAccessToExtensionsPage;
+  };
+
+  setIsPasswordEnabled = (value) => {
+    this.isPasswordEnabled = value;
+  };
+
+  getIsPasswordEnabled = () => {
+    return this.isPasswordEnabled;
+  };
+
   //----- End getters & setters
 
   init = () => {
@@ -245,24 +269,25 @@ export class Background extends Component {
         redirectUrl: this.redirectUrl,
         enableLogs: this.enableLogs,
         logsLength: defaultLogsSettings.maxLength,
+        password: defaultPasswordSettings,
       })
       .then((items) => {
         this.debug('items:', items);
         //----- Start backward compatibility with v1
-        if (items.blackList !== null) {
-          items.blacklist = this.removeListDuplicates(
-            items.blacklist.concat(items.blackList) // merge current & old list
-          );
-          storage.remove('blackList'); // remove old list from storage
-          storage.set({ blacklist: items.blacklist }); // save merged list
-        }
-        if (items.whiteList !== null) {
-          items.whitelist = this.removeListDuplicates(
-            items.whitelist.concat(items.whiteList)
-          );
-          storage.remove('whiteList');
-          storage.set({ whitelist: items.whitelist });
-        }
+        // if (items.blackList !== null) {
+        //   items.blacklist = this.removeListDuplicates(
+        //     items.blacklist.concat(items.blackList) // merge current & old list
+        //   );
+        //   storage.remove('blackList'); // remove old list from storage
+        //   storage.set({ blacklist: items.blacklist }); // save merged list
+        // }
+        // if (items.whiteList !== null) {
+        //   items.whitelist = this.removeListDuplicates(
+        //     items.whitelist.concat(items.whiteList)
+        //   );
+        //   storage.remove('whiteList');
+        //   storage.set({ whitelist: items.whitelist });
+        // }
         //----- End backward compatibility with v1
         this.blacklist = transformList(items.blacklist);
         this.whitelist = transformList(items.whitelist);
@@ -278,9 +303,14 @@ export class Background extends Component {
         };
         this.redirectUrl = getValidUrl(items.redirectUrl);
         this.enableLogs = items.enableLogs;
+        this.blockAccessToExtensionsPage = items.password.blockAccessToExtensionsPage;
+        this.isPasswordEnabled = items.password.isEnabled;
         logger.maxLength = items.logsLength;
         if (!this.hasBeenEnabledOnStartup && items.isEnabled) {
           this.enable();
+        }
+        if (!this.isEventListenersEnabled) {
+          this.enableEventListeners();
         }
         if (!this.isEnabled) {
           this.updateIcon();
@@ -376,21 +406,36 @@ export class Background extends Component {
       switch (request.message) {
         // unblockSenderTab
         case 'unblockSenderTab':
-          const { url, option, time = 0 } = request.params[0];
-          let timeout = 0;
-          switch (option) {
-            case UnblockOptions.unblockForWhile:
-              // convert minutes to ms
-              timeout = time * 60000;
-              break;
-            case UnblockOptions.unblockOnce:
-            default:
-              // convert seconds to ms
-              timeout = this.unblock.unblockOnceTimeout * 1000;
-              break;
+          {
+            const { url, option, time = 0 } = request.params[0];
+            let timeout = 0;
+            switch (option) {
+              case UnblockOptions.unblockForWhile:
+                // convert minutes to ms
+                timeout = time * 60000;
+                break;
+              case UnblockOptions.unblockOnce:
+              default:
+                // convert seconds to ms
+                timeout = this.unblock.unblockOnceTimeout * 1000;
+                break;
+            }
+            this.unblockTab(sender.tab.id, url, timeout);
+            response = this.redirectTab(sender.tab.id, url);
           }
-          this.unblockTab(sender.tab.id, url, timeout);
-          response = this.redirectTab(sender.tab.id, url);
+          break;
+        // allowAccessWithToken
+        case 'allowAccessWithToken':
+          {
+            const { url: initialUrl, token, timeout = 60000 } = request.params[0];
+            this.accessTokens.push({
+              token,
+              expireAt: new Date().getTime() + timeout,
+            });
+            const url = new URL(initialUrl);
+            url.searchParams.set('token', token);
+            response = this.redirectTab(sender.tab.id, url.toString());
+          }
           break;
         // redirectSenderTab
         case 'redirectSenderTab':
@@ -514,7 +559,8 @@ export class Background extends Component {
       case Action.closeTab:
         this.closeTab(data.tabId);
         return {
-          redirectUrl: 'javascript:window.close()', // eslint-disable-line
+          // eslint-disable-next-line
+          redirectUrl: 'javascript:window.close()',
         };
     }
   };
@@ -675,6 +721,30 @@ export class Background extends Component {
     }
   };
 
+  removeOutdatedAccessTokens = () => {
+    const now = new Date().getTime();
+    this.accessTokens = this.accessTokens.filter((token) => {
+      if (now > token.expireAt) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+  };
+
+  isValidAccessToken = (token) => {
+    if (token && this.accessTokens.length) {
+      this.removeOutdatedAccessTokens();
+      const found = this.accessTokens.find((access) => access.token === token);
+      if (found) {
+        this.debug('valid access token:', token);
+        return true;
+      }
+    }
+    this.debug('unvalid access token:', token);
+    return false;
+  };
+
   parseUrl = (data, caller) => {
     this.debug('parsing url:', {
       caller: caller,
@@ -707,30 +777,58 @@ export class Background extends Component {
     }
   };
 
+  handleTabEvent = (data, caller) => {
+    // Handle access to extensions page
+    if (
+      this.blockAccessToExtensionsPage &&
+      this.isPasswordEnabled &&
+      isExtensionsPage(data.url)
+    ) {
+      const url = new URL(data.url);
+      const token = queryString.parse(url.search).token;
+      if (!this.isValidAccessToken(token)) {
+        return {
+          redirectUrl: `${indexUrl}#pwd?redirect=${encodeURIComponent(data.url)}`,
+        };
+      }
+    }
+    // Handle disabled state
+    if (!this.isEnabled || !this.isEventListenersActive) {
+      return;
+    }
+    // Parse url
+    return this.parseUrl(data, caller);
+  };
+
   onBeforeRequestHandler = (requestDetails) => {
-    return this.parseUrl(requestDetails, 'onBeforeRequestHandler'); // redirect will be handled by the event listener
+    return this.handleTabEvent(requestDetails, 'onBeforeRequestHandler'); // redirect will be handled by the event listener
   };
 
   onUpdatedHandler = (tabId, changeInfo, tab) => {
-    if (
-      changeInfo.status === 'loading' &&
-      changeInfo.url &&
-      hasValidProtocol(changeInfo.url)
-    ) {
-      this.checkTab({ ...changeInfo, tabId: tabId }, 'onUpdatedHandler');
+    const url = changeInfo.url || tab.url;
+    if (changeInfo.status === 'loading' && url && hasValidProtocol(url)) {
+      this.checkTab(
+        { ...changeInfo, url, tabId },
+        'onUpdatedHandler',
+        this.handleTabEvent
+      );
     }
   };
 
   onReplacedHandler = (addedTabId, removedTabId) => {
     getTab(addedTabId).then((tab) => {
       if (tab) {
-        this.checkTab({ url: tab.url, tabId: tab.id }, 'onReplacedHandler');
+        this.checkTab(
+          { url: tab.url, tabId: tab.id },
+          'onReplacedHandler',
+          this.handleTabEvent
+        );
       }
     });
   };
 
-  checkTab = (data, caller) => {
-    const results = this.parseUrl(data, caller);
+  checkTab = (data, caller, parserCallback = this.parseUrl) => {
+    const results = parserCallback(data, caller);
     if (results && results.redirectUrl) {
       this.redirectTab(data.tabId, results.redirectUrl);
     }
@@ -745,22 +843,30 @@ export class Background extends Component {
   };
 
   enableEventListeners = () => {
-    browser.webRequest.onBeforeRequest.addListener(
-      this.onBeforeRequestHandler,
-      {
-        urls: ['*://*/*'],
-        types: ['main_frame', 'sub_frame'],
-      },
-      ['blocking']
-    );
-    browser.tabs.onUpdated.addListener(this.onUpdatedHandler);
-    browser.tabs.onReplaced.addListener(this.onReplacedHandler);
+    if (!this.isEventListenersEnabled) {
+      browser.webRequest.onBeforeRequest.addListener(
+        this.onBeforeRequestHandler,
+        {
+          urls: ['*://*/*'],
+          types: ['main_frame', 'sub_frame'],
+        },
+        ['blocking']
+      );
+      browser.tabs.onUpdated.addListener(this.onUpdatedHandler);
+      browser.tabs.onReplaced.addListener(this.onReplacedHandler);
+      this.isEventListenersEnabled = true;
+    }
+    this.isEventListenersActive = true;
   };
 
-  disableEventListeners = () => {
-    browser.webRequest.onBeforeRequest.removeListener(this.onBeforeRequestHandler);
-    browser.tabs.onUpdated.removeListener(this.onUpdatedHandler);
-    browser.tabs.onReplaced.removeListener(this.onReplacedHandler);
+  disableEventListeners = (remove = true) => {
+    if (this.isEventListenersEnabled && remove) {
+      browser.webRequest.onBeforeRequest.removeListener(this.onBeforeRequestHandler);
+      browser.tabs.onUpdated.removeListener(this.onUpdatedHandler);
+      browser.tabs.onReplaced.removeListener(this.onReplacedHandler);
+      this.isEventListenersEnabled = false;
+    }
+    this.isEventListenersActive = false;
   };
 
   checkAllTabs = () => {
@@ -794,7 +900,7 @@ export class Background extends Component {
   disable = (debugMessage = 'disabled!') => {
     if (this.isEnabled) {
       this.isEnabled = false;
-      this.disableEventListeners();
+      this.disableEventListeners(false);
       this.checkAllTabs();
       this.updateIcon();
       this.debug(debugMessage);

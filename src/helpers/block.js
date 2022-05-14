@@ -65,9 +65,27 @@ export const defaultUnblockSettings = {
   autoReblockOnTimeout: false,
 };
 
+export const defaultPasswordSettings = {
+  isEnabled: false,
+  isSet: false,
+  value: '',
+  hash: '',
+  allowActivationWithoutPassword: false,
+  allowAddingWebsitesWithoutPassword: false,
+  blockAccessToExtensionsPage: false,
+};
+
 // prettier-ignore
 export function isAccessible(url) {
   return !!url && !/^((file|chrome|edge|moz-extension|chrome-extension|extension):\/\/|about:)/i.test(url);
+}
+
+export function isExtensionsPage(url) {
+  return !!url && [
+    'about:addons',
+    'chrome://extensions',
+    'edge://extensions',
+  ].some((prefix) => url.startsWith(prefix));
 }
 
 export function isPageReloaded() {

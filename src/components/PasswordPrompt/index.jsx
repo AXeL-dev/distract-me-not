@@ -31,19 +31,28 @@ import {
   isActiveTabBlockable,
 } from 'helpers/block';
 import { isSmallDevice } from 'helpers/device';
+import { isUrl, getValidUrl, generateToken } from 'helpers/url';
+import queryString from 'query-string';
 
 const defaultHash = process.env.REACT_APP_HASH;
 
 export class PasswordPrompt extends Component {
   constructor(props) {
     super(props);
+    this.redirect = props.location
+      ? queryString.parse(props.location.search).redirect
+      : null;
+    if (this.redirect && isUrl(this.redirect)) {
+      this.redirect = decodeURIComponent(this.redirect);
+      this.redirect = getValidUrl(this.redirect);
+    }
     this.mode = defaultMode;
     this.hash = defaultHash || null;
     this.hasHeader = this.getProp('hasHeader');
     this.hasFooter = this.getProp('hasFooter');
     this.showAddWebsitePrompt = false;
     this.isSmallScreen = isSmallDevice();
-    debug.log({ hash: this.hash, props });
+    debug.log({ redirect: this.redirect, hash: this.hash, props });
     this.state = {
       password: '',
       enableLogs: false,
@@ -141,6 +150,11 @@ export class PasswordPrompt extends Component {
       toaster.closeAll();
       if (this.props.onSuccess) {
         this.props.onSuccess();
+      } else if (this.redirect) {
+        sendMessage('allowAccessWithToken', {
+          url: this.redirect,
+          token: generateToken(),
+        });
       } else {
         const pathname = this.getRedirectPath();
         const search = this.getQueryParams();

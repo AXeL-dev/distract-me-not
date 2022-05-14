@@ -17,6 +17,7 @@ import {
   Pill,
   TimeIcon,
   Badge,
+  WarningSignIcon,
 } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv } from 'helpers/debug';
@@ -32,6 +33,7 @@ import {
   defaultBlockSettings,
   defaultUnblockSettings,
   defaultIsEnabled,
+  defaultPasswordSettings,
 } from 'helpers/block';
 import { ScheduleType, defaultSchedule, newScheduleTimeRange } from 'helpers/schedule';
 import { sendMessage, storage, isWebExtension, openExtensionPage } from 'helpers/webext';
@@ -121,12 +123,8 @@ export class Settings extends Component {
         blacklistKeywordsLastModifiedDate: null,
         whitelistKeywordsLastModifiedDate: null,
         password: {
-          isEnabled: props.enablePassword || false,
-          isSet: false,
-          value: '',
-          hash: '',
-          allowActivationWithoutPassword: false,
-          allowAddingWebsitesWithoutPassword: false,
+          ...defaultPasswordSettings,
+          isEnabled: props.enablePassword || defaultPasswordSettings.isEnabled,
         },
         timer: defaultTimerSettings,
         logs: defaultLogsSettings,
@@ -367,6 +365,8 @@ export class Settings extends Component {
             this.state.options.password.allowActivationWithoutPassword,
           allowAddingWebsitesWithoutPassword:
             this.state.options.password.allowAddingWebsitesWithoutPassword,
+          blockAccessToExtensionsPage:
+            this.state.options.password.blockAccessToExtensionsPage,
           hash: this.state.options.password.isEnabled // if password protection is enabled
             ? this.state.options.password.value.length // + password length is > 0
               ? hash(this.state.options.password.value) // hash & save the new password
@@ -386,6 +386,11 @@ export class Settings extends Component {
           sendMessage('setWhitelist', this.state.options.whitelist);
           sendMessage('setBlacklistKeywords', this.state.options.blacklistKeywords);
           sendMessage('setWhitelistKeywords', this.state.options.whitelistKeywords);
+          sendMessage('setIsPasswordEnabled', this.state.options.password.isEnabled);
+          sendMessage(
+            'setBlockAccessToExtensionsPage',
+            this.state.options.password.blockAccessToExtensionsPage
+          );
           sendMessage(
             'setUnblockOnceTimeout',
             this.state.options.unblock.unblockOnceTimeout
@@ -505,7 +510,6 @@ export class Settings extends Component {
               this.setOptions('blockTab.displayBlankPage', event.target.checked)
             }
             disabled={!this.state.options.isEnabled}
-            margin={0}
           />
           <Checkbox
             label={translate('displayBlockedLink')}
@@ -517,6 +521,7 @@ export class Settings extends Component {
               !this.state.options.isEnabled ||
               this.state.options.blockTab.displayBlankPage
             }
+            margin={0}
           />
         </Fragment>
       )}
@@ -1025,6 +1030,24 @@ export class Settings extends Component {
         disabled={
           !this.state.options.unblock.isEnabled || !this.state.options.password.isEnabled
         }
+      />
+      <Checkbox
+        label={
+          <span className="ub-dspl_flex">
+            {translate('blockAccessToExtensionsPage')}
+            <Tooltip
+              content={translate('blockAccessToExtensionsPageWarning')}
+              disabled={!this.state.options.password.isEnabled}
+            >
+              <WarningSignIcon color="warning" marginLeft={8} marginTop={-2} />
+            </Tooltip>
+          </span>
+        }
+        checked={this.state.options.password.blockAccessToExtensionsPage}
+        onChange={(event) =>
+          this.setOptions('password.blockAccessToExtensionsPage', event.target.checked)
+        }
+        disabled={!this.state.options.password.isEnabled}
         margin={0}
       />
     </Fragment>
