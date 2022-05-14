@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Pane, Dialog, RadioGroup, Button, UnlockIcon, toaster } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { storage, sendMessage } from 'helpers/webext';
-import { debug, isDevEnv } from 'helpers/debug';
+import { debug, isDevEnv, isProdEnv } from 'helpers/debug';
 import { isUrl, getValidUrl } from 'helpers/url';
 import {
   UnblockOptions,
@@ -31,9 +31,10 @@ export class Blocked extends Component {
     const defaultUnblockTime = 10; // min
     this.state = {
       message: props.message || translate('defaultBlockingMessage'),
-      isBlank: props.isBlank === undefined ? !isDevEnv : props.isBlank,
-      hasUnblockButton: props.hasUnblockButton || isDevEnv, // == isDevEnv ? true : false
-      displayBlockedLink: props.displayBlockedLink || isDevEnv,
+      isBlank: props.isBlank === undefined ? isProdEnv : props.isBlank, // isBlank should be true by default in prod
+      hasUnblockButton: props.hasUnblockButton || isDevEnv,
+      displayBlockedLink:
+        props.displayBlockedLink || isDevEnv || defaultBlockSettings.displayBlockedLink,
       unblockDialog: {
         isShown: false,
         options: this.getUnblockOptions(defaultUnblockTime),
@@ -88,11 +89,10 @@ export class Blocked extends Component {
     storage
       .get({
         message: this.state.message,
-        displayBlankPage: defaultBlockSettings.displayBlankPage,
-        displayBlockedLink:
-          this.state.displayBlockedLink || defaultBlockSettings.displayBlockedLink,
+        displayBlankPage: this.state.isBlank,
+        displayBlockedLink: this.state.displayBlockedLink,
         unblock: {
-          isEnabled: defaultUnblockSettings.isEnabled,
+          isEnabled: isDevEnv || defaultUnblockSettings.isEnabled,
           requirePassword: defaultUnblockSettings.requirePassword,
         },
         password: {
@@ -105,7 +105,7 @@ export class Blocked extends Component {
             message: items.message.length ? items.message : this.state.message,
             isBlank: items.displayBlankPage,
             displayBlockedLink: items.displayBlockedLink,
-            hasUnblockButton: isDevEnv || items.unblock.isEnabled,
+            hasUnblockButton: items.unblock.isEnabled,
             unblockDialog: {
               ...this.state.unblockDialog,
               requirePassword:
@@ -152,7 +152,7 @@ export class Blocked extends Component {
   copyBlockedLink = () => {
     if (copy(this.url)) {
       toaster.success(translate('copiedToClipboard'), {
-        id: 'settings-toaster',
+        id: 'blocked-toaster',
       });
     }
   };
@@ -170,7 +170,7 @@ export class Blocked extends Component {
                   </span>
                   {this.state.displayBlockedLink && (
                     <span className="distract-blocked-link">
-                      <input type="text" value={this.url} readOnly />
+                      <input type="text" value={this.url || ''} readOnly />
                       <button
                         className="copy"
                         title={translate('copy')}
