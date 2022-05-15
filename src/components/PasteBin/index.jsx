@@ -30,6 +30,10 @@ export class PasteBin extends Component {
   };
 
   render() {
+    if (!this.url) {
+      return null;
+    }
+
     return (
       <Pane
         display="flex"
