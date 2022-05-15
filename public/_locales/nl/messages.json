@@ -450,5 +450,16 @@
   },
   "blockAccessToExtensionsPageWarning": {
     "message": "Zorg ervoor dat u uw wachtwoord op een veilige plaats opslaat voordat u deze functie inschakelt"
+  },
+  "pasteBinTip": {
+    "message": "Kopieer de url hierboven en plak deze in uw adresbalk en druk vervolgens op Enter. Houd er rekening mee dat het token verloopt over $tokenExpireTime$ $unit$.",
+    "placeholders": {
+      "tokenExpireTime": {
+        "content": "$1"
+      },
+      "unit": {
+        "content": "$2"
+      }
+    }
   }
 }

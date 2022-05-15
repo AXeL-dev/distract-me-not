@@ -1,5 +1,13 @@
 import React, { Component, Fragment } from 'react';
-import { Pane, Dialog, RadioGroup, Button, UnlockIcon, toaster } from 'evergreen-ui';
+import {
+  Pane,
+  Dialog,
+  RadioGroup,
+  Button,
+  UnlockIcon,
+  toaster,
+  DuplicateIcon,
+} from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { storage, sendMessage } from 'helpers/webext';
 import { debug, isDevEnv, isProdEnv } from 'helpers/debug';
@@ -13,7 +21,6 @@ import {
 import { NumberInput, PasswordPrompt } from 'components';
 import queryString from 'query-string';
 import copy from 'copy-to-clipboard';
-import { ReactComponent as CopyIcon } from '../../../public/icons/copy.svg';
 import './styles.scss';
 
 export class Blocked extends Component {
@@ -176,7 +183,7 @@ export class Blocked extends Component {
                         title={translate('copy')}
                         onClick={this.copyBlockedLink}
                       >
-                        <CopyIcon />
+                        <DuplicateIcon />
                       </button>
                     </span>
                   )}

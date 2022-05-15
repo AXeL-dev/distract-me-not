@@ -450,5 +450,16 @@
   },
   "blockAccessToExtensionsPageWarning": {
     "message": "Assurez-vous d'enregistrer votre mot de passe dans un endroit sûr avant d'activer cette fonctionnalité"
+  },
+  "pasteBinTip": {
+    "message": "Copiez l'URL ci-dessus et collez-la dans votre barre d'adresse, puis appuyez sur Entrée. Veuillez noter que le jeton expirera dans $tokenExpireTime$ $unit$.",
+    "placeholders": {
+      "tokenExpireTime": {
+        "content": "$1"
+      },
+      "unit": {
+        "content": "$2"
+      }
+    }
   }
 }

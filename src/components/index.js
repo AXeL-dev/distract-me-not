@@ -3,6 +3,7 @@ export * from './Blocked';
 export * from './Panel';
 export * from './PasswordPrompt';
 export * from './AddWebsitePrompt';
+export * from './PasteBin';
 export * from './Settings';
 export * from './Timer';
 export * from './Logs';

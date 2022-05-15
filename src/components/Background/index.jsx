@@ -7,6 +7,7 @@ import {
   sendNotification,
   openExtensionPage,
   getActiveTab,
+  isFirefox,
 } from 'helpers/webext';
 import {
   Mode,
@@ -434,7 +435,18 @@ export class Background extends Component {
             });
             const url = new URL(initialUrl);
             url.searchParams.set('token', token);
-            response = this.redirectTab(sender.tab.id, url.toString());
+            if (isFirefox && /^about:/i.test(url)) {
+              // Note: You must access about: protocol pages by typing them into the address bar.
+              // Attempts to navigate through window.location will throw error
+              // Error: Access to 'about:addons' from script denied.
+              // See: https://developer.mozilla.org/en-US/Firefox/The_about_protocol
+              response = this.redirectTab(
+                sender.tab.id,
+                `${indexUrl}#pastebin?url=${encodeURIComponent(url.toString())}`
+              );
+            } else {
+              response = this.redirectTab(sender.tab.id, url.toString());
+            }
           }
           break;
         // redirectSenderTab
@@ -778,6 +790,10 @@ export class Background extends Component {
   };
 
   handleTabEvent = (data, caller) => {
+    this.debug('tab event:', {
+      caller: caller,
+      data: data,
+    });
     // Handle access to extensions page
     if (
       this.blockAccessToExtensionsPage &&
@@ -805,7 +821,7 @@ export class Background extends Component {
   };
 
   onUpdatedHandler = (tabId, changeInfo, tab) => {
-    const url = changeInfo.url || tab.url;
+    const url = isFirefox ? changeInfo.url : changeInfo.url || tab.url;
     if (changeInfo.status === 'loading' && url && hasValidProtocol(url)) {
       this.checkTab(
         { ...changeInfo, url, tabId },

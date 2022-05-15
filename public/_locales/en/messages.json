@@ -450,5 +450,16 @@
   },
   "blockAccessToExtensionsPageWarning": {
     "message": "Please make sure to save your password in a safe place before enabling this feature"
+  },
+  "pasteBinTip": {
+    "message": "Copy the url above & paste it in your address bar then hit Enter. Please notice that the token will expire in $tokenExpireTime$ $unit$.",
+    "placeholders": {
+      "tokenExpireTime": {
+        "content": "$1"
+      },
+      "unit": {
+        "content": "$2"
+      }
+    }
   }
 }

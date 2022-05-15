@@ -74,11 +74,11 @@ $textColor: white;
   > input {
     font-family: OpenSansFont !important;
     font-size: 14px;
-    color: $textColor;
+    color: white;
     background-color: transparent;
     border: 2px solid #db9d61;
     border-radius: 4px;
-    padding: 10px 48px 10px 20px;
+    padding: 10px 48px 10px 16px;
     width: 100%;
     &:hover,
     &:active,
@@ -103,8 +103,8 @@ $textColor: white;
       path {
         fill: #d0d0d0;
       }
-      width: 20px;
-      height: 20px;
+      width: 16px;
+      height: 16px;
     }
   }
 }

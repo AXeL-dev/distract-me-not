@@ -13,6 +13,7 @@ import {
   Blocked,
   PasswordPrompt,
   AddWebsitePrompt,
+  PasteBin,
 } from './components';
 import { PasswordProtectedRoute } from './routes';
 
@@ -79,6 +80,7 @@ export default class App extends Component {
                     <Route path="/background" component={Background} />
                     <Route path="/blocked" component={Blocked} />
                     <Route path="/addWebsitePrompt" component={AddWebsitePrompt} />
+                    <Route path="/pastebin" component={PasteBin} />
                     {isDevEnv || !this.state.accessAllowed ? (
                       <Route path="/pwd" component={PasswordPrompt} />
                     ) : null}
