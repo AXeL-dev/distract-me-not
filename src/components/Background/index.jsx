@@ -433,8 +433,9 @@ export class Background extends Component {
               token,
               expireAt: new Date().getTime() + timeout,
             });
-            const url = new URL(initialUrl);
-            url.searchParams.set('token', token);
+            const urlParser = new URL(initialUrl);
+            urlParser.searchParams.set('token', token);
+            const url = urlParser.toString();
             if (isFirefox && /^about:/i.test(url)) {
               // Note: You must access about: protocol pages by typing them into the address bar.
               // Attempts to navigate through window.location will throw error
@@ -442,10 +443,10 @@ export class Background extends Component {
               // See: https://developer.mozilla.org/en-US/Firefox/The_about_protocol
               response = this.redirectTab(
                 sender.tab.id,
-                `${indexUrl}#pastebin?url=${encodeURIComponent(url.toString())}`
+                `${indexUrl}#pastebin?url=${encodeURIComponent(url)}`
               );
             } else {
-              response = this.redirectTab(sender.tab.id, url.toString());
+              response = this.redirectTab(sender.tab.id, url);
             }
           }
           break;
@@ -800,8 +801,8 @@ export class Background extends Component {
       this.isPasswordEnabled &&
       isExtensionsPage(data.url)
     ) {
-      const url = new URL(data.url);
-      const token = queryString.parse(url.search).token;
+      const urlParser = new URL(data.url);
+      const token = queryString.parse(urlParser.search).token;
       if (!this.isValidAccessToken(token)) {
         return {
           redirectUrl: `${indexUrl}#pwd?redirect=${encodeURIComponent(data.url)}`,
