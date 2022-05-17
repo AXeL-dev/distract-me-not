@@ -1,3 +1,4 @@
+/* eslint-disable no-script-url */
 import React, { Component } from 'react';
 import {
   storage,
@@ -331,7 +332,7 @@ export class Background extends Component {
     for (const menu of contextMenus) {
       browser.contextMenus.create({
         ...menu,
-        enabled: this.isContextMenuEnablable(menu, activeTab),
+        enabled: this.isContextMenuEnableable(menu, activeTab),
       });
     }
     browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
@@ -487,7 +488,7 @@ export class Background extends Component {
     }
   };
 
-  isContextMenuEnablable = (menu, tab) => {
+  isContextMenuEnableable = (menu, tab) => {
     switch (menu.id) {
       case 'block_current_domain':
       case 'block_current_url':
@@ -501,7 +502,7 @@ export class Background extends Component {
     for (const menu of contextMenus) {
       try {
         browser.contextMenus.update(menu.id, {
-          enabled: this.isContextMenuEnablable(menu, tab),
+          enabled: this.isContextMenuEnableable(menu, tab),
         });
       } catch (error) {
         this.debug(error);
@@ -572,7 +573,6 @@ export class Background extends Component {
       case Action.closeTab:
         this.closeTab(data.tabId);
         return {
-          // eslint-disable-next-line
           redirectUrl: 'javascript:window.close()',
         };
     }
