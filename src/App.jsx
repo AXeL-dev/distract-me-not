@@ -11,6 +11,7 @@ import {
   Logs,
   Background,
   Blocked,
+  Allowed,
   PasswordPrompt,
   AddWebsitePrompt,
   PasteBin,
@@ -75,6 +76,11 @@ export default class App extends Component {
                     <PasswordProtectedRoute
                       path="/logs"
                       component={Logs}
+                      accessAllowed={this.state.accessAllowed}
+                    />
+                    <PasswordProtectedRoute
+                      path="/allowed"
+                      component={Allowed}
                       accessAllowed={this.state.accessAllowed}
                     />
                     <Route path="/background" component={Background} />

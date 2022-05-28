@@ -15,13 +15,14 @@ import {
   CaretDownIcon,
   TextDropdownButton,
   TickCircleIcon,
-  BanCircleIcon,
   RefreshIcon,
-  EraserIcon,
   TimeIcon,
 } from 'evergreen-ui';
+import { sendMessage } from 'helpers/webext';
 import { translate } from 'helpers/i18n';
-import { logger } from 'helpers/logger';
+import { getHostname } from 'helpers/url';
+import { isDevEnv } from 'helpers/debug';
+import { now } from 'helpers/date';
 import './styles.scss';
 
 const Order = {
@@ -30,7 +31,25 @@ const Order = {
   DESC: 'DESC',
 };
 
-export class Logs extends Component {
+const allowedUrlsDataset = [
+  {
+    time: 60000 * 10,
+    startedAt: new Date().getTime(),
+    hostname: getHostname('https://www.website1.com'),
+  },
+  {
+    time: 60000 * 15,
+    startedAt: new Date().getTime(),
+    hostname: getHostname('https://www.website2.com'),
+  },
+  {
+    time: 60000 * 30,
+    startedAt: new Date().getTime(),
+    hostname: getHostname('https://www.website3.com'),
+  },
+];
+
+export class Allowed extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -38,21 +57,31 @@ export class Logs extends Component {
       searchQuery: '',
       orderedColumn: 1,
       scrollToIndex: null,
-      showDate: false,
+      showRemainingTime: true,
+      currentTime: now(true),
       ordering: Order.NONE,
     };
   }
 
   componentDidMount() {
-    this.fetchLogs();
+    this.fetchAllowedUrls();
+    this.interval = setInterval(() => this.setState({ currentTime: now(true) }), 1000);
   }
 
-  fetchLogs = (scrollToTop = false) => {
-    logger.get().then((logs) => {
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  fetchAllowedUrls = (scrollToTop = false) => {
+    sendMessage('getTmpAllowed').then((allowed) => {
+      const data = isDevEnv ? allowedUrlsDataset : allowed;
       this.setState({
-        list: this.getOrderedList(logs),
+        list: this.getOrderedList(data).map((row) => ({
+          ...row,
+          url: row.hostname,
+        })),
         scrollToIndex: scrollToTop
-          ? logs.length > 0
+          ? data.length > 0
             ? 0
             : null
           : this.state.scrollToIndex,
@@ -169,14 +198,14 @@ export class Logs extends Component {
         content={({ close }) => (
           <Menu>
             <Menu.OptionsGroup
-              title={translate('date')}
+              title={translate('remainingTime')}
               options={[
                 { label: translate('show'), value: true },
                 { label: translate('hide'), value: false },
               ]}
-              selected={this.state.showDate}
+              selected={this.state.showRemainingTime}
               onChange={(value) => {
-                this.setState({ showDate: value });
+                this.setState({ showRemainingTime: value });
                 // Close the popover when you select a value.
                 close();
               }}
@@ -198,21 +227,11 @@ export class Logs extends Component {
           <Menu.Item
             icon={RefreshIcon}
             onSelect={() => {
-              this.fetchLogs(true);
+              this.fetchAllowedUrls(true);
               close();
             }}
           >
             {translate('refresh')}
-          </Menu.Item>
-          <Menu.Item
-            icon={EraserIcon}
-            onSelect={() => {
-              logger.clear();
-              this.setState({ list: [], scrollToIndex: null });
-              close();
-            }}
-          >
-            {translate('clear')}
           </Menu.Item>
         </Menu.Group>
       </Menu>
@@ -220,28 +239,30 @@ export class Logs extends Component {
   };
 
   renderRow = ({ row }) => {
+    const endTime = row.startedAt + row.time;
+    const remainingTime =
+      endTime > this.state.currentTime ? endTime - this.state.currentTime : 0;
+
     return (
       <Table.Row key={row.id} height={38}>
         <Table.Cell
-          flex="none"
+          flex={this.state.showRemainingTime ? 1 : 'none'}
           display="flex"
           alignItems="center"
-          title={translate(row.blocked ? 'blocked' : 'allowed')}
+          title={translate('allowed')}
         >
-          {row.blocked ? (
-            <BanCircleIcon color="#dc3545" size={16} />
-          ) : (
-            <TickCircleIcon color="#28a745" size={16} />
-          )}
-          {this.state.showDate && row.date && (
-            <Text marginLeft={8} size={300} fontWeight={500} data-testid="date">
-              {format(new Date(row.date), 'dd/MM/yyyy HH:mm:ss')}
-            </Text>
-          )}
+          <TickCircleIcon color="#28a745" size={16} />
           <Text marginLeft={8} size={300} fontWeight={500} data-testid="url">
             {row.url}
           </Text>
         </Table.Cell>
+        {this.state.showRemainingTime && (
+          <Table.Cell flex="none">
+            <Text marginLeft={8} size={300} fontWeight={500} data-testid="remaining-time">
+              {format(new Date(remainingTime), 'HH:mm:ss')}
+            </Text>
+          </Table.Cell>
+        )}
       </Table.Row>
     );
   };

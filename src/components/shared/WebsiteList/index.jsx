@@ -113,14 +113,6 @@ export class WebsiteList extends Component {
       let aValue = a[propKey];
       let bValue = b[propKey];
 
-      // Parse money as a number.
-      const isMoney = aValue.indexOf('$') === 0;
-
-      if (isMoney) {
-        aValue = Number(aValue.slice(1));
-        bValue = Number(bValue.slice(1));
-      }
-
       // Support string comparison
       const sortTable = { true: 1, false: -1 };
 

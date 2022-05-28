@@ -10,7 +10,7 @@ import {
   SmallMinusIcon,
   SlashIcon,
   HistoryIcon,
-  IssueNewIcon,
+  ShieldIcon,
   StopwatchIcon,
 } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
@@ -22,11 +22,12 @@ import {
   isActiveTabBlockable,
   defaultMode,
   defaultIsEnabled,
+  defaultUnblockSettings,
 } from 'helpers/block';
 import { ScheduleType, defaultSchedule, getTodaySchedule } from 'helpers/schedule';
 import { defaultLogsSettings } from 'helpers/logger';
 import { defaultTimerSettings } from 'helpers/timer';
-import { isTestEnv } from 'helpers/debug';
+import { isDevEnv, isTestEnv } from 'helpers/debug';
 import {
   Header,
   SwitchField,
@@ -36,6 +37,7 @@ import {
   LinkIconButton,
   TooltipIcon,
 } from 'components';
+import { BugIcon } from 'icons';
 import colors from 'helpers/color';
 import './styles.scss';
 
@@ -48,6 +50,7 @@ export class Panel extends Component {
       mode: defaultMode,
       schedule: defaultSchedule,
       isAddButtonVisible: false,
+      enableUnblock: false,
       enableLogs: false,
       enableTimer: false,
       hideReportIssueButton: false,
@@ -63,9 +66,14 @@ export class Panel extends Component {
       sendMessage('getSchedule').then((schedule) =>
         this.setState({ schedule: schedule || defaultSchedule })
       ),
+      sendMessage('getUnblockSettings').then((unblock) =>
+        this.setState({
+          enableUnblock: isDevEnv || (unblock || defaultUnblockSettings).isEnabled,
+        })
+      ),
       sendMessage('getLogsSettings').then((logs) =>
         this.setState({
-          enableLogs: (logs || defaultLogsSettings).isEnabled,
+          enableLogs: isDevEnv || (logs || defaultLogsSettings).isEnabled,
         })
       ),
       sendMessage('getTimerSettings').then((timer) =>
@@ -218,6 +226,14 @@ export class Panel extends Component {
             >
               <Pane display="flex" gap={10}>
                 <SettingsButton history={this.props.history} />
+                {this.state.enableUnblock && (
+                  <LinkIconButton
+                    icon={ShieldIcon}
+                    link="/allowed"
+                    tooltip={translate('allowedUrls')}
+                    history={this.props.history}
+                  />
+                )}
                 {this.state.enableLogs && (
                   <LinkIconButton
                     icon={HistoryIcon}
@@ -238,7 +254,7 @@ export class Panel extends Component {
                 )}
                 {!this.state.hideReportIssueButton && (
                   <LinkIconButton
-                    icon={IssueNewIcon}
+                    icon={BugIcon}
                     link="https://github.com/AXeL-dev/distract-me-not/issues"
                     external
                     tooltip={translate('reportIssue')}

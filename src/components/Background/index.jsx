@@ -1,4 +1,3 @@
-/* eslint-disable no-script-url */
 import React, { Component } from 'react';
 import {
   storage,
@@ -199,28 +198,15 @@ export class Background extends Component {
     return this.redirectUrl;
   };
 
-  setUnblockOnceTimeout = (value) => {
-    this.unblock.unblockOnceTimeout = value;
+  setUnblockSettings = (value) => {
+    this.unblock = {
+      ...this.unblock,
+      ...value,
+    };
   };
 
-  getUnblockOnceTimeout = () => {
-    return this.unblock.unblockOnceTimeout;
-  };
-
-  setDisplayNotificationOnTimeout = (value) => {
-    this.unblock.displayNotificationOnTimeout = value;
-  };
-
-  getDisplayNotificationOnTimeout = () => {
-    return this.unblock.displayNotificationOnTimeout;
-  };
-
-  setAutoReblockOnTimeout = (value) => {
-    this.unblock.autoReblockOnTimeout = value;
-  };
-
-  getAutoReblockOnTimeout = () => {
-    return this.unblock.autoReblockOnTimeout;
+  getUnblockSettings = () => {
+    return this.unblock;
   };
 
   setLogsSettings = (logs) => {
@@ -249,6 +235,10 @@ export class Background extends Component {
 
   getIsPasswordEnabled = () => {
     return this.isPasswordEnabled;
+  };
+
+  getTmpAllowed = () => {
+    return this.tmpAllowed;
   };
 
   //----- End getters & setters
@@ -573,6 +563,7 @@ export class Background extends Component {
       case Action.closeTab:
         this.closeTab(data.tabId);
         return {
+          // eslint-disable-next-line no-script-url
           redirectUrl: 'javascript:window.close()',
         };
     }

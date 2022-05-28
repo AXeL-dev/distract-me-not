@@ -461,5 +461,8 @@
         "content": "$2"
       }
     }
+  },
+  "allowedUrls": {
+    "message": "URL autorisées"
   }
 }
