@@ -190,7 +190,7 @@ export class Allowed extends Component {
     );
   };
 
-  renderColumnDateButton = ({ label } = {}) => {
+  renderColumnTimeButton = ({ label } = {}) => {
     return (
       <Popover
         position={Position.BOTTOM_LEFT}
@@ -283,7 +283,7 @@ export class Allowed extends Component {
               {this.renderColumnSortButton({ orderedColumn: 1 })}
             </Table.HeaderCell>
             <Table.HeaderCell flex="none">
-              {this.renderColumnDateButton()}
+              {this.renderColumnTimeButton()}
             </Table.HeaderCell>
             <Table.HeaderCell width={48} flex="none">
               <Popover

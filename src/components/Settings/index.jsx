@@ -387,11 +387,11 @@ export class Settings extends Component {
           sendMessage('setBlacklistKeywords', this.state.options.blacklistKeywords);
           sendMessage('setWhitelistKeywords', this.state.options.whitelistKeywords);
           sendMessage('setIsPasswordEnabled', this.state.options.password.isEnabled);
-          sendMessage('setUnblockSettings', this.state.options.unblock);
           sendMessage(
             'setBlockAccessToExtensionsPage',
             this.state.options.password.blockAccessToExtensionsPage
           );
+          sendMessage('setUnblockSettings', this.state.options.unblock);
           sendMessage('setLogsSettings', this.state.options.logs);
           sendMessage('setTimerSettings', this.state.options.timer);
         }
