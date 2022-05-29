@@ -31,7 +31,7 @@ const Order = {
   DESC: 'DESC',
 };
 
-const allowedUrlsDataset = [
+const allowedHostsDataset = [
   {
     time: 60000 * 10,
     startedAt: new Date().getTime(),
@@ -64,7 +64,7 @@ export class Allowed extends Component {
   }
 
   componentDidMount() {
-    this.fetchAllowedUrls();
+    this.fetchAllowedHosts();
     this.interval = setInterval(() => this.setState({ currentTime: now(true) }), 1000);
   }
 
@@ -72,14 +72,11 @@ export class Allowed extends Component {
     clearInterval(this.interval);
   }
 
-  fetchAllowedUrls = (scrollToTop = false) => {
+  fetchAllowedHosts = (scrollToTop = false) => {
     sendMessage('getTmpAllowed').then((allowed) => {
-      const data = isDevEnv ? allowedUrlsDataset : allowed;
+      const data = isDevEnv ? allowedHostsDataset : allowed;
       this.setState({
-        list: this.getOrderedList(data).map((row) => ({
-          ...row,
-          url: row.hostname,
-        })),
+        list: this.getOrderedList(data),
         scrollToIndex: scrollToTop
           ? data.length > 0
             ? 0
@@ -99,8 +96,8 @@ export class Allowed extends Component {
     if (ordering === Order.NONE) return items;
 
     // Get the property to sort each item on.
-    // By default use the `url` property.
-    let propKey = 'url';
+    // By default use the `hostname` property.
+    let propKey = 'hostname';
 
     return items.sort((a, b) => {
       let aValue = a[propKey];
@@ -127,8 +124,8 @@ export class Allowed extends Component {
     if (searchQuery.length === 0) return items;
 
     return items.filter((item) => {
-      // Use the filter from fuzzaldrin-plus to filter by url.
-      const result = filter([item.url], searchQuery);
+      // Use the filter from fuzzaldrin-plus to filter by hostname.
+      const result = filter([item.hostname], searchQuery);
       return result.length === 1;
     });
   };
@@ -227,7 +224,7 @@ export class Allowed extends Component {
           <Menu.Item
             icon={RefreshIcon}
             onSelect={() => {
-              this.fetchAllowedUrls(true);
+              this.fetchAllowedHosts(true);
               close();
             }}
           >
@@ -252,8 +249,8 @@ export class Allowed extends Component {
           title={translate('allowed')}
         >
           <TickCircleIcon color="#28a745" size={16} />
-          <Text marginLeft={8} size={300} fontWeight={500} data-testid="url">
-            {row.url}
+          <Text marginLeft={8} size={300} fontWeight={500} data-testid="hostname">
+            {row.hostname}
           </Text>
         </Table.Cell>
         {this.state.showRemainingTime && (

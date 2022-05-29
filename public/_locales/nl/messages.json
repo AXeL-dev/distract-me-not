@@ -462,7 +462,7 @@
       }
     }
   },
-  "allowedUrls": {
-    "message": "Toegestane URL's"
+  "allowedHosts": {
+    "message": "Toegestane hosts"
   }
 }

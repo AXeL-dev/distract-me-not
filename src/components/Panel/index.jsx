@@ -230,7 +230,7 @@ export class Panel extends Component {
                   <LinkIconButton
                     icon={ShieldIcon}
                     link="/allowed"
-                    tooltip={translate('allowedUrls')}
+                    tooltip={translate('allowedHosts')}
                     history={this.props.history}
                   />
                 )}

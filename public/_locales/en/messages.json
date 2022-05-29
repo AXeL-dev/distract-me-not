@@ -462,7 +462,7 @@
       }
     }
   },
-  "allowedUrls": {
-    "message": "Allowed urls"
+  "allowedHosts": {
+    "message": "Allowed hosts"
   }
 }
