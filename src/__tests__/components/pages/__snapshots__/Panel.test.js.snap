@@ -156,7 +156,7 @@ exports[`renders panel correctly 1`] = `
               color="#4E4E50"
               size="18"
             >
-              bug.svg
+              github.svg
             </svg>
           </div>
         </button>

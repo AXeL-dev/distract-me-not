@@ -37,7 +37,7 @@ import {
   LinkIconButton,
   TooltipIcon,
 } from 'components';
-import { BugIcon } from 'icons';
+import { GithubIcon } from 'icons';
 import colors from 'helpers/color';
 import './styles.scss';
 
@@ -254,7 +254,7 @@ export class Panel extends Component {
                 )}
                 {!this.state.hideReportIssueButton && (
                   <LinkIconButton
-                    icon={BugIcon}
+                    icon={GithubIcon}
                     link="https://github.com/AXeL-dev/distract-me-not/issues"
                     external
                     tooltip={translate('reportIssue')}
