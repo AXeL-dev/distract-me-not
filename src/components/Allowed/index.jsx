@@ -69,14 +69,16 @@ export class Allowed extends Component {
   }
 
   componentWillUnmount() {
-    clearInterval(this.interval);
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
   }
 
   fetchAllowedHosts = (scrollToTop = false) => {
     sendMessage('getTmpAllowed').then((allowed) => {
       const data = isDevEnv ? allowedHostsDataset : allowed;
       this.setState({
-        list: this.getOrderedList(data),
+        list: this.getOrderedList(data).filter((row) => this.getRemaningTime(row) > 0),
         scrollToIndex: scrollToTop
           ? data.length > 0
             ? 0
@@ -84,6 +86,11 @@ export class Allowed extends Component {
           : this.state.scrollToIndex,
       });
     });
+  };
+
+  getRemaningTime = (row) => {
+    const endTime = row.startedAt + row.time;
+    return endTime > this.state.currentTime ? endTime - this.state.currentTime : 0;
   };
 
   getOrderedList = (list) => {
@@ -236,9 +243,7 @@ export class Allowed extends Component {
   };
 
   renderRow = ({ row }) => {
-    const endTime = row.startedAt + row.time;
-    const remainingTime =
-      endTime > this.state.currentTime ? endTime - this.state.currentTime : 0;
+    const remainingTime = this.getRemaningTime(row);
 
     return (
       <Table.Row key={row.id} height={38}>
