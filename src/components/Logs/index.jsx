@@ -280,7 +280,7 @@ export class Logs extends Component {
             </Table.HeaderCell>
           </Table.Head>
           <Table.VirtualBody
-            scrollToIndex={this.state.scrollToIndex}
+            scrollToIndex={items.length > 0 ? this.state.scrollToIndex : undefined}
             height="calc(100% - 32px)"
           >
             {items.map((item) => this.renderRow({ row: item }))}
