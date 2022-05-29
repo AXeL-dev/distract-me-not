@@ -78,7 +78,7 @@ export class Allowed extends Component {
     sendMessage('getTmpAllowed').then((allowed) => {
       const data = isDevEnv ? allowedHostsDataset : allowed;
       this.setState({
-        list: this.getOrderedList(data).filter((row) => this.getRemaningTime(row) > 0),
+        list: this.getOrderedList(data).filter((row) => this.getRemainingTime(row) > 0),
         scrollToIndex: scrollToTop
           ? data.length > 0
             ? 0
@@ -88,7 +88,7 @@ export class Allowed extends Component {
     });
   };
 
-  getRemaningTime = (row) => {
+  getRemainingTime = (row) => {
     const endTime = row.startedAt + row.time;
     return endTime > this.state.currentTime ? endTime - this.state.currentTime : 0;
   };
@@ -243,7 +243,7 @@ export class Allowed extends Component {
   };
 
   renderRow = ({ row }) => {
-    const remainingTime = this.getRemaningTime(row);
+    const remainingTime = this.getRemainingTime(row);
 
     return (
       <Table.Row key={row.id} height={38}>
