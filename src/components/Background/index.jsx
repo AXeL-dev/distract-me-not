@@ -473,7 +473,10 @@ export class Background extends Component {
         openExtensionPage('/settings?tab=whitelist');
         break;
       default:
-        this.debug('unknown context menu action:', info, tab);
+        this.debug('unknown context menu action:', {
+          info,
+          tab,
+        });
         break;
     }
   };
@@ -519,7 +522,10 @@ export class Background extends Component {
             sendNotification(message, title);
           }
           if (this.unblock.autoReblockOnTimeout) {
-            this.debug('auto reblock after timeout:', tabId, timeout);
+            this.debug('auto reblock after timeout:', {
+              tabId,
+              timeout,
+            });
             getTab(tabId).then((tab) => {
               // get latest tab infos (url)
               this.redirectTab(
@@ -575,7 +581,10 @@ export class Background extends Component {
   };
 
   redirectTab = (tabId, redirectUrl) => {
-    this.debug('redirecting tab:', tabId, redirectUrl);
+    this.debug('redirecting tab:', {
+      tabId,
+      redirectUrl,
+    });
     nativeAPI.tabs.update(tabId, {
       url: redirectUrl,
     });
@@ -751,8 +760,8 @@ export class Background extends Component {
 
   parseUrl = (data, caller) => {
     this.debug('parsing url:', {
-      caller: caller,
-      data: data,
+      caller,
+      data,
       mode: this.mode,
       blacklist: this.blacklist,
       whitelist: this.whitelist,
@@ -783,8 +792,8 @@ export class Background extends Component {
 
   handleTabEvent = (data, caller) => {
     this.debug('tab event:', {
-      caller: caller,
-      data: data,
+      caller,
+      data,
     });
     // Handle access to extensions page
     if (
