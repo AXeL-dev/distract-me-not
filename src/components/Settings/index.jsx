@@ -470,9 +470,9 @@ export class Settings extends Component {
         disabled={!this.state.options.isEnabled}
         marginBottom={16}
       >
-        {framesTypes.map((action) => (
-          <option key={action.value} value={action.value}>
-            {action.label}
+        {framesTypes.map((frameType) => (
+          <option key={frameType.value} value={frameType.value}>
+            {frameType.label}
           </option>
         ))}
       </SelectField>
