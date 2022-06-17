@@ -479,5 +479,8 @@
   },
   "subFrames": {
     "message": "Subframes"
+  },
+  "FAQ": {
+    "message": "FAQ"
   }
 }

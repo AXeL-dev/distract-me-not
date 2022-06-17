@@ -1160,7 +1160,7 @@ export class Settings extends Component {
         <div className="text">{translate('appDesc')}</div>
         <a
           className="link"
-          href="https://github.com/AXeL-dev/distract-me-not/releases"
+          href="https://github.com/AXeL-dev/distract-me-not/releases/latest"
           target="_blank"
           rel="noreferrer"
         >{`${translate('version')} ${version}`}</a>
@@ -1174,11 +1174,11 @@ export class Settings extends Component {
         </a>
         <a
           className="link"
-          href="https://github.com/AXeL-dev/distract-me-not"
+          href="https://github.com/AXeL-dev/distract-me-not/wiki/FAQ"
           target="_blank"
           rel="noreferrer"
         >
-          Github
+          {translate('FAQ')}
         </a>
       </div>
       <div className="small-text">{translate('supportDeveloper')}</div>
