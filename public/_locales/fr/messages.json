@@ -464,5 +464,20 @@
   },
   "allowedHosts": {
     "message": "Hôtes autorisés"
+  },
+  "framesType": {
+    "message": "Type de frames"
+  },
+  "framesTypeDescription": {
+    "message": "Choisissez un type de frames à bloquer. Réglez-le sur 'Frames principales' pour autoriser les iframes et les intégrations"
+  },
+  "allFrames": {
+    "message": "Toutes les frames"
+  },
+  "mainFrames": {
+    "message": "Frames principales"
+  },
+  "subFrames": {
+    "message": "Sous-frames"
   }
 }

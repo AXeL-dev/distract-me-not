@@ -15,6 +15,12 @@ export const Action = {
   closeTab: 'closeTab',
 };
 
+export const FramesType = {
+  all: ['main_frame', 'sub_frame'],
+  main: ['main_frame'],
+  // sub: ['sub_frame'],
+};
+
 export const UnblockOptions = {
   unblockOnce: 'unblock-once',
   unblockForWhile: 'unblock-for-while',
@@ -33,11 +39,20 @@ export const actions = [
   { label: translate('closeTab'), value: Action.closeTab },
 ];
 
+export const framesTypes = [
+  { label: translate('allFrames'), value: FramesType.all },
+  { label: translate('mainFrames'), value: FramesType.main },
+  // blocking only sub frames doesn't seem to work on chrome
+  // { label: translate('subFrames'), value: FramesType.sub },
+];
+
 export const defaultIsEnabled = false;
 
 export const defaultAction = Action.blockTab;
 
 export const defaultMode = Mode.combined;
+
+export const defaultFramesType = FramesType.all;
 
 // prettier-ignore
 export const defaultBlacklist = [

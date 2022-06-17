@@ -23,6 +23,7 @@ import {
   addCurrentWebsite,
   isExtensionsPage,
   defaultPasswordSettings,
+  defaultFramesType,
 } from 'helpers/block';
 import { defaultSchedule, getTodaySchedule, isScheduleAllowed } from 'helpers/schedule';
 import { hasValidProtocol, getValidUrl, getHostname } from 'helpers/url';
@@ -77,6 +78,7 @@ export class Background extends Component {
     this.isEnabled = defaultIsEnabled;
     this.mode = defaultMode;
     this.action = defaultAction;
+    this.framesType = defaultFramesType;
     this.redirectUrl = '';
     this.unblock = defaultUnblockSettings;
     this.schedule = defaultSchedule;
@@ -241,6 +243,20 @@ export class Background extends Component {
     return this.tmpAllowed;
   };
 
+  setFramesType = (value) => {
+    const oldFramesType = this.framesType;
+    this.framesType = value;
+    if (oldFramesType.join(',') !== this.framesType.join(',')) {
+      // update event listeners
+      this.disableEventListeners();
+      this.enableEventListeners();
+    }
+  };
+
+  getFramesType = () => {
+    return this.framesType;
+  };
+
   //----- End getters & setters
 
   init = () => {
@@ -255,6 +271,7 @@ export class Background extends Component {
         isEnabled: this.isEnabled,
         mode: this.mode,
         action: this.action,
+        framesType: this.framesType,
         timer: this.timer,
         unblock: this.unblock,
         schedule: this.schedule,
@@ -287,6 +304,7 @@ export class Background extends Component {
         this.whitelistKeywords = items.whitelistKeywords;
         this.mode = items.mode;
         this.action = items.action;
+        this.framesType = items.framesType;
         this.timer = { ...this.timer, ...items.timer };
         this.unblock = { ...this.unblock, ...items.unblock }; // merge
         this.schedule = {
@@ -865,7 +883,7 @@ export class Background extends Component {
         this.onBeforeRequestHandler,
         {
           urls: ['*://*/*'],
-          types: ['main_frame', 'sub_frame'],
+          types: this.framesType || defaultFramesType,
         },
         ['blocking']
       );

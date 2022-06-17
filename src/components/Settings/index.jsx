@@ -34,6 +34,8 @@ import {
   defaultUnblockSettings,
   defaultIsEnabled,
   defaultPasswordSettings,
+  defaultFramesType,
+  framesTypes,
 } from 'helpers/block';
 import { ScheduleType, defaultSchedule, newScheduleTimeRange } from 'helpers/schedule';
 import { sendMessage, storage, isWebExtension, openExtensionPage } from 'helpers/webext';
@@ -108,6 +110,7 @@ export class Settings extends Component {
         isEnabled: defaultIsEnabled,
         mode: '', // don't use defaultMode to avoid annoying flickering when the mode is different from the default value
         action: defaultAction,
+        framesType: defaultFramesType,
         blockTab: defaultBlockSettings,
         redirectToUrl: {
           url: '',
@@ -144,6 +147,7 @@ export class Settings extends Component {
         isEnabled: this.state.options.isEnabled,
         mode: this.state.options.mode || defaultMode,
         action: this.state.options.action,
+        framesType: this.state.options.framesType,
         message: this.state.options.blockTab.message,
         displayBlankPage: this.state.options.blockTab.displayBlankPage,
         displayBlockedLink: this.state.options.blockTab.displayBlockedLink,
@@ -175,6 +179,7 @@ export class Settings extends Component {
             isEnabled: items.isEnabled,
             mode: items.mode,
             action: items.action,
+            framesType: items.framesType,
             blockTab: {
               message: items.message,
               displayBlankPage: items.displayBlankPage,
@@ -337,6 +342,7 @@ export class Settings extends Component {
         isEnabled: this.state.options.isEnabled,
         mode: this.state.options.mode,
         action: this.state.options.action,
+        framesType: this.state.options.framesType,
         message: this.state.options.blockTab.message,
         displayBlankPage: this.state.options.blockTab.displayBlankPage,
         displayBlockedLink: this.state.options.blockTab.displayBlockedLink,
@@ -380,6 +386,7 @@ export class Settings extends Component {
           sendMessage('setIsEnabled', this.state.options.isEnabled);
           sendMessage('setMode', this.state.options.mode);
           sendMessage('setAction', this.state.options.action);
+          sendMessage('setFramesType', this.state.options.framesType);
           sendMessage('setRedirectUrl', this.state.options.redirectToUrl.url);
           sendMessage('setSchedule', this.state.options.schedule);
           sendMessage('setBlacklist', this.state.options.blacklist);
@@ -455,6 +462,20 @@ export class Settings extends Component {
         marginBottom={16}
         showTooltips
       />
+      <SelectField
+        label={translate('framesType')}
+        tooltip={translate('framesTypeDescription')}
+        value={this.state.options.framesType}
+        onChange={(event) => this.setOptions('framesType', event.target.value.split(','))}
+        disabled={!this.state.options.isEnabled}
+        marginBottom={16}
+      >
+        {framesTypes.map((action) => (
+          <option key={action.value} value={action.value}>
+            {action.label}
+          </option>
+        ))}
+      </SelectField>
       <SelectField
         label={translate('action')}
         tooltip={translate(

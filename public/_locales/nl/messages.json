@@ -464,5 +464,20 @@
   },
   "allowedHosts": {
     "message": "Toegestane hosts"
+  },
+  "framesType": {
+    "message": "Frametype"
+  },
+  "framesTypeDescription": {
+    "message": "Kies een type frames om te blokkeren. Stel het in op 'Hoofdframes' om iframes en insluitingen toe te staan"
+  },
+  "allFrames": {
+    "message": "Alle frames"
+  },
+  "mainFrames": {
+    "message": "Hoofdframes"
+  },
+  "subFrames": {
+    "message": "Subframes"
   }
 }

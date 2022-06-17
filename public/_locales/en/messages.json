@@ -464,5 +464,20 @@
   },
   "allowedHosts": {
     "message": "Allowed hosts"
+  },
+  "framesType": {
+    "message": "Frames type"
+  },
+  "framesTypeDescription": {
+    "message": "Choose a type of frames to block. Set it to 'Main frames' to allow iframes & embeds"
+  },
+  "allFrames": {
+    "message": "All frames"
+  },
+  "mainFrames": {
+    "message": "Main frames"
+  },
+  "subFrames": {
+    "message": "Sub frames"
   }
 }
