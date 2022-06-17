@@ -11,7 +11,9 @@ export class LinkIconButton extends Component {
         window.close();
       } else {
         if (isWebExtension && !this.props.sameTab) {
-          openExtensionPage(this.props.link);
+          openExtensionPage(this.props.link, {
+            closeCurrent: true,
+          });
         } else if (this.props.history) {
           this.props.history.push({
             pathname: this.props.link,

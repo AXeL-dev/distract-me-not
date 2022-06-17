@@ -52,8 +52,20 @@ export function openExtensionPage(url, options = {}) {
   };
   const pageUrl = `${browser.runtime.getURL('index.html')}#${url}`;
 
+  const handleClose = () => {
+    if (options.closeCurrent) {
+      window.close();
+    }
+  };
+
+  const openInNewTab = () => {
+    createTab(pageUrl);
+    handleClose();
+  };
+
   if (!options.reloadIfExists) {
-    return createTab(pageUrl);
+    openInNewTab();
+    return;
   }
 
   nativeAPI.tabs.query({}, (tabs) => {
@@ -65,14 +77,12 @@ export function openExtensionPage(url, options = {}) {
             active: true,
           }, () => {
             nativeAPI.tabs.reload(tab.id);
+            handleClose();
           });
           return;
         }
       }
-      createTab(pageUrl);
-      if (options.closeCurrent) {
-        window.close();
-      }
+      openInNewTab();
     }
   });
 }
