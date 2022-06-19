@@ -32,6 +32,7 @@ export class LinkIconButton extends Component {
         tooltip={this.props.tooltip}
         tooltipPosition={Position.RIGHT}
         icon={this.props.icon}
+        iconSize={this.props.iconSize}
         iconColor="#4E4E50"
         onClick={this.handleClick}
         disabled={this.props.disabled}
