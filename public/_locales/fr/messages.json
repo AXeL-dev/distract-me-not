@@ -475,10 +475,10 @@
     "message": "Toutes les frames"
   },
   "mainFrames": {
-    "message": "Frames principales"
+    "message": "Frames principales uniquement"
   },
   "subFrames": {
-    "message": "Sous-frames"
+    "message": "Sous-frames uniquement"
   },
   "FAQ": {
     "message": "FAQ"

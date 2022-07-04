@@ -475,10 +475,10 @@
     "message": "Alle frames"
   },
   "mainFrames": {
-    "message": "Hoofdframes"
+    "message": "Alleen hoofdframes"
   },
   "subFrames": {
-    "message": "Subframes"
+    "message": "Alleen subframes"
   },
   "FAQ": {
     "message": "FAQ"
