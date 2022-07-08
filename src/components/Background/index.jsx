@@ -316,15 +316,19 @@ export class Background extends Component {
         this.blockAccessToExtensionsPage = items.password.blockAccessToExtensionsPage;
         this.isPasswordEnabled = items.password.isEnabled;
         logger.maxLength = items.logsLength;
+        // restore enabled state
         if (!this.hasBeenEnabledOnStartup && items.isEnabled) {
           this.enable();
         }
+        // enable event listeners if disabled (for extensions page blocking)
         if (!this.isEventListenersEnabled) {
           this.enableEventListeners();
         }
+        // update icon
         if (!this.isEnabled) {
           this.updateIcon();
         }
+        // resume timer
         if (this.timer.isEnabled) {
           this.resumeTimer();
         }
