@@ -32,6 +32,7 @@ import {
 } from 'helpers/block';
 import { isSmallDevice } from 'helpers/device';
 import { isUrl, getValidUrl, generateToken } from 'helpers/url';
+import { GithubIcon } from 'icons';
 import queryString from 'query-string';
 
 const defaultHash = process.env.REACT_APP_HASH;
@@ -50,7 +51,6 @@ export class PasswordPrompt extends Component {
     this.hash = defaultHash || null;
     this.hasHeader = this.getProp('hasHeader');
     this.hasFooter = this.getProp('hasFooter');
-    this.showAddWebsitePrompt = false;
     this.isSmallScreen = isSmallDevice();
     debug.log({ redirect: this.redirect, hash: this.hash, props });
     this.state = {
@@ -59,6 +59,8 @@ export class PasswordPrompt extends Component {
       enableTimer: false,
       isAddButtonVisible: false,
       isQuickActivationButtonVisible: false,
+      hideReportIssueButton: false,
+      showAddWebsitePrompt: false,
     };
   }
 
@@ -100,13 +102,17 @@ export class PasswordPrompt extends Component {
           allowActivationWithoutPassword: false,
           allowAddingWebsitesWithoutPassword: false,
         },
-        showAddWebsitePrompt: this.showAddWebsitePrompt,
+        hideReportIssueButton: this.state.hideReportIssueButton,
+        showAddWebsitePrompt: this.state.showAddWebsitePrompt,
       })
       .then((items) => {
         if (items) {
           this.mode = items.mode;
           this.hash = items.password.hash;
-          this.showAddWebsitePrompt = items.showAddWebsitePrompt;
+          this.setState({
+            hideReportIssueButton: items.hideReportIssueButton,
+            showAddWebsitePrompt: items.showAddWebsitePrompt,
+          });
           if (items.password.allowActivationWithoutPassword) {
             this.toggleQuickActivationButton();
           }
@@ -276,6 +282,15 @@ export class PasswordPrompt extends Component {
                   history={this.props.history}
                 />
               )}
+              {!this.state.hideReportIssueButton && (
+                <LinkIconButton
+                  icon={GithubIcon}
+                  link="https://github.com/AXeL-dev/distract-me-not/issues"
+                  external
+                  tooltip={translate('reportIssue')}
+                  history={this.props.history}
+                />
+              )}
             </Pane>
             <Pane>
               <AnimatedIconButton
@@ -289,7 +304,9 @@ export class PasswordPrompt extends Component {
                 icon={PlusIcon}
                 iconSize={22}
                 iconColor="#47b881"
-                onClick={() => addCurrentWebsite(this.mode, this.showAddWebsitePrompt)}
+                onClick={() =>
+                  addCurrentWebsite(this.mode, this.state.showAddWebsitePrompt)
+                }
                 hideOnClick={true}
                 hideAnimationIcon={TickIcon}
                 isVisible={this.state.isAddButtonVisible}
