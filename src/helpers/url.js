@@ -9,7 +9,12 @@ export function stripUrl(url) {
 }
 
 export function getHostname(url) {
-  return url.replace(/^(?:.*:\/\/)?(?:(?:www|m|\*)\.)?([^/]+).*/i, '$1');
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname.split('.').slice(-2).join('.');
+  } catch(e) {
+    return url.replace(/^(?:.*:\/\/)?(?:(?:www|m|\*)\.)?([^/]+).*/i, '$1');
+  }
 }
 
 export function getFaviconLink(url) {
