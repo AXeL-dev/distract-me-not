@@ -465,7 +465,7 @@ export class Settings extends Component {
       <SelectField
         label={translate('framesType')}
         tooltip={translate('framesTypeDescription')}
-        value={this.state.options.framesType}
+        value={this.state.options.framesType.join(',')}
         onChange={(event) => this.setOptions('framesType', event.target.value.split(','))}
         disabled={!this.state.options.isEnabled}
         marginBottom={16}
