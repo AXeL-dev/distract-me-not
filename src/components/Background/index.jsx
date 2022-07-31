@@ -300,8 +300,8 @@ export class Background extends Component {
         //----- End backward compatibility with v1
         this.blacklist = transformList(items.blacklist);
         this.whitelist = transformList(items.whitelist);
-        this.blacklistKeywords = items.blacklistKeywords;
-        this.whitelistKeywords = items.whitelistKeywords;
+        this.blacklistKeywords = transformKeywords(items.blacklistKeywords);
+        this.whitelistKeywords = transformKeywords(items.whitelistKeywords);
         this.mode = items.mode;
         this.action = items.action;
         this.framesType = items.framesType;
@@ -642,15 +642,23 @@ export class Background extends Component {
       return false;
     }
     for (const rule of this.blacklist) {
-      if (rule.test(url)) {
-        this.debug('is blacklisted:', url);
-        return true;
+      try {
+        if (rule.test(url)) {
+          this.debug('is blacklisted:', url);
+          return true;
+        }
+      } catch (e) {
+        console.error('error while testing blacklist rule:', rule, e);
       }
     }
     for (const rule of this.blacklistKeywords) {
-      if (rule.test(url)) {
-        this.debug('found blacklisted keyword in:', url);
-        return true;
+      try {
+        if (rule.test(url)) {
+          this.debug('found blacklisted keyword in:', url);
+          return true;
+        }
+      } catch (e) {
+        console.error('error while testing blacklist keyword rule:', rule, e);
       }
     }
     this.debug('not blacklisted:', url);
@@ -662,15 +670,23 @@ export class Background extends Component {
       return true;
     }
     for (const rule of this.whitelist) {
-      if (rule.test(url)) {
-        this.debug('is whitelisted:', url);
-        return true;
+      try {
+        if (rule.test(url)) {
+          this.debug('is whitelisted:', url);
+          return true;
+        }
+      } catch (e) {
+        console.error('error while testing whitelist rule:', rule, e);
       }
     }
     for (const rule of this.whitelistKeywords) {
-      if (rule.test(url)) {
-        this.debug('found whitelisted keyword in:', url);
-        return true;
+      try {
+        if (rule.test(url)) {
+          this.debug('found whitelisted keyword in:', url);
+          return true;
+        }
+      } catch (e) {
+        console.error('error while testing whitelist keyword rule:', rule, e);
       }
     }
     this.debug('not whitelisted:', url);
