@@ -51,3 +51,11 @@
     padding: 16px;
   }
 }
+
+.hidden {
+  display: none;
+  visibility: hidden;
+  overflow: hidden;
+  width: 0;
+  height: 0;
+}

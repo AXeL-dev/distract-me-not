@@ -22,3 +22,4 @@ export * from './WebsiteList';
 export * from './WordList';
 export * from './Tooltip';
 export * from './TruncatedText';
+export * from './Button';

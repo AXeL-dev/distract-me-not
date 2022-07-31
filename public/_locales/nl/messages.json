@@ -482,5 +482,11 @@
   },
   "FAQ": {
     "message": "FAQ"
+  },
+  "importSettings": {
+    "message": "Instellingen importeren"
+  },
+  "exportSettings": {
+    "message": "Instellingen exporteren"
   }
 }

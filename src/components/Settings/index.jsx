@@ -4,7 +4,6 @@ import {
   Tablist,
   Tab,
   Checkbox,
-  Button,
   TickIcon,
   PlusIcon,
   CrossIcon,
@@ -18,6 +17,8 @@ import {
   TimeIcon,
   Badge,
   WarningSignIcon,
+  ImportIcon,
+  ExportIcon,
 } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv } from 'helpers/debug';
@@ -54,9 +55,11 @@ import {
   WordList,
   Tooltip,
   TruncatedText,
+  Button,
 } from 'components';
 import { defaultLogsSettings } from 'helpers/logger';
 import { defaultTimerSettings } from 'helpers/timer';
+import { download, readFile } from 'helpers/file';
 import { isSmallDevice } from 'helpers/device';
 import { version } from '../../../package.json';
 import { set, cloneDeep, debounce } from 'lodash';
@@ -66,6 +69,7 @@ import './styles.scss';
 export class Settings extends Component {
   constructor(props) {
     super(props);
+    this.importFileInputRef = React.createRef();
     this.blacklistComponentRef = React.createRef();
     this.whitelistComponentRef = React.createRef();
     this.blacklistKeywordsComponentRef = React.createRef();
@@ -142,99 +146,7 @@ export class Settings extends Component {
   }
 
   componentDidMount() {
-    storage
-      .get({
-        isEnabled: this.state.options.isEnabled,
-        mode: this.state.options.mode || defaultMode,
-        action: this.state.options.action,
-        framesType: this.state.options.framesType,
-        message: this.state.options.blockTab.message,
-        displayBlankPage: this.state.options.blockTab.displayBlankPage,
-        displayBlockedLink: this.state.options.blockTab.displayBlockedLink,
-        redirectUrl: this.state.options.redirectToUrl.url,
-        enableLogs: this.state.options.logs.isEnabled,
-        logsLength: this.state.options.logs.maxLength,
-        hideReportIssueButton: this.state.options.misc.hideReportIssueButton,
-        showAddWebsitePrompt: this.state.options.misc.showAddWebsitePrompt,
-        enableOnBrowserStartup: this.state.options.misc.enableOnBrowserStartup,
-        schedule: this.state.options.schedule,
-        password: this.state.options.password,
-        unblock: this.state.options.unblock,
-        timer: this.state.options.timer,
-        blacklist: defaultBlacklist,
-        whitelist: defaultWhitelist,
-        blacklistKeywords: [],
-        whitelistKeywords: [],
-        blacklistLastModifiedDate: this.state.options.blacklistLastModifiedDate,
-        whitelistLastModifiedDate: this.state.options.whitelistLastModifiedDate,
-        blacklistKeywordsLastModifiedDate:
-          this.state.options.blacklistKeywordsLastModifiedDate,
-        whitelistKeywordsLastModifiedDate:
-          this.state.options.whitelistKeywordsLastModifiedDate,
-      })
-      .then((items) => {
-        if (items) {
-          // Update state
-          this.setOptions({
-            isEnabled: items.isEnabled,
-            mode: items.mode,
-            action: items.action,
-            framesType: items.framesType,
-            blockTab: {
-              message: items.message,
-              displayBlankPage: items.displayBlankPage,
-              displayBlockedLink: items.displayBlockedLink,
-            },
-            redirectToUrl: {
-              url: items.redirectUrl,
-            },
-            schedule: {
-              // merge both state & storage values
-              ...this.state.options.schedule,
-              ...(!items.schedule.time ? items.schedule : {}), // omit old schedule settings in version <= 2.3.0
-            },
-            password: {
-              ...this.state.options.password,
-              ...items.password,
-              isSet: !!(items.password.hash && items.password.hash.length),
-            },
-            timer: {
-              ...this.state.options.timer,
-              ...items.timer,
-            },
-            logs: {
-              ...this.state.options.logs,
-              isEnabled: items.enableLogs,
-              maxLength: items.logsLength,
-            },
-            unblock: {
-              ...this.state.options.unblock,
-              ...items.unblock,
-            },
-            blacklist: items.blacklist,
-            whitelist: items.whitelist,
-            blacklistKeywords: items.blacklistKeywords,
-            whitelistKeywords: items.whitelistKeywords,
-            blacklistLastModifiedDate: items.blacklistLastModifiedDate,
-            whitelistLastModifiedDate: items.whitelistLastModifiedDate,
-            blacklistKeywordsLastModifiedDate: items.blacklistKeywordsLastModifiedDate,
-            whitelistKeywordsLastModifiedDate: items.whitelistKeywordsLastModifiedDate,
-            misc: {
-              hideReportIssueButton: items.hideReportIssueButton,
-              showAddWebsitePrompt: items.showAddWebsitePrompt,
-              enableOnBrowserStartup: items.enableOnBrowserStartup,
-            },
-          });
-          // Toggle tabs
-          this.toggleListTabs(items.mode);
-          this.toggleTab('unblocking', items.action !== Action.blockTab);
-          // Update WebsiteList components
-          this.blacklistComponentRef.current.setList(items.blacklist);
-          this.whitelistComponentRef.current.setList(items.whitelist);
-          this.blacklistKeywordsComponentRef.current.setList(items.blacklistKeywords);
-          this.whitelistKeywordsComponentRef.current.setList(items.whitelistKeywords);
-        }
-      });
+    this.getAllSettings().then(this.setSettings);
     window.addEventListener('resize', this.handleResize);
   }
 
@@ -245,6 +157,102 @@ export class Settings extends Component {
   handleResize = debounce(() => {
     this.setState({ isSmallScreen: isSmallDevice() });
   }, 200);
+
+  getAllSettings = () => {
+    return storage.get({
+      isEnabled: this.state.options.isEnabled,
+      mode: this.state.options.mode || defaultMode,
+      action: this.state.options.action,
+      framesType: this.state.options.framesType,
+      message: this.state.options.blockTab.message,
+      displayBlankPage: this.state.options.blockTab.displayBlankPage,
+      displayBlockedLink: this.state.options.blockTab.displayBlockedLink,
+      redirectUrl: this.state.options.redirectToUrl.url,
+      enableLogs: this.state.options.logs.isEnabled,
+      logsLength: this.state.options.logs.maxLength,
+      hideReportIssueButton: this.state.options.misc.hideReportIssueButton,
+      showAddWebsitePrompt: this.state.options.misc.showAddWebsitePrompt,
+      enableOnBrowserStartup: this.state.options.misc.enableOnBrowserStartup,
+      schedule: this.state.options.schedule,
+      password: this.state.options.password,
+      unblock: this.state.options.unblock,
+      timer: this.state.options.timer,
+      blacklist: defaultBlacklist,
+      whitelist: defaultWhitelist,
+      blacklistKeywords: [],
+      whitelistKeywords: [],
+      blacklistLastModifiedDate: this.state.options.blacklistLastModifiedDate,
+      whitelistLastModifiedDate: this.state.options.whitelistLastModifiedDate,
+      blacklistKeywordsLastModifiedDate:
+        this.state.options.blacklistKeywordsLastModifiedDate,
+      whitelistKeywordsLastModifiedDate:
+        this.state.options.whitelistKeywordsLastModifiedDate,
+    });
+  };
+
+  setSettings = (items) => {
+    if (items) {
+      // Update state
+      this.setOptions({
+        isEnabled: items.isEnabled,
+        mode: items.mode,
+        action: items.action,
+        framesType: items.framesType,
+        blockTab: {
+          message: items.message,
+          displayBlankPage: items.displayBlankPage,
+          displayBlockedLink: items.displayBlockedLink,
+        },
+        redirectToUrl: {
+          url: items.redirectUrl,
+        },
+        schedule: {
+          // merge both state & storage values
+          ...this.state.options.schedule,
+          ...(!items.schedule.time ? items.schedule : {}), // omit old schedule settings in version <= 2.3.0
+        },
+        password: {
+          ...this.state.options.password,
+          ...items.password,
+          isSet: !!(items.password.hash && items.password.hash.length),
+        },
+        timer: {
+          ...this.state.options.timer,
+          ...items.timer,
+        },
+        logs: {
+          ...this.state.options.logs,
+          isEnabled: items.enableLogs,
+          maxLength: items.logsLength,
+        },
+        unblock: {
+          ...this.state.options.unblock,
+          ...items.unblock,
+        },
+        blacklist: items.blacklist,
+        whitelist: items.whitelist,
+        blacklistKeywords: items.blacklistKeywords,
+        whitelistKeywords: items.whitelistKeywords,
+        blacklistLastModifiedDate: items.blacklistLastModifiedDate,
+        whitelistLastModifiedDate: items.whitelistLastModifiedDate,
+        blacklistKeywordsLastModifiedDate: items.blacklistKeywordsLastModifiedDate,
+        whitelistKeywordsLastModifiedDate: items.whitelistKeywordsLastModifiedDate,
+        misc: {
+          hideReportIssueButton: items.hideReportIssueButton,
+          showAddWebsitePrompt: items.showAddWebsitePrompt,
+          enableOnBrowserStartup: items.enableOnBrowserStartup,
+        },
+      });
+      // Toggle tabs
+      this.toggleListTabs(items.mode);
+      this.toggleTab('unblocking', items.action !== Action.blockTab);
+      // Update WebsiteList components
+      this.blacklistComponentRef.current.setList(items.blacklist);
+      this.whitelistComponentRef.current.setList(items.whitelist);
+      this.blacklistKeywordsComponentRef.current.setList(items.blacklistKeywords);
+      this.whitelistKeywordsComponentRef.current.setList(items.whitelistKeywords);
+    }
+  };
 
   changeAction = (event) => {
     const action = event.target.value;
@@ -407,6 +415,28 @@ export class Settings extends Component {
           id: 'settings-toaster',
         });
       });
+  };
+
+  export = () => {
+    this.getAllSettings().then((settings) => {
+      if (settings) {
+        const blob = new Blob([JSON.stringify(settings, null, 2)], {
+          type: 'application/json',
+        });
+        download(blob, 'settings.json');
+      }
+    });
+  };
+
+  import = (file) => {
+    readFile(file).then((content) => {
+      try {
+        const settings = JSON.parse(content);
+        this.setSettings(settings);
+      } catch (e) {
+        // proceed
+      }
+    });
   };
 
   openDonationLink = () => {
@@ -1267,6 +1297,28 @@ export class Settings extends Component {
               </Button>
             ) : (
               <>
+                {this.state.selectedTab === 'misc' && (
+                  <>
+                    <Button
+                      height={32}
+                      appearance="primary"
+                      iconBefore={ImportIcon}
+                      onClick={() => {
+                        this.importFileInputRef.current.click();
+                      }}
+                    >
+                      {translate('importSettings')}
+                    </Button>
+                    <Button
+                      height={32}
+                      appearance="primary"
+                      iconBefore={ExportIcon}
+                      onClick={this.export}
+                    >
+                      {translate('exportSettings')}
+                    </Button>
+                  </>
+                )}
                 <Button
                   height={32}
                   appearance="primary"
@@ -1304,6 +1356,18 @@ export class Settings extends Component {
         >
           {translate('confirmApplyScheduleSettings')}
         </Dialog>
+        <input
+          ref={this.importFileInputRef}
+          type="file"
+          className="hidden"
+          accept=".json"
+          onClick={(event) => (event.target.value = '')}
+          onChange={(event) => {
+            const file = event.target.files[0];
+            this.import(file);
+          }}
+          data-testid="settings-file-input"
+        />
       </Pane>
     );
   }
