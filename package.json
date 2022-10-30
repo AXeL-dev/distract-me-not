@@ -77,6 +77,6 @@
     "release-it": "^15.5.0",
     "release-it-update-manifest-plugin": "^1.0.0",
     "sign-addon": "^3.11.0",
-    "web-ext": "^6.7.0"
+    "web-ext": "^7.3.1"
   }
 }
