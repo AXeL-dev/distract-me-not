@@ -18,13 +18,13 @@
     "message": "Combine les modes liste noire et liste blanche en ignorant les sites web sur liste blanche et en bloquant ceux de la liste noire"
   },
   "whitelistDescription": {
-    "message": "Quand le mode liste blanche est actif, vous pouvez uniquement visiter les sites web suivants:"
+    "message": "Quand le mode liste blanche est actif, vous pouvez uniquement visiter les sites web suivants :"
   },
   "blacklistDescription": {
-    "message": "Quand le mode liste noire est actif, vous ne pouvez pas visiter les sites web suivants:"
+    "message": "Quand le mode liste noire est actif, vous ne pouvez pas visiter les sites web suivants :"
   },
   "websiteUrlPlaceholder": {
-    "message": "Veuillez entrer l'URL du site içi"
+    "message": "Veuillez entrer l'URL du site ici"
   },
   "blockingMessage": {
     "message": "Message à afficher"
@@ -45,7 +45,7 @@
     "message": "Faire un don"
   },
   "help": {
-    "message": "Besoin d'aide?"
+    "message": "Besoin d'aide ?"
   },
   "about": {
     "message": "À propos"
@@ -54,7 +54,7 @@
     "message": "Version"
   },
   "license": {
-    "message": "License"
+    "message": "Licence"
   },
   "supportDeveloper": {
     "message": "* Si vous avez aimé cette extension, pensez à soutenir le développeur."
@@ -102,19 +102,19 @@
     "message": "Url"
   },
   "redirectUrlExample": {
-    "message": "Exemple: about:blank, https://www.google.com, ..."
+    "message": "Exemple : about:blank, https://www.google.com, ..."
   },
   "urlExample": {
-    "message": "Exemple: www.facebook.com, www.youtube.com, ..."
+    "message": "Exemple : www.facebook.com, www.youtube.com, ..."
   },
   "urlIsNotValid": {
     "message": "L'url n'est pas valide"
   },
   "urlAlreadyExists": {
-    "message": "L'url existe déjà!"
+    "message": "L'url existe déjà !"
   },
   "copiedToClipboard": {
-    "message": "Copié dans le presse-papier!"
+    "message": "Copié dans le presse-papier !"
   },
   "enableOnBrowserStartup": {
     "message": "Toujours activer au démarrage du navigateur"
@@ -204,7 +204,7 @@
     "message": "Le mot de passe doit contenir au moins 8 caractères."
   },
   "passwordIsWrong": {
-    "message": "Mot de passe incorrect!"
+    "message": "Mot de passe incorrect !"
   },
   "allowAddingWebsitesWithoutPassword": {
     "message": "Permettre l'ajout de sites web sans entrer le mot de passe"
@@ -225,7 +225,7 @@
     "message": "Sauvegarder"
   },
   "settingsSaved": {
-    "message": "Paramètres sauvegardés!"
+    "message": "Paramètres sauvegardés !"
   },
   "copy": {
     "message": "Copier"
@@ -365,7 +365,7 @@
     "message": "Quand le mode liste blanche est actif, vous pouvez uniquement visiter les liens contenant les mots-clés suivants:"
   },
   "keywordExample": {
-    "message": "Exemple: foo, bar, ..."
+    "message": "Exemple : foo, bar, ..."
   },
   "addKeywordHint": {
     "message": "Vous pouvez utiliser des expressions régulières pour plus de flexibilité, par exemple: <b>/foo?/</b>, <b>/bar/i</b>, <b>/(foo|bar)/i</b>"
@@ -374,7 +374,7 @@
     "message": "Le mot-clé n'est pas valide"
   },
   "keywordAlreadyExists": {
-    "message": "Le mot-clé existe déjà!"
+    "message": "Le mot-clé existe déjà !"
   },
   "allowActivationWithoutPassword": {
     "message": "Permettre l'activation sans entrer le mot de passe"
@@ -422,7 +422,7 @@
     "message": "Temps restant"
   },
   "timerCompleted": {
-    "message": "Minuteur terminé!"
+    "message": "Minuteur terminé !"
   },
   "blockCurrentDomain": {
     "message": "Bloquer le nom de domaine courant"
@@ -437,7 +437,7 @@
     "message": "Réglages > Liste blanche"
   },
   "lastModified": {
-    "message": "Dernière modification:"
+    "message": "Dernière modification :"
   },
   "never": {
     "message": "Jamais"
