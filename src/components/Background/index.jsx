@@ -12,8 +12,6 @@ import {
 import {
   Mode,
   Action,
-  defaultBlacklist,
-  defaultWhitelist,
   UnblockOptions,
   defaultUnblockSettings,
   isAccessible,
@@ -262,8 +260,8 @@ export class Background extends Component {
   init = () => {
     storage
       .get({
-        blacklist: defaultBlacklist,
-        whitelist: defaultWhitelist,
+        blacklist: [],
+        whitelist: [],
         blacklistKeywords: [],
         whitelistKeywords: [],
         blackList: null, // for backward compatibility (with v1)
