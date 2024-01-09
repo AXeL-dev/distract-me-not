@@ -61,7 +61,7 @@ import { defaultLogsSettings } from 'helpers/logger';
 import { defaultTimerSettings } from 'helpers/timer';
 import { download, readFile } from 'helpers/file';
 import { isSmallDevice } from 'helpers/device';
-import { version } from '../../../package.json';
+import packageInfo from '../../../package.json';
 import { set, cloneDeep, debounce } from 'lodash';
 import { format } from 'date-fns';
 import './styles.scss';
@@ -1193,7 +1193,7 @@ export class Settings extends Component {
           href="https://github.com/AXeL-dev/distract-me-not/releases/latest"
           target="_blank"
           rel="noreferrer"
-        >{`${translate('version')} ${version}`}</a>
+        >{`${translate('version')} ${packageInfo.version}`}</a>
         <a
           className="link"
           href="https://github.com/AXeL-dev/distract-me-not/blob/master/LICENSE"
