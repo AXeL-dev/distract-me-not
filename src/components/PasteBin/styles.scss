@@ -36,8 +36,10 @@
       path {
         fill: #d0d0d0;
       }
-      width: 16px;
-      height: 16px;
+      & {
+        width: 16px;
+        height: 16px;
+      }
     }
   }
 }
