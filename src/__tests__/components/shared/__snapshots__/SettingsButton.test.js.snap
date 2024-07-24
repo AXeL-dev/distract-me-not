@@ -10,7 +10,7 @@ exports[`renders correctly 1`] = `
       class="ub-dspl_inline-flex ub-box-szg_border-box"
     >
       <svg
-        class="css-1wyorxj ub-w_18px ub-h_18px ub-box-szg_border-box"
+        class="ub-fill_4E4E50 ub-w_18px ub-h_18px ub-box-szg_border-box"
         data-icon="cog"
         viewBox="0 0 16 16"
       >

@@ -30,7 +30,7 @@ exports[`renders correctly 1`] = `
             class="ub-dspl_inline-flex ub-ml_10px ub-mr_-4px ub-box-szg_border-box"
           >
             <svg
-              class="css-c4d79v ub-w_14px ub-h_14px ub-box-szg_border-box"
+              class="ub-fill_currentColor ub-w_14px ub-h_14px ub-box-szg_border-box"
               data-icon="caret-down"
               viewBox="0 0 16 16"
             >
