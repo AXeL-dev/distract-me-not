@@ -91,6 +91,14 @@ describe('url helper', () => {
         url: '*.website.com/*',
         expected: 'website.com',
       },
+      {
+        url: 'http://website',
+        expected: 'website',
+      },
+      {
+        url: 'http://website:8080',
+        expected: 'website',
+      },
     ];
 
     for (const { url, expected } of payload) {

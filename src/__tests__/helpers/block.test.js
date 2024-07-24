@@ -6,6 +6,7 @@ describe('block helper', () => {
     const urls = [
       'http://website.com',
       'https://website.com',
+      'http://website',
     ];
 
     for (const url of urls) {

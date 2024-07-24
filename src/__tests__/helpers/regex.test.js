@@ -13,6 +13,10 @@ describe('regex helper', () => {
   it('transforms urls to regular expressions', () => {
     const payload = [
       {
+        url: 'http://website',
+        expected: /^http:\/\/website$/i,
+      },
+      {
         url: 'http://website.com',
         expected: /^http:\/\/website\.com$/i,
       },
