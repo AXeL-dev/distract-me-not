@@ -1,13 +1,33 @@
-import { hasValidProtocol, getHostname, getFaviconLink } from 'helpers/url';
+import { hasValidProtocol, getHostname, getFaviconLink, isUrl } from 'helpers/url';
+
+const commonValidUrls = [
+  'http://website.com',
+  'https://website.com',
+  'ftp://website.com',
+  'ftps://website.com',
+  'file://my_file.txt',
+  'blob:7b2e7a34-8573-4c16-a3bb-8fb89577e5b4',
+  'blob:null/7b2e7a34-8573-4c16-a3bb-8fb89577e5b4',
+];
 
 describe('url helper', () => {
+  it('accepts valid urls', () => {
+    const urls = [
+      ...commonValidUrls,
+      'http://stablediffusion',
+      'http://stablediffusion:32444',
+      'ftp://a.stablediffusion:32444/r/typo/*',
+    ];
+
+    for (const url of urls) {
+      const result = isUrl(url);
+      expect(result).toEqual(true);
+    }
+  });
+
   it('detects urls with a valid protocol', () => {
     const urls = [
-      'http://website.com',
-      'https://website.com',
-      'ftp://website.com',
-      'ftps://website.com',
-      'file://my_file.txt',
+      ...commonValidUrls,
       'chrome://extensions',
       'edge://extensions',
       'moz-extension://something',

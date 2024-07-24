@@ -1,6 +1,6 @@
 export function isUrl(url) {
-  return url.match(
-    /(^|\s)((https?:\/\/)?(localhost(:\d+)?$|(\*?|[\w-]+)(\.[\w-]+)+\.?(:\d+)?(\/\S*)?))/gi
+  return /(^|\s)(((https?|ftps?|file):\/\/|blob:)?((localhost|[\w-\/]+)(:\d+)?$|(\*?|[\w-]+)(\.[\w-]+)+\.?(:\d+)?(\/\S*)?))/gi.test(
+    url
   );
 }
 
@@ -12,7 +12,7 @@ export function getHostname(url) {
   try {
     const parsed = new URL(url);
     return parsed.hostname.split('.').slice(-2).join('.');
-  } catch(e) {
+  } catch (e) {
     return url.replace(/^(?:.*:\/\/)?(?:(?:www|m|\*)\.)?([^/]+).*/i, '$1');
   }
 }
@@ -36,7 +36,7 @@ export function checkFaviconLink(faviconLink) {
 
 // prettier-ignore
 export function hasValidProtocol(url) {
-  return /^((ftps?|https?|file|chrome|edge|moz-extension|chrome-extension|extension):\/\/|about:)/i.test(url);
+  return /^((ftps?|https?|file|chrome|edge|moz-extension|chrome-extension|extension):\/\/|about:|blob:)/i.test(url);
 }
 
 export function getValidUrl(url) {
