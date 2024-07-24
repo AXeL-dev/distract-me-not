@@ -26,8 +26,7 @@ exports[`renders correctly 1`] = `
           </svg>
         </div>
         <input
-          appearance="none"
-          class="ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_16px ub-ltr-spc_0 ub-fnt-fam_b77syt ub-color_474d66 ub-flx_1 ub-b-btm_none ub-b-lft_none ub-b-rgt_none ub-b-top_none ub-bg-clr_transparent ub-otln_iu2jf4_1bcl2f4 ub-color_rgba67-90-111-0-7_1b2gqua ub-ml_-2px ub-pl_0px ub-box-szg_border-box"
+          class="css-q4k7k7 ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_16px ub-ltr-spc_0 ub-fnt-fam_b77syt ub-color_474d66 ub-flx_1 ub-ml_-2px ub-pl_0px ub-box-szg_border-box"
           placeholder="filter..."
           spellcheck="true"
           value=""

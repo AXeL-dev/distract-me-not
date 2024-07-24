@@ -6,7 +6,7 @@
     "bcryptjs": "^2.4.3",
     "copy-to-clipboard": "^3.3.3",
     "date-fns": "^2.30.0",
-    "evergreen-ui": "^6.13.3",
+    "evergreen-ui": "^6.9.0",
     "fuzzaldrin-plus": "^0.6.0",
     "lodash": "^4.17.21",
     "omgopass": "^3.2.1",
