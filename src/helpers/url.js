@@ -1,5 +1,5 @@
 export function isUrl(url) {
-  return /(^|\s)(((https?|ftps?|file|\*):\/\/|blob:)?((localhost|[\w-\/]+)(:\d+)?$|[\w-]+(:|\/)?\*$|(\*?|[\w-]+)(\.[\w-]+)+\.?(:\d+)?(\/\S*)?))/gi.test(
+  return /(^|\s)(\*:\/\/.*|blob:.*|(((https?|ftps?|file):\/\/)?(localhost|((?<=((https?|ftps?|file):\/\/))[\w-]+)|(\*?|[\w-]+)(\.[\w-]+)+)))(:\d+)?(\/\S*)?/gi.test(
     url
   );
 }

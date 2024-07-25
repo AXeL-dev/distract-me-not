@@ -8,24 +8,53 @@ const commonValidUrls = [
   'file://my_file.txt',
   'blob:7b2e7a34-8573-4c16-a3bb-8fb89577e5b4',
   'blob:null/7b2e7a34-8573-4c16-a3bb-8fb89577e5b4',
+  'blob:http://example.com/550e8400-e29b-41d4-a716-446655440000',
 ];
 
 describe('url helper', () => {
   it('accepts valid urls', () => {
     const urls = [
       ...commonValidUrls,
+      'http://localhost',
+      'http://localhost:3000',
+      'localhost:3000',
       'http://website',
+      'http://website/r',
       'http://website:8080',
       'ftp://a.website:8080/r/typo/*',
       'http://website*',
       'http://website/*',
       'http://website:*',
       '*://website',
+      '*.website',
+      '*.website.com',
+      'website.com',
     ];
 
     for (const url of urls) {
       const result = isUrl(url);
       expect(result).toEqual(true);
+    }
+  });
+
+  it('rejects invalid urls', () => {
+    const urls = [
+      'website',
+      '*website',
+      'website*',
+      'my-website',
+      '123',
+      'hello@world',
+      '-',
+      '_',
+      'http:',
+      'http://',
+      'http://*://',
+    ];
+
+    for (const url of urls) {
+      const result = isUrl(url);
+      expect(result).toEqual(false);
     }
   });
 
