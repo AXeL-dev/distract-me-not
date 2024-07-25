@@ -1,9 +1,13 @@
 export class regex {
   static wildcard(url) {
-    if (url.indexOf('://') === -1 && !url.startsWith('^')) {
-      return url.endsWith('$') ? `*://${url}` : `*://${url}/*`;
+    if (url.startsWith('^')) {
+      return url;
     }
-    return url;
+    const exactMatch = url.endsWith('$');
+    if (url.indexOf('://') === -1) {
+      return exactMatch ? `*://${url}` : `*://${url}/*`;
+    }
+    return !exactMatch ? `${url}/*` : url;
   }
 
   static escape(str) {

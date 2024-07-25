@@ -14,9 +14,13 @@ describe('url helper', () => {
   it('accepts valid urls', () => {
     const urls = [
       ...commonValidUrls,
-      'http://stablediffusion',
-      'http://stablediffusion:32444',
-      'ftp://a.stablediffusion:32444/r/typo/*',
+      'http://website',
+      'http://website:8080',
+      'ftp://a.website:8080/r/typo/*',
+      'http://website*',
+      'http://website/*',
+      'http://website:*',
+      '*://website',
     ];
 
     for (const url of urls) {

@@ -13,16 +13,60 @@ describe('regex helper', () => {
   it('transforms urls to regular expressions', () => {
     const payload = [
       {
+        url: '*://website',
+        expected: /^.*:\/\/website(\/|$).*$/i,
+      },
+      {
+        url: '*://website*',
+        expected: /^.*:\/\/website.*(\/|$).*$/i,
+      },
+      {
         url: 'http://website',
-        expected: /^http:\/\/website$/i,
+        expected: /^http:\/\/website(\/|$).*$/i,
+      },
+      {
+        url: 'http*://website',
+        expected: /^http.*:\/\/website(\/|$).*$/i,
+      },
+      {
+        url: 'http://website*',
+        expected: /^http:\/\/website.*(\/|$).*$/i,
+      },
+      {
+        url: 'http://website:*',
+        expected: /^http:\/\/website:.*(\/|$).*$/i,
+      },
+      {
+        url: 'http://website:',
+        expected: /^http:\/\/website:(\/|$).*$/i,
+      },
+      {
+        url: 'http://website.',
+        expected: /^http:\/\/website\.(\/|$).*$/i,
+      },
+      {
+        url: 'http://website$',
+        expected: /^http:\/\/website(\/|$)$/i,
+      },
+      {
+        url: 'http://website:80',
+        expected: /^http:\/\/website:80(\/|$).*$/i,
+      },
+      {
+        url: 'http://website:80$',
+        expected: /^http:\/\/website:80(\/|$)$/i,
       },
       {
         url: 'http://website.com',
-        expected: /^http:\/\/website\.com$/i,
+        expected: /^http:\/\/website\.com(\/|$).*$/i,
       },
       {
         url: 'https://website.com',
-        expected: /^https:\/\/website\.com$/i,
+        expected: /^https:\/\/website\.com(\/|$).*$/i,
+      },
+      {
+        url: 'http://website.com*',
+        expected: /^http:\/\/website\.com.*(\/|$).*$/i,
       },
       {
         url: 'website.com',
@@ -39,6 +83,18 @@ describe('regex helper', () => {
       {
         url: 'website.com/*',
         expected: /^.*:\/\/website\.com\/.*(\/|$).*$/i,
+      },
+      {
+        url: 'website.com/article',
+        expected: /^.*:\/\/website\.com\/article(\/|$).*$/i,
+      },
+      {
+        url: 'website.com/article*',
+        expected: /^.*:\/\/website\.com\/article.*(\/|$).*$/i,
+      },
+      {
+        url: 'website.com/*/article',
+        expected: /^.*:\/\/website\.com\/.*\/article(\/|$).*$/i,
       },
       {
         url: 'website.com/*/article$',
