@@ -218,6 +218,11 @@ export class Blocked extends Component {
                       selected: event.target.value,
                     })
                   }
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      this.unblock();
+                    }
+                  }}
                 />
                 {this.state.unblockDialog.requirePassword ? (
                   <PasswordPrompt
