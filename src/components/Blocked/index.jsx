@@ -218,6 +218,7 @@ export class Blocked extends Component {
                       selected: event.target.value,
                     })
                   }
+                  // Only Key Down event listener was added, to handle ENTER keypress and close dialog
                   onKeyDown={(event) => {
                     if (event.key === 'Enter') {
                       this.unblock();
