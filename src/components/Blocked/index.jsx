@@ -208,7 +208,7 @@ export class Blocked extends Component {
                 className: 'unblock-dialog',
                 // Handle ENTER keypress and close dialog
                 onKeyDown: (event) => {
-                  if (event.key === 'Enter') {
+                  if (!this.state.unblockDialog.requirePassword && event.key === 'Enter') {
                     this.unblock();
                   }
                 }
