@@ -205,13 +205,7 @@ export class Blocked extends Component {
               topOffset="40vmin"
               width={400}
               containerProps={{
-                className: 'unblock-dialog',
-                // Handle ENTER keypress and close dialog
-                onKeyDown: (event) => {
-                  if (event.key === 'Enter') {
-                    this.unblock();
-                  }
-                }
+                className: 'unblock-dialog'
               }}
             >
               <Pane width="95%" margin="auto">
