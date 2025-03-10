@@ -21,7 +21,7 @@ import {
   ExportIcon,
 } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
-import { debug, isDevEnv } from 'helpers/debug';
+import { debug, isDevEnv, logInfo } from 'helpers/debug';
 import {
   Mode,
   Action,
@@ -142,15 +142,27 @@ export class Settings extends Component {
         },
       },
       isSmallScreen: isSmallDevice(),
+      originalIsEnabled: defaultIsEnabled, // Add this line to track original status
     };
   }
 
   componentDidMount() {
-    this.getAllSettings().then(this.setSettings);
+    this.getAllSettings().then((settings) => {
+      this.setSettings(settings);
+      // Store the original isEnabled state
+      if (settings && settings.isEnabled !== undefined) {
+        this.setState({ originalIsEnabled: settings.isEnabled });
+      }
+    });
+    
+    // Add storage change listener to keep settings in sync with popup
+    chrome.storage.onChanged.addListener(this.handleStorageChanges);
+    
     window.addEventListener('resize', this.handleResize);
   }
 
   componentWillUnmount() {
+    chrome.storage.onChanged.removeListener(this.handleStorageChanges);
     window.removeEventListener('resize', this.handleResize);
   }
 
@@ -345,6 +357,11 @@ export class Settings extends Component {
       });
       return;
     }
+
+    // Capture original enabled state to detect changes
+    const wasEnabled = this.state.originalIsEnabled;
+    const willBeEnabled = this.state.options.isEnabled;
+
     storage
       .set({
         isEnabled: this.state.options.isEnabled,
@@ -390,7 +407,7 @@ export class Settings extends Component {
       })
       .then((success) => {
         if (success) {
-          // Update background script
+          // Always update the background script with the saved values
           sendMessage('setIsEnabled', this.state.options.isEnabled);
           sendMessage('setMode', this.state.options.mode);
           sendMessage('setAction', this.state.options.action);
@@ -409,6 +426,9 @@ export class Settings extends Component {
           sendMessage('setUnblockSettings', this.state.options.unblock);
           sendMessage('setLogsSettings', this.state.options.logs);
           sendMessage('setTimerSettings', this.state.options.timer);
+          
+          // Update originalIsEnabled to reflect the saved state
+          this.setState({ originalIsEnabled: this.state.options.isEnabled });
         }
         // Show success message (keep out of success condition to ensure it's executed on unit tests & dev env.)
         toaster.success(translate('settingsSaved'), {
@@ -474,6 +494,19 @@ export class Settings extends Component {
     );
     this.closeDialog();
   };
+
+  handleStorageChanges = (changes) => {
+    // If isEnabled changed from another source (like the popup)
+    if (changes.isEnabled) {
+      const newIsEnabled = changes.isEnabled.newValue;
+      
+      // Update both the form field and our tracking var
+      this.setOptions('isEnabled', newIsEnabled);
+      this.setState({ originalIsEnabled: newIsEnabled });
+      
+      logInfo(`Status changed from external source: ${newIsEnabled}`);
+    }
+  }
 
   renderBlockingTab = () => (
     <Fragment>

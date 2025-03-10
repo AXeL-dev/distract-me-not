@@ -57,7 +57,7 @@ function logError(message, error) {
   console.error(`[DMN ERROR] ${message}`, error || '');
 }
 
-// Initialize the extension
+// Enhanced initialization that checks all tabs
 async function init() {
   try {
     logInfo('Initializing service worker...');
@@ -98,6 +98,12 @@ async function init() {
     
     // Setup navigation listener for URL blocking
     setupNavigationListener();
+    
+    // Check all open tabs against the current rules
+    if (isEnabled) {
+      logInfo('Checking all open tabs against blocking rules');
+      checkAllTabs();
+    }
 
     logInfo('Service worker initialized successfully');
   } catch (error) {
@@ -290,7 +296,7 @@ let blockedUrls = new Set();
 function redirectToBlockedPage(tabId, url) {
   const indexUrl = chrome.runtime.getURL('index.html');
   chrome.tabs.update(tabId, {
-    url: `${indexUrl}#blocked?url=${encodeURIComponent(url)}`
+    url: `${indexUrl}#/blocked?url=${encodeURIComponent(url)}`
   });
 }
 
@@ -770,6 +776,141 @@ async function setupBlockingRules() {
   }
 }
 
+// Fix checkAllTabs function to detect blocked tabs more reliably
+function checkAllTabs() {
+  chrome.tabs.query({}).then((tabs) => {
+    if (tabs.length > 0) {
+      const indexUrl = chrome.runtime.getURL('index.html');
+      
+      for (const tab of tabs) {
+        if (isEnabled) {
+          // When extension is enabled, check if each tab should be blocked
+          if (tab.url && tab.url.startsWith('http')) {
+            logInfo(`Checking tab on enable: ${tab.url}`);
+            handleUrl(tab.url, tab.id, 'checkAllTabs');
+          }
+        } else {
+          // When extension is disabled, unblock any blocked tabs
+          // More robust detection of blocked pages - match with or without the slash
+          if (tab.url && (
+              tab.url.includes(`${indexUrl}#blocked?url=`) || 
+              tab.url.includes(`${indexUrl}#/blocked?url=`)
+            )) {
+            try {
+              // Extract the original URL that was blocked - handle both formats
+              let hash = new URL(tab.url).hash;
+              if (hash.startsWith('#/')) {
+                hash = hash.substring(2); // Remove the #/ prefix
+              } else if (hash.startsWith('#')) {
+                hash = hash.substring(1); // Remove the # prefix
+              }
+              
+              const originalUrl = hash.split('url=')[1]?.split('&')[0];
+              
+              if (originalUrl) {
+                const decodedUrl = decodeURIComponent(originalUrl);
+                logInfo(`Unblocking tab: ${decodedUrl}`);
+                chrome.tabs.update(tab.id, { url: decodedUrl });
+              } else {
+                logError('Could not extract original URL from hash: ' + hash);
+                chrome.tabs.reload(tab.id);
+              }
+            } catch (e) {
+              logError('Error extracting URL from blocked page:', e);
+              // If we can't extract the URL, just reload the tab
+              chrome.tabs.reload(tab.id);
+            }
+          }
+        }
+      }
+    }
+  }).catch(error => {
+    logError('Error querying tabs:', error);
+  });
+}
+
+// Update the checkTab function to use handleUrl directly
+function checkTab(data, caller) {
+  if (data && data.url) {
+    handleUrl(data.url, data.tabId, caller);
+  }
+}
+
+// Add a performance improvement for setIsEnabled with an immediate icon update
+function setIsEnabled(value) {
+  const wasEnabled = isEnabled;
+  isEnabled = !!value;
+  
+  // Update icon immediately for better UX
+  updateIcon();
+  
+  if (wasEnabled === isEnabled) {
+    // No change, nothing to do
+    return isEnabled;
+  }
+  
+  if (!isEnabled) {
+    // When disabling:
+    // 1. Clear blocked URLs cache
+    blockedUrls.clear();
+    logInfo('Cleared blocked URLs cache due to disable');
+    
+    // 2. Unblock any blocked tabs
+    logInfo('Unblocking any blocked tabs due to disable');
+    checkAllTabs();
+  } else {
+    // When enabling, check all tabs against blocking rules
+    logInfo('Checking all tabs against blocking rules due to enable');
+    checkAllTabs();
+  }
+  
+  chrome.storage.local.set({ isEnabled });
+  logInfo(`Extension ${isEnabled ? 'enabled' : 'disabled'}`);
+  return isEnabled;
+}
+
+// Update the updateIcon function for better handling
+function updateIcon() {
+  try {
+    chrome.action.setIcon({
+      path: isEnabled ? {
+        16: 'icons/magnet-16.png',
+        32: 'icons/magnet-32.png',
+        48: 'icons/magnet-48.png',
+        64: 'icons/magnet-64.png',
+        128: 'icons/magnet-128.png',
+      } : {
+        16: 'icons/magnet-grayscale-16.png',
+        32: 'icons/magnet-grayscale-32.png',
+        48: 'icons/magnet-grayscale-48.png',
+        64: 'icons/magnet-grayscale-64.png',
+        128: 'icons/magnet-grayscale-128.png',
+      }
+    });
+  } catch (e) {
+    // Fall back to browserAction for compatibility
+    try {
+      chrome.browserAction.setIcon({
+        path: isEnabled ? {
+          16: 'icons/magnet-16.png',
+          32: 'icons/magnet-32.png',
+          48: 'icons/magnet-48.png',
+          64: 'icons/magnet-64.png',
+          128: 'icons/magnet-128.png',
+        } : {
+          16: 'icons/magnet-grayscale-16.png',
+          32: 'icons/magnet-grayscale-32.png',
+          48: 'icons/magnet-grayscale-48.png',
+          64: 'icons/magnet-grayscale-64.png',
+          128: 'icons/magnet-grayscale-128.png',
+        }
+      });
+    } catch (err) {
+      logError('Failed to update extension icon:', err);
+    }
+  }
+}
+
 // Enhanced message handler with more extension functionality
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   logInfo('Message received:', request.message);
@@ -922,6 +1063,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         response = safeDebugFunction(testRedditNormalization);
         break;
         
+      case 'getCurrentSettings':
+        response = getCurrentSettings();
+        break;
+        
       default:
         console.log('Unknown message type:', request.message);
         response = null;
@@ -1065,6 +1210,18 @@ function testRedditNormalization() {
   });
 }
 
+// Add a function to get the current settings for the UI
+function getCurrentSettings() {
+  return {
+    isEnabled,
+    mode,
+    blacklist,
+    whitelist,
+    blacklistKeywords,
+    whitelistKeywords
+  };
+}
+
 // Initialize on install or update
 chrome.runtime.onInstalled.addListener(() => {
   console.log('Extension installed or updated');
@@ -1080,19 +1237,65 @@ chrome.runtime.onStartup.addListener(() => {
 // Initialize immediately
 init();
 
-// Update setIsEnabled to fix clearing of blocked URLs cache
-function setIsEnabled(value) {
-  if (!value) {
-    // Clear blocked URLs cache when disabling
-    blockedUrls.clear();
-    logInfo('Cleared blocked URLs cache due to disable');
+// Improve the extension's unload handling
+chrome.runtime.onSuspend.addListener(() => {
+  try {
+    logInfo('Extension unloading - restoring blocked tabs');
+    
+    // Store original state so we don't need to change it in storage
+    const originalEnabledState = isEnabled;
+    
+    // Set to disabled temporarily to use unblocking logic
+    isEnabled = false;
+    
+    // Check all tabs to unblock
+    chrome.tabs.query({}).then((tabs) => {
+      if (tabs.length > 0) {
+        const indexUrl = chrome.runtime.getURL('index.html');
+        
+        // Use Promise.all for better concurrency
+        Promise.all(tabs.map(tab => {
+          // Check if this is a blocked page
+          if (tab.url && (
+              tab.url.includes(`${indexUrl}#blocked?url=`) || 
+              tab.url.includes(`${indexUrl}#/blocked?url=`)
+            )) {
+            try {
+              // Extract the original URL that was blocked - handle both formats
+              let hash = new URL(tab.url).hash;
+              if (hash.startsWith('#/')) {
+                hash = hash.substring(2); // Remove the #/ prefix
+              } else if (hash.startsWith('#')) {
+                hash = hash.substring(1); // Remove the # prefix
+              }
+              
+              const originalUrl = hash.split('url=')[1]?.split('&')[0];
+              
+              if (originalUrl) {
+                const decodedUrl = decodeURIComponent(originalUrl);
+                logInfo(`Unblocking tab on unload: ${decodedUrl}`);
+                return chrome.tabs.update(tab.id, { url: decodedUrl }).catch(e => {
+                  logError(`Failed to unblock tab ${tab.id}:`, e);
+                });
+              }
+            } catch (e) {
+              logError('Error extracting URL from blocked page:', e);
+            }
+          }
+          return Promise.resolve(); // Return resolved promise for tabs that don't need unblocking
+        })).catch(error => {
+          logError('Error during unblock process:', error);
+        });
+      }
+    }).catch(error => {
+      logError('Error querying tabs during unload:', error);
+    });
+
+    // No need to restore isEnabled state since the service worker is being unloaded
+  } catch (error) {
+    logError('Error during extension unload handler:', error);
   }
-  
-  isEnabled = !!value;
-  chrome.storage.local.set({ isEnabled });
-  logInfo(`Extension ${isEnabled ? 'enabled' : 'disabled'}`);
-  return true;
-}
+});
 
 // Add a function to safely run debug functions
 function safeDebugFunction(fn, ...args) {
@@ -1101,4 +1304,4 @@ function safeDebugFunction(fn, ...args) {
   }
   logInfo('Debug function skipped - debugging disabled');
   return null;
-}
+};
