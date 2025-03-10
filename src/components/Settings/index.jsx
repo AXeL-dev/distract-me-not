@@ -39,7 +39,7 @@ import {
   framesTypes,
 } from 'helpers/block';
 import { ScheduleType, defaultSchedule, newScheduleTimeRange } from 'helpers/schedule';
-import { sendMessage, storage, isWebExtension, openExtensionPage } from 'helpers/webext';
+import { sendMessage, isWebExtension, openExtensionPage } from 'helpers/webext';
 import { DaysOfWeek, today } from 'helpers/date';
 import { hash } from 'helpers/crypt';
 import {
@@ -65,6 +65,7 @@ import { version } from '../../../package.json';
 import { set, cloneDeep, debounce } from 'lodash';
 import { format } from 'date-fns';
 import './styles.scss';
+import { syncStorage } from 'helpers/syncStorage';
 
 export class Settings extends Component {
   constructor(props) {
@@ -171,7 +172,7 @@ export class Settings extends Component {
   }, 200);
 
   getAllSettings = () => {
-    return storage.get({
+    return syncStorage.get({
       isEnabled: this.state.options.isEnabled,
       mode: this.state.options.mode || defaultMode,
       action: this.state.options.action,
@@ -362,7 +363,7 @@ export class Settings extends Component {
     const wasEnabled = this.state.originalIsEnabled;
     const willBeEnabled = this.state.options.isEnabled;
 
-    storage
+    syncStorage
       .set({
         isEnabled: this.state.options.isEnabled,
         mode: this.state.options.mode,

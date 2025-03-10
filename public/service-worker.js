@@ -62,17 +62,30 @@ async function init() {
   try {
     logInfo('Initializing service worker...');
     
-    // REMOVED: Emergency password clearing function call
-    // Password functionality is now restored
-    
     // Get settings from storage
-    const items = await chrome.storage.local.get({
+    // Note: We're still using chrome.storage.local directly here because we don't have
+    // access to the syncStorage helper in the service worker. The sync functionality
+    // will be handled by the UI components that save settings.
+    const items = await chrome.storage.sync.get({
       blacklist: [],
       whitelist: [],
       blacklistKeywords: [],
       whitelistKeywords: [],
-      isEnabled: isEnabled,
       mode: mode
+    }).catch(error => {
+      logError('Error retrieving from sync storage, falling back to local:', error);
+      return chrome.storage.local.get({
+        blacklist: [],
+        whitelist: [],
+        blacklistKeywords: [],
+        whitelistKeywords: [],
+        mode: mode
+      });
+    });
+    
+    // Local-only settings
+    const localItems = await chrome.storage.local.get({
+      isEnabled: isEnabled
     });
     
     // Update local state
@@ -80,7 +93,7 @@ async function init() {
     whitelist = items.whitelist;
     blacklistKeywords = items.blacklistKeywords;
     whitelistKeywords = items.whitelistKeywords;
-    isEnabled = items.isEnabled;
+    isEnabled = localItems.isEnabled;
     mode = items.mode;
     
     logInfo('Extension configuration:', {
@@ -934,7 +947,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         
       case 'setMode':
         mode = request.params[0];
-        chrome.storage.local.set({ mode });
+        // Use sync storage for mode
+        chrome.storage.sync.set({ mode }).catch(error => {
+          logError('Failed to save to sync storage, falling back to local:', error);
+          chrome.storage.local.set({ mode });
+        });
         logInfo(`Mode changed to: ${mode}`);
         response = true;
         break;
@@ -947,7 +964,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         logInfo('Updating blacklist with entries:', 
           request.params[0] ? request.params[0].length : 0);
         blacklist = request.params[0];
-        chrome.storage.local.set({ blacklist });
+        // Use sync storage for lists
+        chrome.storage.sync.set({ blacklist }).catch(error => {
+          logError('Failed to save to sync storage, falling back to local:', error);
+          chrome.storage.local.set({ blacklist });
+        });
         // No need to call setupBlockingRules()
         response = true;
         break;
@@ -958,7 +979,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         
       case 'setWhitelist':
         whitelist = request.params[0];
-        chrome.storage.local.set({ whitelist });
+        // Use sync storage for lists
+        chrome.storage.sync.set({ whitelist }).catch(error => {
+          logError('Failed to save to sync storage, falling back to local:', error);
+          chrome.storage.local.set({ whitelist });
+        });
         // No need to call setupBlockingRules()
         response = true;
         break;
