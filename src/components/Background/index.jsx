@@ -698,7 +698,24 @@ export class Background extends Component {
       case Mode.whitelist:
         return !this.isWhitelisted(url);
       case Mode.combined:
-        return !this.isWhitelisted(url) && this.isBlacklisted(url);
+        // FIX: Change this to check blacklist first, but allow whitelist to override
+        // Original: return !this.isWhitelisted(url) && this.isBlacklisted(url);
+        // This logic is incorrect because it requires an item to be both not whitelisted AND blacklisted
+        
+        // If URL is whitelisted, don't block regardless of blacklist
+        if (this.isWhitelisted(url)) {
+          this.debug('URL is whitelisted in combined mode, allowing:', url);
+          return false;
+        }
+        
+        // If URL is blacklisted and not whitelisted, block it
+        if (this.isBlacklisted(url)) {
+          this.debug('URL is blacklisted in combined mode, blocking:', url);
+          return true;
+        }
+        
+        // Not in either list
+        return false;
       default:
         return false;
     }

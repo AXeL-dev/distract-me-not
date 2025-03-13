@@ -341,26 +341,28 @@ function checkUrlShouldBeBlocked(url) {
 
   logInfo(`Checking URL against rules: ${url}`);
   
-  // First, check whitelist in combined or whitelist modes
-  if (mode === 'whitelist' || mode === 'combined') {
-    // Check site patterns in whitelist
-    for (const site of whitelist) {
-      try {
-        const pattern = typeof site === 'string' ? site : site.pattern || site.url;
-        if (!pattern) continue;
-        
-        // Use improved regex pattern matching for wildcards
-        const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
-        if (regexPattern.test(url)) {
-          logInfo(`URL MATCHED whitelist pattern: ${pattern} - allowing access`);
-          return false; // Don't block - URL is explicitly whitelisted
-        }
-      } catch (e) {
-        logError('Error checking whitelist pattern:', e);
+  // Step 1: Check if URL is whitelisted (should override blacklist)
+  let isWhitelisted = false;
+  
+  // Check site patterns in whitelist
+  for (const site of whitelist) {
+    try {
+      const pattern = typeof site === 'string' ? site : site.pattern || site.url;
+      if (!pattern) continue;
+      
+      const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
+      if (regexPattern.test(url)) {
+        logInfo(`URL MATCHED whitelist pattern: ${pattern} - allowing access`);
+        isWhitelisted = true;
+        break;
       }
+    } catch (e) {
+      logError('Error checking whitelist pattern:', e);
     }
-    
-    // Check keywords in whitelist
+  }
+  
+  // Check keywords in whitelist
+  if (!isWhitelisted) {
     for (const keyword of whitelistKeywords) {
       try {
         const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
@@ -369,21 +371,27 @@ function checkUrlShouldBeBlocked(url) {
         // For keywords, do a case-insensitive includes check
         if (url.toLowerCase().includes(pattern.toLowerCase())) {
           logInfo(`URL MATCHED whitelist keyword: ${pattern} - allowing access`);
-          return false; // Don't block - URL contains whitelisted keyword
+          isWhitelisted = true;
+          break;
         }
       } catch (e) {
         logError('Error checking whitelist keyword:', e);
       }
     }
-    
-    // If we're in whitelist mode and didn't match any whitelist item, block the URL
-    if (mode === 'whitelist') {
-      logInfo(`URL not in whitelist: ${url} - blocking access`);
-      return true;
-    }
   }
   
-  // Next, check blacklist in blacklist or combined modes
+  // If URL is explicitly whitelisted, allow regardless of mode or blacklist
+  if (isWhitelisted && (mode === 'whitelist' || mode === 'combined')) {
+    return false;
+  }
+  
+  // Step 2: In whitelist mode, block everything not whitelisted
+  if (mode === 'whitelist') {
+    logInfo(`URL not in whitelist: ${url} - blocking access`);
+    return !isWhitelisted; // Block if not whitelisted
+  }
+  
+  // Step 3: In blacklist or combined modes, check against blacklist
   if (mode === 'blacklist' || mode === 'combined') {
     // Check site patterns in blacklist
     for (const site of blacklist) {
@@ -394,6 +402,11 @@ function checkUrlShouldBeBlocked(url) {
         // Use improved regex pattern matching for wildcards
         const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
         if (regexPattern.test(url)) {
+          // Block only if not already whitelisted
+          if (mode === 'combined' && isWhitelisted) {
+            logInfo(`URL MATCHED blacklist pattern: ${pattern} - but whitelisted, allowing access`);
+            return false;
+          }
           logInfo(`URL MATCHED blacklist pattern: ${pattern} - blocking access`);
           return true; // Block - URL is blacklisted
         }
@@ -410,6 +423,11 @@ function checkUrlShouldBeBlocked(url) {
         
         // Case-insensitive keyword check
         if (url.toLowerCase().includes(pattern.toLowerCase())) {
+          // Block only if not already whitelisted
+          if (mode === 'combined' && isWhitelisted) {
+            logInfo(`URL MATCHED blacklist keyword: ${pattern} - but whitelisted, allowing access`);
+            return false;
+          }
           logInfo(`URL MATCHED blacklist keyword: ${pattern} - blocking access`);
           return true; // Block - URL contains blacklisted keyword
         }
@@ -420,7 +438,7 @@ function checkUrlShouldBeBlocked(url) {
   }
   
   // If we reach here, allow the URL
-  logInfo(`URL didn't match any rules: ${url} - allowing access`);
+  logInfo(`URL didn't match any blocking rules: ${url} - allowing access`);
   return false;
 }
 
@@ -672,26 +690,28 @@ function checkUrlShouldBeBlocked(url) {
   
   logInfo(`Checking URL against rules: ${url}`);
   
-  // First, check whitelist in combined or whitelist modes
-  if (mode === 'whitelist' || mode === 'combined') {
-    // Check site patterns in whitelist
-    for (const site of whitelist) {
-      try {
-        const pattern = typeof site === 'string' ? site : site.pattern || site.url;
-        if (!pattern) continue;
-        
-        // Use improved regex pattern matching for wildcards
-        const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
-        if (regexPattern.test(url)) {
-          logInfo(`URL MATCHED whitelist pattern: ${pattern} - allowing access`);
-          return false; // Don't block - URL is explicitly whitelisted
-        }
-      } catch (e) {
-        logError('Error checking whitelist pattern:', e);
+  // Step 1: Check if URL is whitelisted (should override blacklist)
+  let isWhitelisted = false;
+  
+  // Check site patterns in whitelist
+  for (const site of whitelist) {
+    try {
+      const pattern = typeof site === 'string' ? site : site.pattern || site.url;
+      if (!pattern) continue;
+      
+      const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
+      if (regexPattern.test(url)) {
+        logInfo(`URL MATCHED whitelist pattern: ${pattern} - allowing access`);
+        isWhitelisted = true;
+        break;
       }
+    } catch (e) {
+      logError('Error checking whitelist pattern:', e);
     }
-    
-    // Check keywords in whitelist
+  }
+  
+  // Check keywords in whitelist
+  if (!isWhitelisted) {
     for (const keyword of whitelistKeywords) {
       try {
         const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
@@ -700,21 +720,27 @@ function checkUrlShouldBeBlocked(url) {
         // For keywords, do a case-insensitive includes check
         if (url.toLowerCase().includes(pattern.toLowerCase())) {
           logInfo(`URL MATCHED whitelist keyword: ${pattern} - allowing access`);
-          return false; // Don't block - URL contains whitelisted keyword
+          isWhitelisted = true;
+          break;
         }
       } catch (e) {
         logError('Error checking whitelist keyword:', e);
       }
     }
-    
-    // If we're in whitelist mode and didn't match any whitelist item, block the URL
-    if (mode === 'whitelist') {
-      logInfo(`URL not in whitelist: ${url} - blocking access`);
-      return true;
-    }
   }
   
-  // Next, check blacklist in blacklist or combined modes
+  // If URL is explicitly whitelisted, allow regardless of mode or blacklist
+  if (isWhitelisted && (mode === 'whitelist' || mode === 'combined')) {
+    return false;
+  }
+  
+  // Step 2: In whitelist mode, block everything not whitelisted
+  if (mode === 'whitelist') {
+    logInfo(`URL not in whitelist: ${url} - blocking access`);
+    return !isWhitelisted; // Block if not whitelisted
+  }
+  
+  // Step 3: In blacklist or combined modes, check against blacklist
   if (mode === 'blacklist' || mode === 'combined') {
     // Check site patterns in blacklist
     for (const site of blacklist) {
@@ -725,6 +751,11 @@ function checkUrlShouldBeBlocked(url) {
         // Use improved regex pattern matching for wildcards
         const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
         if (regexPattern.test(url)) {
+          // Block only if not already whitelisted
+          if (mode === 'combined' && isWhitelisted) {
+            logInfo(`URL MATCHED blacklist pattern: ${pattern} - but whitelisted, allowing access`);
+            return false;
+          }
           logInfo(`URL MATCHED blacklist pattern: ${pattern} - blocking access`);
           return true; // Block - URL is blacklisted
         }
@@ -741,6 +772,11 @@ function checkUrlShouldBeBlocked(url) {
         
         // Case-insensitive keyword check
         if (url.toLowerCase().includes(pattern.toLowerCase())) {
+          // Block only if not already whitelisted
+          if (mode === 'combined' && isWhitelisted) {
+            logInfo(`URL MATCHED blacklist keyword: ${pattern} - but whitelisted, allowing access`);
+            return false;
+          }
           logInfo(`URL MATCHED blacklist keyword: ${pattern} - blocking access`);
           return true; // Block - URL contains blacklisted keyword
         }
@@ -751,7 +787,7 @@ function checkUrlShouldBeBlocked(url) {
   }
   
   // If we reach here, allow the URL
-  logInfo(`URL didn't match any rules: ${url} - allowing access`);
+  logInfo(`URL didn't match any blocking rules: ${url} - allowing access`);
   return false;
 }
 
