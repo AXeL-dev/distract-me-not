@@ -45,8 +45,8 @@ export class regex {
     const sanitize = (pattern) => {
       return pattern
         .replace(/^\.\*:\\\/\\\/\.\*\\\./, '.*:\\/\\/(.*\\.)?') // If "*." wildcard is after the protocol (which is equivalent to ".*\." in regex), escape it
-        .replace(/\\\/\.\*$/, '(\\/|$).*') // If "/*" wildcard is at the end (which is equivalent to "\/.*" in regex), escape it
-        .replace(/\\\$$/, '(\\/|$)'); // If regex ends with "\$" it means that we want to match the exact url (including trailing slash after url)
+        .replace(/(\\\/)*\\\/\.\*$/, '(\\/|$).*') // If "/*" wildcard is at the end (which is equivalent to "\/.*" in regex), escape it
+        .replace(/(\\\/)*\\\$$/, '(\\/|$)'); // If regex ends with "\$" it means that we want to match the exact url (including trailing slash after url)
     };
     return this.create(`^${sanitize(url.split('*').map(this.escape).join('.*'))}$`, 'i');
   }

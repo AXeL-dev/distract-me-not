@@ -81,6 +81,18 @@ describe('regex helper', () => {
         expected: /^.*:\/\/website\.com(\/|$)$/i,
       },
       {
+        url: 'website.com/',
+        expected: /^.*:\/\/website\.com(\/|$).*$/i,
+      },
+      {
+        url: 'website.com//',
+        expected: /^.*:\/\/website\.com(\/|$).*$/i,
+      },
+      {
+        url: 'website.com///',
+        expected: /^.*:\/\/website\.com(\/|$).*$/i,
+      },
+      {
         url: 'website.com/*',
         expected: /^.*:\/\/website\.com\/.*(\/|$).*$/i,
       },
