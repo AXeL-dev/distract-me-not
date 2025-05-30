@@ -19,6 +19,13 @@ import {
   WarningSignIcon,
   ImportIcon,
   ExportIcon,
+  BugIcon,
+  RefreshIcon,
+  TrashIcon,
+  InfoSignIcon,
+  UploadIcon,
+  Heading,
+  Text,
 } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv, logInfo } from 'helpers/debug';
@@ -66,6 +73,7 @@ import { set, cloneDeep, debounce } from 'lodash';
 import { format } from 'date-fns';
 import './styles.scss';
 import { syncStorage } from 'helpers/syncStorage';
+import { syncStatusLog, diagnostics, syncableSettings, localOnlySettings } from 'helpers/syncDiagnostics';
 
 export class Settings extends Component {
   constructor(props) {
@@ -86,6 +94,7 @@ export class Settings extends Component {
       { label: translate('timer'), id: 'timer' },
       { label: translate('logs'), id: 'logs' },
       { label: translate('miscellaneous'), id: 'misc' },
+      { label: translate('diagnose'), id: 'diagnose' },
       { label: translate('about'), id: 'about' },
     ];
     // prettier-ignore
@@ -144,6 +153,9 @@ export class Settings extends Component {
       },
       isSmallScreen: isSmallDevice(),
       originalIsEnabled: defaultIsEnabled, // Add this line to track original status
+      syncDiagnostics: null,
+      diagnosisRunning: false,
+      forceSyncRunning: false,
     };
   }
 
@@ -508,6 +520,52 @@ export class Settings extends Component {
       logInfo(`Status changed from external source: ${newIsEnabled}`);
     }
   }
+
+  runSyncDiagnosis = async () => {
+    this.setState({ diagnosisRunning: true });
+    try {
+      const result = await syncStatusLog();
+      this.setState({ syncDiagnostics: result });
+    } finally {
+      this.setState({ diagnosisRunning: false });
+    }
+  };
+
+  clearSyncStorage = async () => {
+    if (window.confirm(translate('confirmClearSync'))) {
+      const result = await diagnostics.clearSyncStorage();
+      if (result.success) {
+        toaster.success(translate('syncStorageCleared'), {
+          id: 'settings-toaster',
+        });
+        this.runSyncDiagnosis();
+      } else {
+        toaster.danger(translate('syncStorageClearFailed'), {
+          id: 'settings-toaster',
+        });
+      }
+    }
+  };
+
+  forceSyncSettings = async () => {
+    this.setState({ forceSyncRunning: true });
+    try {
+      const result = await diagnostics.forceSyncSettings();
+      if (result.success) {
+        toaster.success(`${translate('forceSyncSuccess')} (${result.syncedSettings.length} ${translate('settingsSynced')})`, {
+          id: 'settings-toaster',
+        });
+        // Re-run diagnosis to show updated status
+        await this.runSyncDiagnosis();
+      } else {
+        toaster.danger(`${translate('forceSyncFailed')}: ${result.error}`, {
+          id: 'settings-toaster',
+        });
+      }
+    } finally {
+      this.setState({ forceSyncRunning: false });
+    }
+  };
 
   renderBlockingTab = () => (
     <Fragment>
@@ -1217,6 +1275,145 @@ export class Settings extends Component {
     </Fragment>
   );
 
+  renderDiagnosticTab = () => (
+    <Fragment>
+      <Paragraph size={400} marginBottom={16}>
+        {translate('syncDiagnosticsDescription')}
+      </Paragraph>
+      
+      <Pane display="flex" marginBottom={24}>
+        <Button 
+          height={32} 
+          iconBefore={RefreshIcon} 
+          marginRight={10} 
+          onClick={this.runSyncDiagnosis}
+          isLoading={this.state.diagnosisRunning}
+        >
+          {translate('runDiagnosis')}
+        </Button>
+        
+        <Button 
+          height={32} 
+          iconBefore={TrashIcon} 
+          intent="danger" 
+          marginRight={10}
+          onClick={this.clearSyncStorage}
+        >
+          {translate('clearSyncStorage')}
+        </Button>
+
+        <Button 
+          height={32} 
+          iconBefore={UploadIcon} 
+          intent="success" 
+          onClick={this.forceSyncSettings}
+          isLoading={this.state.forceSyncRunning}
+        >
+          {translate('forceSyncSettings')}
+        </Button>
+      </Pane>
+      
+      {this.state.syncDiagnostics && (
+        <Pane 
+          elevation={1} 
+          background="tint1" 
+          padding={16} 
+          marginBottom={16}
+          borderRadius={3}
+        >
+          <Pane display="flex" alignItems="center" marginBottom={8}>
+            <InfoSignIcon color="info" marginRight={8} />
+            <Heading size={500}>{translate('syncStatus')}</Heading>
+          </Pane>
+          
+          <Pane marginBottom={8}>
+            <Text>
+              {translate('syncAvailable')}: {' '}
+              <Badge color={this.state.syncDiagnostics.syncAvailable ? "green" : "red"}>
+                {this.state.syncDiagnostics.syncAvailable ? 'Yes' : 'No'}
+              </Badge>
+            </Text>
+          </Pane>
+
+          <Pane marginBottom={8}>
+            <Text>
+              {translate('browser')}: {' '}
+              <Badge color="blue">
+                {this.state.syncDiagnostics.browser 
+                  ? this.state.syncDiagnostics.browser.split(' ').slice(0, 3).join(' ') 
+                  : translate('unknown')}
+              </Badge>
+            </Text>
+          </Pane>
+          
+          <Pane marginBottom={8}>
+            <Text>
+              {translate('storageUsed')}: {' '}
+              {this.state.syncDiagnostics.storageUsed !== null ? 
+                `${(this.state.syncDiagnostics.storageUsed / 1024).toFixed(2)} KB` : 
+                translate('unknown')}
+            </Text>
+          </Pane>
+          
+          <Pane marginBottom={8}>
+            <Text>
+              {translate('syncedItems')}: {this.state.syncDiagnostics.syncableSettingsFound.length} 
+              {this.state.syncDiagnostics.missingSettings.length > 0 && 
+                ` (${this.state.syncDiagnostics.missingSettings.length} missing)`}
+            </Text>
+          </Pane>
+
+          {this.state.syncDiagnostics.errors.length > 0 && (
+            <Pane marginBottom={8}>
+              <Text color="danger">
+                {translate('syncErrors')}: {this.state.syncDiagnostics.errors.length}
+              </Text>
+            </Pane>
+          )}
+          
+          <Paragraph size={300} color="muted">
+            {translate('syncSettingsNote')}
+          </Paragraph>
+        </Pane>
+      )}
+      
+      <Pane marginBottom={16}>
+        <Heading size={500} marginBottom={8}>{translate('syncableSettings')}</Heading>
+        <Text>{translate('syncSettingsList')}</Text>
+        <Pane display="flex" flexWrap="wrap" marginTop={8}>
+          {syncableSettings.map(setting => (
+            <Badge 
+              key={setting}
+              color="green" 
+              marginRight={8} 
+              marginBottom={8}
+              isSolid={this.state.syncDiagnostics?.syncableSettingsFound.includes(setting)}
+            >
+              {setting}
+            </Badge>
+          ))}
+        </Pane>
+      </Pane>
+      
+      <Pane>
+        <Heading size={500} marginBottom={8}>{translate('localOnlySettings')}</Heading>
+        <Text>{translate('localSettingsList')}</Text>
+        <Pane display="flex" flexWrap="wrap" marginTop={8}>
+          {localOnlySettings.map(setting => (
+            <Badge 
+              key={setting}
+              color="neutral" 
+              marginRight={8} 
+              marginBottom={8}
+            >
+              {setting}
+            </Badge>
+          ))}
+        </Pane>
+      </Pane>
+    </Fragment>
+  );
+
   renderAboutTab = () => (
     <div className="about">
       <h3 className="title">{translate('appName')}</h3>
@@ -1309,6 +1506,7 @@ export class Settings extends Component {
                 {tab.id === 'timer' && this.renderTimerTab()}
                 {tab.id === 'logs' && this.renderLogsTab()}
                 {tab.id === 'misc' && this.renderMiscTab()}
+                {tab.id === 'diagnose' && this.renderDiagnosticTab()}
                 {tab.id === 'about' && this.renderAboutTab()}
               </Pane>
             ))}

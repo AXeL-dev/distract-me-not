@@ -29,6 +29,25 @@ Distract Me Not is a lightweight website blocker with a user friendly interface.
 [![Get it for Edge!](https://i.imgur.com/n49Wiu2.png)](https://microsoftedge.microsoft.com/addons/detail/distract-me-not/bonjdhkkkokfmnmnkpgkakhkiccnllba)
 [![Get it for Chrome!](https://i.imgur.com/B0i5sn3.png)](https://chrome.google.com/webstore/detail/distract-me-not/lkmfokajfoplgdkdifijpffkjeejainc)
 
+## Development
+
+### Building for different browsers
+
+This extension can be built for different browsers with specific adaptations for each platform:
+
+- Firefox: `npm run build:firefox`
+- Chrome: `npm run build:chrome`
+- Edge: `npm run build:edge`
+
+#### Browser-specific build notes
+
+- **Chrome** builds require special handling of external libraries due to Content Security Policy restrictions. The build process:
+  1. Copies the required libraries to the output directory
+  2. Updates the HTML to reference them externally instead of inlining
+  3. Modifies the service worker to properly load the libraries
+
+- **Firefox** and **Edge** builds use a simpler approach that also works well across these platforms.
+
 Or download it from [github releases](https://github.com/AXeL-dev/distract-me-not/releases/latest).
 
 [How to install?](https://github.com/AXeL-dev/install-webextension)

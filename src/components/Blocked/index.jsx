@@ -26,19 +26,13 @@ import './styles.scss';
 export class Blocked extends Component {
   constructor(props) {
     super(props);
-    this.url = props.location ? queryString.parse(props.location.search).url : null;
-    if (this.url && isUrl(this.url)) {
-      this.url = decodeURIComponent(this.url);
-      this.url = getValidUrl(this.url);
-    }
-    if (isDevEnv && !this.url) {
-      this.url = 'https://www.example.com';
-    }
-    debug.log('url', this.url);
+
     const defaultUnblockTime = 10; // min
     this.state = {
+      url: '', // Initialize url in state
+      reason: '', // Initialize reason state
       message: props.message || translate('defaultBlockingMessage'),
-      isBlank: props.isBlank === undefined ? isProdEnv : props.isBlank, // isBlank should be true by default in prod
+      isBlank: props.isBlank === undefined ? isProdEnv : props.isBlank,
       hasUnblockButton: props.hasUnblockButton || isDevEnv,
       displayBlockedLink:
         props.displayBlockedLink || isDevEnv || defaultBlockSettings.displayBlockedLink,
@@ -83,15 +77,44 @@ export class Blocked extends Component {
   };
 
   componentDidMount() {
+    const hash = window.location.hash;
+    const queryStringInHash = hash.substring(hash.indexOf('?') + 1);
+    const params = new URLSearchParams(queryStringInHash);
+
+    let parsedUrl = params.get('url');
+    let parsedReason = params.get('reason');
+
+    let finalUrl = '';
+    if (parsedUrl) {
+      finalUrl = decodeURIComponent(parsedUrl);
+      finalUrl = getValidUrl(finalUrl);
+    }
+
+    if (isDevEnv && !finalUrl) {
+      finalUrl = 'https://www.example.com'; // Dev fallback
+    }
+    
+    const finalReason = parsedReason ? decodeURIComponent(parsedReason) : 'REASON_NOT_IN_URL_PARAMS'; // Default if not found
+    debug.log('[Blocked Page] Initial Parsed - URL:', finalUrl, 'Reason:', finalReason);
+
+    this.setState({ 
+      url: finalUrl, 
+      reason: finalReason 
+    }, () => {
+      // Log state after URL params are set
+      debug.log('[Blocked Page] State after URL parse - URL:', this.state.url, 'Reason:', this.state.reason, 'IsBlank:', this.state.isBlank);
+    });
+
     if (isPageReloaded()) {
       debug.log('page reloaded!');
-      sendMessage('isUrlStillBlocked', this.url).then((isUrlStillBlocked) => {
-        // Redirect to blocked url if no longer blocked
-        if (isUrlStillBlocked === false && this.url) {
-          sendMessage('redirectSenderTab', this.url);
-          return;
-        }
-      });
+      if (finalUrl) { // Use the parsed finalUrl
+        sendMessage('isUrlStillBlocked', finalUrl).then((isUrlStillBlocked) => {
+          if (isUrlStillBlocked === false) {
+            sendMessage('redirectSenderTab', finalUrl);
+            // No return needed here
+          }
+        });
+      }
     }
     storage
       .get({
@@ -108,19 +131,24 @@ export class Blocked extends Component {
       })
       .then((items) => {
         if (items) {
-          this.setState({
-            message: items.message.length ? items.message : this.state.message,
-            isBlank: items.displayBlankPage,
+          this.setState((prevState) => ({
+            message: items.message.length ? items.message : prevState.message,
+            isBlank: items.displayBlankPage, // This could be overriding isBlank
             displayBlockedLink: items.displayBlockedLink,
             hasUnblockButton: items.unblock.isEnabled,
             unblockDialog: {
-              ...this.state.unblockDialog,
+              ...prevState.unblockDialog,
               requirePassword:
                 items.unblock.isEnabled &&
                 items.unblock.requirePassword &&
                 items.password.isEnabled,
             },
+          }), () => {
+            // Log state after storage items are applied
+            debug.log('[Blocked Page] State after storage.get - URL:', this.state.url, 'Reason:', this.state.reason, 'IsBlank:', this.state.isBlank);
           });
+        } else {
+          debug.log('[Blocked Page] storage.get returned no items. State remains - URL:', this.state.url, 'Reason:', this.state.reason, 'IsBlank:', this.state.isBlank);
         }
       });
   }
@@ -145,19 +173,18 @@ export class Blocked extends Component {
   unblock = () => {
     this.closeUnblockDialog();
     const params = {
-      url: this.url,
+      url: this.state.url, // Use state.url
       option: this.state.unblockDialog.selected,
       time: this.state.unblockDialog.time,
     };
     debug.log('unblocking:', params);
-    if (this.url) {
-      //window.location.replace(this.url);
+    if (this.state.url) { // Use state.url
       sendMessage('unblockSenderTab', params);
     }
   };
 
   copyBlockedLink = () => {
-    if (copy(this.url)) {
+    if (copy(this.state.url)) { // Use state.url
       toaster.success(translate('copiedToClipboard'), {
         id: 'blocked-toaster',
       });
@@ -167,6 +194,12 @@ export class Blocked extends Component {
   render() {
     return (
       <Fragment>
+        {/* For debugging, let's add a direct display of state.reason and state.isBlank outside the main conditional */}
+        <div style={{ position: 'absolute', top: '0', left: '0', backgroundColor: 'yellow', padding: '10px', zIndex: '9999' }}>
+          <p>DEBUG: Reason from state: "{this.state.reason}"</p>
+          <p>DEBUG: isBlank from state: {this.state.isBlank ? 'true' : 'false'}</p>
+        </div>
+
         {!this.state.isBlank && (
           <Fragment>
             <div className="distract-cursor distract-select distract-overlay-container">
@@ -177,7 +210,7 @@ export class Blocked extends Component {
                   </span>
                   {this.state.displayBlockedLink && (
                     <span className="distract-blocked-link">
-                      <input type="text" value={this.url || ''} readOnly />
+                      <input type="text" value={this.state.url || ''} readOnly /> {/* Use state.url */}
                       <button
                         className="copy"
                         title={translate('copy')}
@@ -254,6 +287,11 @@ export class Blocked extends Component {
                 )}
               </Pane>
             </Dialog>
+            <div className="reason-container">
+              <p className="text-lg text-red-500 font-bold">
+                Displaying Reason: {this.state.reason ? this.state.reason : 'No specific reason provided in state.'}
+              </p>
+            </div>
           </Fragment>
         )}
       </Fragment>

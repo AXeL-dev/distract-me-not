@@ -10,6 +10,16 @@
  * URLs that should be blocked are redirected to a blocking page.
  */
 
+// Try to load required libraries - this will be replaced with inlined code in Chrome builds
+try {
+  importScripts('browser-polyfill.min.js');
+  importScripts('bcrypt.min.js');
+  console.log('Successfully imported browser-polyfill and bcrypt libraries');
+} catch (e) {
+  console.error('Failed to import libraries:', e);
+  console.log('This is normal for Chrome builds where the libraries are inlined');
+}
+
 // Enhanced service worker with core blocking functionality
 
 console.log('Enhanced service worker starting...');
@@ -30,14 +40,20 @@ const defaultTimerSettings = {
   runtime: defaultTimerRuntime
 };
 
+// Add default framesType definition
+const defaultFramesType = ['main_frame'];
+const defaultMode = 'blacklist';
+const defaultIsEnabled = false;
+
 // Basic state
-let isEnabled = false;
-let mode = 'blacklist'; // Default mode: blacklist
+let isEnabled = defaultIsEnabled;
+let mode = defaultMode;
 let blacklist = [];
 let whitelist = [];
 let blacklistKeywords = [];
 let whitelistKeywords = [];
 let timerSettings = defaultTimerSettings;
+let framesType = defaultFramesType;
 
 // Constants for declarativeNetRequest
 const MAX_RULES = 5000; // Chrome has a limit of 5000 dynamic rules
@@ -62,48 +78,72 @@ async function init() {
   try {
     logInfo('Initializing service worker...');
     
-    // Get settings from storage
-    // Note: We're still using chrome.storage.local directly here because we don't have
-    // access to the syncStorage helper in the service worker. The sync functionality
-    // will be handled by the UI components that save settings.
-    const items = await chrome.storage.sync.get({
+    // Settings that should sync between devices
+    const syncSettings = {
       blacklist: [],
       whitelist: [],
       blacklistKeywords: [],
       whitelistKeywords: [],
-      mode: mode
-    }).catch(error => {
+      mode: mode,
+      framesType: defaultFramesType,
+      message: '', 
+      redirectUrl: '',
+      schedule: { isEnabled: false, days: {} }
+    };
+    
+    // Settings that should remain local to this device
+    const localSettings = {
+      isEnabled: isEnabled,
+      password: {},
+      timer: defaultTimerSettings,
+      enableLogs: false,
+      logsLength: 100
+    };
+    
+    // Try to get synced settings first
+    try {
+      const items = await chrome.storage.sync.get(syncSettings);
+      logInfo('Successfully retrieved sync settings', items);
+      
+      // Update local state with synced values
+      blacklist = items.blacklist || [];
+      whitelist = items.whitelist || [];
+      blacklistKeywords = items.blacklistKeywords || [];
+      whitelistKeywords = items.whitelistKeywords || [];
+      mode = items.mode || defaultMode;
+      framesType = items.framesType || defaultFramesType;
+    } catch (error) {
       logError('Error retrieving from sync storage, falling back to local:', error);
-      return chrome.storage.local.get({
-        blacklist: [],
-        whitelist: [],
-        blacklistKeywords: [],
-        whitelistKeywords: [],
-        mode: mode
-      });
-    });
+      
+      // Fall back to local storage for sync settings
+      try {
+        const localItems = await chrome.storage.local.get(syncSettings);
+        logInfo('Retrieved sync settings from local storage fallback', localItems);
+        
+        // Update state with local fallback values
+        blacklist = localItems.blacklist || [];
+        whitelist = localItems.whitelist || [];
+        blacklistKeywords = localItems.blacklistKeywords || [];
+        whitelistKeywords = localItems.whitelistKeywords || [];
+        mode = localItems.mode || defaultMode;
+        framesType = localItems.framesType || defaultFramesType;
+      } catch (localError) {
+        logError('Error retrieving from local storage fallback, using defaults:', localError);
+      }
+    }
     
-    // Local-only settings
-    const localItems = await chrome.storage.local.get({
-      isEnabled: isEnabled
-    });
-    
-    // Update local state
-    blacklist = items.blacklist;
-    whitelist = items.whitelist;
-    blacklistKeywords = items.blacklistKeywords;
-    whitelistKeywords = items.whitelistKeywords;
-    isEnabled = localItems.isEnabled;
-    mode = items.mode;
-    
-    logInfo('Extension configuration:', {
-      mode,
-      isEnabled,
-      blacklistCount: blacklist.length,
-      whitelistCount: whitelist.length,
-      blacklistKeywordsCount: blacklistKeywords.length,
-      whitelistKeywordsCount: whitelistKeywords.length
-    });
+    // Always get local settings from local storage
+    try {
+      const localItems = await chrome.storage.local.get(localSettings);
+      logInfo('Retrieved local settings', localItems);
+      
+      // Update local state
+      isEnabled = localItems.isEnabled ?? defaultIsEnabled;
+      timerSettings = { ...defaultTimerSettings, ...localItems.timer };
+      enableLogs = localItems.enableLogs ?? false;
+    } catch (error) {
+      logError('Error retrieving local settings, using defaults:', error);
+    }
     
     // Log details of blacklist for debugging
     logInfo('Blacklist items:', blacklist.slice(0, 10)); // Show first 10 items
@@ -246,7 +286,8 @@ function handleUrl(url, tabId, source) {
   // Skip our own redirect pages
   const indexUrl = chrome.runtime.getURL('index.html');
   if (url.startsWith(indexUrl)) {
-    return false;
+    logInfo(`Skipping redirect page: ${url} (source: ${source})`);
+    return;
   }
   
   // Normalize the URL for consistency
@@ -254,40 +295,56 @@ function handleUrl(url, tabId, source) {
   
   // First check our blocked URLs cache for quick rejection
   if (blockedUrls.has(url) || blockedUrls.has(normalizedUrl)) {
-    logInfo(`URL found in blocked cache - blocking: ${url} [${source}]`);
-    redirectToBlockedPage(tabId, url);
-    return true; // Signal to cancel the request if applicable
+    logInfo(`URL found in blocked cache: ${url} (source: ${source}) - blocking`);
+    // Even if it's in cache, we need a reason. Let's re-check, but this might be inefficient.
+    // A better approach might be to store the reason in the cache too.
+    // For now, let's re-evaluate to get the reason.
+    const blockDetails = checkUrlShouldBeBlocked(normalizedUrl);
+    redirectToBlockedPage(tabId, url, blockDetails.reason || "Cached block");
+    return;
   }
 
   // Only proceed if extension is enabled
   if (!isEnabled) {
-    logInfo(`Extension disabled, allowing: ${url} [${source}]`);
-    return false;
+    logInfo(`Extension disabled, allowing URL: ${url} (source: ${source})`);
+    return;
   }
   
   // Check if URL should be blocked
-  const shouldBlock = checkUrlShouldBeBlocked(normalizedUrl);
+  const blockDetails = checkUrlShouldBeBlocked(normalizedUrl);
   
-  if (shouldBlock) {
-    // Add both original and normalized URLs to blocked cache
-    blockedUrls.add(url);
-    blockedUrls.add(normalizedUrl);
-    
-    // Block the navigation by redirecting to the blocked page
-    logInfo(`BLOCKING navigation to: ${url} [${source}]`);
-    redirectToBlockedPage(tabId, url);
-    return true; // Signal to cancel the request if applicable
+  if (blockDetails.blocked) {
+    logInfo(`BLOCKING URL: ${normalizedUrl} (source: ${source}), Reason: ${blockDetails.reason}`);
+    blockedUrls.add(url); // Cache original URL
+    blockedUrls.add(normalizedUrl); // Cache normalized URL
+    redirectToBlockedPage(tabId, url, blockDetails.reason);
   } else {
-    logInfo(`ALLOWING navigation to: ${url} [${source}]`);
-    return false;
+    logInfo(`ALLOWING URL: ${normalizedUrl} (source: ${source}), Reason: ${blockDetails.reason}`);
   }
 }
 
 // Update the existing navigation handler to use the central handler
 function navigationHandler(details) {
   if (details.frameId === 0) { // Only block main frame navigations
-    logInfo(`Navigation attempt to: ${details.url} [webNavigation.onBeforeNavigate]`);
-    handleUrl(details.url, details.tabId, 'webNavigation.onBeforeNavigate');
+    logInfo(`Navigation attempt to: ${details.url} (via navigationHandler)`);
+
+    // Only check if extension is enabled
+    if (!isEnabled) {
+      logInfo('Extension disabled, allowing navigation (via navigationHandler)');
+      return;
+    }
+
+    // Check if URL should be blocked
+    const blockDetails = checkUrlShouldBeBlocked(details.url); // Returns { blocked, reason }
+
+    if (blockDetails.blocked) { // Corrected condition to check blockDetails.blocked
+      // Block the navigation by redirecting to the blocked page
+      logInfo(`BLOCKING navigation to: ${details.url}, Reason: ${blockDetails.reason} (via navigationHandler)`);
+      redirectToBlockedPage(details.tabId, details.url, blockDetails.reason); // Use redirectToBlockedPage to include reason
+    } else {
+      logInfo(`ALLOWING navigation to: ${details.url}, Reason: ${blockDetails.reason} (via navigationHandler)`);
+      // No action needed if not blocked
+    }
   }
 }
 // Add enhanced diagnostic functions to troubleshoot specific URL issues
@@ -306,10 +363,14 @@ function deepLog(message, data) {
 let blockedUrls = new Set();
 
 // Extract the redirect logic to a separate function
-function redirectToBlockedPage(tabId, url) {
+function redirectToBlockedPage(tabId, url, reason) {
   const indexUrl = chrome.runtime.getURL('index.html');
+  const encodedUrl = encodeURIComponent(url);
+  // Safeguard: if reason is empty or falsy, provide a default.
+  const effectiveReason = reason || "Unknown reason for block";
+  const encodedReason = encodeURIComponent(effectiveReason);
   chrome.tabs.update(tabId, {
-    url: `${indexUrl}#/blocked?url=${encodeURIComponent(url)}`
+    url: `${indexUrl}#/blocked?url=${encodedUrl}&reason=${encodedReason}`
   });
 }
 
@@ -334,15 +395,22 @@ function normalizeUrl(url) {
 
 // Fix checkUrlShouldBeBlocked to remove overly aggressive Reddit blocking
 function checkUrlShouldBeBlocked(url) {
-  // If not enabled, don't block anything
-  if (!isEnabled) {
-    return false;
+  // Always allow internal browser pages
+  if (url.startsWith('edge://') || url.startsWith('chrome://')) {
+    logInfo(`Allowing internal browser page: ${url}`);
+    return { blocked: false, reason: "Internal browser page" };
   }
 
+  // If not enabled, don't block anything
+  if (!isEnabled) {
+    return { blocked: false, reason: "Extension disabled" };
+  }
+  
   logInfo(`Checking URL against rules: ${url}`);
   
   // Step 1: Check if URL is whitelisted (should override blacklist)
   let isWhitelisted = false;
+  let whitelistedBy = null; 
   
   // Check site patterns in whitelist
   for (const site of whitelist) {
@@ -354,6 +422,7 @@ function checkUrlShouldBeBlocked(url) {
       if (regexPattern.test(url)) {
         logInfo(`URL MATCHED whitelist pattern: ${pattern} - allowing access`);
         isWhitelisted = true;
+        whitelistedBy = `Whitelist pattern: ${pattern}`;
         break;
       }
     } catch (e) {
@@ -368,11 +437,11 @@ function checkUrlShouldBeBlocked(url) {
         const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
         if (!pattern) continue;
         
-        // For keywords, do a case-insensitive includes check
         if (url.toLowerCase().includes(pattern.toLowerCase())) {
           logInfo(`URL MATCHED whitelist keyword: ${pattern} - allowing access`);
           isWhitelisted = true;
-          break;
+          whitelistedBy = `Whitelist keyword: ${pattern}`;
+          break; 
         }
       } catch (e) {
         logError('Error checking whitelist keyword:', e);
@@ -382,13 +451,13 @@ function checkUrlShouldBeBlocked(url) {
   
   // If URL is explicitly whitelisted, allow regardless of mode or blacklist
   if (isWhitelisted && (mode === 'whitelist' || mode === 'combined')) {
-    return false;
+    return { blocked: false, reason: whitelistedBy };
   }
   
   // Step 2: In whitelist mode, block everything not whitelisted
   if (mode === 'whitelist') {
     logInfo(`URL not in whitelist: ${url} - blocking access`);
-    return !isWhitelisted; // Block if not whitelisted
+    return { blocked: true, reason: "URL not on whitelist (Whitelist Mode)" }; 
   }
   
   // Step 3: In blacklist or combined modes, check against blacklist
@@ -399,16 +468,14 @@ function checkUrlShouldBeBlocked(url) {
         const pattern = typeof site === 'string' ? site : site.pattern || site.url;
         if (!pattern) continue;
         
-        // Use improved regex pattern matching for wildcards
         const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
         if (regexPattern.test(url)) {
-          // Block only if not already whitelisted
           if (mode === 'combined' && isWhitelisted) {
-            logInfo(`URL MATCHED blacklist pattern: ${pattern} - but whitelisted, allowing access`);
-            return false;
+            logInfo(`URL MATCHED blacklist pattern: ${pattern}, but was whitelisted by: ${whitelistedBy} - allowing access`);
+            return { blocked: false, reason: whitelistedBy };
           }
           logInfo(`URL MATCHED blacklist pattern: ${pattern} - blocking access`);
-          return true; // Block - URL is blacklisted
+          return { blocked: true, reason: `Blacklist pattern: ${pattern}` };
         }
       } catch (e) {
         logError('Error checking blacklist pattern:', e);
@@ -421,15 +488,13 @@ function checkUrlShouldBeBlocked(url) {
         const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
         if (!pattern) continue;
         
-        // Case-insensitive keyword check
         if (url.toLowerCase().includes(pattern.toLowerCase())) {
-          // Block only if not already whitelisted
           if (mode === 'combined' && isWhitelisted) {
-            logInfo(`URL MATCHED blacklist keyword: ${pattern} - but whitelisted, allowing access`);
-            return false;
+            logInfo(`URL MATCHED blacklist keyword: ${pattern}, but was whitelisted by: ${whitelistedBy} - allowing access`);
+            return { blocked: false, reason: whitelistedBy };
           }
           logInfo(`URL MATCHED blacklist keyword: ${pattern} - blocking access`);
-          return true; // Block - URL contains blacklisted keyword
+          return { blocked: true, reason: `Blacklist keyword: ${pattern}` };
         }
       } catch (e) {
         logError('Error checking blacklist keyword:', e);
@@ -439,7 +504,7 @@ function checkUrlShouldBeBlocked(url) {
   
   // If we reach here, allow the URL
   logInfo(`URL didn't match any blocking rules: ${url} - allowing access`);
-  return false;
+  return { blocked: false, reason: "URL allowed by default (no matching rules)" };
 }
 
 // Function to get detailed diagnostic information about URL matching
@@ -626,24 +691,24 @@ function testProblematicUrl(url = 'https://www.reddit.com/r/redheads/') {
 // Create a separate named function for the navigation handler
 function navigationHandler(details) {
   if (details.frameId === 0) { // Only block main frame navigations
-    logInfo(`Navigation attempt to: ${details.url}`);
-    
+    logInfo(`Navigation attempt to: ${details.url} (via navigationHandler)`);
+
     // Only check if extension is enabled
     if (!isEnabled) {
-      logInfo('Extension disabled, allowing navigation');
+      logInfo('Extension disabled, allowing navigation (via navigationHandler)');
       return;
     }
-    
+
     // Check if URL should be blocked
-    const shouldBlock = checkUrlShouldBeBlocked(details.url);
-    
-    if (shouldBlock) {
+    const blockDetails = checkUrlShouldBeBlocked(details.url); // Returns { blocked, reason }
+
+    if (blockDetails.blocked) { // Corrected condition to check blockDetails.blocked
       // Block the navigation by redirecting to the blocked page
-      logInfo(`BLOCKING navigation to: ${details.url}`);
-      const indexUrl = chrome.runtime.getURL('index.html');
-      chrome.tabs.update(details.tabId, {
-        url: `${indexUrl}#blocked?url=${encodeURIComponent(details.url)}`
-      });
+      logInfo(`BLOCKING navigation to: ${details.url}, Reason: ${blockDetails.reason} (via navigationHandler)`);
+      redirectToBlockedPage(details.tabId, details.url, blockDetails.reason); // Use redirectToBlockedPage to include reason
+    } else {
+      logInfo(`ALLOWING navigation to: ${details.url}, Reason: ${blockDetails.reason} (via navigationHandler)`);
+      // No action needed if not blocked
     }
   }
 }
@@ -683,15 +748,22 @@ function wildcardToRegExp(pattern) {
 
 // Clean implementation of checkUrlShouldBeBlocked without special cases
 function checkUrlShouldBeBlocked(url) {
+  // Always allow internal browser pages
+  if (url.startsWith('edge://') || url.startsWith('chrome://')) {
+    logInfo(`Allowing internal browser page: ${url}`);
+    return { blocked: false, reason: "Internal browser page" };
+  }
+
   // If not enabled, don't block anything
   if (!isEnabled) {
-    return false;
+    return { blocked: false, reason: "Extension disabled" };
   }
   
   logInfo(`Checking URL against rules: ${url}`);
   
   // Step 1: Check if URL is whitelisted (should override blacklist)
   let isWhitelisted = false;
+  let whitelistedBy = null; 
   
   // Check site patterns in whitelist
   for (const site of whitelist) {
@@ -703,6 +775,7 @@ function checkUrlShouldBeBlocked(url) {
       if (regexPattern.test(url)) {
         logInfo(`URL MATCHED whitelist pattern: ${pattern} - allowing access`);
         isWhitelisted = true;
+        whitelistedBy = `Whitelist pattern: ${pattern}`;
         break;
       }
     } catch (e) {
@@ -717,11 +790,11 @@ function checkUrlShouldBeBlocked(url) {
         const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
         if (!pattern) continue;
         
-        // For keywords, do a case-insensitive includes check
         if (url.toLowerCase().includes(pattern.toLowerCase())) {
           logInfo(`URL MATCHED whitelist keyword: ${pattern} - allowing access`);
           isWhitelisted = true;
-          break;
+          whitelistedBy = `Whitelist keyword: ${pattern}`;
+          break; 
         }
       } catch (e) {
         logError('Error checking whitelist keyword:', e);
@@ -731,13 +804,13 @@ function checkUrlShouldBeBlocked(url) {
   
   // If URL is explicitly whitelisted, allow regardless of mode or blacklist
   if (isWhitelisted && (mode === 'whitelist' || mode === 'combined')) {
-    return false;
+    return { blocked: false, reason: whitelistedBy };
   }
   
   // Step 2: In whitelist mode, block everything not whitelisted
   if (mode === 'whitelist') {
     logInfo(`URL not in whitelist: ${url} - blocking access`);
-    return !isWhitelisted; // Block if not whitelisted
+    return { blocked: true, reason: "URL not on whitelist (Whitelist Mode)" }; 
   }
   
   // Step 3: In blacklist or combined modes, check against blacklist
@@ -748,16 +821,14 @@ function checkUrlShouldBeBlocked(url) {
         const pattern = typeof site === 'string' ? site : site.pattern || site.url;
         if (!pattern) continue;
         
-        // Use improved regex pattern matching for wildcards
         const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
         if (regexPattern.test(url)) {
-          // Block only if not already whitelisted
           if (mode === 'combined' && isWhitelisted) {
-            logInfo(`URL MATCHED blacklist pattern: ${pattern} - but whitelisted, allowing access`);
-            return false;
+            logInfo(`URL MATCHED blacklist pattern: ${pattern}, but was whitelisted by: ${whitelistedBy} - allowing access`);
+            return { blocked: false, reason: whitelistedBy };
           }
           logInfo(`URL MATCHED blacklist pattern: ${pattern} - blocking access`);
-          return true; // Block - URL is blacklisted
+          return { blocked: true, reason: `Blacklist pattern: ${pattern}` };
         }
       } catch (e) {
         logError('Error checking blacklist pattern:', e);
@@ -770,15 +841,13 @@ function checkUrlShouldBeBlocked(url) {
         const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
         if (!pattern) continue;
         
-        // Case-insensitive keyword check
         if (url.toLowerCase().includes(pattern.toLowerCase())) {
-          // Block only if not already whitelisted
           if (mode === 'combined' && isWhitelisted) {
-            logInfo(`URL MATCHED blacklist keyword: ${pattern} - but whitelisted, allowing access`);
-            return false;
+            logInfo(`URL MATCHED blacklist keyword: ${pattern}, but was whitelisted by: ${whitelistedBy} - allowing access`);
+            return { blocked: false, reason: whitelistedBy };
           }
           logInfo(`URL MATCHED blacklist keyword: ${pattern} - blocking access`);
-          return true; // Block - URL contains blacklisted keyword
+          return { blocked: true, reason: `Blacklist keyword: ${pattern}` };
         }
       } catch (e) {
         logError('Error checking blacklist keyword:', e);
@@ -788,7 +857,7 @@ function checkUrlShouldBeBlocked(url) {
   
   // If we reach here, allow the URL
   logInfo(`URL didn't match any blocking rules: ${url} - allowing access`);
-  return false;
+  return { blocked: false, reason: "URL allowed by default (no matching rules)" };
 }
 
 // Replace the checkUrlAgainstRules function with a call to our more comprehensive function
@@ -988,7 +1057,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           logError('Failed to save to sync storage, falling back to local:', error);
           chrome.storage.local.set({ mode });
         });
-        logInfo(`Mode changed to: ${mode}`);
+        // Clear the blocked URLs cache when mode changes
+        blockedUrls.clear();
+        logInfo(`Mode changed to: ${mode}, cleared blocked URLs cache`);
         response = true;
         break;
         
@@ -1005,6 +1076,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           logError('Failed to save to sync storage, falling back to local:', error);
           chrome.storage.local.set({ blacklist });
         });
+        // Clear the blocked URLs cache when blacklist rules change
+        blockedUrls.clear();
+        logInfo('Cleared blocked URLs cache due to blacklist update');
         // No need to call setupBlockingRules()
         response = true;
         break;
@@ -1020,6 +1094,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           logError('Failed to save to sync storage, falling back to local:', error);
           chrome.storage.local.set({ whitelist });
         });
+        // Clear the blocked URLs cache when whitelist rules change
+        blockedUrls.clear();
+        logInfo('Cleared blocked URLs cache due to whitelist update');
         // No need to call setupBlockingRules()
         response = true;
         break;
@@ -1032,6 +1109,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         logInfo('Updating blacklist keywords:', request.params[0]);
         blacklistKeywords = request.params[0];
         chrome.storage.local.set({ blacklistKeywords });
+        // Clear the blocked URLs cache when blacklist keywords change
+        blockedUrls.clear();
+        logInfo('Cleared blocked URLs cache due to blacklist keywords update');
         // No need to call setupBlockingRules()
         response = true;
         break;
@@ -1043,6 +1123,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       case 'setWhitelistKeywords':
         whitelistKeywords = request.params[0];
         chrome.storage.local.set({ whitelistKeywords });
+        // Clear the blocked URLs cache when whitelist keywords change
+        blockedUrls.clear();
+        logInfo('Cleared blocked URLs cache due to whitelist keywords update');
         // No need to call setupBlockingRules()
         response = true;
         break;
@@ -1365,4 +1448,23 @@ function safeDebugFunction(fn, ...args) {
   }
   logInfo('Debug function skipped - debugging disabled');
   return null;
-};
+}
+
+// Add a more robust setMode function that ensures proper sync
+function setMode(newMode) {
+  mode = newMode;
+  
+  // Try to sync first
+  chrome.storage.sync.set({ mode }).then(() => {
+    logInfo('Mode successfully saved to sync storage');
+  }).catch(error => {
+    logError('Failed to save mode to sync storage, falling back to local:', error);
+    chrome.storage.local.set({ mode }).then(() => {
+      logInfo('Mode saved to local storage (fallback)');
+    }).catch(localError => {
+      logError('Failed to save mode to local storage:', localError);
+    });
+  });
+  
+  return true;
+}

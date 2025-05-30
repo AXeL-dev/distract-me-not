@@ -3,6 +3,8 @@
   "version": "2.9.2",
   "private": true,
   "dependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/runtime": "^7.16.0",
     "bcryptjs": "^2.4.3",
     "copy-to-clipboard": "^3.3.3",
     "date-fns": "^2.30.0",
@@ -18,19 +20,17 @@
     "react-transition-group": "^4.4.2",
     "sass": "^1.77.8",
     "web-vitals": "^2.1.4",
-    "webextension-polyfill": "^0.12.0",
-    "@babel/core": "^7.16.0",
-    "@babel/runtime": "^7.16.0"
+    "webextension-polyfill": "^0.12.0"
   },
   "scripts": {
     "start": "craco start",
-    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider INLINE_RUNTIME_CHUNK=false GENERATE_SOURCEMAP=false craco build",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider INLINE_RUNTIME_CHUNK=false GENERATE_SOURCEMAP=false craco build && node scripts/ensure-vendor-libs.js",
     "build:firefox": "npm run build",
-    "build:chrome": "npm run build",
+    "build:chrome": "cross-env NODE_OPTIONS=--openssl-legacy-provider INLINE_RUNTIME_CHUNK=false GENERATE_SOURCEMAP=false craco build && node scripts/generate-chrome-service-worker.js && node scripts/prepare-chrome-build.js",
+    "postbuild:chrome": "powershell -Command \"if (Test-Path ./build/manifest.firefox.json) { Remove-Item -Path ./build/manifest.firefox.json -Force }\"",
     "build:edge": "npm run build",
     "build:watch": "nodemon --watch src --watch src/components --exec npm run build",
     "postbuild:firefox": "cd build && mv -f manifest.firefox.json manifest.json",
-    "postbuild:chrome": "cd build && cp -f ../public/manifest.json manifest.json && rm -f manifest.firefox.json",
     "postbuild:edge": "npm run postbuild:chrome",
     "package": "web-ext build --source-dir=build --artifacts-dir=. --overwrite-dest",
     "package:firefox": "npm run package -- --filename={name}-{version}-firefox.zip",
@@ -70,11 +70,17 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.16.0",
+    "@babel/plugin-proposal-private-property-in-object": "^7.16.0",
+    "@babel/plugin-transform-runtime": "^7.16.0",
+    "@babel/preset-env": "^7.16.0",
+    "@babel/preset-react": "^7.16.0",
     "@craco/craco": "^6.4.5",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^12.1.5",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.4.1",
+    "cheerio": "^1.0.0",
     "copy-webpack-plugin": "^5.1.2",
     "cross-env": "^7.0.3",
     "nodemon": "^3.1.9",
@@ -82,10 +88,11 @@
     "release-it": "^15.5.0",
     "release-it-update-manifest-plugin": "^1.0.0",
     "sign-addon": "^3.11.0",
-    "web-ext": "^7.12.0",
-    "@babel/plugin-proposal-private-property-in-object": "^7.16.0",
-    "@babel/preset-env": "^7.16.0",
-    "@babel/preset-react": "^7.16.0"
+    "web-ext": "^7.12.0"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "resolutions": {
+    "@babel/core": "^7.16.0",
+    "babel-loader": "^8.2.3"
+  }
 }
