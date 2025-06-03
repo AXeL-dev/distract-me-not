@@ -6,7 +6,7 @@
  * 2. tabs.onUpdated - Captures page loads and in-page navigations
  * 3. (When available) webRequest API - Extra coverage for link clicks
  * 
- * URLs are matched against blacklist/whitelist patterns using regex-converted wildcards.
+ * URLs are matched against deny list/allow list patterns using regex-converted wildcards.
  * URLs that should be blocked are redirected to a blocking page.
  */
 
@@ -23,6 +23,40 @@ try {
 // Enhanced service worker with core blocking functionality
 
 console.log('Enhanced service worker starting...');
+
+// Define the wildcardToRegExp function needed for URL pattern matching
+function wildcardToRegExp(pattern) {
+  // First, normalize pattern to lowercase for case-insensitive matching
+  // We'll still use the 'i' flag, but this helps with pre-processing
+  pattern = pattern.toLowerCase().trim();
+  
+  // Detect if this is likely a domain-only pattern (no protocol, no path)
+  const isDomainOnly = !pattern.includes('://') && !pattern.includes('/');
+  
+  // Handle domain-only patterns specially
+  if (isDomainOnly) {
+    // First, escape any regex special characters
+    const escaped = pattern.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&');
+    
+    // Replace wildcards with appropriate regex
+    const regexPattern = escaped.replace(/\*/g, '.*');
+    
+    // Special case for *.domain.com to match both domain.com and subdomains
+    if (pattern.startsWith('*.')) {
+      const domainPart = escaped.substring(2); // Remove *. prefix
+      return new RegExp(`(^|\\.)${domainPart}$`, 'i');
+    }
+    
+    // For domain-only patterns, make the regex match either the full domain
+    // or as a subdomain suffix (e.g., "example.com" matches "example.com" and "sub.example.com")
+    return new RegExp(`(^|\\.)${regexPattern}$`, 'i');
+  }
+  
+  // For patterns with a specified path or protocol, do standard wildcard conversion
+  const escaped = pattern.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&');
+  const regexPattern = escaped.replace(/\*/g, '.*');
+  return new RegExp(`^${regexPattern}$`, 'i');
+}
 
 // Import necessary constants for the basic functionality
 const defaultTimerRuntime = {
@@ -42,16 +76,16 @@ const defaultTimerSettings = {
 
 // Add default framesType definition
 const defaultFramesType = ['main_frame'];
-const defaultMode = 'blacklist';
+const defaultMode = 'denylist'; // Updated from 'blacklist'
 const defaultIsEnabled = false;
 
 // Basic state
 let isEnabled = defaultIsEnabled;
 let mode = defaultMode;
-let blacklist = [];
-let whitelist = [];
-let blacklistKeywords = [];
-let whitelistKeywords = [];
+let blacklist = []; // denylist (legacy name kept for backward compatibility)
+let whitelist = []; // allowlist (legacy name kept for backward compatibility)
+let blacklistKeywords = []; // denylist keywords
+let whitelistKeywords = []; // allowlist keywords
 let timerSettings = defaultTimerSettings;
 let framesType = defaultFramesType;
 
@@ -408,21 +442,32 @@ function checkUrlShouldBeBlocked(url) {
   
   logInfo(`Checking URL against rules: ${url}`);
   
-  // Step 1: Check if URL is whitelisted (should override blacklist)
-  let isWhitelisted = false;
-  let whitelistedBy = null; 
+  // Step 1: Parse URL for hostname matching
+  let hostname = "";
+  try {
+    const parsedUrl = new URL(url);
+    hostname = parsedUrl.hostname.toLowerCase();
+    logInfo(`URL hostname: ${hostname}`);
+  } catch (e) {
+    // Not a valid URL, continue with normal checks
+    logInfo(`URL parsing failed, will use full URL: ${e.message}`);
+  }
+    // Step 2: Check if URL is in allow list (should override deny list)
+  let isWhitelisted = false; // isAllowed (kept for compatibility)
+  let whitelistedBy = null; // allowedBy (kept for compatibility)
   
-  // Check site patterns in whitelist
+  // Check site patterns in allow list
   for (const site of whitelist) {
     try {
       const pattern = typeof site === 'string' ? site : site.pattern || site.url;
       if (!pattern) continue;
       
-      const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
-      if (regexPattern.test(url)) {
-        logInfo(`URL MATCHED whitelist pattern: ${pattern} - allowing access`);
+      const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$/g, ''));
+      
+      // Try to match both full URL and hostname (if available)
+      if (regexPattern.test(url) || (hostname && regexPattern.test(hostname))) {        logInfo(`URL MATCHED allow list pattern: ${pattern} - allowing access`);
         isWhitelisted = true;
-        whitelistedBy = `Whitelist pattern: ${pattern}`;
+        whitelistedBy = `Allow List pattern: ${pattern}`;
         break;
       }
     } catch (e) {
@@ -437,7 +482,8 @@ function checkUrlShouldBeBlocked(url) {
         const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
         if (!pattern) continue;
         
-        if (url.toLowerCase().includes(pattern.toLowerCase())) {
+        if (url.toLowerCase().includes(pattern.toLowerCase()) || 
+            (hostname && hostname.toLowerCase().includes(pattern.toLowerCase()))) {
           logInfo(`URL MATCHED whitelist keyword: ${pattern} - allowing access`);
           isWhitelisted = true;
           whitelistedBy = `Whitelist keyword: ${pattern}`;
@@ -447,29 +493,53 @@ function checkUrlShouldBeBlocked(url) {
         logError('Error checking whitelist keyword:', e);
       }
     }
-  }
-  
-  // If URL is explicitly whitelisted, allow regardless of mode or blacklist
-  if (isWhitelisted && (mode === 'whitelist' || mode === 'combined')) {
+  }    // If URL is explicitly in allow list, always allow regardless of mode or deny list
+  if (isWhitelisted) {
     return { blocked: false, reason: whitelistedBy };
   }
   
-  // Step 2: In whitelist mode, block everything not whitelisted
-  if (mode === 'whitelist') {
-    logInfo(`URL not in whitelist: ${url} - blocking access`);
-    return { blocked: true, reason: "URL not on whitelist (Whitelist Mode)" }; 
+  // Step 3: In allow list mode, block everything not in allow list
+  if (mode === 'whitelist' || mode === 'allowlist') {
+    logInfo(`URL not in allow list: ${url} - blocking access`);
+    return { blocked: true, reason: "URL not on Allow List (Allow List Mode)" }; 
   }
   
-  // Step 3: In blacklist or combined modes, check against blacklist
-  if (mode === 'blacklist' || mode === 'combined') {
-    // Check site patterns in blacklist
+  // Step 4: In deny list or combined modes, check against deny list
+  if (mode === 'blacklist' || mode === 'denylist' || mode === 'combined') {
+    // Try direct hostname match first (more reliable)
+    if (hostname) {
+      for (const site of blacklist) {
+        try {
+          const pattern = typeof site === 'string' ? site : site.pattern || site.url;
+          if (!pattern) continue;
+          
+          const patternLower = pattern.toLowerCase().trim();
+          
+          // Direct domain comparison (very reliable)
+          if (hostname === patternLower || hostname.endsWith('.' + patternLower)) {
+            if (mode === 'combined' && isWhitelisted) {
+              logInfo(`Hostname '${hostname}' directly matched blacklist domain: ${pattern}, but was whitelisted by: ${whitelistedBy} - allowing access`);
+              return { blocked: false, reason: whitelistedBy };
+            }
+            logInfo(`Hostname '${hostname}' directly matched blacklist domain: ${pattern} - blocking access`);
+            return { blocked: true, reason: `Blacklist pattern: ${pattern}` };
+          }
+        } catch (e) {
+          logError('Error checking blacklist pattern direct match:', e);
+        }
+      }
+    }
+    
+    // Check site patterns in blacklist using regex
     for (const site of blacklist) {
       try {
         const pattern = typeof site === 'string' ? site : site.pattern || site.url;
         if (!pattern) continue;
         
-        const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
-        if (regexPattern.test(url)) {
+        const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$/g, ''));
+        
+        // Try to match both full URL and hostname
+        if (regexPattern.test(url) || (hostname && regexPattern.test(hostname))) {
           if (mode === 'combined' && isWhitelisted) {
             logInfo(`URL MATCHED blacklist pattern: ${pattern}, but was whitelisted by: ${whitelistedBy} - allowing access`);
             return { blocked: false, reason: whitelistedBy };
@@ -488,360 +558,11 @@ function checkUrlShouldBeBlocked(url) {
         const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
         if (!pattern) continue;
         
-        if (url.toLowerCase().includes(pattern.toLowerCase())) {
-          if (mode === 'combined' && isWhitelisted) {
-            logInfo(`URL MATCHED blacklist keyword: ${pattern}, but was whitelisted by: ${whitelistedBy} - allowing access`);
-            return { blocked: false, reason: whitelistedBy };
-          }
-          logInfo(`URL MATCHED blacklist keyword: ${pattern} - blocking access`);
-          return { blocked: true, reason: `Blacklist keyword: ${pattern}` };
-        }
-      } catch (e) {
-        logError('Error checking blacklist keyword:', e);
-      }
-    }
-  }
-  
-  // If we reach here, allow the URL
-  logInfo(`URL didn't match any blocking rules: ${url} - allowing access`);
-  return { blocked: false, reason: "URL allowed by default (no matching rules)" };
-}
-
-// Function to get detailed diagnostic information about URL matching
-function checkUrlShouldBeBlockedWithDetails(url) {
-  const results = {
-    url: url,
-    mode: mode,
-    isEnabled: isEnabled,
-    whitelistMatches: [],
-    blacklistMatches: [],
-    whitelistKeywordMatches: [],
-    blacklistKeywordMatches: [],
-    regexConversions: [],
-    finalDecision: null
-  };
-  
-  // If not enabled, don't block anything
-  if (!isEnabled) {
-    results.finalDecision = 'ALLOWED - Extension disabled';
-    return results;
-  }
-  
-  // Check whitelist in combined or whitelist modes
-  if (mode === 'whitelist' || mode === 'combined') {
-    // Check site patterns in whitelist
-    for (const site of whitelist) {
-      try {
-        const pattern = typeof site === 'string' ? site : site.pattern || site.url;
-        if (!pattern) continue;
+        const normalizedPattern = pattern.toLowerCase();
+        const normalizedUrl = url.toLowerCase();
         
-        const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
-        results.regexConversions.push({
-          original: pattern,
-          regex: regexPattern.toString()
-        });
-        
-        const isMatch = regexPattern.test(url);
-        if (isMatch) {
-          results.whitelistMatches.push(pattern);
-          if (mode === 'whitelist' || mode === 'combined') {
-            results.finalDecision = `ALLOWED - URL matched whitelist pattern: ${pattern}`;
-            return results;
-          }
-        }
-      } catch (e) {
-        results.errors = results.errors || [];
-        results.errors.push(`Error checking whitelist pattern: ${e.message}`);
-      }
-    }
-    
-    // Check keywords in whitelist
-    for (const keyword of whitelistKeywords) {
-      try {
-        const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
-        if (!pattern) continue;
-        
-        const isMatch = url.toLowerCase().includes(pattern.toLowerCase());
-        if (isMatch) {
-          results.whitelistKeywordMatches.push(pattern);
-          if (mode === 'whitelist' || mode === 'combined') {
-            results.finalDecision = `ALLOWED - URL matched whitelist keyword: ${pattern}`;
-            return results;
-          }
-        }
-      } catch (e) {
-        results.errors = results.errors || [];
-        results.errors.push(`Error checking whitelist keyword: ${e.message}`);
-      }
-    }
-    
-    // If we're in whitelist mode and didn't match any whitelist item, block the URL
-    if (mode === 'whitelist') {
-      results.finalDecision = 'BLOCKED - URL not in whitelist';
-      return results;
-    }
-  }
-  
-  // Next, check blacklist in blacklist or combined modes
-  if (mode === 'blacklist' || mode === 'combined') {
-    // Check site patterns in blacklist
-    for (const site of blacklist) {
-      try {
-        const pattern = typeof site === 'string' ? site : site.pattern || site.url;
-        if (!pattern) continue;
-        
-        const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
-        results.regexConversions.push({
-          original: pattern,
-          regex: regexPattern.toString()
-        });
-        
-        const isMatch = regexPattern.test(url);
-        if (isMatch) {
-          results.blacklistMatches.push(pattern);
-          results.finalDecision = `BLOCKED - URL matched blacklist pattern: ${pattern}`;
-          return results;
-        }
-      } catch (e) {
-        results.errors = results.errors || [];
-        results.errors.push(`Error checking blacklist pattern: ${e.message}`);
-      }
-    }
-    
-    // Check keywords in blacklist
-    for (const keyword of blacklistKeywords) {
-      try {
-        const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
-        if (!pattern) continue;
-        
-        const lowercaseUrl = url.toLowerCase();
-        const lowercasePattern = pattern.toLowerCase();
-        const isMatch = lowercaseUrl.includes(lowercasePattern);
-        if (isMatch) {
-          results.blacklistKeywordMatches.push({
-            pattern,
-            matchIndex: lowercaseUrl.indexOf(lowercasePattern),
-            urlFragment: url.substring(
-              Math.max(0, lowercaseUrl.indexOf(lowercasePattern) - 10),
-              Math.min(url.length, lowercaseUrl.indexOf(lowercasePattern) + pattern.length + 10)
-            )
-          });
-          results.finalDecision = `BLOCKED - URL matched blacklist keyword: ${pattern}`;
-          return results;
-        }
-      } catch (e) {
-        results.errors = results.errors || [];
-        results.errors.push(`Error checking blacklist keyword: ${e.message}`);
-      }
-    }
-  }
-  
-  // If we reach here, allow the URL
-  results.finalDecision = `ALLOWED - URL didn't match any blocking rules`;
-  return results;
-}
-
-// Add an explicit testing function for known problematic URL
-function testProblematicUrl(url = 'https://www.reddit.com/r/redheads/') {
-  if (!ENABLE_DEEP_DEBUGGING) {
-    logInfo('Debug testing disabled in production');
-    return null;
-  }
-  
-  console.log('====================================');
-  console.log(`DETAILED DIAGNOSTIC FOR ${url}`);
-  console.log('====================================');
-  
-  console.log('Current mode:', mode);
-  console.log('Extension enabled:', isEnabled);
-  console.log('Blacklist entries:', blacklist.length);
-  console.log('Blacklist keywords:', blacklistKeywords);
-  
-  // Test wildcard matching
-  const redditPattern = 'https://www.reddit.com/*';
-  const redditRegex = wildcardToRegExp(redditPattern);
-  console.log('Reddit pattern test:', {
-    pattern: redditPattern,
-    regex: redditRegex.toString(),
-    isMatch: redditRegex.test(url)
-  });
-  
-  // Test keyword matching
-  const keywordPattern = 'redhead';
-  const keywordMatch = url.toLowerCase().includes(keywordPattern.toLowerCase());
-  console.log('Keyword test:', {
-    keyword: keywordPattern,
-    isMatch: keywordMatch,
-    inUrl: url.toLowerCase(),
-    indexOf: url.toLowerCase().indexOf(keywordPattern.toLowerCase())
-  });
-  
-  // Get full detailed results
-  const details = checkUrlShouldBeBlockedWithDetails(url);
-  console.log('Detailed matching results:', details);
-  
-  // Final check
-  const finalResult = checkUrlShouldBeBlocked(url);
-  console.log('Final result:', finalResult ? 'BLOCKED' : 'ALLOWED');
-  
-  console.log('====================================');
-  return details;
-}
-
-// Create a separate named function for the navigation handler
-function navigationHandler(details) {
-  if (details.frameId === 0) { // Only block main frame navigations
-    logInfo(`Navigation attempt to: ${details.url} (via navigationHandler)`);
-
-    // Only check if extension is enabled
-    if (!isEnabled) {
-      logInfo('Extension disabled, allowing navigation (via navigationHandler)');
-      return;
-    }
-
-    // Check if URL should be blocked
-    const blockDetails = checkUrlShouldBeBlocked(details.url); // Returns { blocked, reason }
-
-    if (blockDetails.blocked) { // Corrected condition to check blockDetails.blocked
-      // Block the navigation by redirecting to the blocked page
-      logInfo(`BLOCKING navigation to: ${details.url}, Reason: ${blockDetails.reason} (via navigationHandler)`);
-      redirectToBlockedPage(details.tabId, details.url, blockDetails.reason); // Use redirectToBlockedPage to include reason
-    } else {
-      logInfo(`ALLOWING navigation to: ${details.url}, Reason: ${blockDetails.reason} (via navigationHandler)`);
-      // No action needed if not blocked
-    }
-  }
-}
-
-// Improve the wildcardToRegExp function to handle exact matches properly
-
-function wildcardToRegExp(pattern) {
-  // First, determine if this is a pattern with wildcards
-  const hasWildcard = pattern.includes('*');
-  
-  // For patterns without wildcards, we want to be more exact in matching
-  if (!hasWildcard) {
-    // Check if pattern is a base domain/path that should only match itself or direct children
-    if (pattern.endsWith('/')) {
-      // For patterns ending with slash like "example.com/", 
-      // match the exact URL or direct children path segments (but not deeper paths)
-      const escaped = pattern.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&');
-      return new RegExp(`^${escaped}(?:[^/]*)?$`, 'i');
-    } else {
-      // For exact patterns like "example.com/page", match only that exact URL
-      const escaped = pattern.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&');
-      return new RegExp(`^${escaped}$`, 'i');
-    }
-  }
-  
-  // Handle patterns with wildcards (existing functionality)
-  let regexPattern = pattern.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&');
-  regexPattern = regexPattern.replace(/\*/g, '.*');
-  
-  // For URL patterns with protocol, anchor to the start
-  if (pattern.includes('://')) {
-    return new RegExp(`^${regexPattern}`, 'i');
-  } else {
-    return new RegExp(regexPattern, 'i');
-  }
-}
-
-// Clean implementation of checkUrlShouldBeBlocked without special cases
-function checkUrlShouldBeBlocked(url) {
-  // Always allow internal browser pages
-  if (url.startsWith('edge://') || url.startsWith('chrome://')) {
-    logInfo(`Allowing internal browser page: ${url}`);
-    return { blocked: false, reason: "Internal browser page" };
-  }
-
-  // If not enabled, don't block anything
-  if (!isEnabled) {
-    return { blocked: false, reason: "Extension disabled" };
-  }
-  
-  logInfo(`Checking URL against rules: ${url}`);
-  
-  // Step 1: Check if URL is whitelisted (should override blacklist)
-  let isWhitelisted = false;
-  let whitelistedBy = null; 
-  
-  // Check site patterns in whitelist
-  for (const site of whitelist) {
-    try {
-      const pattern = typeof site === 'string' ? site : site.pattern || site.url;
-      if (!pattern) continue;
-      
-      const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
-      if (regexPattern.test(url)) {
-        logInfo(`URL MATCHED whitelist pattern: ${pattern} - allowing access`);
-        isWhitelisted = true;
-        whitelistedBy = `Whitelist pattern: ${pattern}`;
-        break;
-      }
-    } catch (e) {
-      logError('Error checking whitelist pattern:', e);
-    }
-  }
-  
-  // Check keywords in whitelist
-  if (!isWhitelisted) {
-    for (const keyword of whitelistKeywords) {
-      try {
-        const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
-        if (!pattern) continue;
-        
-        if (url.toLowerCase().includes(pattern.toLowerCase())) {
-          logInfo(`URL MATCHED whitelist keyword: ${pattern} - allowing access`);
-          isWhitelisted = true;
-          whitelistedBy = `Whitelist keyword: ${pattern}`;
-          break; 
-        }
-      } catch (e) {
-        logError('Error checking whitelist keyword:', e);
-      }
-    }
-  }
-  
-  // If URL is explicitly whitelisted, allow regardless of mode or blacklist
-  if (isWhitelisted && (mode === 'whitelist' || mode === 'combined')) {
-    return { blocked: false, reason: whitelistedBy };
-  }
-  
-  // Step 2: In whitelist mode, block everything not whitelisted
-  if (mode === 'whitelist') {
-    logInfo(`URL not in whitelist: ${url} - blocking access`);
-    return { blocked: true, reason: "URL not on whitelist (Whitelist Mode)" }; 
-  }
-  
-  // Step 3: In blacklist or combined modes, check against blacklist
-  if (mode === 'blacklist' || mode === 'combined') {
-    // Check site patterns in blacklist
-    for (const site of blacklist) {
-      try {
-        const pattern = typeof site === 'string' ? site : site.pattern || site.url;
-        if (!pattern) continue;
-        
-        const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
-        if (regexPattern.test(url)) {
-          if (mode === 'combined' && isWhitelisted) {
-            logInfo(`URL MATCHED blacklist pattern: ${pattern}, but was whitelisted by: ${whitelistedBy} - allowing access`);
-            return { blocked: false, reason: whitelistedBy };
-          }
-          logInfo(`URL MATCHED blacklist pattern: ${pattern} - blocking access`);
-          return { blocked: true, reason: `Blacklist pattern: ${pattern}` };
-        }
-      } catch (e) {
-        logError('Error checking blacklist pattern:', e);
-      }
-    }
-    
-    // Check keywords in blacklist
-    for (const keyword of blacklistKeywords) {
-      try {
-        const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
-        if (!pattern) continue;
-        
-        if (url.toLowerCase().includes(pattern.toLowerCase())) {
+        if (normalizedUrl.includes(normalizedPattern) || 
+            (hostname && hostname.includes(normalizedPattern))) {
           if (mode === 'combined' && isWhitelisted) {
             logInfo(`URL MATCHED blacklist keyword: ${pattern}, but was whitelisted by: ${whitelistedBy} - allowing access`);
             return { blocked: false, reason: whitelistedBy };
@@ -867,6 +588,47 @@ function checkUrlAgainstRules(url) {
   if (shouldBlock) {
     logInfo(`URL should be BLOCKED: ${url}`);
   }
+}
+
+// Utility function for testing URL matching
+function testUrlMatch(url, pattern) {
+  const regex = wildcardToRegExp(pattern);
+  const isMatch = regex.test(url);
+  console.log(`Testing URL: ${url} against pattern: ${pattern}`);
+  console.log(`Regex: ${regex}`);
+  console.log(`Result: ${isMatch ? 'MATCH' : 'NO MATCH'}`);
+  
+  // Try also with hostname extraction
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname;
+    const hostnameMatch = regex.test(hostname);
+    console.log(`Hostname: ${hostname}`);
+    console.log(`Hostname match: ${hostnameMatch ? 'MATCH' : 'NO MATCH'}`);
+  } catch (e) {
+    console.log(`URL parsing failed: ${e.message}`);
+  }
+  
+  return isMatch;
+}
+
+// Debug function to test domain matching
+function testDomainMatching() {
+  console.log("=== TESTING DOMAIN MATCHING ===");
+  
+  // Test with iptorrents.com
+  testUrlMatch("https://iptorrents.com/t", "iptorrents.com");
+  testUrlMatch("https://iptorrents.com/t?p=8#torrents", "iptorrents.com");
+  testUrlMatch("https://www.iptorrents.com/t", "iptorrents.com");
+  
+  // Test with wildcards
+  testUrlMatch("https://sub.example.com/page", "*.example.com");
+  testUrlMatch("https://example.com/page", "*.example.com");
+  
+  // Test with uppercase/lowercase
+  testUrlMatch("https://IPTORRENTS.COM/t", "iptorrents.com");
+  
+  console.log("=== END TESTING ===");
 }
 
 // Replace the setupBlockingRules function with a simpler version that doesn't use declarativeNetRequest
@@ -1366,6 +1128,38 @@ function getCurrentSettings() {
   };
 }
 
+// Function to test if URL patterns match correctly
+function testUrlMatching(url, pattern) {
+  const regex = wildcardToRegExp(pattern);
+  const isMatch = regex.test(url);
+  console.log(`Testing if '${url}' matches pattern '${pattern}': ${isMatch ? 'YES' : 'NO'}`);
+  console.log(`Regex used: ${regex.toString()}`);
+  return isMatch;
+}
+
+// Test function for problematic domains
+function testProblemDomains() {
+  console.log("=== DOMAIN MATCHING TEST ===");
+  
+  // Test IPTORRENTS.COM
+  testUrlMatching("https://iptorrents.com/some/path", "iptorrents.com");
+  testUrlMatching("https://www.iptorrents.com", "iptorrents.com");
+  testUrlMatching("https://sub.iptorrents.com/page", "iptorrents.com");
+  testUrlMatching("http://iptorrents.com", "iptorrents.com");
+  testUrlMatching("https://iptorrents.comextra.com", "iptorrents.com"); // Should NOT match
+  
+  // Test wildcard domains
+  testUrlMatching("https://test.example.com", "*.example.com");
+  testUrlMatching("https://example.com", "*.example.com"); // Should NOT match
+  testUrlMatching("https://a.b.example.com", "*.example.com");
+  
+  // Test case sensitivity
+  testUrlMatching("https://IPTORRENTS.COM", "iptorrents.com");
+  testUrlMatching("https://iptorrents.com", "IPTORRENTS.COM");
+  
+  console.log("=== TEST COMPLETE ===");
+}
+
 // Initialize on install or update
 chrome.runtime.onInstalled.addListener(() => {
   console.log('Extension installed or updated');
@@ -1467,4 +1261,48 @@ function setMode(newMode) {
   });
   
   return true;
+}
+
+// Call this function to manually test domain matching in the browser console
+// testProblemDomains();
+
+// Utility function for testing URL matching
+function testUrlMatch(url, pattern) {
+  const regex = wildcardToRegExp(pattern);
+  const isMatch = regex.test(url);
+  console.log(`Testing URL: ${url} against pattern: ${pattern}`);
+  console.log(`Regex: ${regex}`);
+  console.log(`Result: ${isMatch ? 'MATCH' : 'NO MATCH'}`);
+  
+  // Try also with hostname extraction
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname;
+    const hostnameMatch = regex.test(hostname);
+    console.log(`Hostname: ${hostname}`);
+    console.log(`Hostname match: ${hostnameMatch ? 'MATCH' : 'NO MATCH'}`);
+  } catch (e) {
+    console.log(`URL parsing failed: ${e.message}`);
+  }
+  
+  return isMatch;
+}
+
+// Debug function to test domain matching
+function testDomainMatching() {
+  console.log("=== TESTING DOMAIN MATCHING ===");
+  
+  // Test with iptorrents.com
+  testUrlMatch("https://iptorrents.com/t", "iptorrents.com");
+  testUrlMatch("https://iptorrents.com/t?p=8#torrents", "iptorrents.com");
+  testUrlMatch("https://www.iptorrents.com/t", "iptorrents.com");
+  
+  // Test with wildcards
+  testUrlMatch("https://sub.example.com/page", "*.example.com");
+  testUrlMatch("https://example.com/page", "*.example.com");
+  
+  // Test with uppercase/lowercase
+  testUrlMatch("https://IPTORRENTS.COM/t", "iptorrents.com");
+  
+  console.log("=== END TESTING ===");
 }

@@ -1,6 +1,5 @@
-{
-  "name": "distract-me-not",
-  "version": "2.9.2",
+{  "name": "distract-me-not",
+  "version": "2.9.4",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.16.0",

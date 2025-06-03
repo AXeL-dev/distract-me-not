@@ -27,10 +27,12 @@ const translations = isDevEnv ? require('../../public/_locales/en/messages') : {
   // New sync diagnostic messages
   browser: 'Browser',
   forceSyncSettings: 'Force Sync Settings',
-  forceSyncSuccess: 'Settings forcibly synchronized',
-  forceSyncFailed: 'Sync attempt failed',
-  settingsSynced: 'settings synced',
+  forceSyncSuccess: 'Settings forcibly synchronized',  forceSyncFailed: 'Sync attempt failed',
+  settingsSynced: 'Settings synced',
+  settingsSyncedDescription: 'Your settings were updated from another device',
   syncErrors: 'Sync Errors',
+  youtubeDetected: 'YouTube detected in blacklist',
+  youtubeDetectedDescription: 'YouTube was found in your blacklist, which might be unintended. You can remove it manually if needed.',
 };
 
 export function translate(messageName, substitutions = null) {

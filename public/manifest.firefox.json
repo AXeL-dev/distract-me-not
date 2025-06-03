@@ -7,9 +7,8 @@
       "strict_min_version": "58.0"
     }
   },
-
   "name": "__MSG_appName__",
-  "version": "2.9.2",
+  "version": "2.9.4",
 
   "default_locale": "en",
   "description": "__MSG_appDesc__",

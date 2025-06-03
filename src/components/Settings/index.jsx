@@ -78,18 +78,16 @@ import { syncStatusLog, diagnostics, syncableSettings, localOnlySettings } from 
 export class Settings extends Component {
   constructor(props) {
     super(props);
-    this.importFileInputRef = React.createRef();
-    this.blacklistComponentRef = React.createRef();
-    this.whitelistComponentRef = React.createRef();
-    this.blacklistKeywordsComponentRef = React.createRef();
-    this.whitelistKeywordsComponentRef = React.createRef();
+    this.importFileInputRef = React.createRef();    this.blacklistComponentRef = React.createRef(); // denylist
+    this.whitelistComponentRef = React.createRef(); // allowlist 
+    this.blacklistKeywordsComponentRef = React.createRef(); // denylist keywords
+    this.whitelistKeywordsComponentRef = React.createRef(); // allowlist keywords
     // prettier-ignore
     const tabs = [
       { label: translate('blocking'), id: 'blocking' },
       { label: translate('unblocking'), id: 'unblocking', disabled: defaultAction !== Action.blockTab },
-      { label: translate('schedule'), id: 'schedule' },
-      { label: translate('blacklist'), id: 'blacklist', disabled: defaultMode === Mode.whitelist },
-      { label: translate('whitelist'), id: 'whitelist', disabled: defaultMode === Mode.blacklist },
+      { label: translate('schedule'), id: 'schedule' },      { label: translate('denyList'), id: 'blacklist', disabled: defaultMode === Mode.whitelist },
+      { label: translate('allowList'), id: 'whitelist', disabled: defaultMode === Mode.blacklist },
       { label: translate('password'), id: 'password' },
       { label: translate('timer'), id: 'timer' },
       { label: translate('logs'), id: 'logs' },
@@ -176,8 +174,7 @@ export class Settings extends Component {
 
   componentWillUnmount() {
     chrome.storage.onChanged.removeListener(this.handleStorageChanges);
-    window.removeEventListener('resize', this.handleResize);
-  }
+    window.removeEventListener('resize', this.handleResize);  }
 
   handleResize = debounce(() => {
     this.setState({ isSmallScreen: isSmallDevice() });
@@ -506,66 +503,141 @@ export class Settings extends Component {
       )
     );
     this.closeDialog();
-  };
+  };  handleStorageChanges = (changes, areaName) => {
+    logInfo(`Storage changes detected in ${areaName}:`, changes);
+    let settingsUpdated = false;
+    const updates = {};
 
-  handleStorageChanges = (changes) => {
-    // If isEnabled changed from another source (like the popup)
-    if (changes.isEnabled) {
-      const newIsEnabled = changes.isEnabled.newValue;
+    // Process changes from any storage area
+    // We should handle both sync and local storage changes
+    if (areaName !== 'sync' && areaName !== 'local') {
+      return;
+    }
+
+    // Process changes in blacklist
+    if (changes.blacklist && this.blacklistComponentRef.current) {
+      logInfo('Blacklist updated from storage:', changes.blacklist.newValue);
+      const newList = changes.blacklist.newValue || [];
       
-      // Update both the form field and our tracking var
-      this.setOptions('isEnabled', newIsEnabled);
-      this.setState({ originalIsEnabled: newIsEnabled });
+      // Update the component's list
+      this.blacklistComponentRef.current.setList(newList);
       
-      logInfo(`Status changed from external source: ${newIsEnabled}`);
+      // Update state if needed
+      if (JSON.stringify(this.state.options.blacklist) !== JSON.stringify(newList)) {
+        this.setOptions('blacklist', newList);
+      }
+      
+      updates.blacklist = newList;
+      settingsUpdated = true;
+    }
+
+    // Process changes in whitelist
+    if (changes.whitelist && this.whitelistComponentRef.current) {
+      logInfo('Whitelist updated from storage:', changes.whitelist.newValue);
+      const newList = changes.whitelist.newValue || [];
+      
+      // Update the component's list
+      this.whitelistComponentRef.current.setList(newList);
+      
+      // Update state if needed
+      if (JSON.stringify(this.state.options.whitelist) !== JSON.stringify(newList)) {
+        this.setOptions('whitelist', newList);
+      }
+      
+      updates.whitelist = newList;
+      settingsUpdated = true;
+    }
+
+    // Process changes in blacklist keywords
+    if (changes.blacklistKeywords && this.blacklistKeywordsComponentRef.current) {
+      logInfo('Blacklist keywords updated from sync:', changes.blacklistKeywords.newValue);
+      const newList = changes.blacklistKeywords.newValue || [];
+      
+      // Update the component's list
+      this.blacklistKeywordsComponentRef.current.setList(newList);
+      
+      // Update state if needed
+      if (JSON.stringify(this.state.options.blacklistKeywords) !== JSON.stringify(newList)) {
+        this.setOptions('blacklistKeywords', newList);
+      }
+      
+      updates.blacklistKeywords = newList;
+      settingsUpdated = true;
+    }
+
+    // Process changes in whitelist keywords
+    if (changes.whitelistKeywords && this.whitelistKeywordsComponentRef.current) {
+      logInfo('Whitelist keywords updated from sync:', changes.whitelistKeywords.newValue);
+      const newList = changes.whitelistKeywords.newValue || [];
+      
+      // Update the component's list
+      this.whitelistKeywordsComponentRef.current.setList(newList);
+      
+      // Update state if needed
+      if (JSON.stringify(this.state.options.whitelistKeywords) !== JSON.stringify(newList)) {
+        this.setOptions('whitelistKeywords', newList);
+      }
+      
+      updates.whitelistKeywords = newList;
+      settingsUpdated = true;
+    }
+
+    // Process changes in mode
+    if (changes.mode) {
+      logInfo('Mode updated from sync:', changes.mode.newValue);
+      this.setOptions('mode', changes.mode.newValue);
+      settingsUpdated = true;
+    }
+
+    // Process changes in enabled state
+    if (changes.isEnabled !== undefined) {
+      logInfo('Enabled state updated from sync:', changes.isEnabled.newValue);
+      this.setOptions('isEnabled', changes.isEnabled.newValue);
+      settingsUpdated = true;
+    }
+
+    // Process changes in action
+    if (changes.action) {
+      logInfo('Action updated from sync:', changes.action.newValue);
+      this.setOptions('action', changes.action.newValue);
+      settingsUpdated = true;
+    }
+
+    // Process changes in framesType
+    if (changes.framesType) {
+      logInfo('Frames type updated from sync:', changes.framesType.newValue);
+      this.setOptions('framesType', changes.framesType.newValue);
+      settingsUpdated = true;
+    }    // If settings were updated, notify the user
+    if (settingsUpdated) {
+      // Add a slight delay to ensure UI updates before showing notification
+      setTimeout(() => {
+        toaster.notify({
+          title: translate('settingsSynced'),
+          description: translate('settingsSyncedDescription'),
+          duration: 5
+        });
+
+        // If YouTube was automatically added to blacklist, check and fix
+        if (updates.blacklist && Array.isArray(updates.blacklist)) {
+          const youtubeIndex = updates.blacklist.findIndex(item => {
+            const pattern = typeof item === 'string' ? item : item.pattern || item.url;
+            return pattern && pattern.toLowerCase().includes('youtube.com');
+          });
+          
+          // If YouTube is in the blacklist but shouldn't be, show a warning
+          if (youtubeIndex >= 0) {
+            logInfo('YouTube detected in blacklist from sync - this might be unintended');
+            toaster.warning({
+              title: translate('youtubeDetected'),
+              description: translate('youtubeDetectedDescription'),
+              duration: 8
+            });
+          }
+        }
+      }, 500);
     }
   }
-
-  runSyncDiagnosis = async () => {
-    this.setState({ diagnosisRunning: true });
-    try {
-      const result = await syncStatusLog();
-      this.setState({ syncDiagnostics: result });
-    } finally {
-      this.setState({ diagnosisRunning: false });
-    }
-  };
-
-  clearSyncStorage = async () => {
-    if (window.confirm(translate('confirmClearSync'))) {
-      const result = await diagnostics.clearSyncStorage();
-      if (result.success) {
-        toaster.success(translate('syncStorageCleared'), {
-          id: 'settings-toaster',
-        });
-        this.runSyncDiagnosis();
-      } else {
-        toaster.danger(translate('syncStorageClearFailed'), {
-          id: 'settings-toaster',
-        });
-      }
-    }
-  };
-
-  forceSyncSettings = async () => {
-    this.setState({ forceSyncRunning: true });
-    try {
-      const result = await diagnostics.forceSyncSettings();
-      if (result.success) {
-        toaster.success(`${translate('forceSyncSuccess')} (${result.syncedSettings.length} ${translate('settingsSynced')})`, {
-          id: 'settings-toaster',
-        });
-        // Re-run diagnosis to show updated status
-        await this.runSyncDiagnosis();
-      } else {
-        toaster.danger(`${translate('forceSyncFailed')}: ${result.error}`, {
-          id: 'settings-toaster',
-        });
-      }
-    } finally {
-      this.setState({ forceSyncRunning: false });
-    }
-  };
 
   renderBlockingTab = () => (
     <Fragment>

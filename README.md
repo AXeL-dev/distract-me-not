@@ -100,6 +100,27 @@ Packages the app in a zip file.
 
 **Note:** the web-ext package is required. You can install it using `npm install -g web-ext`.
 
+### Pattern matching notes
+
+The extension uses pattern matching to determine which websites should be blocked or allowed. The following formats are supported:
+
+#### Domain patterns
+- Simple domain names: `example.com` - Matches the domain and all subdomains
+- Wildcard domains: `*.example.com` - Matches all subdomains but not the root domain
+- Case-insensitive: Both `EXAMPLE.COM` and `example.com` will work the same
+
+#### URL patterns
+- Full URLs: `https://example.com/path` - Matches exact URL only
+- URLs with wildcards: `https://example.com/*` - Matches all pages on the site
+- Path patterns: `example.com/path*` - Matches paths starting with the specified prefix
+
+#### Troubleshooting pattern matching
+If a website isn't being blocked as expected:
+1. Check the browser console for logs starting with `[DMN INFO]`
+2. Try adding the domain in multiple formats (with and without wildcards)
+3. For complex domains, you can try the URL pattern format
+4. If a specific TLD isn't working, try adding rules for alternate TLDs
+
 ## Credits
 
 Icon made by [Smashicons](https://www.flaticon.com/authors/smashicons) from [Flaticon](https://www.flaticon.com/).

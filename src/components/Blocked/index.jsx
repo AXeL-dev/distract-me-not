@@ -32,10 +32,9 @@ export class Blocked extends Component {
       url: '', // Initialize url in state
       reason: '', // Initialize reason state
       message: props.message || translate('defaultBlockingMessage'),
-      isBlank: props.isBlank === undefined ? isProdEnv : props.isBlank,
-      hasUnblockButton: props.hasUnblockButton || isDevEnv,
-      displayBlockedLink:
-        props.displayBlockedLink || isDevEnv || defaultBlockSettings.displayBlockedLink,
+      isBlank: props.isBlank !== undefined ? props.isBlank : true, // Default to true for production look
+      hasUnblockButton: props.hasUnblockButton !== undefined ? props.hasUnblockButton : false, // Only show when explicitly enabled
+      displayBlockedLink: props.displayBlockedLink !== undefined ? props.displayBlockedLink : defaultBlockSettings.displayBlockedLink,
       unblockDialog: {
         isShown: false,
         options: this.getUnblockOptions(defaultUnblockTime),
@@ -286,12 +285,14 @@ export class Blocked extends Component {
                   </Pane>
                 )}
               </Pane>
-            </Dialog>
-            <div className="reason-container">
-              <p className="text-lg text-red-500 font-bold">
-                Displaying Reason: {this.state.reason ? this.state.reason : 'No specific reason provided in state.'}
-              </p>
-            </div>
+            </Dialog>            {/* Remove debug banner */}
+            {isDevEnv && (
+              <div className="reason-container">
+                <p className="text-lg text-red-500 font-bold">
+                  Displaying Reason: {this.state.reason ? this.state.reason : 'No specific reason provided in state.'}
+                </p>
+              </div>
+            )}
           </Fragment>
         )}
       </Fragment>
