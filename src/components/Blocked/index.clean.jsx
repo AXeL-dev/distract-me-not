@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { toaster, DuplicateIcon } from 'evergreen-ui';
+import { Pane, toaster, DuplicateIcon } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { storage, sendMessage } from 'helpers/webext';
 import { debug, isDevEnv } from 'helpers/debug';
@@ -15,8 +15,8 @@ export class Blocked extends Component {
     this.state = {
       url: '', // Initialize url in state
       reason: '', // Initialize reason state
-      message: translate('defaultBlockingMessage'),
-      displayBlockedLink: true,
+      message: props.message || translate('defaultBlockingMessage'),
+      displayBlockedLink: props.displayBlockedLink !== undefined ? props.displayBlockedLink : true, // Default to showing it
     };
   }
 
@@ -38,41 +38,50 @@ export class Blocked extends Component {
       finalUrl = 'https://www.example.com'; // Dev fallback
     }
     
-    const finalReason = parsedReason ? decodeURIComponent(parsedReason) : 'REASON_NOT_IN_URL_PARAMS';
+    const finalReason = parsedReason ? decodeURIComponent(parsedReason) : 'REASON_NOT_IN_URL_PARAMS'; // Default if not found
     debug.log('[Blocked Page] Initial Parsed - URL:', finalUrl, 'Reason:', finalReason);
 
     this.setState({ 
       url: finalUrl, 
       reason: finalReason 
+    }, () => {
+      // Log state after URL params are set
+      debug.log('[Blocked Page] State after URL parse - URL:', this.state.url, 'Reason:', this.state.reason);
     });
 
     if (isPageReloaded()) {
       debug.log('page reloaded!');
-      if (finalUrl) {
+      if (finalUrl) { // Use the parsed finalUrl
         sendMessage('isUrlStillBlocked', finalUrl).then((isUrlStillBlocked) => {
           if (isUrlStillBlocked === false) {
             sendMessage('redirectSenderTab', finalUrl);
+            // No return needed here
           }
         });
       }
     }
     
-    // Retrieve stored settings
-    storage.get({
-      message: translate('defaultBlockingMessage'),
-      displayBlockedLink: true,
-    }).then((items) => {
-      if (items) {
-        this.setState({
-          message: items.message.length ? items.message : translate('defaultBlockingMessage'),
-          displayBlockedLink: items.displayBlockedLink !== false,
-        }, () => {
-          debug.log('[Blocked Page] State after storage.get:', this.state);
-        });
-      }
-    });
+    storage
+      .get({
+        message: translate('defaultBlockingMessage'),
+        displayBlockedLink: true,
+      })
+      .then((items) => {
+        if (items) {
+          this.setState({
+            message: items.message.length ? items.message : translate('defaultBlockingMessage'),
+            // Make sure the blocked URL is shown if enabled in settings
+            displayBlockedLink: items.displayBlockedLink
+          }, () => {
+            // Log state after storage items are applied
+            debug.log('[Blocked Page] State after storage.get - URL:', this.state.url, 'Reason:', this.state.reason);
+          });
+        } else {
+          debug.log('[Blocked Page] storage.get returned no items. State remains - URL:', this.state.url, 'Reason:', this.state.reason);
+        }
+      });
   }
-  
+
   copyBlockedLink = () => {
     if (copy(this.state.url)) {
       toaster.success(translate('copiedToClipboard'), {
@@ -80,7 +89,7 @@ export class Blocked extends Component {
       });
     }
   };
-  
+
   render() {
     debug.log('[Blocked Render] Rendering block page with state:', {
       url: this.state.url,
@@ -94,15 +103,14 @@ export class Blocked extends Component {
     
     return (
       <Fragment>
-        {/* Always show the black page with the block message */}
+        {/* Always show the block page with the block message */}
         <div className="distract-cursor distract-select distract-overlay-container">
           <div className="distract-cursor distract-select distract-overlay">
             <div className="distract-cursor distract-select distract-info-container">
               <span className="distract-cursor distract-select distract-overlay-top-text">
                 {blockMessage}
               </span>
-              
-              {/* Show the blocked link if enabled */}
+              {/* Show the blocked link only if enabled in settings */}
               {this.state.displayBlockedLink && (
                 <span className="distract-blocked-link">
                   <input type="text" value={this.state.url || ''} readOnly />
@@ -115,9 +123,8 @@ export class Blocked extends Component {
                   </button>
                 </span>
               )}
-              
               <div className="distract-cursor distract-select distract-overlay-img"></div>
-              {/* No unblock button */}
+              {/* No unblock button, no unblock dialog */}
             </div>
           </div>
         </div>
@@ -126,7 +133,7 @@ export class Blocked extends Component {
         {isDevEnv && (
           <div className="reason-container">
             <p className="text-lg text-red-500 font-bold">
-              Displaying Reason: {this.state.reason || 'No reason provided'}
+              Displaying Reason: {this.state.reason ? this.state.reason : 'No specific reason provided in state.'}
             </p>
           </div>
         )}
@@ -134,3 +141,5 @@ export class Blocked extends Component {
     );
   }
 }
+
+export default Blocked;
