@@ -475,6 +475,33 @@
   "displayBlockedLink": {
     "message": "Display blocked link"
   },
+  "blockedDueTo": {
+    "message": "Blocked due to"
+  },  "noSpecificReason": {
+    "message": "No specific reason provided"
+  },
+  "denyListPattern": {
+    "message": "Deny List pattern: $pattern$",
+    "placeholders": {
+      "pattern": {
+        "content": "$1"
+      }
+    }
+  },
+  "denyListKeyword": {
+    "message": "Deny List keyword: $keyword$",
+    "placeholders": {
+      "keyword": {
+        "content": "$1"
+      }
+    }
+  },
+  "deniedSite": {
+    "message": "This site is not on the Allow List"
+  },
+  "displayInNewTab": {
+    "message": "Display in new tab"
+  },
   "blockAccessToExtensionsPage": {
     "message": "Block access to extensions page"
   },

@@ -44,8 +44,7 @@ function copyLibraryFiles() {
     console.error('❌ Error copying browser-polyfill.min.js:', error.message);
     return false;
   }
-  
-  // Copy bcrypt.min.js to static/js
+    // Copy bcrypt.min.js to static/js
   try {
     fs.copyFileSync(BCRYPT_SRC, path.join(STATIC_JS_DIR, 'bcrypt.min.js'));
     fs.copyFileSync(BCRYPT_SRC, path.join(BUILD_DIR, 'bcrypt.min.js'));
@@ -53,6 +52,54 @@ function copyLibraryFiles() {
   } catch (error) {
     console.error('❌ Error copying bcrypt.min.js:', error.message);
     return false;
+  }
+    // Copy diagnostic files
+  try {    // List of diagnostic files to copy with their source directories
+    // Path is relative to project root
+    const diagnosticFiles = [
+      { file: 'sync-diagnostics.html', source: '' },
+      { file: 'sync-diagnostics-debug.html', source: '' },
+      { file: 'sync-status.html', source: '' },
+      { file: 'test-sync-rules.js', source: '' },
+      { file: 'run-sync-test.js', source: 'public' },
+      { file: 'communication-test.html', source: '' }
+    ];
+    
+    let missingFiles = [];
+    let copiedFiles = [];
+    
+    for (const item of diagnosticFiles) {
+      const file = item.file;
+      const sourcePath = item.source 
+        ? path.join(__dirname, '..', item.source, file) 
+        : path.join(__dirname, '..', file);
+      const destPath = path.join(BUILD_DIR, file);
+      
+      // Check if source file exists before copying
+      if (fs.existsSync(sourcePath)) {
+        try {
+          fs.copyFileSync(sourcePath, destPath);
+          copiedFiles.push(file);
+          console.log(`✓ Copied ${file} from ${item.source || 'root'} directory`);
+        } catch (copyError) {
+          console.error(`❌ Error copying ${file}:`, copyError.message);
+        }
+      } else {
+        missingFiles.push(file);
+        console.warn(`⚠️ Warning: Source file ${file} not found at ${sourcePath}, skipping`);
+      }
+    }
+    
+    if (copiedFiles.length > 0) {
+      console.log(`✅ Successfully copied ${copiedFiles.length} diagnostic files`);
+    }
+    
+    if (missingFiles.length > 0) {
+      console.warn(`⚠️ Warning: ${missingFiles.length} diagnostic files were not found: ${missingFiles.join(', ')}`);
+    }
+  } catch (error) {
+    console.error('❌ Error in diagnostic files copy process:', error.message);
+    // Continue build even if diagnostic files fail to copy
   }
   
   return true;

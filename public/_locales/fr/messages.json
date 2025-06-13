@@ -445,6 +445,33 @@
   "displayBlockedLink": {
     "message": "Afficher le lien bloqué"
   },
+  "blockedDueTo": {
+    "message": "Bloqué en raison de"
+  },  "noSpecificReason": {
+    "message": "Aucune raison spécifique fournie"
+  },
+  "denyListPattern": {
+    "message": "Modèle de liste de refus: $pattern$",
+    "placeholders": {
+      "pattern": {
+        "content": "$1"
+      }
+    }
+  },
+  "denyListKeyword": {
+    "message": "Mot-clé de liste de refus: $keyword$",
+    "placeholders": {
+      "keyword": {
+        "content": "$1"
+      }
+    }
+  },
+  "deniedSite": {
+    "message": "Ce site n'est pas dans la liste d'autorisation"
+  },
+  "displayInNewTab": {
+    "message": "Afficher dans un nouvel onglet"
+  },
   "blockAccessToExtensionsPage": {
     "message": "Bloquer l'accès à la page des extensions"
   },

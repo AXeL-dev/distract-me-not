@@ -154,9 +154,9 @@ export class Settings extends Component {
       syncDiagnostics: null,
       diagnosisRunning: false,
       forceSyncRunning: false,
+      refreshRulesRunning: false,
     };
   }
-
   componentDidMount() {
     this.getAllSettings().then((settings) => {
       this.setSettings(settings);
@@ -164,17 +164,69 @@ export class Settings extends Component {
       if (settings && settings.isEnabled !== undefined) {
         this.setState({ originalIsEnabled: settings.isEnabled });
       }
+      
+      // If this is a fresh install or lists are empty, try to refresh rules from sync
+      if ((Array.isArray(settings.blacklist) && settings.blacklist.length === 0) && 
+          (Array.isArray(settings.whitelist) && settings.whitelist.length === 0)) {
+        logInfo('Fresh install or empty lists detected - auto-refreshing rules from sync');
+        setTimeout(() => {
+          this.refreshRulesFromCloud();
+        }, 1500); // Wait 1.5 seconds to give Chrome sync time to initialize
+      }
     });
     
     // Add storage change listener to keep settings in sync with popup
     chrome.storage.onChanged.addListener(this.handleStorageChanges);
+    
+    // Listen for sync update messages from the service worker
+    chrome.runtime.onMessage.addListener(this.handleBackgroundMessages);
     
     window.addEventListener('resize', this.handleResize);
   }
 
   componentWillUnmount() {
     chrome.storage.onChanged.removeListener(this.handleStorageChanges);
-    window.removeEventListener('resize', this.handleResize);  }
+    chrome.runtime.onMessage.removeListener(this.handleBackgroundMessages);
+    window.removeEventListener('resize', this.handleResize);  
+  }
+  
+  // Handle messages from service worker
+  handleBackgroundMessages = (message, sender, sendResponse) => {
+    if (message.type === 'syncRulesUpdated') {
+      logInfo('Received syncRulesUpdated message:', message.data);
+      
+      // Refresh settings from storage since rules were updated
+      this.getAllSettings().then(settings => {
+        this.setSettings(settings);
+        
+        // Show notification
+        toaster.success(`Rules refreshed (${message.data.blacklistCount} deny, ${message.data.whitelistCount} allow)`, {
+          id: 'sync-rules-updated',
+          duration: 4
+        });
+      });
+      
+      // End the loading state if it's active
+      if (this.state.refreshRulesRunning) {
+        this.setState({ refreshRulesRunning: false });
+      }
+    } else if (message.type === 'syncRulesUpdateFailed') {
+      logInfo('Sync rules update failed:', message.error);
+      
+      // Show error notification
+      toaster.danger(`Failed to update rules: ${message.error}`, {
+        id: 'sync-rules-failed',
+        duration: 5
+      });
+      
+      // End the loading state if it's active
+      if (this.state.refreshRulesRunning) {
+        this.setState({ refreshRulesRunning: false });
+      }
+    }
+    
+    return true;
+  }
 
   handleResize = debounce(() => {
     this.setState({ isSmallScreen: isSmallDevice() });
@@ -638,6 +690,104 @@ export class Settings extends Component {
       }, 500);
     }
   }
+
+  refreshRulesFromCloud = async () => {
+    this.setState({ refreshRulesRunning: true });
+    
+    try {
+      logInfo('Requesting rules refresh from sync storage');
+      
+      // Step 1: Try direct sync access to get the true cloud state
+      try {
+        logInfo('Directly reading from sync storage');
+        
+        // Define the keys we're interested in
+        const syncKeys = {
+          blacklist: [],
+          whitelist: [],
+          blacklistKeywords: [],
+          whitelistKeywords: [],
+          mode: 'combined',
+          framesType: ['main', 'sub']
+        };
+        
+        // Read from Chrome sync directly
+        const rawSyncData = await chrome.storage.sync.get(syncKeys);
+        logInfo('Raw sync data retrieved:', {
+          blacklistCount: rawSyncData?.blacklist?.length || 0,
+          whitelistCount: rawSyncData?.whitelist?.length || 0
+        });
+        
+        // Validate the data
+        const validSyncData = {
+          blacklist: Array.isArray(rawSyncData.blacklist) ? rawSyncData.blacklist : [],
+          whitelist: Array.isArray(rawSyncData.whitelist) ? rawSyncData.whitelist : [],
+          blacklistKeywords: Array.isArray(rawSyncData.blacklistKeywords) ? rawSyncData.blacklistKeywords : [],
+          whitelistKeywords: Array.isArray(rawSyncData.whitelistKeywords) ? rawSyncData.whitelistKeywords : [],
+          mode: rawSyncData.mode || 'combined',
+          framesType: Array.isArray(rawSyncData.framesType) ? rawSyncData.framesType : ['main', 'sub']
+        };
+        
+        // If the sync data has non-empty lists, force-update local storage with this data
+        if (validSyncData.blacklist.length > 0 || validSyncData.whitelist.length > 0) {
+          logInfo('Found rules in sync storage, updating local storage');
+          
+          // Force-update local storage with the sync data
+          await chrome.storage.local.set(validSyncData);
+          
+          // Notify service worker to update its rules
+          await sendMessage('updateRules');
+        } else {
+          logInfo('No rules found in sync storage');
+        }
+      } catch (syncError) {
+        logInfo('Error accessing sync storage directly:', syncError);
+      }
+      
+      // Step 2: Use the service worker update mechanism (backup path)
+      try {
+        const updateResult = await sendMessage('updateRules');
+        if (!updateResult?.success) {
+          logInfo('Service worker reported non-success for updateRules', updateResult);
+        }
+      } catch (swError) {
+        logInfo('Error sending updateRules message to service worker:', swError);
+      }
+      
+      // Wait a moment for all updates to process
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Step 3: Get latest settings
+      const settings = await this.getAllSettings();
+      
+      // Log what we got
+      logInfo('Final settings retrieved from storage:', {
+        blacklistCount: settings?.blacklist?.length || 0,
+        whitelistCount: settings?.whitelist?.length || 0
+      });
+      
+      // Update our component with the fresh settings
+      this.setSettings(settings);
+      
+      // Show success notification with counts
+      toaster.success(`Rules refreshed: ${settings?.blacklist?.length || 0} deny, ${settings?.whitelist?.length || 0} allow`, {
+        id: 'refresh-rules-success',
+        duration: 4
+      });
+    } catch (error) {
+      logInfo('Error refreshing rules from cloud:', error);
+      toaster.danger(`Failed to refresh rules: ${error.message}`, {
+        id: 'refresh-rules-error',
+        duration: 5
+      });
+    } finally {
+      this.setState({ refreshRulesRunning: false });
+    }
+  };
+
+  forceSyncSettings = async () => {
+    // Implementation for forcing sync of settings
+  };
 
   renderBlockingTab = () => (
     <Fragment>
@@ -1378,10 +1528,21 @@ export class Settings extends Component {
           height={32} 
           iconBefore={UploadIcon} 
           intent="success" 
+          marginRight={10}
           onClick={this.forceSyncSettings}
           isLoading={this.state.forceSyncRunning}
         >
           {translate('forceSyncSettings')}
+        </Button>
+
+        <Button 
+          height={32} 
+          iconBefore={ImportIcon} 
+          intent="success" 
+          onClick={this.refreshRulesFromCloud}
+          isLoading={this.state.refreshRulesRunning}
+        >
+          {translate('refreshRulesFromCloud') || "Refresh Rules from Cloud"}
         </Button>
       </Pane>
       

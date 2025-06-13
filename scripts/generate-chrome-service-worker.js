@@ -19,9 +19,10 @@ try {
   if (!fs.existsSync(BUILD_DIR)) {
     fs.mkdirSync(BUILD_DIR, { recursive: true });
   }
-  
-  // Read the source service worker
+    // Read the source service worker
   let serviceWorkerContent = fs.readFileSync(SOURCE_SERVICE_WORKER, 'utf8');
+    // We don't need to fix any syntax issues as the source file should be correct
+  // The previous attempt to fix missing parentheses was causing the problem
 
   // Add a special header for Chrome
   const chromeServiceWorkerContent = `/**

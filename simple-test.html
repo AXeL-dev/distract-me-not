@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Distract Me Not - Basic Test</title>
+  <script src="browser-polyfill.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #0078d7;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      margin: 5px;
+      cursor: pointer;
+    }
+    pre {
+      background-color: #1e1e1e;
+      color: #ddd;
+      padding: 10px;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Distract Me Not - Basic Test</h1>
+  
+  <div>
+    <button id="testButton">Test Basic JavaScript</button>
+    <button id="pingButton">Ping Service Worker</button>
+    <button id="getInfoButton">Get Extension Info</button>
+  </div>
+  
+  <pre id="output">Results will appear here...</pre>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const output = document.getElementById('output');
+      output.textContent = 'Page loaded at ' + new Date().toISOString();
+      
+      try {
+        output.textContent += '\nExtension ID: ' + chrome.runtime.id;
+      } catch (e) {
+        output.textContent += '\nError accessing chrome API: ' + e.message;
+      }
+      
+      document.getElementById('testButton').addEventListener('click', function() {
+        output.textContent = 'Button clicked at ' + new Date().toISOString();
+      });
+      
+      document.getElementById('pingButton').addEventListener('click', function() {
+        output.textContent = 'Pinging service worker...';
+        
+        try {
+          chrome.runtime.sendMessage(
+            { message: 'ping' },
+            function(response) {
+              if (chrome.runtime.lastError) {
+                output.textContent += '\nError: ' + chrome.runtime.lastError.message;
+                return;
+              }
+              
+              output.textContent += '\nResponse: ' + JSON.stringify(response, null, 2);
+            }
+          );
+        } catch (e) {
+          output.textContent += '\nException: ' + e.message;
+        }
+      });
+      
+      document.getElementById('getInfoButton').addEventListener('click', function() {
+        output.textContent = 'Getting extension info...';
+        
+        try {
+          const manifest = chrome.runtime.getManifest();
+          output.textContent += '\nManifest: ' + JSON.stringify(manifest, null, 2);
+        } catch (e) {
+          output.textContent += '\nException: ' + e.message;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

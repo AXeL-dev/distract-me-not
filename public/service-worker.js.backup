@@ -111,29 +111,8 @@ function logError(message, error) {
   console.error(`[DMN ERROR] ${message}`, error || '');
 }
 
-// Stub periodic sync checker so init() can always call it
-function setupPeriodicSyncCheck() {
-  // No-op for periodic sync
-}
-
-// Fallback: ensure checkAllTabs exists before any registration
-if (typeof checkAllTabs !== 'function') {
-  function checkAllTabs() {
-    chrome.tabs.query({}, (tabs) => {
-      for (const tab of tabs) {
-        if (tab.url && tab.url.startsWith('http')) {
-          handleUrl(tab.url, tab.id, 'checkAllTabs');
-        }
-      }
-    });
-  }
-}
-
-// Enhanced initialization that checks all tabs
-async function init() {
 // Flag to track whether we're in a fresh install/initialization
 let isInitialInstall = true;
-}
 
 // Helper to check if rules seem to have come from default initialization
 function isLikelyFreshInstall() {
@@ -724,29 +703,14 @@ function deepLog(message, data) {
 let blockedUrls = new Set();
 
 // Extract the redirect logic to a separate function
-function redirectToBlockedPage(tabId, url, reason) {  const indexUrl = chrome.runtime.getURL('index.html');
+function redirectToBlockedPage(tabId, url, reason) {
+  const indexUrl = chrome.runtime.getURL('index.html');
   const encodedUrl = encodeURIComponent(url);
   // Safeguard: if reason is empty or falsy, provide a default.
   const effectiveReason = reason || "Unknown reason for block";
   const encodedReason = encodeURIComponent(effectiveReason);
-    // Get custom message if available - use promise pattern compatible with both Chrome and Firefox
-  chrome.storage.sync.get({ message: '', blockTab: { message: '' } }, function(items) {
-    // Try to get the message from either location
-    const messageFromRoot = items.message || '';
-    const messageFromBlockTab = (items.blockTab && items.blockTab.message) || '';
-    const customMessage = messageFromRoot || messageFromBlockTab || '';
-    
-    logInfo('Retrieved custom block message - root:', messageFromRoot);
-    logInfo('Retrieved custom block message - blockTab:', messageFromBlockTab);
-    logInfo('Using custom message:', customMessage);
-    
-    const messageParam = customMessage ? `&message=${encodeURIComponent(customMessage)}` : '';
-    
-    // Log the full redirect URL for debugging
-    const redirectUrl = `${indexUrl}#/blocked?url=${encodedUrl}&reason=${encodedReason}${messageParam}`;
-    logInfo('Redirecting to:', redirectUrl);
-    
-    chrome.tabs.update(tabId, { url: redirectUrl });
+  chrome.tabs.update(tabId, {
+    url: `${indexUrl}#/blocked?url=${encodedUrl}&reason=${encodedReason}`
   });
 }
 
@@ -1324,7 +1288,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         break;
         
       case 'testRedditNormalization':        response = safeDebugFunction(testRedditNormalization);
-        break;            case 'ping':
+        break;
+            case 'ping':
         // Simple ping response for diagnostics
         logInfo('Ping received from diagnostics page');
         response = { 
@@ -1332,12 +1297,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           status: 'alive',
           version: chrome.runtime.getManifest().version
         };
-        break;
-        
-      case 'getCurrentSettings':
-        // Return current settings to the requester
-        logInfo('Current settings requested from diagnostics page');
-        response = getCurrentSettings();
         break;
         
       case 'forceUpdateRules':
@@ -1795,17 +1754,37 @@ chrome.runtime.onInstalled.addListener(details => {
         try {
           logInfo(`Sync check attempt #${attempt} - Reading sync storage directly`);
           
-          // Get all sync data
-          const syncData = await chrome.storage.sync.get({
+          // Create default sync data structure
+          const defaultSyncData = {
             blacklist: [],
             whitelist: [],
             blacklistKeywords: [],
             whitelistKeywords: []
-          });
+          };
           
-          // Count items
-          const blacklistCount = Array.isArray(syncData.blacklist) ? syncData.blacklist.length : 0;
-          const whitelistCount = Array.isArray(syncData.whitelist) ? syncData.whitelist.length : 0;
+          // Get all sync data with robust error handling
+          let syncData = defaultSyncData; // Default empty data
+          
+          try {
+            // Get sync data and ensure it's an object
+            const rawSyncData = await chrome.storage.sync.get(defaultSyncData);
+            
+            // Make sure we got a valid object
+            if (rawSyncData && typeof rawSyncData === 'object') {
+              syncData = rawSyncData;
+            } else {
+              logWarning(`Sync check attempt #${attempt} - Received invalid sync data (${typeof rawSyncData})`);
+            }
+          } catch (innerSyncError) {
+            logWarning(`Sync check attempt #${attempt} - Error getting sync data: ${innerSyncError.message}`);
+            // Continue with default empty data
+          }
+          
+          // Count items with safe access
+          const blacklistCount = syncData && syncData.blacklist && Array.isArray(syncData.blacklist) 
+            ? syncData.blacklist.length : 0;
+          const whitelistCount = syncData && syncData.whitelist && Array.isArray(syncData.whitelist) 
+            ? syncData.whitelist.length : 0;
           
           logInfo(`Sync data check result: ${blacklistCount} deny, ${whitelistCount} allow items`);
           
@@ -2052,9 +2031,6 @@ function setMode(newMode) {
     chrome.storage.local.set({ mode }).then(() => {
       logInfo('Mode saved to local storage (fallback)');
     }).catch(localError => {
-      logError('Failed to save mode to local storage:', localError);
-    });
-  });
   
   return true;
 }

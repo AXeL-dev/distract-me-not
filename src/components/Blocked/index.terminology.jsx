@@ -24,25 +24,19 @@ export class Blocked extends Component {
 
   componentDidMount() {
     console.log('[Blocked] componentDidMount - Starting extraction');
-      // Log all URL parts
+    
+    // Log all URL parts
     console.log('[Blocked] window.location.href:', window.location.href);
     console.log('[Blocked] window.location.hash:', window.location.hash);
     console.log('[Blocked] window.location.search:', window.location.search);
     
     // Try direct extraction with regex for most reliable parsing
     const hash = window.location.hash;
-    console.log('[Blocked] Working with hash:', hash);
     const urlMatch = hash.match(/[?&]url=([^&]*)/);
     const reasonMatch = hash.match(/[?&]reason=([^&]*)/);
-    const messageMatch = hash.match(/[?&]message=([^&]*)/);
-    
-    console.log('[Blocked] URL match:', urlMatch);
-    console.log('[Blocked] Reason match:', reasonMatch);
-    console.log('[Blocked] Message match:', messageMatch);
     
     let finalUrl = '';
     let finalReason = 'REASON_NOT_FOUND';
-    let customMessage = '';
     
     if (urlMatch && urlMatch[1]) {
       try {
@@ -64,25 +58,11 @@ export class Blocked extends Component {
         console.error('[Blocked] Error decoding reason:', e);
       }
     }
-      if (messageMatch && messageMatch[1]) {
-      try {
-        customMessage = decodeURIComponent(messageMatch[1]);
-        console.log('[Blocked] Extracted custom message:', customMessage);
-      } catch (e) {
-        console.error('[Blocked] Error decoding message:', e);
-      }
-    }
-      
-    // Store whether we got a custom message from URL for later reference
-    const hasCustomMessageFromUrl = !!customMessage;
-    console.log('[Blocked] Has custom message from URL:', hasCustomMessageFromUrl, customMessage);
-      
+    
     this.setState({
       url: finalUrl,
       reason: finalReason,
-      message: customMessage || this.state.message, // Use extracted message if available
-      hash: hash, // Store for debugging
-      hasCustomMessageFromUrl: hasCustomMessageFromUrl // Flag to know if message came from URL
+      hash: hash // Store for debugging
     });
     
     // Handle redirects if needed
@@ -105,36 +85,24 @@ export class Blocked extends Component {
     })
     .then((items) => {
       console.log('[Blocked] Storage items:', items);
-        // Only use storage settings if we don't already have a message from URL params
-      let storageMessage = '';
+      
+      let customMessage = '';
       let showBlockedLink = true;
       
       if (items.blockTab && typeof items.blockTab === 'object') {
-        storageMessage = items.blockTab.message || '';
+        customMessage = items.blockTab.message || '';
         showBlockedLink = items.blockTab.displayBlockedLink !== undefined ? 
           items.blockTab.displayBlockedLink : true;
       } else {
-        storageMessage = items.message || '';
+        customMessage = items.message || '';
         showBlockedLink = items.displayBlockedLink !== undefined ? 
           items.displayBlockedLink : true;
       }
       
-      // Log for debugging
-      console.log('[Blocked] URL message:', this.state.message);
-      console.log('[Blocked] Storage message:', storageMessage);
-        // Prioritize the URL parameter message over storage settings
       this.setState({
-        displayBlockedLink: showBlockedLink,
-        // If we have a custom message from URL, always keep it
-        message: this.state.hasCustomMessageFromUrl 
-          ? this.state.message  // Keep URL message if it exists
-          : (storageMessage.length ? storageMessage : translate('defaultBlockingMessage'))
+        message: customMessage.length ? customMessage : translate('defaultBlockingMessage'),
+        displayBlockedLink: showBlockedLink
       });
-      
-      console.log('[Blocked] Final message decision:', 
-        this.state.hasCustomMessageFromUrl ? 'Using URL message' : 'Using storage message', 
-        'Final message:', this.state.hasCustomMessageFromUrl ? this.state.message : 
-          (storageMessage.length ? storageMessage : translate('defaultBlockingMessage')));
     });
   }
   
@@ -186,13 +154,12 @@ export class Blocked extends Component {
     // Default case - just show the reason as is
     return reasonText;
   };
-    render() {
+  
+  render() {
     console.log('[Blocked] Render - State:', this.state);
     
     // Always use a default message if none is available
-    // Explicitly log the message being used for rendering
     const blockMessage = this.state.message || translate('defaultBlockingMessage');
-    console.log('[Blocked] Using message for rendering:', blockMessage);
     
     return (
       <Fragment>
@@ -253,11 +220,10 @@ export class Blocked extends Component {
                   maxWidth: '90%',
                   margin: '20px auto',
                   textAlign: 'left'
-                }}>                  <p><strong>URL Hash:</strong> {this.state.hash}</p>
+                }}>
+                  <p><strong>URL Hash:</strong> {this.state.hash}</p>
                   <p><strong>Parsed URL:</strong> {this.state.url}</p>
                   <p><strong>Parsed Reason:</strong> {this.state.reason}</p>
-                  <p><strong>Message from URL:</strong> {this.state.hasCustomMessageFromUrl ? 'Yes' : 'No'}</p>
-                  <p><strong>Message being displayed:</strong> {blockMessage}</p>
                 </div>
               )}
             </div>

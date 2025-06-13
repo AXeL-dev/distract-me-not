@@ -1,8 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_appName__",
-  "version": "2.9.4",
-
+  "version": "2.9.8",
   "default_locale": "en",
   "description": "__MSG_appDesc__",
   "icons": {
@@ -12,33 +11,44 @@
     "64": "icons/magnet-64.png",
     "128": "icons/magnet-128.png"
   },
-
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
-
-  "web_accessible_resources": [{
-    "resources": ["index.html"],
-    "matches": ["<all_urls>"]
-  }],
-
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "index.html",
+        "test-sync-rules.js",
+        "run-sync-test.js",
+        "sync-diagnostics.html",
+        "sync-diagnostics-debug.html",
+        "sync-diagnostics-debug.js",
+        "browser-polyfill-debug.js",
+        "service-worker-sync-logging.js",
+        "service-worker-helpers.js",
+        "service-worker-test.html",
+        "communication-test.html",
+        "sync-status.html",
+        "simple-test.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
   "action": {
     "default_icon": "icons/magnet-128.png",
     "default_popup": "index.html"
   },
-
   "options_ui": {
     "page": "index.html#settings",
     "open_in_tab": true
   },
-
   "background": {
     "service_worker": "service-worker.js"
   },
-
   "author": "AXeL-dev",
   "homepage_url": "https://github.com/AXeL-dev/distract-me-not",
-
   "permissions": [
     "notifications",
     "activeTab",
@@ -47,8 +57,8 @@
     "contextMenus",
     "webNavigation"
   ],
-
   "host_permissions": [
     "<all_urls>"
-  ]
+  ],
+  "key": "wHwNnvAyWaQZbN/vJ+IodA=="
 }

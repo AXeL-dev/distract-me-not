@@ -125,6 +125,33 @@ If a website isn't being blocked as expected:
 
 Icon made by [Smashicons](https://www.flaticon.com/authors/smashicons) from [Flaticon](https://www.flaticon.com/).
 
+## Changelog
+
+### v2.9.8 (2025-06-06)
+- Fixed sync storage issues and added more robust error handling
+- Improved diagnostic tools with better display of settings
+- Added detailed error handling for undefined/null values
+- Fixed "Cannot read properties of undefined (reading 'mode')" error
+- Enhanced extension ID display in diagnostics
+- Implemented service worker backup and restore functionality
+- Fixed tab re-evaluation when rules change
+
+### v2.9.5 (2025-06-05)
+- Updated terminology to use "Deny List" and "Allow List" (instead of blacklist/whitelist)
+- Added clearer distinction between deny list pattern matches and directly denied sites
+- Removed unblock functionality from the block page
+- Improved block reason display for better user experience
+- Fixed cross-device synchronization for blocking rules
+- Added diagnostic tools for testing and verifying sync functionality
+- Fixed various bugs and improved stability
+
+### Troubleshooting Sync Issues
+
+If you're experiencing issues with settings not syncing between machines, please refer to our [Sync Troubleshooting Guide](SYNC-TROUBLESHOOTING.md).
+
+### Previous Versions
+For previous version changes, please check the commit history.
+
 ## License
 
 Distract Me Not is licensed under the [MIT license](LICENSE).

@@ -27,7 +27,9 @@ const translations = isDevEnv ? require('../../public/_locales/en/messages') : {
   // New sync diagnostic messages
   browser: 'Browser',
   forceSyncSettings: 'Force Sync Settings',
-  forceSyncSuccess: 'Settings forcibly synchronized',  forceSyncFailed: 'Sync attempt failed',
+  forceSyncSuccess: 'Settings forcibly synchronized',
+  forceSyncFailed: 'Sync attempt failed',
+  refreshRulesFromCloud: 'Refresh Rules from Cloud',
   settingsSynced: 'Settings synced',
   settingsSyncedDescription: 'Your settings were updated from another device',
   syncErrors: 'Sync Errors',
