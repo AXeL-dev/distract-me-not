@@ -141,9 +141,8 @@ async function forcePullFromSyncStorage() {
     if (typeof self.diagnoseSyncStatus === 'function') {
       await self.diagnoseSyncStatus();
     }
-    
-    // Define all the sync settings we want to check
-    const syncSettings = {
+      // Define the default values for sync settings 
+    const syncDefaults = {
       blacklist: [],
       whitelist: [],
       blacklistKeywords: [],
@@ -154,6 +153,9 @@ async function forcePullFromSyncStorage() {
       redirectUrl: '',
       schedule: { isEnabled: false, days: {} }
     };
+    
+    // Use the global syncSettings array for the storage.get() call
+    const syncKeys = syncSettings;
     
     // Get sync data - use getBytesInUse first to check if there's any data
     let bytesInUse = 0;
@@ -247,15 +249,30 @@ async function forcePullFromSyncStorage() {
 async function init() {
   try {
     logInfo('Initializing service worker...');
-    
-    // Try to get synced settings first
+      // Try to get synced settings first
     try {
-      // Log that we're attempting to read from sync storage
+      // Define the default values for sync settings 
+      const syncDefaults = {
+        blacklist: [],
+        whitelist: [],
+        blacklistKeywords: [],
+        whitelistKeywords: [],
+        mode: defaultMode,
+        framesType: defaultFramesType,
+        message: '', 
+        redirectUrl: '',
+        schedule: { isEnabled: false, days: {} }
+      };
+      
+      // Use the global syncSettings array for the storage.get() call
+      const syncKeys = syncSettings;
+        // Log that we're attempting to read from sync storage
       if (typeof self.syncDebug !== 'undefined') {
         self.syncDebug.log('Initializing service worker: Attempting to read from sync storage', {
           keys: syncSettings
-        });      }
-        // Get the actual stored data using callback pattern (more reliable than async/await)
+        });
+      }
+      // Get the actual stored data using callback pattern (more reliable than async/await)
       logInfo('Reading from sync storage...');
       const items = await new Promise((resolve, reject) => {
         chrome.storage.sync.get(syncSettings, (result) => {
@@ -345,9 +362,7 @@ async function init() {
       try {
         if (typeof self.syncDebug !== 'undefined') {
           self.syncDebug.log('Falling back to local storage for sync settings');
-        }
-        
-        const localItems = await new Promise((resolve, reject) => {
+        }        const localItems = await new Promise((resolve, reject) => {
           chrome.storage.local.get(syncSettings, (result) => {
             if (chrome.runtime.lastError) {
               reject(new Error(chrome.runtime.lastError.message || 'Local storage error'));
