@@ -25,6 +25,7 @@ const errors = [
   /ReferenceError: chrome is not defined/i,
   /Unsupported style property -webkit-font-smoothing/i,
   /Warning: Unsupported style property/i,
+  /Warning: React does not recognize the `isSolid` prop on a DOM element/i,
 ];
 
 // prettier-ignore
