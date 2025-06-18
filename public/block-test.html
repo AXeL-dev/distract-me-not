@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blocking Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            background-color: #0366d6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Blocking Test Tool</h1>
+    <p>This tool helps you test if URLs are being properly blocked by the extension.</p>
+    
+    <div>
+        <button id="addToBlacklist">Add to Deny List</button>
+        <button id="addToWhitelist">Add to Allow List</button>
+        <button id="checkBlocking">Check If Working</button>
+        <button id="checkMode">Check Mode</button>
+    </div>
+    
+    <div class="result" id="result">
+        Results will appear here...
+    </div>
+    
+    <script>
+        document.getElementById('addToBlacklist').addEventListener('click', async () => {
+            const result = document.getElementById('result');
+            try {
+                // Get the blacklist
+                const blacklist = await sendMessage('getBlacklist');
+                
+                // Add the reddit.com pattern if it's not already there
+                if (!blacklist.some(item => {
+                    const pattern = typeof item === 'string' ? item : item.pattern || item.url;
+                    return pattern === 'reddit.com';
+                })) {
+                    blacklist.push('reddit.com');
+                    await sendMessage('setBlacklist', [blacklist]);
+                    result.innerHTML = `<p>Added 'reddit.com' to deny list.</p><pre>New deny list: ${JSON.stringify(blacklist, null, 2)}</pre>`;
+                } else {
+                    result.innerHTML = `<p>'reddit.com' is already in the deny list.</p><pre>Current deny list: ${JSON.stringify(blacklist, null, 2)}</pre>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        });
+        
+        document.getElementById('addToWhitelist').addEventListener('click', async () => {
+            const result = document.getElementById('result');
+            try {
+                // Get the whitelist
+                const whitelist = await sendMessage('getWhitelist');
+                
+                // Add the pattern if it's not already there
+                const testPattern = 'reddit.com/r/cars';
+                if (!whitelist.some(item => {
+                    const pattern = typeof item === 'string' ? item : item.pattern || item.url;
+                    return pattern === testPattern;
+                })) {
+                    whitelist.push(testPattern);
+                    await sendMessage('setWhitelist', [whitelist]);
+                    result.innerHTML = `<p>Added '${testPattern}' to allow list.</p><pre>New allow list: ${JSON.stringify(whitelist, null, 2)}</pre>`;
+                } else {
+                    result.innerHTML = `<p>'${testPattern}' is already in the allow list.</p><pre>Current allow list: ${JSON.stringify(whitelist, null, 2)}</pre>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        });
+        
+        document.getElementById('checkBlocking').addEventListener('click', async () => {
+            const result = document.getElementById('result');
+            try {
+                // Test if the URLs are blocked by asking the service worker directly
+                const isEnabled = await sendMessage('getIsEnabled');
+                const mode = await sendMessage('getMode');
+                
+                // Create a list of URLs to test
+                const testUrls = [
+                    "https://www.reddit.com/",            // Should be blocked (in deny list)
+                    "https://www.reddit.com/r/cars",     // Should be allowed (specific allow list entry)
+                    "https://www.facebook.com/"          // Should be allowed (not in any list)
+                ];
+                
+                let testResults = `Testing with isEnabled=${isEnabled}, mode=${mode}\n\n`;
+                
+                // Test each URL
+                for (const url of testUrls) {
+                    const isBlocked = await sendMessage('testUrlMatching', [url]);
+                    testResults += `${url}: ${isBlocked ? 'BLOCKED ❌' : 'ALLOWED ✅'}\n`;
+                }
+                
+                result.innerHTML = `<pre>${testResults}</pre>`;
+            } catch (error) {
+                result.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        });
+        
+        document.getElementById('checkMode').addEventListener('click', async () => {
+            const result = document.getElementById('result');
+            try {
+                const isEnabled = await sendMessage('getIsEnabled');
+                const mode = await sendMessage('getMode');
+                const blacklist = await sendMessage('getBlacklist');
+                const whitelist = await sendMessage('getWhitelist');
+                
+                result.innerHTML = `
+                    <pre>
+Extension Status: ${isEnabled ? 'Enabled' : 'Disabled'}
+Mode: ${mode}
+Deny List: ${blacklist.length} entries
+Allow List: ${whitelist.length} entries
+                    </pre>
+                `;
+            } catch (error) {
+                result.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        });
+        
+        async function sendMessage(message, params = []) {
+            return new Promise((resolve, reject) => {
+                chrome.runtime.sendMessage({
+                    message: message,
+                    params: params
+                }, response => {
+                    if (chrome.runtime.lastError) {
+                        reject(new Error(chrome.runtime.lastError.message));
+                    } else {
+                        resolve(response);
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

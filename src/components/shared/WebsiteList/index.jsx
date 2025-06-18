@@ -154,19 +154,18 @@ export class WebsiteList extends Component {
   handleFilterChange = (value) => {
     this.setState({ searchQuery: value });
   };
-
   addToList = (url, setTextFieldValue) => {
     debug.log('add to list:', url);
     if (!isUrl(url)) {
       toaster.danger(translate('urlIsNotValid'), {
         id: 'settings-toaster',
       });
-    } else if (this.state.list.find((item) => item.url === url)) {
+    } else if (this.state.list.find((item) => item.url.toLowerCase() === url.toLowerCase())) {
       toaster.danger(translate('urlAlreadyExists'), {
         id: 'settings-toaster',
       });
     } else {
-      // Add url
+      // Add url (preserve original case for display purposes)
       const list = [...this.state.list];
       const newItem = { id: list.length + 1, url: url };
       if (this.props.addNewItemsOnTop) {

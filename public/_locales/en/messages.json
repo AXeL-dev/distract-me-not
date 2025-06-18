@@ -4,24 +4,34 @@
   },
   "appDesc": {
     "message": "Stay focused in a world full of distractions."
-  },
-  "blacklist": {
-    "message": "Blacklist"
+  },  "blacklist": {
+    "message": "Deny List"
   },
   "whitelist": {
-    "message": "Whitelist"
+    "message": "Allow List"
+  },
+  "denyList": {
+    "message": "Deny List"
+  },
+  "allowList": {
+    "message": "Allow List"
   },
   "combined": {
     "message": "Combined"
-  },
-  "combinedDescription": {
-    "message": "Combines both blacklist & whitelist modes by ignoring whitelisted websites & blocking blacklisted ones"
+  },  "combinedDescription": {
+    "message": "Combines both Deny List & Allow List modes by allowing specified websites & blocking denied ones"
   },
   "whitelistDescription": {
-    "message": "When mode is set to whitelist, you can only visit the following websites:"
+    "message": "When mode is set to Allow List, you can only visit the following websites:"
   },
   "blacklistDescription": {
-    "message": "When mode is set to blacklist, you cannot visit the following websites:"
+    "message": "When mode is set to Deny List, you cannot visit the following websites:"
+  },
+  "allowListDescription": {
+    "message": "When mode is set to Allow List, you can only visit the following websites:"
+  },
+  "denyListDescription": {
+    "message": "When mode is set to Deny List, you cannot visit the following websites:"
   },
   "websiteUrlPlaceholder": {
     "message": "Please enter the URL of the website here"
@@ -73,12 +83,17 @@
   },
   "allowed": {
     "message": "Allowed"
-  },
-  "addToBlacklist": {
-    "message": "Add current website to blacklist"
+  },  "addToBlacklist": {
+    "message": "Add current website to Deny List"
   },
   "addToWhitelist": {
-    "message": "Add current website to whitelist"
+    "message": "Add current website to Allow List"
+  },
+  "addToDenyList": {
+    "message": "Add current website to Deny List"
+  },
+  "addToAllowList": {
+    "message": "Add current website to Allow List"
   },
   "status": {
     "message": "Status"
@@ -127,12 +142,17 @@
   },
   "blocking": {
     "message": "Blocking"
-  },
-  "blockingBlacklistDescription": {
-    "message": "Choose an action to take for the blacklisted websites"
+  },  "blockingBlacklistDescription": {
+    "message": "Choose an action to take for the denied websites"
   },
   "blockingWhitelistDescription": {
-    "message": "Choose an action to take for non whitelisted websites"
+    "message": "Choose an action to take for non-allowed websites"
+  },
+  "blockingDenyListDescription": {
+    "message": "Choose an action to take for the denied websites"
+  },
+  "blockingAllowListDescription": {
+    "message": "Choose an action to take for non-allowed websites"
   },
   "unblocking": {
     "message": "Unblocking"
@@ -357,12 +377,17 @@
   },
   "keywords": {
     "message": "Keywords"
-  },
-  "blacklistKeywordsDescription": {
-    "message": "When mode is set to blacklist, you cannot visit website urls containing the following keywords:"
+  },  "blacklistKeywordsDescription": {
+    "message": "When mode is set to Deny List, you cannot visit website urls containing the following keywords:"
   },
   "whitelistKeywordsDescription": {
-    "message": "When mode is set to whitelist, you can only visit website urls containing the following keywords:"
+    "message": "When mode is set to Allow List, you can only visit website urls containing the following keywords:"
+  },
+  "denyListKeywordsDescription": {
+    "message": "When mode is set to Deny List, you cannot visit website urls containing the following keywords:"
+  },
+  "allowListKeywordsDescription": {
+    "message": "When mode is set to Allow List, you can only visit website urls containing the following keywords:"
   },
   "keywordExample": {
     "message": "Example: foo, bar, ..."
@@ -429,12 +454,17 @@
   },
   "blockCurrentUrl": {
     "message": "Block the current url"
-  },
-  "blacklistSettings": {
-    "message": "Settings > Blacklist"
+  },  "blacklistSettings": {
+    "message": "Settings > Deny List"
   },
   "whitelistSettings": {
-    "message": "Settings > Whitelist"
+    "message": "Settings > Allow List"
+  },
+  "denyListSettings": {
+    "message": "Settings > Deny List"
+  },
+  "allowListSettings": {
+    "message": "Settings > Allow List"
   },
   "lastModified": {
     "message": "Last modified:"
@@ -444,6 +474,33 @@
   },
   "displayBlockedLink": {
     "message": "Display blocked link"
+  },
+  "blockedDueTo": {
+    "message": "Blocked due to"
+  },  "noSpecificReason": {
+    "message": "No specific reason provided"
+  },
+  "denyListPattern": {
+    "message": "Deny List pattern: $pattern$",
+    "placeholders": {
+      "pattern": {
+        "content": "$1"
+      }
+    }
+  },
+  "denyListKeyword": {
+    "message": "Deny List keyword: $keyword$",
+    "placeholders": {
+      "keyword": {
+        "content": "$1"
+      }
+    }
+  },
+  "deniedSite": {
+    "message": "This site is not on the Allow List"
+  },
+  "displayInNewTab": {
+    "message": "Display in new tab"
   },
   "blockAccessToExtensionsPage": {
     "message": "Block access to extensions page"
@@ -485,8 +542,18 @@
   },
   "importSettings": {
     "message": "Import settings"
-  },
-  "exportSettings": {
+  },  "exportSettings": {
     "message": "Export settings"
+  },
+  "settingsSynced": {
+    "message": "Settings synced"
+  },
+  "settingsSyncedDescription": {
+    "message": "Your settings were updated from another device"
+  },  "youtubeDetected": {
+    "message": "YouTube detected in Deny List"
+  },
+  "youtubeDetectedDescription": {
+    "message": "YouTube was found in your Deny List, which might be unintended. You can remove it manually if needed."
   }
 }

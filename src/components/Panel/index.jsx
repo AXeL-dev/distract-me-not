@@ -14,7 +14,8 @@ import {
   StopwatchIcon,
 } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
-import { sendMessage, storage } from 'helpers/webext';
+import { sendMessage } from 'helpers/webext';
+import { syncStorage } from 'helpers/syncStorage';
 import {
   Mode,
   modes,
@@ -85,7 +86,7 @@ export class Panel extends Component {
         this.setState({ mode });
         this.toggleAddButton(mode);
       }),
-      storage
+      syncStorage
         .get({
           hideReportIssueButton: this.state.hideReportIssueButton,
           showAddWebsitePrompt: this.state.showAddWebsitePrompt,
@@ -113,13 +114,13 @@ export class Panel extends Component {
   toggleStatus = (value) => {
     this.setState({ isEnabled: value });
     sendMessage('setIsEnabled', value); // update background script
-    storage.set({ isEnabled: value });
+    syncStorage.set({ isEnabled: value }); // This will use local storage because isEnabled is local-only
   };
 
   changeMode = (value) => {
     this.setState({ mode: value });
     sendMessage('setMode', value);
-    storage.set({ mode: value });
+    syncStorage.set({ mode: value }); // This will use sync storage
     this.toggleAddButton(value);
   };
 

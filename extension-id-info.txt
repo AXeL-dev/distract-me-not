@@ -1,0 +1,14 @@
+Extension Key and ID Information
+=============================
+Generated: 2025-06-06T16:12:41.648Z
+
+Extension Key (for manifest.json):
+wHwNnvAyWaQZbN/vJ+IodA==
+
+Expected Extension ID:
+Unknown - will be determined by Chrome
+
+Instructions:
+1. This key has been added to your manifest.json
+2. When loading as an unpacked extension, Chrome will use this key to generate the extension ID
+3. The same extension ID will be used on all machines with this same key

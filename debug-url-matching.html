@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distract Me Not - URL Matching Debug</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    h1, h2 {
+      color: #333;
+    }
+    .input-section {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    textarea {
+      height: 150px;
+      font-family: monospace;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .results {
+      background-color: #2c2c2c;
+      color: #f0f0f0;
+      padding: 15px;
+      border-radius: 4px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      overflow: auto;
+      max-height: 300px;
+      margin-top: 20px;
+      border: 1px solid #555;
+    }
+    .match {
+      color: #4CAF50;
+      font-weight: bold;
+    }
+    .no-match {
+      color: #f44336;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Distract Me Not - URL Matching Debug</h1>
+  <p>This tool helps debug URL pattern matching issues in the Distract Me Not extension.</p>
+  
+  <div class="input-section">
+    <h2>URL to Test</h2>
+    <input type="text" id="testUrl" placeholder="https://www.reddit.com/r/all" value="https://www.reddit.com/r/all">
+    
+    <h2>Patterns to Test</h2>
+    <p>Enter one pattern per line:</p>
+    <textarea id="patterns">https://www.reddit.com/*
+reddit.com
+*.reddit.com
+*.reddit.com/*</textarea>
+    
+    <button onclick="testMatching()">Test Matching</button>
+  </div>
+  
+  <div id="results" class="results">Results will appear here...</div>
+  
+  <script>    // Copy of the improved wildcardToRegExp function from the service worker
+    function wildcardToRegExp(pattern) {
+      // First, normalize pattern to lowercase for case-insensitive matching
+      pattern = pattern.toLowerCase().trim();
+      
+      // Special case: empty pattern
+      if (!pattern) {
+        return new RegExp("^$", 'i');
+      }
+      
+      // If it's a simple domain rule without protocol or path
+      if (!pattern.includes('://') && !pattern.includes('/')) {
+        // First, escape any regex special characters
+        const escaped = pattern.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&');
+        
+        // Replace wildcards with appropriate regex
+        const regexPattern = escaped.replace(/\*/g, '.*');
+        
+        // Special case for *.domain.com to match both domain.com and subdomains
+        if (pattern.startsWith('*.')) {
+          const domainPart = regexPattern.substring(2); // Remove *. prefix
+          return new RegExp(`(^|\\.)${domainPart}$`, 'i');
+        }
+        
+        // For domain-only patterns, make the regex match either the full domain
+        // or as a subdomain suffix (e.g., "example.com" matches "example.com" and "sub.example.com")
+        return new RegExp(`(^|\\.)${regexPattern}$`, 'i');
+      }
+
+      // Handle URL patterns with paths
+      
+      // Case 1: Domain with wildcard path (most common pattern)
+      // Like https://www.example.com/* or example.com/*
+      const domainWithWildcardPath = /^((?:https?:\/\/)?[^\/]+)\/\*$/i;
+      const domainPathMatch = pattern.match(domainWithWildcardPath);
+      
+      if (domainPathMatch) {
+        // Extract just the domain part
+        const domainPart = domainPathMatch[1];
+        
+        // Escape special characters in domain
+        const escapedDomain = domainPart.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&');
+        
+        // Create a regex that matches the domain and anything after the slash
+        return new RegExp(`^${escapedDomain}\/.*$`, 'i');
+      }
+      
+      // Case 2: Domain with specific path pattern
+      // Like https://www.example.com/path/* or example.com/path/to/*
+      if (pattern.includes('/*')) {
+        // Split into domain+path and wildcard parts
+        const parts = pattern.split('/*');
+        if (parts.length > 0) {
+          const base = parts[0].replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&');
+          return new RegExp(`^${base}\/.*$`, 'i');
+        }
+      }
+      
+      // Case 3: Special wildcard subdomain with specific path
+      // Like *.example.com/path/*
+      if (pattern.startsWith('*.') && pattern.includes('/')) {
+        const domainEnd = pattern.indexOf('/');
+        const domainPart = pattern.substring(2, domainEnd); // Remove *. prefix and get domain
+        const pathPart = pattern.substring(domainEnd);
+        
+        const escapedDomain = domainPart.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&');
+        const escapedPath = pathPart.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&').replace(/\*/g, '.*');
+        
+        return new RegExp(`^(?:https?:\/\/)?(?:[^\/]+\\.)?${escapedDomain}${escapedPath}$`, 'i');
+      }
+      
+      // For other patterns with a specified path or protocol, do standard wildcard conversion
+      const escaped = pattern.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&');
+      const regexPattern = escaped.replace(/\*/g, '.*');
+      return new RegExp(`^${regexPattern}$`, 'i');
+    }
+
+    // Function to test if URL should be blocked based on the extension's logic
+    function checkUrlShouldBeBlocked(url, patterns) {
+      let output = `Testing URL: ${url}\n\n`;
+      
+      // Step 1: Parse URL for hostname matching
+      let hostname = "";
+      try {
+        const parsedUrl = new URL(url);
+        hostname = parsedUrl.hostname.toLowerCase();
+        output += `Extracted hostname: ${hostname}\n\n`;
+      } catch (e) {
+        output += `URL parsing failed: ${e.message}\n\n`;
+      }
+        
+      // Check patterns using regex
+      for (const pattern of patterns) {
+        try {
+          const trimmedPattern = pattern.trim();
+          if (!trimmedPattern) continue;
+          
+          const regexPattern = wildcardToRegExp(trimmedPattern);
+          output += `Pattern: "${trimmedPattern}"\n`;
+          output += `Regex: ${regexPattern}\n`;
+          
+          // Try to match both full URL and hostname
+          const urlMatch = regexPattern.test(url);
+          const hostnameMatch = hostname && regexPattern.test(hostname);
+          
+          output += `URL match: ${urlMatch ? 'MATCH' : 'NO MATCH'}\n`;
+          output += `Hostname match: ${hostnameMatch ? 'MATCH' : 'NO MATCH'}\n`;
+          
+          if (urlMatch || hostnameMatch) {
+            output += `RESULT: ${urlMatch ? 'URL' : 'Hostname'} matched pattern "${trimmedPattern}" - WOULD BLOCK\n`;
+          } else {
+            output += `RESULT: No match for pattern "${trimmedPattern}" - WOULD NOT BLOCK\n`;
+          }
+          output += "\n--------------------------------------------------\n\n";
+        } catch (e) {
+          output += `Error checking pattern "${pattern}": ${e.message}\n\n`;
+        }
+      }
+      
+      return output;
+    }
+    
+    function testMatching() {
+      const url = document.getElementById('testUrl').value;
+      const patternsText = document.getElementById('patterns').value;
+      const patterns = patternsText.split('\n').filter(p => p.trim().length > 0);
+      
+      const results = checkUrlShouldBeBlocked(url, patterns);
+      document.getElementById('results').textContent = results;
+    }
+    
+    // Auto-run on page load
+    window.onload = testMatching;
+  </script>
+</body>
+</html>

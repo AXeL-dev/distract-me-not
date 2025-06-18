@@ -445,6 +445,33 @@
   "displayBlockedLink": {
     "message": "Geblokkeerde link weergeven"
   },
+  "blockedDueTo": {
+    "message": "Geblokkeerd vanwege"
+  },  "noSpecificReason": {
+    "message": "Geen specifieke reden opgegeven"
+  },
+  "denyListPattern": {
+    "message": "Weigeringslijstpatroon: $pattern$",
+    "placeholders": {
+      "pattern": {
+        "content": "$1"
+      }
+    }
+  },
+  "denyListKeyword": {
+    "message": "Weigeringslijstsleutelwoord: $keyword$",
+    "placeholders": {
+      "keyword": {
+        "content": "$1"
+      }
+    }
+  },
+  "deniedSite": {
+    "message": "Deze site staat niet op de toelatingslijst"
+  },
+  "displayInNewTab": {
+    "message": "Toon in nieuw tabblad"
+  },
   "blockAccessToExtensionsPage": {
     "message": "Toegang tot extensiepagina blokkeren"
   },

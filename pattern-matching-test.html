@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern Matching Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .test-case {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        .test-url {
+            font-weight: bold;
+        }
+        .instructions {
+            background-color: #e9f7fe;
+            padding: 15px;
+            border-left: 4px solid #0078d7;
+            margin-bottom: 20px;
+        }
+        .patterns {
+            background-color: #f0f9e8;
+            padding: 15px;
+            border-left: 4px solid #4caf50;
+            margin-bottom: 20px;
+        }
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Distract-Me-Not Pattern Matching Test</h1>
+    
+    <div class="instructions">
+        <h2>Test Instructions</h2>
+        <ol>
+            <li>Install/reload the extension with your updated code</li>
+            <li>Add the following patterns to your extension:</li>
+            <ul>
+                <li>Allow List: <code>example.com</code> and <code>example.com/products/*</code></li>
+                <li>Deny List: <code>example.com/*</code></li>
+            </ul>
+            <li>Enable blocking in "Combined Mode" (both Allow and Deny lists)</li>
+            <li>Test the links below to verify correct pattern matching behavior</li>
+        </ol>
+    </div>
+    
+    <div class="patterns">
+        <h2>Expected Behavior</h2>
+        <p>With the patterns configured above:</p>
+        <ul>
+            <li>The root domain (<code>example.com</code>) should be ALLOWED</li>
+            <li>General paths (<code>example.com/about</code>, <code>example.com/contact</code>) should be BLOCKED</li>
+            <li>Specifically allowed paths (<code>example.com/products</code>, <code>example.com/products/item1</code>) should be ALLOWED</li>
+        </ul>
+    </div>
+
+    <h2>Test Cases</h2>
+    
+    <div class="test-case">
+        <p class="test-url">1. Root domain (should be ALLOWED):</p>
+        <a href="https://example.com" target="_blank">https://example.com</a>
+    </div>
+    
+    <div class="test-case">
+        <p class="test-url">2. Root domain with subdomain (should be ALLOWED):</p>
+        <a href="https://www.example.com" target="_blank">https://www.example.com</a>
+    </div>
+    
+    <div class="test-case">
+        <p class="test-url">3. General path (should be BLOCKED):</p>
+        <a href="https://example.com/about" target="_blank">https://example.com/about</a>
+    </div>
+    
+    <div class="test-case">
+        <p class="test-url">4. General path with subdomain (should be BLOCKED):</p>
+        <a href="https://www.example.com/contact" target="_blank">https://www.example.com/contact</a>
+    </div>
+    
+    <div class="test-case">
+        <p class="test-url">5. Specifically allowed path (should be ALLOWED):</p>
+        <a href="https://example.com/products" target="_blank">https://example.com/products</a>
+    </div>
+    
+    <div class="test-case">
+        <p class="test-url">6. Specifically allowed path with trailing slash (should be ALLOWED):</p>
+        <a href="https://example.com/products/" target="_blank">https://example.com/products/</a>
+    </div>
+    
+    <div class="test-case">
+        <p class="test-url">7. Subpath of specifically allowed path (should be ALLOWED):</p>
+        <a href="https://example.com/products/item1" target="_blank">https://example.com/products/item1</a>
+    </div>
+    
+    <div class="test-case">
+        <p class="test-url">8. Subpath with subdomain (should be ALLOWED):</p>
+        <a href="https://www.example.com/products/item2/details" target="_blank">https://www.example.com/products/item2/details</a>
+    </div>
+
+    <h2>Try with Different Domain</h2>
+    <p>To test with a real domain, replace the patterns with:</p>
+    <ul>
+        <li>Allow List: <code>reddit.com</code> and <code>reddit.com/r/news/*</code></li>
+        <li>Deny List: <code>reddit.com/*</code></li>
+    </ul>
+    <p>Then test these links:</p>
+    <div class="test-case">
+        <a href="https://www.reddit.com" target="_blank">https://www.reddit.com</a> (should be ALLOWED)
+    </div>
+    <div class="test-case">
+        <a href="https://www.reddit.com/r/all" target="_blank">https://www.reddit.com/r/all</a> (should be BLOCKED)
+    </div>
+    <div class="test-case">
+        <a href="https://www.reddit.com/r/news" target="_blank">https://www.reddit.com/r/news</a> (should be ALLOWED)
+    </div>
+    <div class="test-case">
+        <a href="https://www.reddit.com/r/news/comments/abc123" target="_blank">https://www.reddit.com/r/news/comments/abc123</a> (should be ALLOWED)
+    </div>
+</body>
+</html>

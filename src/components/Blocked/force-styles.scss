@@ -1,0 +1,54 @@
+/* Force blocking styles */
+.distract-overlay-container,
+.distract-overlay,
+.distract-info-container,
+.distract-overlay-top-text,
+.distract-blocked-link,
+.distract-overlay-img,
+button.unblock {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.distract-overlay-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 9999999 !important;
+}
+
+.distract-overlay {
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Make sure text is visible */
+.distract-overlay-top-text {
+  color: white !important;
+  font-size: 32px !important;
+}
+
+/* Fix for blocked link input/button */
+.distract-blocked-link {
+  display: flex !important;
+}
+
+.distract-blocked-link > input {
+  display: block !important;
+}
+
+.distract-blocked-link > button.copy {
+  display: flex !important;
+}
+
+/* Fix for unblock button */
+button.unblock {
+  display: inline-block !important;
+}

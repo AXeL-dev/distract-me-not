@@ -19,6 +19,13 @@ import {
   WarningSignIcon,
   ImportIcon,
   ExportIcon,
+  BugIcon,
+  RefreshIcon,
+  TrashIcon,
+  InfoSignIcon,
+  UploadIcon,
+  Heading,
+  Text,
 } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv, logInfo } from 'helpers/debug';
@@ -39,7 +46,7 @@ import {
   framesTypes,
 } from 'helpers/block';
 import { ScheduleType, defaultSchedule, newScheduleTimeRange } from 'helpers/schedule';
-import { sendMessage, storage, isWebExtension, openExtensionPage } from 'helpers/webext';
+import { sendMessage, isWebExtension, openExtensionPage } from 'helpers/webext';
 import { DaysOfWeek, today } from 'helpers/date';
 import { hash } from 'helpers/crypt';
 import {
@@ -65,26 +72,27 @@ import { version } from '../../../package.json';
 import { set, cloneDeep, debounce } from 'lodash';
 import { format } from 'date-fns';
 import './styles.scss';
+import { syncStorage } from 'helpers/syncStorage';
+import { syncStatusLog, diagnostics, syncableSettings, localOnlySettings } from 'helpers/syncDiagnostics';
 
 export class Settings extends Component {
   constructor(props) {
     super(props);
-    this.importFileInputRef = React.createRef();
-    this.blacklistComponentRef = React.createRef();
-    this.whitelistComponentRef = React.createRef();
-    this.blacklistKeywordsComponentRef = React.createRef();
-    this.whitelistKeywordsComponentRef = React.createRef();
+    this.importFileInputRef = React.createRef();    this.blacklistComponentRef = React.createRef(); // denylist
+    this.whitelistComponentRef = React.createRef(); // allowlist 
+    this.blacklistKeywordsComponentRef = React.createRef(); // denylist keywords
+    this.whitelistKeywordsComponentRef = React.createRef(); // allowlist keywords
     // prettier-ignore
     const tabs = [
       { label: translate('blocking'), id: 'blocking' },
       { label: translate('unblocking'), id: 'unblocking', disabled: defaultAction !== Action.blockTab },
-      { label: translate('schedule'), id: 'schedule' },
-      { label: translate('blacklist'), id: 'blacklist', disabled: defaultMode === Mode.whitelist },
-      { label: translate('whitelist'), id: 'whitelist', disabled: defaultMode === Mode.blacklist },
+      { label: translate('schedule'), id: 'schedule' },      { label: translate('denyList'), id: 'blacklist', disabled: defaultMode === Mode.whitelist },
+      { label: translate('allowList'), id: 'whitelist', disabled: defaultMode === Mode.blacklist },
       { label: translate('password'), id: 'password' },
       { label: translate('timer'), id: 'timer' },
       { label: translate('logs'), id: 'logs' },
       { label: translate('miscellaneous'), id: 'misc' },
+      { label: translate('diagnose'), id: 'diagnose' },
       { label: translate('about'), id: 'about' },
     ];
     // prettier-ignore
@@ -143,9 +151,12 @@ export class Settings extends Component {
       },
       isSmallScreen: isSmallDevice(),
       originalIsEnabled: defaultIsEnabled, // Add this line to track original status
+      syncDiagnostics: null,
+      diagnosisRunning: false,
+      forceSyncRunning: false,
+      refreshRulesRunning: false,
     };
   }
-
   componentDidMount() {
     this.getAllSettings().then((settings) => {
       this.setSettings(settings);
@@ -153,17 +164,68 @@ export class Settings extends Component {
       if (settings && settings.isEnabled !== undefined) {
         this.setState({ originalIsEnabled: settings.isEnabled });
       }
+      
+      // If this is a fresh install or lists are empty, try to refresh rules from sync
+      if ((Array.isArray(settings.blacklist) && settings.blacklist.length === 0) && 
+          (Array.isArray(settings.whitelist) && settings.whitelist.length === 0)) {
+        logInfo('Fresh install or empty lists detected - auto-refreshing rules from sync');
+        setTimeout(() => {
+          this.refreshRulesFromCloud();
+        }, 1500); // Wait 1.5 seconds to give Chrome sync time to initialize
+      }
     });
     
     // Add storage change listener to keep settings in sync with popup
     chrome.storage.onChanged.addListener(this.handleStorageChanges);
+    
+    // Listen for sync update messages from the service worker
+    chrome.runtime.onMessage.addListener(this.handleBackgroundMessages);
     
     window.addEventListener('resize', this.handleResize);
   }
 
   componentWillUnmount() {
     chrome.storage.onChanged.removeListener(this.handleStorageChanges);
-    window.removeEventListener('resize', this.handleResize);
+    chrome.runtime.onMessage.removeListener(this.handleBackgroundMessages);
+    window.removeEventListener('resize', this.handleResize);  
+  }
+  
+  // Handle messages from service worker
+  handleBackgroundMessages = (message, sender, sendResponse) => {
+    if (message.type === 'syncRulesUpdated') {
+      logInfo('Received syncRulesUpdated message:', message.data);
+      
+      // Refresh settings from storage since rules were updated
+      this.getAllSettings().then(settings => {
+        this.setSettings(settings);
+        
+        // Show notification
+        toaster.success(`Rules refreshed (${message.data.blacklistCount} deny, ${message.data.whitelistCount} allow)`, {
+          id: 'sync-rules-updated',
+          duration: 4
+        });
+      });
+      
+      // End the loading state if it's active
+      if (this.state.refreshRulesRunning) {
+        this.setState({ refreshRulesRunning: false });
+      }
+    } else if (message.type === 'syncRulesUpdateFailed') {
+      logInfo('Sync rules update failed:', message.error);
+      
+      // Show error notification
+      toaster.danger(`Failed to update rules: ${message.error}`, {
+        id: 'sync-rules-failed',
+        duration: 5
+      });
+      
+      // End the loading state if it's active
+      if (this.state.refreshRulesRunning) {
+        this.setState({ refreshRulesRunning: false });
+      }
+    }
+    
+    return true;
   }
 
   handleResize = debounce(() => {
@@ -171,7 +233,7 @@ export class Settings extends Component {
   }, 200);
 
   getAllSettings = () => {
-    return storage.get({
+    return syncStorage.get({
       isEnabled: this.state.options.isEnabled,
       mode: this.state.options.mode || defaultMode,
       action: this.state.options.action,
@@ -362,7 +424,7 @@ export class Settings extends Component {
     const wasEnabled = this.state.originalIsEnabled;
     const willBeEnabled = this.state.options.isEnabled;
 
-    storage
+    syncStorage
       .set({
         isEnabled: this.state.options.isEnabled,
         mode: this.state.options.mode,
@@ -493,20 +555,239 @@ export class Settings extends Component {
       )
     );
     this.closeDialog();
-  };
+  };  handleStorageChanges = (changes, areaName) => {
+    logInfo(`Storage changes detected in ${areaName}:`, changes);
+    let settingsUpdated = false;
+    const updates = {};
 
-  handleStorageChanges = (changes) => {
-    // If isEnabled changed from another source (like the popup)
-    if (changes.isEnabled) {
-      const newIsEnabled = changes.isEnabled.newValue;
+    // Process changes from any storage area
+    // We should handle both sync and local storage changes
+    if (areaName !== 'sync' && areaName !== 'local') {
+      return;
+    }
+
+    // Process changes in blacklist
+    if (changes.blacklist && this.blacklistComponentRef.current) {
+      logInfo('Blacklist updated from storage:', changes.blacklist.newValue);
+      const newList = changes.blacklist.newValue || [];
       
-      // Update both the form field and our tracking var
-      this.setOptions('isEnabled', newIsEnabled);
-      this.setState({ originalIsEnabled: newIsEnabled });
+      // Update the component's list
+      this.blacklistComponentRef.current.setList(newList);
       
-      logInfo(`Status changed from external source: ${newIsEnabled}`);
+      // Update state if needed
+      if (JSON.stringify(this.state.options.blacklist) !== JSON.stringify(newList)) {
+        this.setOptions('blacklist', newList);
+      }
+      
+      updates.blacklist = newList;
+      settingsUpdated = true;
+    }
+
+    // Process changes in whitelist
+    if (changes.whitelist && this.whitelistComponentRef.current) {
+      logInfo('Whitelist updated from storage:', changes.whitelist.newValue);
+      const newList = changes.whitelist.newValue || [];
+      
+      // Update the component's list
+      this.whitelistComponentRef.current.setList(newList);
+      
+      // Update state if needed
+      if (JSON.stringify(this.state.options.whitelist) !== JSON.stringify(newList)) {
+        this.setOptions('whitelist', newList);
+      }
+      
+      updates.whitelist = newList;
+      settingsUpdated = true;
+    }
+
+    // Process changes in blacklist keywords
+    if (changes.blacklistKeywords && this.blacklistKeywordsComponentRef.current) {
+      logInfo('Blacklist keywords updated from sync:', changes.blacklistKeywords.newValue);
+      const newList = changes.blacklistKeywords.newValue || [];
+      
+      // Update the component's list
+      this.blacklistKeywordsComponentRef.current.setList(newList);
+      
+      // Update state if needed
+      if (JSON.stringify(this.state.options.blacklistKeywords) !== JSON.stringify(newList)) {
+        this.setOptions('blacklistKeywords', newList);
+      }
+      
+      updates.blacklistKeywords = newList;
+      settingsUpdated = true;
+    }
+
+    // Process changes in whitelist keywords
+    if (changes.whitelistKeywords && this.whitelistKeywordsComponentRef.current) {
+      logInfo('Whitelist keywords updated from sync:', changes.whitelistKeywords.newValue);
+      const newList = changes.whitelistKeywords.newValue || [];
+      
+      // Update the component's list
+      this.whitelistKeywordsComponentRef.current.setList(newList);
+      
+      // Update state if needed
+      if (JSON.stringify(this.state.options.whitelistKeywords) !== JSON.stringify(newList)) {
+        this.setOptions('whitelistKeywords', newList);
+      }
+      
+      updates.whitelistKeywords = newList;
+      settingsUpdated = true;
+    }
+
+    // Process changes in mode
+    if (changes.mode) {
+      logInfo('Mode updated from sync:', changes.mode.newValue);
+      this.setOptions('mode', changes.mode.newValue);
+      settingsUpdated = true;
+    }
+
+    // Process changes in enabled state
+    if (changes.isEnabled !== undefined) {
+      logInfo('Enabled state updated from sync:', changes.isEnabled.newValue);
+      this.setOptions('isEnabled', changes.isEnabled.newValue);
+      settingsUpdated = true;
+    }
+
+    // Process changes in action
+    if (changes.action) {
+      logInfo('Action updated from sync:', changes.action.newValue);
+      this.setOptions('action', changes.action.newValue);
+      settingsUpdated = true;
+    }
+
+    // Process changes in framesType
+    if (changes.framesType) {
+      logInfo('Frames type updated from sync:', changes.framesType.newValue);
+      this.setOptions('framesType', changes.framesType.newValue);
+      settingsUpdated = true;
+    }    // If settings were updated, notify the user
+    if (settingsUpdated) {
+      // Add a slight delay to ensure UI updates before showing notification
+      setTimeout(() => {
+        toaster.notify({
+          title: translate('settingsSynced'),
+          description: translate('settingsSyncedDescription'),
+          duration: 5
+        });
+
+        // If YouTube was automatically added to blacklist, check and fix
+        if (updates.blacklist && Array.isArray(updates.blacklist)) {
+          const youtubeIndex = updates.blacklist.findIndex(item => {
+            const pattern = typeof item === 'string' ? item : item.pattern || item.url;
+            return pattern && pattern.toLowerCase().includes('youtube.com');
+          });
+          
+          // If YouTube is in the blacklist but shouldn't be, show a warning
+          if (youtubeIndex >= 0) {
+            logInfo('YouTube detected in blacklist from sync - this might be unintended');
+            toaster.warning({
+              title: translate('youtubeDetected'),
+              description: translate('youtubeDetectedDescription'),
+              duration: 8
+            });
+          }
+        }
+      }, 500);
     }
   }
+
+  refreshRulesFromCloud = async () => {
+    this.setState({ refreshRulesRunning: true });
+    
+    try {
+      logInfo('Requesting rules refresh from sync storage');
+      
+      // Step 1: Try direct sync access to get the true cloud state
+      try {
+        logInfo('Directly reading from sync storage');
+        
+        // Define the keys we're interested in
+        const syncKeys = {
+          blacklist: [],
+          whitelist: [],
+          blacklistKeywords: [],
+          whitelistKeywords: [],
+          mode: 'combined',
+          framesType: ['main', 'sub']
+        };
+        
+        // Read from Chrome sync directly
+        const rawSyncData = await chrome.storage.sync.get(syncKeys);
+        logInfo('Raw sync data retrieved:', {
+          blacklistCount: rawSyncData?.blacklist?.length || 0,
+          whitelistCount: rawSyncData?.whitelist?.length || 0
+        });
+        
+        // Validate the data
+        const validSyncData = {
+          blacklist: Array.isArray(rawSyncData.blacklist) ? rawSyncData.blacklist : [],
+          whitelist: Array.isArray(rawSyncData.whitelist) ? rawSyncData.whitelist : [],
+          blacklistKeywords: Array.isArray(rawSyncData.blacklistKeywords) ? rawSyncData.blacklistKeywords : [],
+          whitelistKeywords: Array.isArray(rawSyncData.whitelistKeywords) ? rawSyncData.whitelistKeywords : [],
+          mode: rawSyncData.mode || 'combined',
+          framesType: Array.isArray(rawSyncData.framesType) ? rawSyncData.framesType : ['main', 'sub']
+        };
+        
+        // If the sync data has non-empty lists, force-update local storage with this data
+        if (validSyncData.blacklist.length > 0 || validSyncData.whitelist.length > 0) {
+          logInfo('Found rules in sync storage, updating local storage');
+          
+          // Force-update local storage with the sync data
+          await chrome.storage.local.set(validSyncData);
+          
+          // Notify service worker to update its rules
+          await sendMessage('updateRules');
+        } else {
+          logInfo('No rules found in sync storage');
+        }
+      } catch (syncError) {
+        logInfo('Error accessing sync storage directly:', syncError);
+      }
+      
+      // Step 2: Use the service worker update mechanism (backup path)
+      try {
+        const updateResult = await sendMessage('updateRules');
+        if (!updateResult?.success) {
+          logInfo('Service worker reported non-success for updateRules', updateResult);
+        }
+      } catch (swError) {
+        logInfo('Error sending updateRules message to service worker:', swError);
+      }
+      
+      // Wait a moment for all updates to process
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Step 3: Get latest settings
+      const settings = await this.getAllSettings();
+      
+      // Log what we got
+      logInfo('Final settings retrieved from storage:', {
+        blacklistCount: settings?.blacklist?.length || 0,
+        whitelistCount: settings?.whitelist?.length || 0
+      });
+      
+      // Update our component with the fresh settings
+      this.setSettings(settings);
+      
+      // Show success notification with counts
+      toaster.success(`Rules refreshed: ${settings?.blacklist?.length || 0} deny, ${settings?.whitelist?.length || 0} allow`, {
+        id: 'refresh-rules-success',
+        duration: 4
+      });
+    } catch (error) {
+      logInfo('Error refreshing rules from cloud:', error);
+      toaster.danger(`Failed to refresh rules: ${error.message}`, {
+        id: 'refresh-rules-error',
+        duration: 5
+      });
+    } finally {
+      this.setState({ refreshRulesRunning: false });
+    }
+  };
+
+  forceSyncSettings = async () => {
+    // Implementation for forcing sync of settings
+  };
 
   renderBlockingTab = () => (
     <Fragment>
@@ -1216,6 +1497,156 @@ export class Settings extends Component {
     </Fragment>
   );
 
+  renderDiagnosticTab = () => (
+    <Fragment>
+      <Paragraph size={400} marginBottom={16}>
+        {translate('syncDiagnosticsDescription')}
+      </Paragraph>
+      
+      <Pane display="flex" marginBottom={24}>
+        <Button 
+          height={32} 
+          iconBefore={RefreshIcon} 
+          marginRight={10} 
+          onClick={this.runSyncDiagnosis}
+          isLoading={this.state.diagnosisRunning}
+        >
+          {translate('runDiagnosis')}
+        </Button>
+        
+        <Button 
+          height={32} 
+          iconBefore={TrashIcon} 
+          intent="danger" 
+          marginRight={10}
+          onClick={this.clearSyncStorage}
+        >
+          {translate('clearSyncStorage')}
+        </Button>
+
+        <Button 
+          height={32} 
+          iconBefore={UploadIcon} 
+          intent="success" 
+          marginRight={10}
+          onClick={this.forceSyncSettings}
+          isLoading={this.state.forceSyncRunning}
+        >
+          {translate('forceSyncSettings')}
+        </Button>
+
+        <Button 
+          height={32} 
+          iconBefore={ImportIcon} 
+          intent="success" 
+          onClick={this.refreshRulesFromCloud}
+          isLoading={this.state.refreshRulesRunning}
+        >
+          {translate('refreshRulesFromCloud') || "Refresh Rules from Cloud"}
+        </Button>
+      </Pane>
+      
+      {this.state.syncDiagnostics && (
+        <Pane 
+          elevation={1} 
+          background="tint1" 
+          padding={16} 
+          marginBottom={16}
+          borderRadius={3}
+        >
+          <Pane display="flex" alignItems="center" marginBottom={8}>
+            <InfoSignIcon color="info" marginRight={8} />
+            <Heading size={500}>{translate('syncStatus')}</Heading>
+          </Pane>
+          
+          <Pane marginBottom={8}>
+            <Text>
+              {translate('syncAvailable')}: {' '}
+              <Badge color={this.state.syncDiagnostics.syncAvailable ? "green" : "red"}>
+                {this.state.syncDiagnostics.syncAvailable ? 'Yes' : 'No'}
+              </Badge>
+            </Text>
+          </Pane>
+
+          <Pane marginBottom={8}>
+            <Text>
+              {translate('browser')}: {' '}
+              <Badge color="blue">
+                {this.state.syncDiagnostics.browser 
+                  ? this.state.syncDiagnostics.browser.split(' ').slice(0, 3).join(' ') 
+                  : translate('unknown')}
+              </Badge>
+            </Text>
+          </Pane>
+          
+          <Pane marginBottom={8}>
+            <Text>
+              {translate('storageUsed')}: {' '}
+              {this.state.syncDiagnostics.storageUsed !== null ? 
+                `${(this.state.syncDiagnostics.storageUsed / 1024).toFixed(2)} KB` : 
+                translate('unknown')}
+            </Text>
+          </Pane>
+          
+          <Pane marginBottom={8}>
+            <Text>
+              {translate('syncedItems')}: {this.state.syncDiagnostics.syncableSettingsFound.length} 
+              {this.state.syncDiagnostics.missingSettings.length > 0 && 
+                ` (${this.state.syncDiagnostics.missingSettings.length} missing)`}
+            </Text>
+          </Pane>
+
+          {this.state.syncDiagnostics.errors.length > 0 && (
+            <Pane marginBottom={8}>
+              <Text color="danger">
+                {translate('syncErrors')}: {this.state.syncDiagnostics.errors.length}
+              </Text>
+            </Pane>
+          )}
+          
+          <Paragraph size={300} color="muted">
+            {translate('syncSettingsNote')}
+          </Paragraph>
+        </Pane>
+      )}
+      
+      <Pane marginBottom={16}>
+        <Heading size={500} marginBottom={8}>{translate('syncableSettings')}</Heading>
+        <Text>{translate('syncSettingsList')}</Text>
+        <Pane display="flex" flexWrap="wrap" marginTop={8}>
+          {syncableSettings.map(setting => (
+            <Badge 
+              key={setting}
+              color="green" 
+              marginRight={8} 
+              marginBottom={8}
+              isSolid={this.state.syncDiagnostics?.syncableSettingsFound.includes(setting)}
+            >
+              {setting}
+            </Badge>
+          ))}
+        </Pane>
+      </Pane>
+      
+      <Pane>
+        <Heading size={500} marginBottom={8}>{translate('localOnlySettings')}</Heading>
+        <Text>{translate('localSettingsList')}</Text>
+        <Pane display="flex" flexWrap="wrap" marginTop={8}>
+          {localOnlySettings.map(setting => (
+            <Badge 
+              key={setting}
+              color="neutral" 
+              marginRight={8} 
+              marginBottom={8}
+            >
+              {setting}
+            </Badge>
+          ))}
+        </Pane>
+      </Pane>
+    </Fragment>
+  );
+
   renderAboutTab = () => (
     <div className="about">
       <h3 className="title">{translate('appName')}</h3>
@@ -1308,6 +1739,7 @@ export class Settings extends Component {
                 {tab.id === 'timer' && this.renderTimerTab()}
                 {tab.id === 'logs' && this.renderLogsTab()}
                 {tab.id === 'misc' && this.renderMiscTab()}
+                {tab.id === 'diagnose' && this.renderDiagnosticTab()}
                 {tab.id === 'about' && this.renderAboutTab()}
               </Pane>
             ))}
