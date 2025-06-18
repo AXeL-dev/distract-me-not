@@ -414,7 +414,14 @@ function matchesPattern(pattern, url) {
  * @returns {boolean} True if the URL should be blocked
  */
 function checkUrlShouldBeBlocked(url, allowPatterns = [], denyPatterns = []) {
-  if (!url) return false;
+  if (!url) {
+    return {
+      blocked: false,
+      matchedPattern: null,
+      reason: "No URL provided",
+      specificity: 0
+    };
+  }
   
   // DEBUG: Log that we're in the pattern matching function
   console.log(`[PATTERN FUNCTION] checkUrlShouldBeBlocked called with:`, {
@@ -461,11 +468,15 @@ function checkUrlShouldBeBlocked(url, allowPatterns = [], denyPatterns = []) {
           for (const denyPattern of denyPatterns) {
             if (denyPattern.includes("/r/*")) {
               const denyPatternParsed = parseUrlOrPattern(denyPattern);
-              
-              // Check if domain part matches
-              if (domainMatches(urlParsed.hostname, denyPatternParsed)) {
-                console.log(`BLOCKED: URL subreddit ${urlSubreddit} doesn't match any allowed specific subreddit patterns, and domain matches deny pattern ${denyPattern}`);
-                return true; // BLOCK - URL should match the general deny rule
+                // Check if domain part matches
+              if (domainMatches(urlParsed.hostname, denyPatternParsed)) {                const reason = `pattern: ${denyPattern}`;
+                console.log(`❌ BLOCKED: URL subreddit ${urlSubreddit} doesn't match any allowed specific subreddit patterns, and domain matches deny pattern ${denyPattern}`);
+                return {
+                  blocked: true,
+                  matchedPattern: denyPattern,
+                  reason: reason,
+                  specificity: calculateSpecificity(denyPatternParsed)
+                };
               }
             }
           }
@@ -520,43 +531,68 @@ function checkUrlShouldBeBlocked(url, allowPatterns = [], denyPatterns = []) {
   //    is more specific than the highest specificity deny pattern
   if (matchingAllowPatterns.length > 0) {
     const mostSpecificAllow = matchingAllowPatterns[0];
-    
-    if (matchingDenyPatterns.length === 0) {
-      console.log(`✅ ALLOWED: URL matches allow pattern with specificity ${mostSpecificAllow.specificity}: ${mostSpecificAllow.pattern}`);
-      return false; // Allow wins with no deny patterns
+      if (matchingDenyPatterns.length === 0) {      const reason = `Allow pattern: ${mostSpecificAllow.pattern}`;
+      console.log(`✅ ALLOWED: URL matches allow pattern: ${mostSpecificAllow.pattern} (specificity: ${mostSpecificAllow.specificity})`);
+      return {
+        blocked: false,
+        matchedPattern: mostSpecificAllow.pattern,
+        reason: reason,
+        specificity: mostSpecificAllow.specificity
+      };
     }
     
     const mostSpecificDeny = matchingDenyPatterns[0];
     
     // If allow pattern is more specific or equal to the most specific deny pattern, allow wins
-    if (mostSpecificAllow.specificity >= mostSpecificDeny.specificity) {
-      console.log(`✅ ALLOWED: Allow pattern "${mostSpecificAllow.pattern}" (${mostSpecificAllow.specificity}) is more specific than deny pattern "${mostSpecificDeny.pattern}" (${mostSpecificDeny.specificity})`);
-      return false;
-    } else {
-      console.log(`❌ BLOCKED: Deny pattern "${mostSpecificDeny.pattern}" (${mostSpecificDeny.specificity}) is more specific than allow pattern "${mostSpecificAllow.pattern}" (${mostSpecificAllow.specificity})`);
-      return true;
+    if (mostSpecificAllow.specificity >= mostSpecificDeny.specificity) {      const reason = `Allow pattern: ${mostSpecificAllow.pattern} overrides deny pattern: ${mostSpecificDeny.pattern}`;
+      console.log(`✅ ALLOWED: Allow pattern "${mostSpecificAllow.pattern}" (${mostSpecificAllow.specificity}) overrides deny pattern "${mostSpecificDeny.pattern}" (${mostSpecificDeny.specificity})`);
+      return {
+        blocked: false,
+        matchedPattern: mostSpecificAllow.pattern,
+        reason: reason,
+        specificity: mostSpecificAllow.specificity
+      };
+    } else {      const reason = `pattern: ${mostSpecificDeny.pattern}`;
+      console.log(`❌ BLOCKED: Deny pattern "${mostSpecificDeny.pattern}" (${mostSpecificDeny.specificity}) overrides allow pattern "${mostSpecificAllow.pattern}" (${mostSpecificAllow.specificity})`);
+      return {
+        blocked: true,
+        matchedPattern: mostSpecificDeny.pattern,
+        reason: reason,
+        specificity: mostSpecificDeny.specificity
+      };
     }
   }
-  
-  // 2. If we only have deny patterns, block
+    // 2. If we only have deny patterns, block
   if (matchingDenyPatterns.length > 0) {
     const mostSpecificDeny = matchingDenyPatterns[0];
     
     // Check if this is a domain-only pattern for better logging
     const parsedPattern = parseUrlOrPattern(mostSpecificDeny.pattern);
-    
+      let reason;
     if (parsedPattern.path === '' || parsedPattern.path === '/') {
+      reason = `pattern: ${mostSpecificDeny.pattern}`;
       console.log(`❌ BLOCKED: Hostname ${urlParsed.hostname} directly matched deny list domain: ${mostSpecificDeny.pattern}`);
     } else {
+      reason = `pattern: ${mostSpecificDeny.pattern}`;
       console.log(`❌ BLOCKED: URL matches deny path pattern: ${mostSpecificDeny.pattern}`);
     }
     
-    return true;
+    return {
+      blocked: true,
+      matchedPattern: mostSpecificDeny.pattern,
+      reason: reason,
+      specificity: mostSpecificDeny.specificity
+    };
   }
-  
-  // 3. No patterns matched, default to allow
-  console.log(`✅ ALLOWED: URL doesn't match any patterns (default)`);
-  return false;
+    // 3. No patterns matched, default to allow
+  const reason = "URL doesn't match any patterns (default)";
+  console.log(`✅ ALLOWED: ${reason}`);
+  return {
+    blocked: false,
+    matchedPattern: null,
+    reason: reason,
+    specificity: 0
+  };
 }
 
 // Make the functions available in the global scope for service worker imports

@@ -778,14 +778,24 @@ function checkUrlShouldBeBlockedLocal(url) {
     logInfo(`Checking with ${denyPatterns.length} deny patterns and ${allowPatterns.length} allow patterns`);
     logInfo(`Deny patterns: ${JSON.stringify(denyPatterns)}`);
     logInfo(`Allow patterns: ${JSON.stringify(allowPatterns)}`);
+      // Call the new pattern matching function
+    const result = self.checkUrlShouldBeBlocked(url, allowPatterns, denyPatterns);
     
-    // Call the new pattern matching function
-    const shouldBlock = self.checkUrlShouldBeBlocked(url, allowPatterns, denyPatterns);
-    
-    if (shouldBlock) {
-      return { blocked: true, reason: "Matched deny pattern" };
+    // The new function returns an object with detailed information
+    if (result && typeof result === 'object') {
+      return {
+        blocked: result.blocked,
+        reason: result.reason,
+        matchedPattern: result.matchedPattern,
+        specificity: result.specificity
+      };
     } else {
-      return { blocked: false, reason: "No matching block rules or overridden by allow pattern" };
+      // Fallback for backward compatibility (if function returns boolean)
+      if (result) {
+        return { blocked: true, reason: "Matched deny pattern" };
+      } else {
+        return { blocked: false, reason: "No matching block rules or overridden by allow pattern" };
+      }
     }
   }
   
