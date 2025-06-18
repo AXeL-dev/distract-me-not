@@ -4,9 +4,13 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 import bcrypt from 'bcryptjs';
+import chromeMock from './__mocks__/chrome';
 
 // fix ReferenceError: dcodeIO is not defined
 global.dcodeIO = { bcrypt };
+
+// Mock chrome extension APIs
+global.chrome = chromeMock;
 
 // ignore some specific console errors & warnings
 const consoleError = console.error;
@@ -17,6 +21,10 @@ const errors = [
   /The `value` prop is required for the `<Context\.Provider>`/i,
   /Not implemented: window.prompt/i,
   /Warning: A component is changing a controlled input to be uncontrolled./i,
+  /chrome is not defined/i,
+  /ReferenceError: chrome is not defined/i,
+  /Unsupported style property -webkit-font-smoothing/i,
+  /Warning: Unsupported style property/i,
 ];
 
 // prettier-ignore
