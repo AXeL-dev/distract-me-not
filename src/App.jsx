@@ -82,9 +82,7 @@ export default class App extends Component {
                       path="/allowed"
                       component={Allowed}
                       accessAllowed={this.state.accessAllowed}
-                    />
-                    <Route path="/background" component={Background} />
-                    <Route path="/blocked" component={Blocked} />
+                    />                    <Route path="/background" component={Background} />                    <Route path="/blocked" component={Blocked} />
                     <Route path="/addWebsitePrompt" component={AddWebsitePrompt} />
                     <Route path="/pastebin" component={PasteBin} />
                     {isDevEnv || !this.state.accessAllowed ? (

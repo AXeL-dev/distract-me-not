@@ -4,9 +4,13 @@ import { getHostname, isUrl } from './url';
 import { sendMessage, storage, getActiveTab, createWindow, indexUrl } from './webext';
 
 export const Mode = {
-  blacklist: 'blacklist',
-  whitelist: 'whitelist',
+  blacklist: 'denylist',
+  whitelist: 'allowlist',
   combined: 'combined',
+  
+  // Legacy constants for backward compatibility
+  denylist: 'denylist',
+  allowlist: 'allowlist',
 };
 
 export const Action = {
@@ -27,9 +31,8 @@ export const UnblockOptions = {
 };
 
 // prettier-ignore
-export const modes = [
-  { label: translate('blacklist'), value: Mode.blacklist },
-  { label: translate('whitelist'), value: Mode.whitelist },
+export const modes = [  { label: translate('denyList'), value: Mode.blacklist },
+  { label: translate('allowList'), value: Mode.whitelist },
   { label: translate('combined'), value: Mode.combined, tooltip: translate('combinedDescription') },
 ];
 

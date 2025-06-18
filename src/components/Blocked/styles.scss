@@ -118,6 +118,29 @@ $textColor: white;
   background-image: url(../../../public/icons/magnet-256.png);
   background-size: contain;
 }
+
+.distract-block-reason {
+  margin: 20px auto 0;
+  font-family: OpenSansFont !important;
+  color: #d0d0d0;
+  font-size: 16px;
+  line-height: 1.4;
+  max-width: 80%;
+  padding: 12px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(219, 157, 97, 0.3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+  .reason-text {
+    display: block;
+    margin-top: 4px;
+    font-weight: bold;
+    color: #db9d61;
+    word-break: break-word;
+  }
+}
+
 button.unblock {
   margin-top: 50px;
   background-color: transparent;
@@ -164,6 +187,41 @@ button.unblock {
   }
 }
 
+.distract-debug-info {
+  margin: 15px auto;
+  background-color: rgba(50, 50, 50, 0.7);
+  border: 1px solid #ff9800;
+  border-radius: 4px;
+  padding: 10px;
+  font-family: monospace;
+  color: #fff;
+  text-align: left;
+  max-width: 80%;
+  font-size: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+
+  p {
+    margin: 0 0 5px 0;
+    color: #ff9800;
+    font-weight: bold;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0 0 0 20px;
+    list-style-type: square;
+  }
+
+  li {
+    margin: 3px 0;
+  }
+
+  strong {
+    color: #aaddff;
+  }
+}
+
 @media screen and (max-width: 600px) {
   .distract-overlay-top-text {
     font-size: 24px;
@@ -174,6 +232,12 @@ button.unblock {
   .distract-overlay-img {
     width: 100px;
     height: 100px;
+  }
+  .distract-block-reason {
+    max-width: 90%;
+    font-size: 14px;
+    padding: 8px;
+    margin-top: 15px;
   }
   button.unblock {
     font-size: 12px;

@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Distract Me Not - Sync Diagnostics</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #333;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+    }
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    pre {
+      background-color: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+    button {
+      background-color: #0078d7;
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #0063b1;
+    }
+    .button-container {
+      margin: 15px 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .success {
+      color: #008000;
+      font-weight: bold;
+    }
+    .error {
+      color: #ff0000;
+      font-weight: bold;
+    }
+    .warning {
+      color: #ff8c00;
+      font-weight: bold;
+    }
+    .loading {
+      opacity: 0.5;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+    .status-good {
+      background-color: #4CAF50;
+    }
+    .status-warning {
+      background-color: #FF9800;
+    }
+    .status-error {
+      background-color: #F44336;
+    }
+    .refresh-time {
+      font-size: 12px;
+      color: #666;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <h1>Distract Me Not - Sync Diagnostics</h1>
+  
+  <div class="card">
+    <h2>Sync Status</h2>
+    <div id="syncStatus">Loading...</div>
+    <div class="button-container">
+      <button id="checkSyncBtn">Check Sync Status</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Sync Storage</h2>
+      <div id="syncStorage">Loading...</div>
+      <div class="button-container">
+        <button id="refreshSyncBtn">Refresh Sync Data</button>
+        <button id="exportSyncBtn">Export Data</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Local Storage</h2>
+      <div id="localStorage">Loading...</div>
+      <div class="button-container">
+        <button id="refreshLocalBtn">Refresh Local Data</button>
+        <button id="exportLocalBtn">Export Data</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Advanced Actions</h2>
+    <div class="button-container">
+      <button id="forceSyncBtn">Force Push Settings to Sync</button>
+      <button id="forceLocalBtn">Force Pull Settings from Sync</button>
+      <button id="clearSyncCacheBtn">Clear Sync Cache</button>
+      <button id="reloadExtensionBtn">Reload Extension</button>
+    </div>
+    <div id="actionResult"></div>
+  </div>
+
+  <div class="card">
+    <h2>Sync Tests</h2>
+    <div class="button-container">
+      <button id="runSyncTestBtn">Run Sync Test</button>
+      <button id="addTestItemBtn">Add Test Item to Deny List</button>
+    </div>
+    <div id="testResult">No tests run yet.</div>
+  </div>
+
+  <div class="card">
+    <h2>Troubleshooting Tips</h2>
+    <ul>
+      <li>Make sure you're signed into Chrome/Edge with the same account on both devices</li>
+      <li>Check if sync is enabled in your browser settings</li>
+      <li>Try forcing a sync using the "Force Push Settings to Sync" button</li>
+      <li>Chrome sync has a quota limit (~100KB) - check if you're near the limit</li>
+      <li>Sometimes there might be a delay in sync propagation - wait a few minutes</li>
+      <li>If all else fails, try clearing the sync cache and reloading the extension</li>
+    </ul>
+  </div>
+
+  <script>
+    // Helper functions
+    function formatJSON(json) {
+      try {
+        return JSON.stringify(json, null, 2);
+      } catch (e) {
+        return "Error formatting JSON: " + e.message;
+      }
+    }
+
+    function setElementText(id, text, isHTML = false) {
+      const element = document.getElementById(id);
+      if (element) {
+        if (isHTML) {
+          element.innerHTML = text;
+        } else {
+          element.textContent = text;
+        }
+      }
+    }
+
+    function generateStorageTable(data, includeValues = true) {
+      if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+        return "<p>No data available</p>";
+      }
+
+      let html = '<table><tr><th>Key</th><th>Type</th><th>Size</th>';
+      if (includeValues) {
+        html += '<th>Value</th>';
+      }
+      html += '</tr>';
+
+      for (const key of Object.keys(data).sort()) {
+        const value = data[key];
+        const type = Array.isArray(value) ? 'Array' : typeof value;
+        
+        // Calculate approximate size
+        let size;
+        try {
+          size = JSON.stringify(value).length;
+          size = size > 1024 ? Math.round(size / 1024) + ' KB' : size + ' bytes';
+        } catch (e) {
+          size = 'Unknown';
+        }
+
+        html += `<tr><td>${key}</td><td>${type}</td><td>${size}</td>`;
+        
+        if (includeValues) {
+          let valueDisplay;
+          if (type === 'Array') {
+            valueDisplay = `Array (${value.length} items)`;
+            if (value.length > 0) {
+              valueDisplay += `<br><pre>${JSON.stringify(value.slice(0, 3), null, 2)}${value.length > 3 ? '\n...and ' + (value.length - 3) + ' more items' : ''}</pre>`;
+            }
+          } else if (type === 'object' && value !== null) {
+            valueDisplay = `<pre>${JSON.stringify(value, null, 2)}</pre>`;
+          } else {
+            valueDisplay = JSON.stringify(value);
+          }
+          html += `<td>${valueDisplay}</td>`;
+        }
+        
+        html += '</tr>';
+      }
+
+      html += '</table>';
+      return html;
+    }
+
+    // Diagnostics Functions
+    async function checkSyncStatus() {
+      setElementText('syncStatus', 'Checking sync status...', true);
+      
+      try {
+        // Check browser sync status
+        const syncAvailable = !!chrome?.storage?.sync;
+        let syncEnabled = "Unknown";
+        
+        try {
+          // Try to write and read a test value to check if sync is working
+          const testKey = 'dmn_sync_test_' + Date.now();
+          await chrome.storage.sync.set({ [testKey]: true });
+          const result = await chrome.storage.sync.get(testKey);
+          syncEnabled = result[testKey] === true;
+          await chrome.storage.sync.remove(testKey);
+        } catch (e) {
+          syncEnabled = false;
+        }
+        
+        let quotaInfo = "Unknown";
+        let quotaUsed = "Unknown";
+        
+        try {
+          if (chrome.storage.sync.getBytesInUse) {
+            quotaUsed = await chrome.storage.sync.getBytesInUse(null);
+            quotaUsed = `${Math.round(quotaUsed / 1024 * 100) / 100} KB`;
+          }
+          
+          const MAX_SYNC_STORAGE = 102400; // 100 KB is the typical limit
+          quotaInfo = `${MAX_SYNC_STORAGE / 1024} KB maximum`;
+        } catch (e) {
+          console.error("Error getting quota info:", e);
+        }
+        
+        // Check actual rules in sync storage
+        const denyListKey = await chrome.storage.sync.get('blacklist');
+        const allowListKey = await chrome.storage.sync.get('whitelist');
+        
+        const denyListCount = denyListKey.blacklist ? denyListKey.blacklist.length : 0;
+        const allowListCount = allowListKey.whitelist ? allowListKey.whitelist.length : 0;
+        
+        // Check service worker status
+        let serviceWorkerStatus = "Unknown";
+        try {
+          const response = await chrome.runtime.sendMessage({ message: 'getCurrentSettings' });
+          if (response && response.response) {
+            serviceWorkerStatus = "Active";
+            
+            // Compare service worker rules with storage
+            const workerDenyListCount = response.response.blacklist ? response.response.blacklist.length : 0;
+            const workerAllowListCount = response.response.whitelist ? response.response.whitelist.length : 0;
+            
+            if (workerDenyListCount !== denyListCount || workerAllowListCount !== allowListCount) {
+              serviceWorkerStatus = `Active but out of sync (SW: ${workerDenyListCount}/${workerAllowListCount}, Storage: ${denyListCount}/${allowListCount})`;
+            }
+          } else {
+            serviceWorkerStatus = "Inactive or unresponsive";
+          }
+        } catch (e) {
+          serviceWorkerStatus = "Error: " + e.message;
+        }
+        
+        // Format the result as HTML
+        const statusHTML = `
+          <table>
+            <tr>
+              <th>Component</th>
+              <th>Status</th>
+              <th>Details</th>
+            </tr>
+            <tr>
+              <td>Sync API Available</td>
+              <td><span class="status-indicator ${syncAvailable ? 'status-good' : 'status-error'}"></span>${syncAvailable ? 'Yes' : 'No'}</td>
+              <td>${syncAvailable ? 'Chrome sync API is available' : 'Chrome sync API is not available - check browser compatibility'}</td>
+            </tr>
+            <tr>
+              <td>Sync Enabled</td>
+              <td><span class="status-indicator ${syncEnabled === true ? 'status-good' : syncEnabled === false ? 'status-error' : 'status-warning'}"></span>${syncEnabled === true ? 'Yes' : syncEnabled === false ? 'No' : 'Unknown'}</td>
+              <td>${syncEnabled === true ? 'Sync is working correctly' : syncEnabled === false ? 'Sync is not working - check browser sync settings' : 'Could not determine sync status'}</td>
+            </tr>
+            <tr>
+              <td>Storage Quota</td>
+              <td>${quotaInfo}</td>
+              <td>Current usage: ${quotaUsed}</td>
+            </tr>
+            <tr>
+              <td>Deny List (in Storage)</td>
+              <td>${denyListCount} items</td>
+              <td>${denyListCount > 0 ? 'Deny list rules found in sync storage' : 'No deny list rules in sync storage'}</td>
+            </tr>
+            <tr>
+              <td>Allow List (in Storage)</td>
+              <td>${allowListCount} items</td>
+              <td>${allowListCount > 0 ? 'Allow list rules found in sync storage' : 'No allow list rules in sync storage'}</td>
+            </tr>
+            <tr>
+              <td>Service Worker</td>
+              <td><span class="status-indicator ${serviceWorkerStatus === "Active" ? 'status-good' : serviceWorkerStatus.includes("out of sync") ? 'status-warning' : 'status-error'}"></span>${serviceWorkerStatus}</td>
+              <td>${serviceWorkerStatus === "Active" ? 'Service worker is running and in sync with storage' : 'Service worker might need to be restarted or refreshed'}</td>
+            </tr>
+          </table>
+          <div class="refresh-time">Last checked: ${new Date().toLocaleTimeString()}</div>
+        `;
+        
+        setElementText('syncStatus', statusHTML, true);
+      } catch (error) {
+        setElementText('syncStatus', `<p class="error">Error checking sync status: ${error.message}</p>`, true);
+        console.error('Error checking sync status:', error);
+      }
+    }
+
+    async function loadSyncStorage() {
+      setElementText('syncStorage', 'Loading sync storage data...', true);
+      
+      try {
+        const syncData = await chrome.storage.sync.get(null);
+        setElementText('syncStorage', generateStorageTable(syncData), true);
+      } catch (error) {
+        setElementText('syncStorage', `<p class="error">Error loading sync storage: ${error.message}</p>`, true);
+        console.error('Error loading sync storage:', error);
+      }
+    }
+
+    async function loadLocalStorage() {
+      setElementText('localStorage', 'Loading local storage data...', true);
+      
+      try {
+        const localData = await chrome.storage.local.get(null);
+        setElementText('localStorage', generateStorageTable(localData), true);
+      } catch (error) {
+        setElementText('localStorage', `<p class="error">Error loading local storage: ${error.message}</p>`, true);
+        console.error('Error loading local storage:', error);
+      }
+    }    async function forcePushToSync() {
+      setElementText('actionResult', 'Pushing settings to sync storage...', true);
+      
+      try {
+        // Get current settings from local storage
+        const localData = await chrome.storage.local.get(null);
+        
+        // Extract the syncable settings (deny lists, allow lists, mode)
+        const syncData = {
+          blacklist: Array.isArray(localData.blacklist) ? localData.blacklist : [],
+          whitelist: Array.isArray(localData.whitelist) ? localData.whitelist : [],
+          blacklistKeywords: Array.isArray(localData.blacklistKeywords) ? localData.blacklistKeywords : [],
+          whitelistKeywords: Array.isArray(localData.whitelistKeywords) ? localData.whitelistKeywords : [],
+          mode: localData.mode || 'denylist',
+          framesType: localData.framesType || ['main_frame']
+        };
+
+        // Verify we have data to sync and it's valid
+        console.log('Preparing to sync data:', {
+          blacklistCount: syncData.blacklist.length,
+          whitelistCount: syncData.whitelist.length
+        });
+        
+        if (syncData.blacklist.length === 0 && syncData.whitelist.length === 0) {
+          // Show warning if both lists are empty
+          if (!confirm("Both deny list and allow list are empty. Are you sure you want to push empty lists to sync storage? This could overwrite existing rules on other devices.")) {
+            setElementText('actionResult', 'Push to sync canceled - empty lists would overwrite cloud data.', true);
+            return;
+          }
+        }
+        
+        // Push to sync storage
+        await chrome.storage.sync.set(syncData);
+        
+        // Verify the push worked
+        const verifyData = await chrome.storage.sync.get(null);
+        
+        // Count how many items were synced
+        const itemCount = syncData.blacklist.length + syncData.whitelist.length + 
+                          syncData.blacklistKeywords.length + syncData.whitelistKeywords.length;
+        
+        setElementText('actionResult', `<p class="success">Successfully pushed ${itemCount} items to sync storage!</p>`, true);
+        
+        // Reload storage displays
+        loadSyncStorage();
+        checkSyncStatus();
+        
+        // Notify service worker to pick up changes
+        chrome.runtime.sendMessage({ message: 'updateRules' });
+      } catch (error) {
+        setElementText('actionResult', `<p class="error">Error pushing to sync: ${error.message}</p>`, true);
+        console.error('Error pushing to sync:', error);
+      }
+    }
+
+    async function forcePullFromSync() {
+      setElementText('actionResult', 'Pulling settings from sync storage...', true);
+      
+      try {
+        // Get current settings from sync storage
+        const syncData = await chrome.storage.sync.get(null);
+        
+        if (!syncData || Object.keys(syncData).length === 0) {
+          setElementText('actionResult', `<p class="warning">No data found in sync storage to pull.</p>`, true);
+          return;
+        }
+        
+        // Extract the relevant settings
+        const pullData = {
+          blacklist: syncData.blacklist || [],
+          whitelist: syncData.whitelist || [],
+          blacklistKeywords: syncData.blacklistKeywords || [],
+          whitelistKeywords: syncData.whitelistKeywords || [],
+          mode: syncData.mode || 'denylist',
+          framesType: syncData.framesType || ['main_frame']
+        };
+        
+        // Save to local storage
+        await chrome.storage.local.set(pullData);
+        
+        // Count how many items were pulled
+        const itemCount = pullData.blacklist.length + pullData.whitelist.length + 
+                          pullData.blacklistKeywords.length + pullData.whitelistKeywords.length;
+        
+        setElementText('actionResult', `<p class="success">Successfully pulled ${itemCount} items from sync storage!</p>`, true);
+        
+        // Reload storage displays
+        loadLocalStorage();
+        checkSyncStatus();
+        
+        // Notify service worker to pick up changes
+        chrome.runtime.sendMessage({ message: 'updateRules' });
+      } catch (error) {
+        setElementText('actionResult', `<p class="error">Error pulling from sync: ${error.message}</p>`, true);
+        console.error('Error pulling from sync:', error);
+      }
+    }
+
+    async function clearSyncCache() {
+      if (!confirm('Are you sure you want to clear the sync cache? This will remove all synced settings.')) {
+        return;
+      }
+      
+      setElementText('actionResult', 'Clearing sync cache...', true);
+      
+      try {
+        await chrome.storage.sync.clear();
+        setElementText('actionResult', `<p class="success">Sync cache cleared successfully!</p>`, true);
+        
+        // Reload storage displays
+        loadSyncStorage();
+        checkSyncStatus();
+      } catch (error) {
+        setElementText('actionResult', `<p class="error">Error clearing sync cache: ${error.message}</p>`, true);
+        console.error('Error clearing sync cache:', error);
+      }
+    }
+
+    async function reloadExtension() {
+      setElementText('actionResult', 'Reloading extension...', true);
+      
+      try {
+        chrome.runtime.reload();
+        setElementText('actionResult', `<p class="success">Extension reload requested. Please wait a moment...</p>`, true);
+        
+        // Wait a bit then refresh all data
+        setTimeout(() => {
+          checkSyncStatus();
+          loadSyncStorage();
+          loadLocalStorage();
+        }, 2000);
+      } catch (error) {
+        setElementText('actionResult', `<p class="error">Error reloading extension: ${error.message}</p>`, true);
+        console.error('Error reloading extension:', error);
+      }
+    }
+
+    async function exportData(storageArea) {
+      try {
+        const data = await chrome[storageArea].get(null);
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `dmn-${storageArea}-storage-${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error(`Error exporting ${storageArea} data:`, error);
+        alert(`Error exporting data: ${error.message}`);
+      }
+    }
+
+    async function runSyncTest() {
+      setElementText('testResult', 'Running sync test...', true);
+      
+      try {
+        // Load and execute the test script
+        const response = await fetch(chrome.runtime.getURL('test-sync-rules.js'));
+        const script = await response.text();
+        
+        // Replace the console logging with our custom logging
+        const modifiedScript = script.replace(/console\.log\(/g, 'logToResult(');
+        
+        // Create a logging function to capture output
+        window.logResult = [];
+        window.logToResult = function(message) {
+          window.logResult.push(message);
+          setElementText('testResult', window.logResult.join('<br>'), true);
+          console.log(message);
+        };
+        
+        // Run the script
+        eval(modifiedScript);
+      } catch (error) {
+        setElementText('testResult', `<p class="error">Error running sync test: ${error.message}</p>`, true);
+        console.error('Error running sync test:', error);
+      }
+    }
+
+    async function addTestItem() {
+      try {
+        // Get current blacklist
+        const result = await chrome.storage.sync.get('blacklist');
+        const currentList = result.blacklist || [];
+        
+        // Create a test item with timestamp to ensure uniqueness
+        const testItem = 'test-site-' + Date.now() + '.example.com';
+        
+        // Add it to the list
+        const newList = [...currentList, testItem];
+        
+        // Save to sync storage
+        await chrome.storage.sync.set({ blacklist: newList });
+        
+        setElementText('testResult', `<p class="success">Added test item "${testItem}" to deny list in sync storage.</p>`, true);
+        
+        // Refresh the displays
+        loadSyncStorage();
+        checkSyncStatus();
+      } catch (error) {
+        setElementText('testResult', `<p class="error">Error adding test item: ${error.message}</p>`, true);
+        console.error('Error adding test item:', error);
+      }
+    }
+
+    // Event listeners
+    document.getElementById('checkSyncBtn').addEventListener('click', checkSyncStatus);
+    document.getElementById('refreshSyncBtn').addEventListener('click', loadSyncStorage);
+    document.getElementById('refreshLocalBtn').addEventListener('click', loadLocalStorage);
+    document.getElementById('forceSyncBtn').addEventListener('click', forcePushToSync);
+    document.getElementById('forceLocalBtn').addEventListener('click', forcePullFromSync);
+    document.getElementById('clearSyncCacheBtn').addEventListener('click', clearSyncCache);
+    document.getElementById('reloadExtensionBtn').addEventListener('click', reloadExtension);
+    document.getElementById('runSyncTestBtn').addEventListener('click', runSyncTest);
+    document.getElementById('addTestItemBtn').addEventListener('click', addTestItem);
+    document.getElementById('exportSyncBtn').addEventListener('click', () => exportData('storage.sync'));
+    document.getElementById('exportLocalBtn').addEventListener('click', () => exportData('storage.local'));
+
+    // Initialize the page
+    window.addEventListener('load', () => {
+      // Add global error handler to catch and display any errors
+      window.onerror = function(message, source, lineno, colno, error) {
+        console.error('Error in sync diagnostics:', message, error);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'card';
+        errorDiv.innerHTML = `
+          <h2 class="error">Error Detected</h2>
+          <p>An error occurred while loading the diagnostics page:</p>
+          <pre>${message}\nAt: ${source}:${lineno}:${colno}\n${error ? error.stack : ''}</pre>
+          <p>Check the browser console for more details (F12 > Console tab).</p>
+        `;
+        document.body.prepend(errorDiv);
+        return false;
+      };
+      
+      // Add try-catch blocks around each main function
+      try {
+        checkSyncStatus().catch(error => {
+          console.error('Error in checkSyncStatus:', error);
+          setElementText('syncStatus', `<p class="error">Error checking sync status: ${error.message}<br>Stack: ${error.stack}</p>`, true);
+        });
+      } catch (error) {
+        console.error('Error calling checkSyncStatus:', error);
+        setElementText('syncStatus', `<p class="error">Failed to call checkSyncStatus: ${error.message}</p>`, true);
+      }
+      
+      try {
+        loadSyncStorage().catch(error => {
+          console.error('Error in loadSyncStorage:', error);
+          setElementText('syncStorage', `<p class="error">Error loading sync storage: ${error.message}<br>Stack: ${error.stack}</p>`, true);
+        });
+      } catch (error) {
+        console.error('Error calling loadSyncStorage:', error);
+        setElementText('syncStorage', `<p class="error">Failed to call loadSyncStorage: ${error.message}</p>`, true);
+      }
+      
+      try {
+        loadLocalStorage().catch(error => {
+          console.error('Error in loadLocalStorage:', error);
+          setElementText('localStorage', `<p class="error">Error loading local storage: ${error.message}<br>Stack: ${error.stack}</p>`, true);
+        });
+      } catch (error) {
+        console.error('Error calling loadLocalStorage:', error);
+        setElementText('localStorage', `<p class="error">Failed to call loadLocalStorage: ${error.message}</p>`, true);
+      }
+    });
+  </script>
+</body>
+</html>
