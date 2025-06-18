@@ -94,16 +94,15 @@ export class Settings extends Component {
       { label: translate('miscellaneous'), id: 'misc' },
       { label: translate('diagnose'), id: 'diagnose' },
       { label: translate('about'), id: 'about' },
-    ];
-    // prettier-ignore
+    ];    // prettier-ignore
     const blacklistTabs = [
-      { label: translate('urls'), id: 'urls', getCount: () => this.state.options.blacklist.length },
-      { label: translate('keywords'), id: 'keywords', getCount: () => this.state.options.blacklistKeywords.length },
+      { label: translate('urls'), id: 'urls', getCount: () => this.state.options.blacklist?.length || 0 },
+      { label: translate('keywords'), id: 'keywords', getCount: () => this.state.options.blacklistKeywords?.length || 0 },
     ];
     // prettier-ignore
     const whitelistTabs = [
-      { label: translate('urls'), id: 'urls', getCount: () => this.state.options.whitelist.length },
-      { label: translate('keywords'), id: 'keywords', getCount: () => this.state.options.whitelistKeywords.length },
+      { label: translate('urls'), id: 'urls', getCount: () => this.state.options.whitelist?.length || 0 },
+      { label: translate('keywords'), id: 'keywords', getCount: () => this.state.options.whitelistKeywords?.length || 0 },
     ];
     this.state = {
       tabs,
@@ -279,16 +278,14 @@ export class Settings extends Component {
         },
         redirectToUrl: {
           url: items.redirectUrl,
-        },
-        schedule: {
+        },        schedule: {
           // merge both state & storage values
           ...this.state.options.schedule,
-          ...(!items.schedule.time ? items.schedule : {}), // omit old schedule settings in version <= 2.3.0
-        },
-        password: {
+          ...(!items.schedule?.time ? items.schedule || {} : {}), // omit old schedule settings in version <= 2.3.0
+        },        password: {
           ...this.state.options.password,
-          ...items.password,
-          isSet: !!(items.password.hash && items.password.hash.length),
+          ...(items.password || {}),
+          isSet: !!(items.password?.hash && items.password.hash.length),
         },
         timer: {
           ...this.state.options.timer,
@@ -805,11 +802,10 @@ export class Settings extends Component {
         onChange={this.changeMode}
         marginBottom={16}
         showTooltips
-      />
-      <SelectField
+      />      <SelectField
         label={translate('framesType')}
         tooltip={translate('framesTypeDescription')}
-        value={this.state.options.framesType.join(',')}
+        value={this.state.options.framesType?.join(',') || ''}
         onChange={(event) => this.setOptions('framesType', event.target.value.split(','))}
         disabled={!this.state.options.isEnabled}
         marginBottom={16}

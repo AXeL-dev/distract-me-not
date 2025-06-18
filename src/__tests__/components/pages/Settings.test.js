@@ -9,9 +9,8 @@ it('renders all tabs', () => {
   const unblocking = screen.getByRole('tab', {
     name: /^unblocking/i,
   });
-  const schedule = screen.getByRole('tab', { name: /^schedule/i });
-  const blacklist = screen.getByRole('tab', { name: /^blacklist/i });
-  const whitelist = screen.getByRole('tab', { name: /^whitelist/i });
+  const schedule = screen.getByRole('tab', { name: /^schedule/i });  const denyList = screen.getByRole('tab', { name: /^denyList/i });
+  const allowList = screen.getByRole('tab', { name: /^allowList/i });
   const password = screen.getByRole('tab', { name: /^password/i });
   const timer = screen.getByRole('tab', { name: /^timer/i });
   const logs = screen.getByRole('tab', { name: /^logs/i });
@@ -21,9 +20,8 @@ it('renders all tabs', () => {
   const about = screen.getByRole('tab', { name: /^about/i });
   expect(blocking).toBeInTheDocument();
   expect(unblocking).toBeInTheDocument();
-  expect(schedule).toBeInTheDocument();
-  expect(blacklist).toBeInTheDocument();
-  expect(whitelist).toBeInTheDocument();
+  expect(schedule).toBeInTheDocument();  expect(denyList).toBeInTheDocument();
+  expect(allowList).toBeInTheDocument();
   expect(password).toBeInTheDocument();
   expect(timer).toBeInTheDocument();
   expect(logs).toBeInTheDocument();

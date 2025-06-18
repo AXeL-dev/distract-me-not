@@ -19,25 +19,25 @@ exports[`renders correctly 1`] = `
         class="ub-dspl_block ub-w_36px ub-pst_relative ub-box-szg_border-box"
       >
         <input
-          class="css-1yog12j ub-b-btm_0 ub-b-lft_0 ub-b-rgt_0 ub-b-top_0 ub-h_1px ub-ovflw-x_hidden ub-ovflw-y_hidden ub-pb_0 ub-pl_0 ub-pr_0 ub-pt_0 ub-pst_absolute ub-wht-spc_nowrap ub-w_1px ub-opct_0 ub-box-szg_border-box"
+          class="css-mo4r8n ub-b-btm_0 ub-b-lft_0 ub-b-rgt_0 ub-b-top_0 ub-h_1px ub-ovflw-x_hidden ub-ovflw-y_hidden ub-pb_0 ub-pl_0 ub-pr_0 ub-pt_0 ub-pst_absolute ub-wht-spc_nowrap ub-w_1px ub-opct_0 ub-dspl_none_1uptbf1 ub-tstn_w7alrr_12xuja4 ub-box-szg_border-box"
           type="checkbox"
         />
         <div
           class="ub-h_18px ub-w_36px ub-bblr_9999px ub-bbrr_9999px ub-btlr_9999px ub-btrr_9999px ub-crsr_pointer ub-box-szg_border-box"
         >
           <div
-            class="css-17bhmw6 ub-h_18px ub-w_18px ub-box-szg_border-box"
+            class="ub-h_18px ub-w_18px ub-tstn_1vwg5w8 ub-opct_0 ub-dspl_flex ub-pst_absolute ub-algn-itms_center ub-just-cnt_center ub-pl_4px ub-opct_1_k1hleg ub-tfrm_1wswx72_k1hleg ub-tstn_1vwg5w8_1rtmt35 ub-tfrm_55bmml_1rtmt35 ub-tfrm_1wswx72_1hhbem1 ub-box-szg_border-box"
             data-checked="false"
           />
           <div
-            class="css-1rprxtl ub-w_36px ub-dspl_flex ub-box-szg_border-box"
+            class="ub-w_36px ub-dspl_flex ub-tstn_fu9rwe ub-tfrm_108fc02 ub-tfrm_35ck99_k1hleg ub-box-szg_border-box"
             data-checked="false"
           >
             <div
               class="ub-flx_1 ub-pb_2px ub-pl_2px ub-pr_2px ub-pt_2px ub-box-szg_border-box"
             >
               <div
-                class="css-13qcn8a ub-w_14px ub-h_14px ub-box-szg_border-box"
+                class="ub-w_14px ub-h_14px ub-bg-clr_fff ub-bblr_9999px ub-bbrr_9999px ub-btlr_9999px ub-btrr_9999px ub-box-szg_border-box"
               />
             </div>
           </div>
