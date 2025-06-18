@@ -13,7 +13,7 @@ Distract Me Not is a lightweight website blocker with a user friendly interface.
 ## Features
 
 - Prevent access to a range of websites.
-- Whitelist & blacklist mode.
+- Allow & deny list modes (previously whitelist & blacklist).
 - Custom page redirection.
 - Display your custom message on blocked pages.
 - Immediate closing of blocked tabs.
@@ -22,6 +22,49 @@ Distract Me Not is a lightweight website blocker with a user friendly interface.
 - Export/Import websites lists.
 - Protect your settings with a password.
 - Unblock websites using a password.
+
+## Recent Changes (v3.0.0) - **MAJOR SYNC FIX**
+
+1. **FIXED critical sync storage data loss bug:**
+   - **Root cause**: UI import/save operations bypassed service worker protections and directly overwrote sync storage
+   - **Fresh install protection**: Extension now detects fresh installs and prevents sync storage overwrites for 5 minutes after install
+   - **Service worker initialization**: Enhanced to skip sync reads during fresh installs, allowing sync checks to run first
+   - **UI import protection**: Modified `syncStorage.set()` helper to detect fresh installs and prevent writing empty lists to sync storage
+   - **Install time tracking**: Added install timestamp tracking for accurate fresh install detection
+   - **Multi-layered protection**: Both service worker message handlers AND UI save operations now protect against sync data loss
+   - **Aggressive sync checking**: Up to 6 attempts over 60 seconds to retrieve existing cloud data before allowing any writes
+
+2. **Sync reliability improvements:**
+   - Enhanced error handling for all sync storage operations
+   - Better logging and diagnostics for troubleshooting sync issues
+   - Robust fallback to local storage when sync operations fail
+   - Fixed multiple instances of incorrect `chrome.storage.sync.get()` usage
+
+2. **Enhanced cross-device sync reliability:**
+   - Improved sync data detection on fresh installs
+   - Added robust error handling for sync storage operations
+   - Fixed sync status checking to prevent data corruption
+
+3. **Service worker stability improvements:**
+   - Resolved storage access patterns that caused initialization failures
+   - Enhanced pattern matching with detailed blocking reasons
+   - Improved error handling and fallback mechanisms
+
+## Previous Changes (v2.9.4)
+
+1. Updated terminology to more inclusive language:
+   - Changed "blacklist" to "deny list"
+   - Changed "whitelist" to "allow list"
+   - Maintained backward compatibility for existing users
+
+2. Fixed the blocking page display:
+   - Removed debug yellow banner
+   - Ensured the block page always shows the black custom message
+   - Fixed blocked link display based on user settings
+
+3. Fixed URL pattern matching:
+   - Ensured wildcardToRegExp function is properly defined in service worker
+   - Improved domain matching for better URL filtering
 
 ## Installation
 

@@ -29,6 +29,30 @@ const shouldUseLocalStorage = (key) => {
          localOnlySettings.some(localKey => key.startsWith(`${localKey}.`));
 };
 
+// Helper to check if this is likely a fresh install
+const checkIfFreshInstall = async () => {
+  try {
+    // Get the current blacklist and whitelist from local storage
+    const data = await chrome.storage.local.get(['blacklist', 'whitelist', 'blacklistKeywords', 'whitelistKeywords']);
+    
+    // If all lists are empty or don't exist, this might be a fresh install
+    const hasNoRules = 
+      (!data.blacklist || data.blacklist.length === 0) &&
+      (!data.whitelist || data.whitelist.length === 0) &&
+      (!data.blacklistKeywords || data.blacklistKeywords.length === 0) &&
+      (!data.whitelistKeywords || data.whitelistKeywords.length === 0);
+    
+    // Also check if this was recently installed (within last 5 minutes)
+    const installTime = await chrome.storage.local.get(['installTime']);
+    const isRecentInstall = installTime.installTime && (Date.now() - installTime.installTime) < 5 * 60 * 1000;
+    
+    return hasNoRules && isRecentInstall;
+  } catch (error) {
+    debug.error('Error checking fresh install state:', error);
+    return false; // Assume not fresh install on error
+  }
+};
+
 export const syncStorage = {
   /**
    * Get settings from storage, selecting sync or local as appropriate
@@ -78,8 +102,7 @@ export const syncStorage = {
     
     return results;
   },
-  
-  /**
+    /**
    * Save settings to storage, selecting sync or local as appropriate
    */
   async set(items) {
@@ -94,13 +117,32 @@ export const syncStorage = {
         syncItems[key] = items[key];
       }
     });
+
+    // Check if this might be a fresh install to avoid overwriting cloud data
+    const isLikelyFreshInstall = await checkIfFreshInstall();
     
     let syncSuccess = true;
     let localSuccess = true;
-    
+
     // Save sync items if any
     if (Object.keys(syncItems).length > 0) {
       try {
+        // For fresh installs, avoid writing empty lists to sync storage
+        if (isLikelyFreshInstall) {
+          const hasEmptyLists = (
+            (syncItems.blacklist && Array.isArray(syncItems.blacklist) && syncItems.blacklist.length === 0) ||
+            (syncItems.whitelist && Array.isArray(syncItems.whitelist) && syncItems.whitelist.length === 0)
+          );
+          
+          if (hasEmptyLists) {
+            logInfo('Fresh install detected - skipping sync storage write for empty lists to avoid overwriting cloud data');
+            // Save to local storage instead
+            await chrome.storage.local.set(syncItems);
+            logInfo('Saved to local storage instead during fresh install');
+            return true;
+          }
+        }
+        
         logInfo('Setting to sync storage:', Object.keys(syncItems));
         await chrome.storage.sync.set(syncItems);
         logInfo('Successfully saved to sync storage');

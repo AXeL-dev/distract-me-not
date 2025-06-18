@@ -249,6 +249,25 @@ async function forcePullFromSyncStorage() {
 async function init() {
   try {
     logInfo('Initializing service worker...');
+    
+    // If this is a fresh install, don't load from sync storage yet - let the sync check handle it
+    if (isInitialInstall) {
+      logInfo('Fresh install detected in init() - skipping sync storage read to avoid overwriting cloud data');
+      
+      // Use defaults for now - the sync check will update these if cloud data exists
+      blacklist = [];
+      whitelist = [];
+      blacklistKeywords = [];
+      whitelistKeywords = [];
+      mode = defaultMode;
+      framesType = defaultFramesType;
+      
+      logInfo('Using defaults during fresh install, sync check will load cloud data if available');
+      setupBlockingRules();
+      logInfo('Service worker initialization complete (fresh install mode)');
+      return;
+    }
+    
       // Try to get synced settings first
     try {
       // Define the default values for sync settings 
@@ -271,8 +290,7 @@ async function init() {
         self.syncDebug.log('Initializing service worker: Attempting to read from sync storage', {
           keys: syncSettings
         });
-      }
-      // Get the actual stored data using callback pattern (more reliable than async/await)
+      }      // Get the actual stored data using callback pattern (more reliable than async/await)
       logInfo('Reading from sync storage...');
       const items = await new Promise((resolve, reject) => {
         chrome.storage.sync.get(syncSettings, (result) => {
@@ -1976,6 +1994,11 @@ chrome.runtime.onInstalled.addListener(details => {
   // Set the initial install flag
   isInitialInstall = details.reason === 'install';
   
+  // Store install time for fresh install detection
+  if (details.reason === 'install') {
+    chrome.storage.local.set({ installTime: Date.now() });
+  }
+  
   // Log the reason and extension ID
   logInfo(`Extension ${details.reason}: ID=${chrome.runtime.id}, initial install=${isInitialInstall}`);
   
@@ -1995,16 +2018,23 @@ chrome.runtime.onInstalled.addListener(details => {
       
       // Create a sync check function that's more aggressive
       const checkSyncStorage = async (attempt = 1) => {
-        try {
-          logInfo(`Sync check attempt #${attempt} - Reading sync storage directly`);
+        try {          logInfo(`Sync check attempt #${attempt} - Reading sync storage directly`);
           
-          // Get all sync data
-          const syncData = await chrome.storage.sync.get({
-            blacklist: [],
-            whitelist: [],
-            blacklistKeywords: [],
-            whitelistKeywords: []
+          // Get all sync data using key names array (not defaults object)
+          const syncData = await new Promise((resolve, reject) => {
+            chrome.storage.sync.get(['blacklist', 'whitelist', 'blacklistKeywords', 'whitelistKeywords'], (result) => {
+              if (chrome.runtime.lastError) {
+                reject(new Error(chrome.runtime.lastError.message || 'Storage error'));
+              } else {
+                resolve(result || {});
+              }
+            });
           });
+          
+          // Ensure we have the data object before accessing properties
+          if (!syncData || typeof syncData !== 'object') {
+            throw new Error(`Sync storage returned invalid data: ${typeof syncData}`);
+          }
           
           // Count items
           const blacklistCount = Array.isArray(syncData.blacklist) ? syncData.blacklist.length : 0;
@@ -2109,15 +2139,24 @@ async function checkSyncStatus() {
   logInfo('Performing periodic sync check');
   
   try {
-    // Get current rules from sync storage
-    const syncData = await chrome.storage.sync.get({
-      blacklist: [],
-      whitelist: [],
-      blacklistKeywords: [],
-      whitelistKeywords: [],
-      mode: defaultMode
+    // Get current rules from sync storage using Promise-wrapped callback
+    const syncData = await new Promise((resolve, reject) => {
+      chrome.storage.sync.get(['blacklist', 'whitelist', 'blacklistKeywords', 'whitelistKeywords', 'mode'], (result) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message || 'Storage error'));
+        } else {
+          resolve(result || {});
+        }
+      });
     });
-      // Check if they differ from in-memory rules
+    
+    // Ensure we have valid data before accessing properties
+    if (!syncData || typeof syncData !== 'object') {
+      logError('Sync data is invalid:', syncData);
+      return;
+    }
+    
+    // Check if they differ from in-memory rules
     let needsUpdate = false;
     
     if (syncData.mode !== undefined && syncData.mode !== mode) {
@@ -2126,13 +2165,13 @@ async function checkSyncStatus() {
     }
     
     // Check if deny list length changed or contents changed
-    if (syncData.blacklist.length !== blacklist.length) {
+    const syncBlacklist = Array.isArray(syncData.blacklist) ? syncData.blacklist : [];
+    if (syncBlacklist.length !== blacklist.length) {
       logInfo('Deny list length changed in sync storage, updating');
       needsUpdate = true;
-    } else {
-      // Check if the contents are different
-      for (let i = 0; i < syncData.blacklist.length; i++) {
-        if (syncData.blacklist[i] !== blacklist[i]) {
+    } else {      // Check if the contents are different
+      for (let i = 0; i < syncBlacklist.length; i++) {
+        if (syncBlacklist[i] !== blacklist[i]) {
           logInfo('Deny list content changed in sync storage, updating');
           needsUpdate = true;
           break;
@@ -2141,7 +2180,8 @@ async function checkSyncStatus() {
     }
     
     // Similarly for allow list
-    if (!needsUpdate && syncData.whitelist.length !== whitelist.length) {
+    const syncWhitelist = Array.isArray(syncData.whitelist) ? syncData.whitelist : [];
+    if (!needsUpdate && syncWhitelist.length !== whitelist.length) {
       logInfo('Allow list length changed in sync storage, updating');
       needsUpdate = true;
     }
@@ -2151,11 +2191,13 @@ async function checkSyncStatus() {
       logInfo('Updating rules from sync storage');
       
       // Update in-memory values
-      blacklist = syncData.blacklist;
-      whitelist = syncData.whitelist;
-      blacklistKeywords = syncData.blacklistKeywords;
-      whitelistKeywords = syncData.whitelistKeywords;
-      mode = syncData.mode;
+      blacklist = syncBlacklist;
+      whitelist = syncWhitelist;
+      blacklistKeywords = Array.isArray(syncData.blacklistKeywords) ? syncData.blacklistKeywords : [];
+      whitelistKeywords = Array.isArray(syncData.whitelistKeywords) ? syncData.whitelistKeywords : [];
+      if (syncData.mode) {
+        mode = syncData.mode;
+      }
       
       // Update rules
       setupBlockingRules();

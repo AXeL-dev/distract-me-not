@@ -5,10 +5,9 @@
     "gecko": {
       "id": "{5f884915-160e-4276-a216-770a753a3abe}",
       "strict_min_version": "58.0"
-    }
-  },
+    }  },
   "name": "__MSG_appName__",
-  "version": "2.9.4",
+  "version": "3.0.0",
 
   "default_locale": "en",
   "description": "__MSG_appDesc__",
