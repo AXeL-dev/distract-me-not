@@ -9,6 +9,11 @@
 
 const syncDebugEnabled = true;
 
+// Ensure isInitialInstall variable exists globally to avoid reference errors
+if (typeof global.isInitialInstall === 'undefined') {
+  global.isInitialInstall = false; // Default value
+}
+
 // External interface for sync logging
 global.syncDebug = {
   log: function(message, data) {

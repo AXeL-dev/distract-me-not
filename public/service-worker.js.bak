@@ -13,12 +13,6 @@
 // Import pattern matcher first
 importScripts('service-worker-patterns.js');
 
-// Verify the pattern matcher functions are available
-console.log('Verifying pattern matcher functions:');
-console.log('- wildcardToRegExp available:', typeof wildcardToRegExp === 'function');
-console.log('- matchesPattern available:', typeof matchesPattern === 'function');
-console.log('- self.matchesPattern available:', typeof self.matchesPattern === 'function');
-
 // Import sync logging utility - this comment will be removed in Chrome builds
 // @ts-ignore
 importScripts('service-worker-sync-logging.js');
@@ -79,10 +73,6 @@ const MAX_RULES = 5000; // Chrome has a limit of 5000 dynamic rules
 const BASE_RULE_ID = 1000; // Starting rule ID
 let currentRules = [];
 
-// Storage keys configuration
-const syncSettings = ['blacklist', 'whitelist', 'blacklistKeywords', 'whitelistKeywords', 'mode', 'framesType', 'message', 'redirectUrl', 'schedule'];
-const localSettings = ['isEnabled', 'enableLogs', 'timer'];
-
 // Enhanced logging functionality
 function logInfo(message, data) {
   console.log(`[DMN INFO] ${message}`, data || '');
@@ -114,7 +104,12 @@ if (typeof checkAllTabs !== 'function') {
   }
 }
 
-// Enhanced initialization that checks all tabs - function defined later in file
+// Enhanced initialization that checks all tabs
+async function init() {
+  // isInitialInstall is defined globally - no need to redefine it here
+  // We'll get the value from chrome.runtime.onInstalled handler
+  logInfo(`Starting initialization. Is initial install: ${isInitialInstall}`);
+}
 
 // Helper to check if rules seem to have come from default initialization
 function isLikelyFreshInstall() {
@@ -247,42 +242,86 @@ async function forcePullFromSyncStorage() {
 async function init() {
   try {
     logInfo('Initializing service worker...');
+    // Settings that should sync between devices
+    // Use "blacklist"/"whitelist" for backwards compatibility,
+    // but refer to them in the UI/logs as deny list/allow list
+    const syncSettings = {
+      blacklist: [], // deny list
+      whitelist: [], // allow list
+      blacklistKeywords: [], // deny list keywords
+      whitelistKeywords: [], // allow list keywords
+      mode: mode,
+      framesType: defaultFramesType,
+      message: '', 
+      redirectUrl: '',
+      schedule: { isEnabled: false, days: {} }
+    };
+    
+    // Settings that should remain local to this device
+    const localSettings = {
+      isEnabled: isEnabled,
+      password: {},
+      timer: defaultTimerSettings,
+      enableLogs: false,
+      logsLength: 100
+    };
     
     // Try to get synced settings first
     try {
       // Log that we're attempting to read from sync storage
       if (typeof self.syncDebug !== 'undefined') {
         self.syncDebug.log('Initializing service worker: Attempting to read from sync storage', {
-          keys: syncSettings
-        });      }
-        // Get the actual stored data using callback pattern (more reliable than async/await)
-      logInfo('Reading from sync storage...');
-      const items = await new Promise((resolve, reject) => {
-        chrome.storage.sync.get(syncSettings, (result) => {
-          if (chrome.runtime.lastError) {
-            reject(new Error(chrome.runtime.lastError.message || 'Storage error'));
-          } else {
-            resolve(result || {});
-          }
+          keys: Object.keys(syncSettings)
         });
-      });
-      
-      // Check if storage read was successful
-      if (!items || typeof items !== 'object') {
-        throw new Error('Storage read returned null/undefined or invalid type');
       }
       
-      logInfo('Raw sync storage result:', {
-        blacklistExists: 'blacklist' in items,
-        whitelistExists: 'whitelist' in items,
-        blacklistLength: items.blacklist?.length || 0,
-        whitelistLength: items.whitelist?.length || 0,
-        blacklistType: typeof items.blacklist,
-        whitelistType: typeof items.whitelist,
-        allKeys: Object.keys(items)
-      });
+      // Ensure syncSettings has default values for all keys
+      const fullSyncSettings = {
+        blacklist: [],
+        whitelist: [],
+        blacklistKeywords: [],
+        whitelistKeywords: [],
+        mode: defaultMode,
+        framesType: defaultFramesType,
+        message: '', 
+        redirectUrl: '',
+        schedule: { isEnabled: false, days: {} },
+        ...syncSettings // Merge with any provided settings
+      };
       
-      // Log the retrieved settings for debugging
+      // IMPORTANT: NEVER WRITE TO SYNC DURING INITIAL INSTALLATION
+      // Just read from sync, never write during init on a fresh install
+      let items = await chrome.storage.sync.get(fullSyncSettings);
+      
+      // Create a safe result object with defaults for all expected values
+      const safeItems = {
+        // Default values
+        blacklist: [], // deny list
+        whitelist: [], // allow list  
+        blacklistKeywords: [], // deny list keywords
+        whitelistKeywords: [], // allow list keywords
+        mode: defaultMode,
+        framesType: defaultFramesType,
+        message: '',
+        redirectUrl: '',
+        schedule: { isEnabled: false, days: {} },
+        
+        // Override with any valid values from items
+        ...items
+      };
+      
+      // Ensure we have valid arrays for lists
+      safeItems.blacklist = Array.isArray(safeItems.blacklist) ? safeItems.blacklist : [];
+      safeItems.whitelist = Array.isArray(safeItems.whitelist) ? safeItems.whitelist : [];
+      safeItems.blacklistKeywords = Array.isArray(safeItems.blacklistKeywords) ? safeItems.blacklistKeywords : [];
+      safeItems.whitelistKeywords = Array.isArray(safeItems.whitelistKeywords) ? safeItems.whitelistKeywords : [];
+      
+      // Replace items with our safe object
+      items = safeItems;
+      
+      logInfo('Successfully retrieved sync settings', items);
+      
+      // Log the retrieved settings
       if (typeof self.syncDebug !== 'undefined') {
         self.syncDebug.log('Successfully loaded settings from sync storage', {
           keys: items ? Object.keys(items) : [],
@@ -292,34 +331,15 @@ async function init() {
           allowListKeywordsCount: items.whitelistKeywords ? items.whitelistKeywords.length : 0
         });
       }
-      
-      // Directly assign values with proper validation and fallbacks
-      blacklist = Array.isArray(items.blacklist) ? items.blacklist : [];
-      whitelist = Array.isArray(items.whitelist) ? items.whitelist : [];
-      blacklistKeywords = Array.isArray(items.blacklistKeywords) ? items.blacklistKeywords : [];
-      whitelistKeywords = Array.isArray(items.whitelistKeywords) ? items.whitelistKeywords : [];
+        // Update local state with synced values
+      blacklist = items.blacklist || [];
+      whitelist = items.whitelist || [];
+      blacklistKeywords = items.blacklistKeywords || [];
+      whitelistKeywords = items.whitelistKeywords || [];
       mode = items.mode || defaultMode;
-      framesType = Array.isArray(items.framesType) ? items.framesType : defaultFramesType;
-      
-      // Log assignment results
-      logInfo('Assignment results:', {
-        blacklistCount: blacklist.length,
-        whitelistCount: whitelist.length,
-        blacklistKeywordsCount: blacklistKeywords.length,
-        whitelistKeywordsCount: whitelistKeywords.length,
-        mode: mode
-      });
-      
-      // Log some information about the deny list
+      framesType = items.framesType || defaultFramesType;
+        // Log some information about the deny list
       logInfo(`Loaded deny list with ${blacklist.length} entries.`);
-      
-      // Show sample data for debugging
-      if (blacklist.length > 0) {
-        logInfo('Sample blacklist items:', blacklist.slice(0, 3));
-      }
-      if (whitelist.length > 0) {
-        logInfo('Sample whitelist items:', whitelist.slice(0, 3));
-      }
       
       // IMPORTANT: For a fresh install, ALWAYS save sync data to local storage
       // This ensures we have rules locally even if writing to sync fails later
@@ -347,47 +367,24 @@ async function init() {
           self.syncDebug.log('Falling back to local storage for sync settings');
         }
         
-        const localItems = await new Promise((resolve, reject) => {
-          chrome.storage.local.get(syncSettings, (result) => {
-            if (chrome.runtime.lastError) {
-              reject(new Error(chrome.runtime.lastError.message || 'Local storage error'));
-            } else {
-              resolve(result || {});
-            }
-          });
-        });
+        const localItems = await chrome.storage.local.get(syncSettings);
         logInfo('Retrieved sync settings from local storage fallback', localItems);
         
         // Update state with local fallback values
-        blacklist = Array.isArray(localItems.blacklist) ? localItems.blacklist : [];
-        whitelist = Array.isArray(localItems.whitelist) ? localItems.whitelist : [];
-        blacklistKeywords = Array.isArray(localItems.blacklistKeywords) ? localItems.blacklistKeywords : [];
-        whitelistKeywords = Array.isArray(localItems.whitelistKeywords) ? localItems.whitelistKeywords : [];
+        blacklist = localItems.blacklist || [];
+        whitelist = localItems.whitelist || [];
+        blacklistKeywords = localItems.blacklistKeywords || [];
+        whitelistKeywords = localItems.whitelistKeywords || [];
         mode = localItems.mode || defaultMode;
-        framesType = Array.isArray(localItems.framesType) ? localItems.framesType : defaultFramesType;
+        framesType = localItems.framesType || defaultFramesType;
       } catch (localError) {
         logError('Error retrieving from local storage fallback, using defaults:', localError);
-        
-        // Use safe defaults if everything fails
-        blacklist = [];
-        whitelist = [];
-        blacklistKeywords = [];
-        whitelistKeywords = [];
-        mode = defaultMode;
-        framesType = defaultFramesType;
       }
     }
-      // Always get local settings from local storage
+    
+    // Always get local settings from local storage
     try {
-      const localItems = await new Promise((resolve, reject) => {
-        chrome.storage.local.get(localSettings, (result) => {
-          if (chrome.runtime.lastError) {
-            reject(new Error(chrome.runtime.lastError.message || 'Local settings storage error'));
-          } else {
-            resolve(result || {});
-          }
-        });
-      });
+      const localItems = await chrome.storage.local.get(localSettings);
       logInfo('Retrieved local settings', localItems);
       
       // Update local state
@@ -397,8 +394,7 @@ async function init() {
     } catch (error) {
       logError('Error retrieving local settings, using defaults:', error);
     }
-    
-    // Log details of blacklist and whitelist for debugging
+      // Log details of blacklist and whitelist for debugging
     logInfo('Blacklist items:', blacklist.slice(0, 10)); // Show first 10 items
     logInfo('Blacklist keywords:', blacklistKeywords);
     
@@ -648,7 +644,7 @@ function handleUrl(url, tabId, source) {
     // Even if it's in cache, we need a reason. Let's re-check, but this might be inefficient.
     // A better approach might be to store the reason in the cache too.
     // For now, let's re-evaluate to get the reason.
-    const blockDetails = checkUrlShouldBeBlockedLocal(normalizedUrl);
+    const blockDetails = checkUrlShouldBeBlocked(normalizedUrl);
     redirectToBlockedPage(tabId, url, blockDetails.reason || "Cached block");
     return;
   }
@@ -658,18 +654,17 @@ function handleUrl(url, tabId, source) {
     logInfo(`Extension disabled, allowing URL: ${url} (source: ${source})`);
     return;
   }
-    // Check if URL should be blocked
-  const blockDetails = checkUrlShouldBeBlockedLocal(normalizedUrl);
   
-  if (blockDetails && blockDetails.blocked) {
-    const reason = blockDetails.reason || "Matched block rule";
-    logInfo(`BLOCKING URL: ${normalizedUrl} (source: ${source}), Reason: ${reason}`);
+  // Check if URL should be blocked
+  const blockDetails = checkUrlShouldBeBlocked(normalizedUrl);
+  
+  if (blockDetails.blocked) {
+    logInfo(`BLOCKING URL: ${normalizedUrl} (source: ${source}), Reason: ${blockDetails.reason}`);
     blockedUrls.add(url); // Cache original URL
     blockedUrls.add(normalizedUrl); // Cache normalized URL
-    redirectToBlockedPage(tabId, url, reason);
+    redirectToBlockedPage(tabId, url, blockDetails.reason);
   } else {
-    const reason = blockDetails && blockDetails.reason ? blockDetails.reason : "No matching block rules";
-    logInfo(`ALLOWING URL: ${normalizedUrl} (source: ${source}), Reason: ${reason}`);
+    logInfo(`ALLOWING URL: ${normalizedUrl} (source: ${source}), Reason: ${blockDetails.reason}`);
   }
 }
 
@@ -682,17 +677,17 @@ function navigationHandler(details) {
     if (!isEnabled) {
       logInfo('Extension disabled, allowing navigation (via navigationHandler)');
       return;
-    }    // Check if URL should be blocked
-    const blockDetails = checkUrlShouldBeBlockedLocal(details.url); // Returns { blocked, reason }
+    }
 
-    if (blockDetails && blockDetails.blocked) {
+    // Check if URL should be blocked
+    const blockDetails = checkUrlShouldBeBlocked(details.url); // Returns { blocked, reason }
+
+    if (blockDetails.blocked) { // Corrected condition to check blockDetails.blocked
       // Block the navigation by redirecting to the blocked page
-      const reason = blockDetails.reason || "Matched block rule";
-      logInfo(`BLOCKING navigation to: ${details.url}, Reason: ${reason} (via navigationHandler)`);
-      redirectToBlockedPage(details.tabId, details.url, reason); // Use redirectToBlockedPage to include reason
+      logInfo(`BLOCKING navigation to: ${details.url}, Reason: ${blockDetails.reason} (via navigationHandler)`);
+      redirectToBlockedPage(details.tabId, details.url, blockDetails.reason); // Use redirectToBlockedPage to include reason
     } else {
-      const reason = blockDetails && blockDetails.reason ? blockDetails.reason : "No matching block rules";
-      logInfo(`ALLOWING navigation to: ${details.url}, Reason: ${reason} (via navigationHandler)`);
+      logInfo(`ALLOWING navigation to: ${details.url}, Reason: ${blockDetails.reason} (via navigationHandler)`);
       // No action needed if not blocked
     }
   }
@@ -755,7 +750,7 @@ function normalizeUrl(url) {
   }
 }
 
-function checkUrlShouldBeBlockedLocal(url) {
+function checkUrlShouldBeBlocked(url) {
   // Always allow internal browser pages
   if (url.startsWith('edge://') || url.startsWith('chrome://')) {
     logInfo(`Allowing internal browser page: ${url}`);
@@ -769,29 +764,6 @@ function checkUrlShouldBeBlockedLocal(url) {
   
   logInfo(`Checking URL against rules: ${url}`);
   
-  // Use the new pattern matching logic from service-worker-patterns.js
-  if (self.checkUrlShouldBeBlocked && typeof self.checkUrlShouldBeBlocked === 'function') {
-    // Convert our internal blacklist/whitelist to the format expected by the new function
-    const allowPatterns = whitelist.map(site => typeof site === 'string' ? site : site.pattern || site.url).filter(Boolean);
-    const denyPatterns = blacklist.map(site => typeof site === 'string' ? site : site.pattern || site.url).filter(Boolean);
-    
-    logInfo(`Checking with ${denyPatterns.length} deny patterns and ${allowPatterns.length} allow patterns`);
-    logInfo(`Deny patterns: ${JSON.stringify(denyPatterns)}`);
-    logInfo(`Allow patterns: ${JSON.stringify(allowPatterns)}`);
-    
-    // Call the new pattern matching function
-    const shouldBlock = self.checkUrlShouldBeBlocked(url, allowPatterns, denyPatterns);
-    
-    if (shouldBlock) {
-      return { blocked: true, reason: "Matched deny pattern" };
-    } else {
-      return { blocked: false, reason: "No matching block rules or overridden by allow pattern" };
-    }
-  }
-  
-  // Fallback to old logic if new function not available
-  logWarning('New pattern matching function not available, using fallback logic');
-  
   // Parse URL for hostname and path matching (for logging purposes)
   let hostname = "";
   let parsedPath = "";
@@ -804,22 +776,30 @@ function checkUrlShouldBeBlockedLocal(url) {
     // Not a valid URL, continue with normal checks
     logInfo(`URL parsing failed, will use full URL: ${e.message}`);
   }
-
-  // STEP 1: Check if the URL is on the allow list using the imported pattern matching functions
-  // Find all allowlist patterns that match the URL
-  let matchedAllowPatterns = [];
+  
+  // STEP 1: Check for specific path patterns in allow list first (highest priority)
+  // First check if the URL is on the allow list using the imported pattern matching functions
+  let hasAllowMatch = false;
+  let allowPattern = '';
   
   for (const site of whitelist) {
     try {
       const pattern = typeof site === 'string' ? site : site.pattern || site.url;
       if (!pattern) continue;
       
-      // Explicitly use self.matchesPattern to ensure we're using the imported function
-      if (self.matchesPattern && typeof self.matchesPattern === 'function' 
-          ? self.matchesPattern(pattern, url)
-          : pattern.toLowerCase() === url.toLowerCase() || url.toLowerCase().includes(pattern.toLowerCase())) {
-        logInfo(`URL MATCHED allow list pattern: ${pattern}`);
-        matchedAllowPatterns.push(pattern);
+      // Use the imported matchesPattern function for all pattern matching
+      if (matchesPattern(pattern, url)) {
+        logInfo(`URL MATCHED allow list pattern: ${pattern} - allowing access`);
+        hasAllowMatch = true;
+        allowPattern = pattern;
+        
+        // For specific path patterns with wildcards or exact paths, return immediately
+        // as they take highest precedence
+        if (pattern.includes('/')) {
+          return { blocked: false, reason: `Allow List specific path: ${pattern}` };
+        }
+        
+        // Just store the domain-only match for later but don't return immediately
       }
     } catch (e) {
       logError('Error checking allowlist pattern:', e);
@@ -827,8 +807,8 @@ function checkUrlShouldBeBlockedLocal(url) {
   }
   
   // STEP 2: Check if the URL is on the deny list
-  // Find all deny patterns that match the URL
-  let matchedDenyPatterns = [];
+  // Only check deny patterns if no specific allow pattern matched
+  // or if we're in combined/denylist mode
   
   if (mode === 'blacklist' || mode === 'denylist' || mode === 'combined') {
     for (const site of blacklist) {
@@ -836,12 +816,16 @@ function checkUrlShouldBeBlockedLocal(url) {
         const pattern = typeof site === 'string' ? site : site.pattern || site.url;
         if (!pattern) continue;
         
-        // Explicitly use self.matchesPattern to ensure we're using the imported function
-        if (self.matchesPattern && typeof self.matchesPattern === 'function' 
-            ? self.matchesPattern(pattern, url)
-            : pattern.toLowerCase() === url.toLowerCase() || url.toLowerCase().includes(pattern.toLowerCase())) {
-          logInfo(`URL MATCHED deny list pattern: ${pattern}`);
-          matchedDenyPatterns.push(pattern);
+        // Use the imported matchesPattern function
+        if (matchesPattern(pattern, url)) {
+          // If there's an allow match, it might override this deny pattern
+          if (hasAllowMatch) {
+            logInfo(`URL matches deny pattern ${pattern}, but is overridden by allow pattern: ${allowPattern}`);
+            return { blocked: false, reason: `Allow List pattern: ${allowPattern} overrides deny list: ${pattern}` };
+          }
+          
+          logInfo(`URL MATCHED deny list pattern: ${pattern} - blocking access`);
+          return { blocked: true, reason: `Deny List pattern: ${pattern}` };
         }
       } catch (e) {
         logError('Error checking denylist pattern:', e);
@@ -859,189 +843,353 @@ function checkUrlShouldBeBlockedLocal(url) {
         
         if (normalizedUrl.includes(normalizedPattern) || 
             (hostname && hostname.includes(normalizedPattern))) {
-          logInfo(`URL MATCHED deny list keyword: ${pattern}`);
-          matchedDenyPatterns.push(pattern);
+          logInfo(`URL MATCHED deny list keyword: ${pattern} - blocking access`);
+          return { blocked: true, reason: `Deny List keyword: ${pattern}` };
         }
       } catch (e) {
-        logError('Error checking denylist keyword:', e);
+        logError('Error checking deny list keyword:', e);
       }
     }
   }
   
-  // STEP 3: Apply precedence rules for matched patterns
-  // If we have both allow and deny matches, determine which takes precedence
-    if (matchedAllowPatterns.length > 0 && matchedDenyPatterns.length > 0) {
-    logInfo(`URL matched both allowlist and denylist patterns - determining precedence`);
-      // Create a function to get the specificity score of a pattern
-    // Higher score means more specific pattern
-    function getPatternSpecificity(pattern, url) {
-      // Start with basic length - longer patterns are generally more specific
-      let score = pattern.length * 2;
-      
-      // Extract path from URL for comparison
-      let urlDomain = "";
-      let urlPath = "";
-      
-      try {
-        const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
-        urlDomain = urlObj.hostname;
-        urlPath = urlObj.pathname;
-      } catch (e) {
-        // If URL parsing fails, try to extract parts manually
-        const parts = url.split('/');
-        if (parts.length > 0) {
-          urlDomain = parts[0].replace(/^https?:\/\//, '');
-          urlPath = '/' + parts.slice(1).join('/');
-        }
-      }
-      
-      // Handle Reddit and similar sites with subreddit structures
-      // reddit.com/r/specific/* should get very high precedence over reddit.com or reddit.com/r/*
-      const isSubreddit = /\/r\/[^\/]+/.test(pattern);
-      const isGeneralSubreddit = pattern.endsWith('/r/*');
-      const isDomainOnly = !pattern.includes('/');
-      
-      // Extract the base domain and path parts from the pattern
-      let patternDomain = "";
-      let patternPath = "";
-      
-      if (pattern.includes('://')) {
-        const parts = pattern.split('/');
-        patternDomain = parts[2];
-        patternPath = '/' + parts.slice(3).join('/');
-      } else if (pattern.includes('/')) {
-        const parts = pattern.split('/');
-        patternDomain = parts[0];
-        patternPath = '/' + parts.slice(1).join('/');
-      } else {
-        patternDomain = pattern;
-      }
-      
-      // Check for explicit path matching with the URL
-      if (patternPath && urlPath) {
-        // Normalize paths for comparison
-        const normalizedPatternPath = patternPath.endsWith('/*') ? 
-          patternPath.substring(0, patternPath.length - 2) : patternPath;
-          
-        // If the pattern path appears exactly in the URL path, add a significant bonus
-        if (urlPath.startsWith(normalizedPatternPath)) {
-          // Direct path match - this should be highly prioritized
-          score += 2000;
-          
-          // More specific paths should get a higher score
-          const patternPathDepth = (normalizedPatternPath.match(/\//g) || []).length;
-          score += patternPathDepth * 200;
-        }
-      }
-      
-      if (isSubreddit && !isGeneralSubreddit) {
-        // Very high precedence for specific subreddit patterns
-        score += 1000;
-        
-        // Check if the URL is actually for this specific subreddit
-        const subredditMatch = pattern.match(/\/r\/([^\/]+)/);
-        if (subredditMatch && urlPath && urlPath.includes(`/r/${subredditMatch[1]}`)) {
-          score += 500; // Extra bonus for matching the current URL's subreddit
-        }
-      }
-      
-      // Path depth gives more specificity
-      const pathDepth = (pattern.match(/\//g) || []).length;
-      score += pathDepth * 100;
-      
-      // Domain-only patterns are less specific
-      if (isDomainOnly) {
-        score -= 200;
-      }
-      
-      // Patterns ending with wildcards are less specific
-      if (pattern.endsWith('/*')) {
-        score -= 50;
-      }
-      
-      // Patterns with subdomain wildcards (*.example.com) get a penalty unless they also have specific path
-      if (pattern.includes('*.') && !patternPath) {
-        score -= 150;
-      }
-      
-      // For patterns with both subdomain wildcards AND specific paths, adjust based on URL path match
-      if (pattern.includes('*.') && patternPath && urlPath) {
-        // Check if the pattern path is present in the URL path
-        const normalizedPatternPath = patternPath.replace(/\/\*$/, ''); // Remove trailing /* if present
-        
-        if (!urlPath.startsWith(normalizedPatternPath)) {
-          // If the URL path doesn't match the pattern path, heavily penalize this pattern
-          score -= 3000; // This should ensure it doesn't override more specific path matches
-        }
-      }
-      
-      logInfo(`Pattern: ${pattern}, Score: ${score}, Domain: ${patternDomain}, Path: ${patternPath}`);
-      
-      return score;
-    }
-    
-    // Get the most specific patterns based on our custom scoring
-    const sortedAllowPatterns = [...matchedAllowPatterns].sort((a, b) => 
-      getPatternSpecificity(b, url) - getPatternSpecificity(a, url)
-    );
-    const sortedDenyPatterns = [...matchedDenyPatterns].sort((a, b) => 
-      getPatternSpecificity(b, url) - getPatternSpecificity(a, url)
-    );
-    
-    const mostSpecificAllow = sortedAllowPatterns[0];
-    const mostSpecificDeny = sortedDenyPatterns[0];
-    
-    const allowScore = getPatternSpecificity(mostSpecificAllow, url);
-    const denyScore = getPatternSpecificity(mostSpecificDeny, url);
-    
-    logInfo(`Most specific allow pattern: ${mostSpecificAllow} (score: ${allowScore})`);
-    logInfo(`Most specific deny pattern: ${mostSpecificDeny} (score: ${denyScore})`);
-    
-    // Determine which pattern takes precedence
-    if (allowScore > denyScore) {
-      logInfo(`Allow pattern ${mostSpecificAllow} overrides deny pattern ${mostSpecificDeny} - allowing access`);
-      return { blocked: false, reason: `Allow List pattern: ${mostSpecificAllow} overrides deny list: ${mostSpecificDeny}` };
-    } else {
-      logInfo(`Deny pattern ${mostSpecificDeny} takes precedence over allow pattern ${mostSpecificAllow} - blocking access`);
-      return { blocked: true, reason: `Deny List pattern: ${mostSpecificDeny}` };
-    }
-  }
-  
-  // If URL matches any allow pattern with no overriding deny pattern, allow access
-  if (matchedAllowPatterns.length > 0) {
-    const allowPattern = matchedAllowPatterns[0];
-    logInfo(`URL only matched allow patterns - allowing access: ${allowPattern}`);
-    return { blocked: false, reason: `Allow List match: ${allowPattern}` };
-  }
-  
-  // If URL matches any deny pattern with no overriding allow pattern, block access
-  if (matchedDenyPatterns.length > 0) {
-    const denyPattern = matchedDenyPatterns[0];
-    logInfo(`URL only matched deny patterns - blocking access: ${denyPattern}`);
-    return { blocked: true, reason: `Deny List match: ${denyPattern}` };
+  // STEP 3: Check for domain-only allow patterns if we had a match earlier
+  if (hasAllowMatch) {
+    return { blocked: false, reason: `Allow List domain: ${allowPattern}` };
   }
   
   // STEP 4: In allow list mode, block everything not explicitly allowed
   if (mode === 'whitelist' || mode === 'allowlist') {
     logInfo(`URL not in allow list: ${url} - blocking access (Allow List Mode)`);
     return { blocked: true, reason: "URL not on Allow List (Allow List Mode)" }; 
-  }  
+  }
+    // If we reach here, allow the URL
+  logInfo(`URL didn't match any blocking rules: ${url} - allowing access`);
+  return { blocked: false, reason: "URL allowed by default (no matching rules)" };
+}
+  // First check if the URL is on the allow list using the imported pattern matching functions
+  let hasAllowMatch = false;
+  let allowPattern = '';
+  
+  for (const site of whitelist) {
+    try {
+      const pattern = typeof site === 'string' ? site : site.pattern || site.url;
+      if (!pattern) continue;
+      
+      // Use the imported matchesPattern function for all pattern matching
+      if (matchesPattern(pattern, url)) {
+        logInfo(`URL MATCHED allow list pattern: ${pattern} - allowing access`);
+        hasAllowMatch = true;
+        allowPattern = pattern;
+        
+        // For specific path patterns with wildcards or exact paths, return immediately
+        // as they take highest precedence
+        if (pattern.includes('/')) {
+          return { blocked: false, reason: `Allow List specific path: ${pattern}` };
+        }
+        
+        // Just store the domain-only match for later but don't return immediately
+      }
+    } catch (e) {
+      logError('Error checking allowlist pattern:', e);
+    }
+  }
+  
+  // STEP 2: Check if the URL is on the deny list
+  // Only check deny patterns if no specific allow pattern matched
+  // or if we're in combined/denylist mode
+  
+  if (mode === 'blacklist' || mode === 'denylist' || mode === 'combined') {
+    for (const site of blacklist) {
+      try {
+        const pattern = typeof site === 'string' ? site : site.pattern || site.url;
+        if (!pattern) continue;
+        
+        // Use the imported matchesPattern function
+        if (matchesPattern(pattern, url)) {
+          // If there's an allow match, it might override this deny pattern
+          if (hasAllowMatch) {
+            logInfo(`URL matches deny pattern ${pattern}, but is overridden by allow pattern: ${allowPattern}`);
+            return { blocked: false, reason: `Allow List pattern: ${allowPattern} overrides deny list: ${pattern}` };
+          }
+          
+          logInfo(`URL MATCHED deny list pattern: ${pattern} - blocking access`);
+          return { blocked: true, reason: `Deny List pattern: ${pattern}` };
+        }
+      } catch (e) {
+        logError('Error checking denylist pattern:', e);
+      }
+    }
+    
+    // Check keywords in deny list
+    for (const keyword of blacklistKeywords) {
+      try {
+        const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
+        if (!pattern) continue;
+        
+        const normalizedPattern = pattern.toLowerCase();
+        const normalizedUrl = url.toLowerCase();
+        
+        if (normalizedUrl.includes(normalizedPattern) || 
+            (hostname && hostname.includes(normalizedPattern))) {
+          logInfo(`URL MATCHED deny list keyword: ${pattern} - blocking access`);
+          return { blocked: true, reason: `Deny List keyword: ${pattern}` };
+        }
+      } catch (e) {
+        logError('Error checking deny list keyword:', e);
+      }
+    }
+  }
+  
+  // STEP 3: Check for domain-only allow patterns if we had a match earlier
+  if (hasAllowMatch) {
+    return { blocked: false, reason: `Allow List domain: ${allowPattern}` };
+  }
+  
+  // STEP 4: In allow list mode, block everything not explicitly allowed
+  if (mode === 'whitelist' || mode === 'allowlist') {
+    logInfo(`URL not in allow list: ${url} - blocking access (Allow List Mode)`);
+    return { blocked: true, reason: "URL not on Allow List (Allow List Mode)" }; 
+  }  // If we reach here, allow the URL
+  logInfo(`URL didn't match any blocking rules: ${url} - allowing access`);
+  return { blocked: false, reason: "URL allowed by default (no matching rules)" };
+}
+          try {
+            const denyPattern = typeof denySite === 'string' ? denySite : denySite.pattern || denySite.url;
+            if (!denyPattern) continue;
+            
+            const denyRegex = wildcardToRegExp(denyPattern);
+            if (denyRegex.test(url)) {
+              wouldBeBlocked = true;
+              blockingPattern = denyPattern;
+              logInfo(`URL matches deny pattern ${denyPattern}, but is overridden by specific allow pattern: ${pattern}`);
+              break;
+            }
+          } catch (e) {
+            logError('Error checking deny pattern during allow override check:', e);
+          }
+        }
+        
+        // Always allow if an allow pattern matches, but note if it's overriding a deny pattern
+        if (wouldBeBlocked) {
+          logInfo(`URL allowed by specific pattern override: ${pattern} overrides ${blockingPattern}`);
+          return { blocked: false, reason: `Allow List specific path: ${pattern} overrides deny list: ${blockingPattern}` };
+        } else {
+          logInfo(`URL allowed by specific pattern: ${pattern}`);
+          return { blocked: false, reason: `Allow List specific path: ${pattern}` };
+        }
+      }
+    } catch (e) {
+      logError('Error in comprehensive allow pattern check:', e);
+    }
+  }
+  
+  // STEP 4: Check for path wildcard patterns in deny list
+  // Like "domain.com/*" or "domain.com/path/*" that should block all matching paths
+  if (parsedPath && parsedPath !== '/') {
+    for (const site of blacklist) {
+      try {
+        const pattern = typeof site === 'string' ? site : site.pattern || site.url;
+        if (!pattern) continue;
+        
+        // Check for patterns with wildcards in paths, including both domain.com/* and domain.com/path/*
+        if (pattern.includes('/*')) {
+          const regexPattern = wildcardToRegExp(pattern);
+          logInfo(`Testing path deny pattern: ${pattern}, regex: ${regexPattern}`);
+          
+          if (regexPattern.test(url)) {            
+            logInfo(`URL with path matches deny list wildcard path: ${pattern} - blocking access`);
+            return { blocked: true, reason: `Deny List pattern: ${pattern} (blocks matching paths)` };
+          }
+        }
+      } catch (e) {
+        logError('Error checking deny list wildcard path pattern:', e);
+      }
+    }
+  }
+  
+  // If we have a specific allow match or domain allow match, return it now
+  if (hasSpecificAllowMatch) {
+    return { blocked: false, reason: `Allow List specific path: ${specificAllowPattern}` };
+  }
+  
+  if (hasDomainAllowMatch) {
+    return { blocked: false, reason: `Allow List domain: ${domainAllowPattern}` };
+  }
+    // STEP 4: Check other allow list patterns and keywords
+  let isWhitelisted = false;
+  let whitelistedBy = null;
+  
+  // Check remaining site patterns in allow list
+  for (const site of whitelist) {
+    try {
+      const pattern = typeof site === 'string' ? site : site.pattern || site.url;
+      if (!pattern) continue;
+      
+      // Skip patterns we've already checked
+      if (!pattern.includes('/') || (pattern.includes('/') && pattern.includes('*'))) {
+        continue;
+      }
+      
+      const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$/g, ''));
+      
+      // Extract domain from pattern for strict domain matching
+      let patternDomain = pattern;
+      try {
+        if (pattern.includes('://')) {
+          patternDomain = new URL(pattern).hostname.toLowerCase();
+        } else if (pattern.includes('/')) {
+          patternDomain = pattern.split('/')[0].toLowerCase();
+        }
+      } catch (e) {
+        logError('Error extracting domain from pattern:', e);
+        patternDomain = pattern.toLowerCase();
+      }
+      
+      // Only allow if the hostname exactly matches the pattern domain or is a subdomain
+      if ((hostname === patternDomain || hostname.endsWith('.' + patternDomain)) &&
+          (regexPattern.test(url) || (hostname && regexPattern.test(hostname)))) {
+        logInfo(`URL MATCHED allow list pattern: ${pattern} - allowing access`);
+        isWhitelisted = true;
+        whitelistedBy = `Allow List pattern: ${pattern}`;
+        break;
+      }
+    } catch (e) {
+      logError('Error checking whitelist pattern:', e);
+    }
+  }
+  
+  // Check keywords in whitelist
+  if (!isWhitelisted) {
+    for (const keyword of whitelistKeywords) {
+      try {
+        const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
+        if (!pattern) continue;
+        
+        if (url.toLowerCase().includes(pattern.toLowerCase()) || 
+            (hostname && hostname.toLowerCase().includes(pattern.toLowerCase()))) {
+          logInfo(`URL MATCHED whitelist keyword: ${pattern} - allowing access`);
+          isWhitelisted = true;
+          whitelistedBy = `Allow List keyword: ${pattern}`;
+          break; 
+        }
+      } catch (e) {
+        logError('Error checking whitelist keyword:', e);
+      }
+    }
+  }
+  
+  // If URL is in the allow list, allow it
+  if (isWhitelisted) {
+    return { blocked: false, reason: whitelistedBy };
+  }
+  
+  // STEP 5: In allow list mode, block everything not in allow list
+  if (mode === 'whitelist' || mode === 'allowlist') {
+    logInfo(`URL not in allow list: ${url} - blocking access`);
+    return { blocked: true, reason: "URL not on Allow List (Allow List Mode)" }; 
+  }
+    // STEP 6: In deny list or combined modes, check against remaining deny list patterns
+  if (mode === 'blacklist' || mode === 'denylist' || mode === 'combined') {
+    // Try direct domain matches
+    if (hostname) {
+      for (const site of blacklist) {
+        try {
+          const pattern = typeof site === 'string' ? site : site.pattern || site.url;
+          if (!pattern) continue;
+          
+          // Skip patterns we've already checked (domain/* patterns)
+          if (pattern.endsWith('/*') && !pattern.includes('/*/')) {
+            continue;
+          }
+          
+          const patternLower = pattern.toLowerCase().trim();
+          
+          // Direct domain comparison
+          if (!patternLower.includes('/') && (hostname === patternLower || hostname.endsWith('.' + patternLower))) {
+            // If there's a specific allow pattern match, it takes precedence over deny list
+            if (hasSpecificAllowMatch) {
+              logInfo(`Hostname ${hostname} matches deny list domain: ${pattern}, but is overridden by specific allow pattern: ${specificAllowPattern}`);
+              return { blocked: false, reason: `Allow List specific path overrides deny list: ${specificAllowPattern}` };
+            }
+            
+            logInfo(`Hostname ${hostname} directly matched deny list domain: ${pattern} - blocking access`);
+            return { blocked: true, reason: `Deny List pattern: ${pattern}` };
+          }
+        } catch (e) {
+          logError('Error checking deny list domain match:', e);
+        }
+      }
+    }
+      // Check remaining site patterns in deny list using regex
+    for (const site of blacklist) {
+      try {
+        const pattern = typeof site === 'string' ? site : site.pattern || site.url;
+        if (!pattern) continue;
+        
+        // Skip patterns we've already checked
+        if (pattern.endsWith('/*') && !pattern.includes('/*/')) {
+          continue;
+        }
+        
+        const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$/g, ''));
+        
+        // Enhanced logging for regex matching
+        logInfo(`Testing URL against pattern: "${pattern}", regex: ${regexPattern}`);
+        const urlMatches = regexPattern.test(url);
+        const hostnameMatches = hostname && regexPattern.test(hostname);
+        logInfo(`URL match: ${urlMatches ? 'YES' : 'NO'}, Hostname match: ${hostnameMatches ? 'YES' : 'NO'}`);
+        
+        // Try to match both full URL and hostname
+        if (urlMatches || hostnameMatches) {
+          // If there's a specific allow pattern match, it takes precedence over deny patterns
+          if (hasSpecificAllowMatch) {
+            logInfo(`URL matches deny list pattern: ${pattern}, but is overridden by specific allow pattern: ${specificAllowPattern}`);
+            return { blocked: false, reason: `Allow List specific path overrides deny list: ${specificAllowPattern}` };
+          }
+          
+          logInfo(`URL MATCHED deny list pattern: ${pattern} - blocking access`);
+          return { blocked: true, reason: `Deny List pattern: ${pattern}` };
+        }
+      } catch (e) {
+        logError('Error checking deny list pattern:', e);
+      }
+    }
+    
+    // Check keywords in deny list
+    for (const keyword of blacklistKeywords) {
+      try {
+        const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
+        if (!pattern) continue;
+        
+        const normalizedPattern = pattern.toLowerCase();
+        const normalizedUrl = url.toLowerCase();
+        
+        if (normalizedUrl.includes(normalizedPattern) || 
+            (hostname && hostname.includes(normalizedPattern))) {
+          logInfo(`URL MATCHED deny list keyword: ${pattern} - blocking access`);
+          return { blocked: true, reason: `Deny List keyword: ${pattern}` };
+        }
+      } catch (e) {
+        logError('Error checking deny list keyword:', e);
+      }
+    }
+  }
   
   // If we reach here, allow the URL
   logInfo(`URL didn't match any blocking rules: ${url} - allowing access`);
   return { blocked: false, reason: "URL allowed by default (no matching rules)" };
 }
 
+// Function that checks if a URL should be blocked according to rules
 function checkUrlAgainstRules(url) {
   logInfo(`Checking URL against rules: ${url}`);
-  const result = checkUrlShouldBeBlockedLocal(url);
+  const result = checkUrlShouldBeBlocked(url);
   
-  if (result && result.blocked) {
-    logInfo(`URL should be BLOCKED: ${url} - Reason: ${result.reason || "Unknown reason"}`);
+  if (result.blocked) {
+    logInfo(`URL should be BLOCKED: ${url} - Reason: ${result.reason}`);
     return true;
   } else {
-    const reason = result && result.reason ? result.reason : "Unknown reason";
-    logInfo(`URL should be ALLOWED: ${url} - Reason: ${reason}`);
+    logInfo(`URL should be ALLOWED: ${url} - Reason: ${result.reason}`);
     return false;
   }
 }
@@ -1409,9 +1557,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // Implement a simple timer check (can be enhanced later)
         response = false;
         break;
-          case 'isUrlStillBlocked':
+        
+      case 'isUrlStillBlocked':
         if (request.params && request.params[0]) {
-          response = checkUrlShouldBeBlockedLocal(request.params[0]);
+          response = checkUrlShouldBeBlocked(request.params[0]);
         } else {
           response = false;
         }
@@ -1688,67 +1837,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           };
         } catch (error) {
           console.error('Error in sync diagnostics:', error);
-          response = { success: false, error: error.message };        }
-        break;
-          // Debug handlers for real-time debugging
-      case 'reinitialize':
-        logInfo('Force reinitialize requested');
-        // Run init asynchronously and respond immediately
-        init().then(() => {
-          logInfo('Service worker reinitialized successfully');
-        }).catch((error) => {
-          logError('Error during forced reinitialize:', error);
-        });
-        response = { success: true, message: 'Service worker reinitialize started' };
-        break;
-        
-      case 'testUrl':
-        if (request.url && request.blacklist && request.whitelist) {
-          logInfo(`Testing URL: ${request.url}`);
-          
-          // Temporarily use the provided arrays for testing
-          const originalBlacklist = blacklist;
-          const originalWhitelist = whitelist;
-          const originalBlacklistKeywords = blacklistKeywords;
-          const originalWhitelistKeywords = whitelistKeywords;
-          
-          try {
-            // Set test arrays
-            blacklist = request.blacklist;
-            whitelist = request.whitelist;
-            blacklistKeywords = request.blacklistKeywords || [];
-            whitelistKeywords = request.whitelistKeywords || [];
-              // Test the URL using the pattern function
-            const shouldBlock = self.checkUrlShouldBeBlocked(request.url, whitelist, blacklist);
-            response = { 
-              result: shouldBlock ? 'BLOCKED' : 'ALLOWED',
-              url: request.url,
-              blacklistCount: blacklist.length,
-              whitelistCount: whitelist.length
-            };
-          } finally {
-            // Restore original arrays
-            blacklist = originalBlacklist;
-            whitelist = originalWhitelist;
-            blacklistKeywords = originalBlacklistKeywords;
-            whitelistKeywords = originalWhitelistKeywords;
-          }
-        } else {
-          response = { error: 'Missing required parameters: url, blacklist, whitelist' };
+          response = { success: false, error: error.message };
         }
-        break;
-        
-      case 'getCurrentMemoryState':
-        response = {
-          blacklistCount: blacklist.length,
-          whitelistCount: whitelist.length,
-          blacklistKeywordsCount: blacklistKeywords.length,
-          whitelistKeywordsCount: whitelistKeywords.length,
-          isEnabled: isEnabled,
-          mode: mode,
-          firstBlacklistItems: blacklist.slice(0, 3),
-          firstWhitelistItems: whitelist.slice(0, 3)
-        };
         break;
         
       default:
@@ -1824,7 +1914,8 @@ function debugUrlMatching(url) {
       logError('Error debugging blacklist keyword:', e);
     }
   }
-    const result = checkUrlShouldBeBlockedLocal(url);
+  
+  const result = checkUrlShouldBeBlocked(url);
   logInfo(`Final result: ${result ? 'BLOCKED' : 'ALLOWED'}`);
   return result;
 }
@@ -1889,10 +1980,11 @@ function testUrlMatching() {
     'https://www.testsite.org/category/page',
     'https://subdomain.testsite.org/category/page'
   ];
-    console.log('===== URL MATCHING TEST =====');
+  
+  console.log('===== URL MATCHING TEST =====');
   urls.forEach(url => {
     const normalized = normalizeUrl(url);
-    const isBlocked = checkUrlShouldBeBlockedLocal(normalized);
+    const isBlocked = checkUrlShouldBeBlocked(normalized);
     console.log(`Original: ${url}`);
     console.log(`Normalized: ${normalized}`);
     console.log(`Blocked: ${isBlocked ? 'YES' : 'NO'}`);

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Worker Test</title>
+</head>
+<body>
+    <h1>Service Worker Test</h1>
+    <div id="status">Checking service worker registration...</div>
+
+    <script>
+        // Check if service worker is supported
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                const statusEl = document.getElementById('status');
+                
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(function(registration) {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                        statusEl.textContent = 'Service Worker registered successfully! 👍';
+                        statusEl.style.color = 'green';
+                    })
+                    .catch(function(error) {
+                        console.error('Service Worker registration failed:', error);
+                        statusEl.textContent = 'Service Worker registration failed: ' + error;
+                        statusEl.style.color = 'red';
+                    });
+            });
+        } else {
+            console.log('Service workers are not supported in this browser');
+            document.getElementById('status').textContent = 'Service workers are not supported in this browser';
+        }
+    </script>
+</body>
+</html>
