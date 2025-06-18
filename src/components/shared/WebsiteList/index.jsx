@@ -62,13 +62,14 @@ export class WebsiteList extends Component {
   getOrderedList = (list) => {
     return list ? list.map((url, index) => ({ id: index + 1, url: url })) : [];
   };
-
   setList = (list) => {
     // used to update list from parent component
+    // Ensure list is always an array
+    const safeList = Array.isArray(list) ? list : [];
     // Update state
-    this.setState({ list: this.getOrderedList(list) });
+    this.setState({ list: this.getOrderedList(safeList) });
     // Get new favicons
-    for (let url of list) {
+    for (let url of safeList) {
       this.getFavicon(url);
     }
   };

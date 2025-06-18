@@ -20,22 +20,22 @@ it('updates status when toggled', () => {
   expect(statusSwitch.checked).toBe(!oldStatus);
 });
 
-it('updates mode when changed to whitelist', () => {
+it('updates mode when changed to allowList', () => {
   render(<Panel />);
-  const whitelistMode = screen.getByText(/whitelist/i);
-  fireEvent.click(whitelistMode);
-  const whitelistButton = screen.getByRole('button', {
-    name: 'whitelist',
+  const allowListMode = screen.getByText(/allowList/i);
+  fireEvent.click(allowListMode);
+  const allowListButton = screen.getByRole('button', {
+    name: 'allowList',
   });
-  expect(whitelistButton.getAttribute('data-checked')).toEqual('true');
+  expect(allowListButton.getAttribute('data-checked')).toEqual('true');
 });
 
-it('updates mode when changed to blacklist', () => {
+it('updates mode when changed to denyList', () => {
   render(<Panel />);
-  const blacklistMode = screen.getByText(/blacklist/i);
-  fireEvent.click(blacklistMode);
-  const blacklistButton = screen.getByRole('button', {
-    name: 'blacklist',
+  const denyListMode = screen.getByText(/denyList/i);
+  fireEvent.click(denyListMode);
+  const denyListButton = screen.getByRole('button', {
+    name: 'denyList',
   });
-  expect(blacklistButton.getAttribute('data-checked')).toEqual('true');
+  expect(denyListButton.getAttribute('data-checked')).toEqual('true');
 });
