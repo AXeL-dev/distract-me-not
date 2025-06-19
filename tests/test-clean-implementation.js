@@ -6,9 +6,13 @@
 // Import the clean matcher functions
 const fs = require('fs');
 const vm = require('vm');
+const path = require('path');
 
 // Read the clean service-worker-patterns.js file
-const patternCode = fs.readFileSync('./public/service-worker-patterns-clean.js', 'utf8');
+const patternCode = fs.readFileSync(
+  path.join(__dirname, '..', 'public', 'service-worker-patterns-clean.js'),
+  'utf8'
+);
 
 // Create a sandbox with console
 const sandbox = {
