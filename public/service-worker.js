@@ -802,41 +802,91 @@ function checkUrlShouldBeBlockedLocal(url) {
   
   logInfo(`Checking URL against rules: ${url}`);
   
-  // Use the new pattern matching logic from service-worker-patterns.js
+  // Parse URL for hostname extraction
+  let hostname = "";
+  try {
+    const parsedUrl = new URL(url);
+    hostname = parsedUrl.hostname.toLowerCase();
+  } catch (e) {
+    logInfo(`URL parsing failed, will use full URL: ${e.message}`);
+  }
+
+  // STEP 1: Check whitelist keywords first (highest priority)
+  for (const keyword of whitelistKeywords) {
+    try {
+      const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
+      if (!pattern) continue;
+      
+      const normalizedPattern = pattern.toLowerCase();
+      const normalizedUrl = url.toLowerCase();
+      
+      if (normalizedUrl.includes(normalizedPattern) || 
+          (hostname && hostname.includes(normalizedPattern))) {
+        logInfo(`URL MATCHED allow list keyword: ${pattern} - allowing access`);
+        return { blocked: false, reason: `Allow list keyword: ${pattern}` };
+      }
+    } catch (e) {
+      logError('Error checking allowlist keyword:', e);
+    }
+  }
+
+  // STEP 2: Use the new pattern matching logic for URL patterns
   if (self.checkUrlShouldBeBlocked && typeof self.checkUrlShouldBeBlocked === 'function') {
     // Convert our internal blacklist/whitelist to the format expected by the new function
     const allowPatterns = whitelist.map(site => typeof site === 'string' ? site : site.pattern || site.url).filter(Boolean);
     const denyPatterns = blacklist.map(site => typeof site === 'string' ? site : site.pattern || site.url).filter(Boolean);
     
     logInfo(`Checking with ${denyPatterns.length} deny patterns and ${allowPatterns.length} allow patterns`);
+    logInfo(`Also checking ${blacklistKeywords.length} deny keywords and ${whitelistKeywords.length} allow keywords`);
     logInfo(`Deny patterns: ${JSON.stringify(denyPatterns)}`);
     logInfo(`Allow patterns: ${JSON.stringify(allowPatterns)}`);
-      // Call the new pattern matching function
+    
+    // Call the new pattern matching function
     const result = self.checkUrlShouldBeBlocked(url, allowPatterns, denyPatterns);
     
-    // The new function returns an object with detailed information
-    if (result && typeof result === 'object') {
+    // If the pattern matching says to block, return that result
+    if (result && typeof result === 'object' && result.blocked) {
       return {
         blocked: result.blocked,
         reason: result.reason,
         matchedPattern: result.matchedPattern,
         specificity: result.specificity
       };
-    } else {
-      // Fallback for backward compatibility (if function returns boolean)
-      if (result) {
-        return { blocked: true, reason: "Matched deny pattern" };
-      } else {
-        return { blocked: false, reason: "No matching block rules or overridden by allow pattern" };
+    }
+    
+    // If pattern matching didn't block, check blacklist keywords
+    if (!result.blocked) {
+      for (const keyword of blacklistKeywords) {
+        try {
+          const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
+          if (!pattern) continue;
+          
+          const normalizedPattern = pattern.toLowerCase();
+          const normalizedUrl = url.toLowerCase();
+          
+          if (normalizedUrl.includes(normalizedPattern) || 
+              (hostname && hostname.includes(normalizedPattern))) {
+            logInfo(`URL MATCHED deny list keyword: ${pattern} - blocking access`);
+            return { blocked: true, reason: `Deny list keyword: ${pattern}` };
+          }
+        } catch (e) {
+          logError('Error checking denylist keyword:', e);
+        }
       }
     }
+    
+    // Return the pattern matching result (allowed)
+    return {
+      blocked: result.blocked,
+      reason: result.reason || "No matching block rules or overridden by allow pattern",
+      matchedPattern: result.matchedPattern,
+      specificity: result.specificity
+    };
   }
-  
-  // Fallback to old logic if new function not available
+    // Fallback to old logic if new function not available
   logWarning('New pattern matching function not available, using fallback logic');
   
   // Parse URL for hostname and path matching (for logging purposes)
-  let hostname = "";
   let parsedPath = "";
   try {
     const parsedUrl = new URL(url);
