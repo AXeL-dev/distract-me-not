@@ -14,7 +14,7 @@ const vm = require('vm');
 const path = require('path');
 
 // Load the service-worker-patterns.js file content
-const patternFilePath = path.join(__dirname, 'public', 'service-worker-patterns.js');
+const patternFilePath = path.join(__dirname, '..', 'public', 'service-worker-patterns.js');
 const patternCode = fs.readFileSync(patternFilePath, 'utf8');
 
 // Create a context with console support and run the pattern matcher code

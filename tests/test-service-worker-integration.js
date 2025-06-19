@@ -14,7 +14,7 @@ const self = {};
 
 // Read and evaluate the pattern matcher code
 const patternMatcherCode = fs.readFileSync(
-  path.join(__dirname, 'public', 'service-worker-patterns.js'), 
+  path.join(__dirname, '..', 'public', 'service-worker-patterns.js'),
   'utf8'
 );
 eval(patternMatcherCode);

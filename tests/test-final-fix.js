@@ -10,7 +10,10 @@ const fs = require('fs');
 const path = require('path');
 
 // Read the file content and evaluate it as JavaScript
-const patternMatcherCode = fs.readFileSync(path.join(__dirname, 'public', 'service-worker-patterns-final-fix.js'), 'utf8');
+const patternMatcherCode = fs.readFileSync(
+  path.join(__dirname, '..', 'public', 'service-worker-patterns.js'),
+  'utf8'
+);
 // Create a context for the script where 'self' is defined
 const scriptContext = { self: {}, console };
 
