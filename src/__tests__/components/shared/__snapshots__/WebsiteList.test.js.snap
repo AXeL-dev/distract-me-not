@@ -26,7 +26,8 @@ exports[`renders correctly 1`] = `
           </svg>
         </div>
         <input
-          class="css-q4k7k7 ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_16px ub-ltr-spc_0 ub-fnt-fam_b77syt ub-color_474d66 ub-flx_1 ub-ml_-2px ub-pl_0px ub-box-szg_border-box"
+          appearance="none"
+          class="ub-fnt-sze_12px ub-f-wght_500 ub-ln-ht_16px ub-ltr-spc_0 ub-fnt-fam_b77syt ub-color_474d66 ub-flx_1 ub-b-btm_none ub-b-lft_none ub-b-rgt_none ub-b-top_none ub-bg-clr_transparent ub-otln_iu2jf4_1bcl2f4 ub-color_rgba67-90-111-0-7_1b2gqua ub-ml_-2px ub-pl_0px ub-box-szg_border-box"
           placeholder="filter..."
           spellcheck="true"
           value=""
@@ -113,7 +114,7 @@ exports[`renders correctly 1`] = `
                 title="facebook.com"
               >
                 <span
-                  class="css-1ktdej1 ub-fnt-sze_9px ub-f-wght_400 ub-ln-ht_9px ub-ltr-spc_-0-05px ub-fnt-fam_b77syt ub-color_inherit ub-w_24px ub-h_24px ub-box-szg_border-box"
+                  class="ub-fnt-sze_9px ub-f-wght_400 ub-ln-ht_9px ub-ltr-spc_-0-05px ub-fnt-fam_b77syt ub-color_inherit ub-top_0px ub-pst_absolute ub-dspl_flex ub-algn-itms_center ub-just-cnt_center ub-w_24px ub-h_24px ub-box-szg_border-box"
                 >
                   F
                 </span>
@@ -163,7 +164,7 @@ exports[`renders correctly 1`] = `
                 title="twitter.com"
               >
                 <span
-                  class="css-1ktdej1 ub-fnt-sze_9px ub-f-wght_400 ub-ln-ht_9px ub-ltr-spc_-0-05px ub-fnt-fam_b77syt ub-color_inherit ub-w_24px ub-h_24px ub-box-szg_border-box"
+                  class="ub-fnt-sze_9px ub-f-wght_400 ub-ln-ht_9px ub-ltr-spc_-0-05px ub-fnt-fam_b77syt ub-color_inherit ub-top_0px ub-pst_absolute ub-dspl_flex ub-algn-itms_center ub-just-cnt_center ub-w_24px ub-h_24px ub-box-szg_border-box"
                 >
                   T
                 </span>
@@ -213,7 +214,7 @@ exports[`renders correctly 1`] = `
                 title="youtube.com"
               >
                 <span
-                  class="css-1ktdej1 ub-fnt-sze_9px ub-f-wght_400 ub-ln-ht_9px ub-ltr-spc_-0-05px ub-fnt-fam_b77syt ub-color_inherit ub-w_24px ub-h_24px ub-box-szg_border-box"
+                  class="ub-fnt-sze_9px ub-f-wght_400 ub-ln-ht_9px ub-ltr-spc_-0-05px ub-fnt-fam_b77syt ub-color_inherit ub-top_0px ub-pst_absolute ub-dspl_flex ub-algn-itms_center ub-just-cnt_center ub-w_24px ub-h_24px ub-box-szg_border-box"
                 >
                   Y
                 </span>

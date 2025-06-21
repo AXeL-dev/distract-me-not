@@ -8,6 +8,40 @@ import bcrypt from 'bcryptjs';
 // fix ReferenceError: dcodeIO is not defined
 global.dcodeIO = { bcrypt };
 
+// Mock chrome extension APIs
+global.chrome = {
+  storage: {
+    sync: {
+      get: jest.fn().mockResolvedValue({}),
+      set: jest.fn().mockResolvedValue(),
+      remove: jest.fn().mockResolvedValue(),
+      clear: jest.fn().mockResolvedValue(),
+      getBytesInUse: jest.fn().mockResolvedValue(0),
+      MAX_ITEMS: 512,
+      QUOTA_BYTES: 102400,
+      QUOTA_BYTES_PER_ITEM: 8192
+    },
+    local: {
+      get: jest.fn().mockResolvedValue({}),
+      set: jest.fn().mockResolvedValue(),
+      remove: jest.fn().mockResolvedValue(),
+      clear: jest.fn().mockResolvedValue(),
+      getBytesInUse: jest.fn().mockResolvedValue(0)
+    }
+  },
+  runtime: {
+    getManifest: jest.fn().mockReturnValue({ version: '1.0.0' }),
+    getURL: jest.fn().mockImplementation((path) => `chrome-extension://mock-id/${path}`),
+    id: 'mock-extension-id'
+  },
+  tabs: {
+    query: jest.fn().mockResolvedValue([]),
+    update: jest.fn().mockResolvedValue(),
+    remove: jest.fn().mockResolvedValue(),
+    create: jest.fn().mockResolvedValue()
+  }
+};
+
 // ignore some specific console errors & warnings
 const consoleError = console.error;
 const consoleWarn = console.warn;
