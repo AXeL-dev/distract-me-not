@@ -15,15 +15,14 @@ import {
   HistoryIcon,
   Pill,
   TimeIcon,
-  Badge,
-  WarningSignIcon,
+  Badge,  WarningSignIcon,
   ImportIcon,
   ExportIcon,
-  BugIcon,
   RefreshIcon,
   TrashIcon,
   InfoSignIcon,
   UploadIcon,
+  PlayIcon,
   Heading,
   Text,
 } from 'evergreen-ui';
@@ -148,12 +147,14 @@ export class Settings extends Component {
           enableOnBrowserStartup: false,
         },
       },
-      isSmallScreen: isSmallDevice(),
-      originalIsEnabled: defaultIsEnabled, // Add this line to track original status
+      isSmallScreen: isSmallDevice(),      originalIsEnabled: defaultIsEnabled, // Add this line to track original status
       syncDiagnostics: null,
       diagnosisRunning: false,
       forceSyncRunning: false,
+      syncTestRunning: false,
       refreshRulesRunning: false,
+      lastDiagnosisResults: null,
+      lastSyncTestResults: null,
     };
   }
   componentDidMount() {
@@ -173,19 +174,25 @@ export class Settings extends Component {
         }, 1500); // Wait 1.5 seconds to give Chrome sync time to initialize
       }
     });
-    
-    // Add storage change listener to keep settings in sync with popup
-    chrome.storage.onChanged.addListener(this.handleStorageChanges);
+      // Add storage change listener to keep settings in sync with popup
+    if (global.chrome && chrome.storage && chrome.storage.onChanged) {
+      chrome.storage.onChanged.addListener(this.handleStorageChanges);
+    }
     
     // Listen for sync update messages from the service worker
-    chrome.runtime.onMessage.addListener(this.handleBackgroundMessages);
+    if (global.chrome && chrome.runtime && chrome.runtime.onMessage) {
+      chrome.runtime.onMessage.addListener(this.handleBackgroundMessages);
+    }
     
     window.addEventListener('resize', this.handleResize);
   }
-
   componentWillUnmount() {
-    chrome.storage.onChanged.removeListener(this.handleStorageChanges);
-    chrome.runtime.onMessage.removeListener(this.handleBackgroundMessages);
+    if (global.chrome && chrome.storage && chrome.storage.onChanged) {
+      chrome.storage.onChanged.removeListener(this.handleStorageChanges);
+    }
+    if (global.chrome && chrome.runtime && chrome.runtime.onMessage) {
+      chrome.runtime.onMessage.removeListener(this.handleBackgroundMessages);
+    }
     window.removeEventListener('resize', this.handleResize);  
   }
   
@@ -284,8 +291,8 @@ export class Settings extends Component {
           ...(!items.schedule?.time ? items.schedule || {} : {}), // omit old schedule settings in version <= 2.3.0
         },        password: {
           ...this.state.options.password,
-          ...(items.password || {}),
-          isSet: !!(items.password?.hash && items.password.hash.length),
+          ...items.password,
+          isSet: !!(items.password?.hash && items.password?.hash.length),
         },
         timer: {
           ...this.state.options.timer,
@@ -313,15 +320,14 @@ export class Settings extends Component {
           showAddWebsitePrompt: items.showAddWebsitePrompt,
           enableOnBrowserStartup: items.enableOnBrowserStartup,
         },
-      });
-      // Toggle tabs
+      });      // Toggle tabs
       this.toggleListTabs(items.mode);
       this.toggleTab('unblocking', items.action !== Action.blockTab);
       // Update WebsiteList components
-      this.blacklistComponentRef.current.setList(items.blacklist);
-      this.whitelistComponentRef.current.setList(items.whitelist);
-      this.blacklistKeywordsComponentRef.current.setList(items.blacklistKeywords);
-      this.whitelistKeywordsComponentRef.current.setList(items.whitelistKeywords);
+      this.blacklistComponentRef.current?.setList(items.blacklist);
+      this.whitelistComponentRef.current?.setList(items.whitelist);
+      this.blacklistKeywordsComponentRef.current?.setList(items.blacklistKeywords);
+      this.whitelistKeywordsComponentRef.current?.setList(items.whitelistKeywords);
     }
   };
 
@@ -781,9 +787,107 @@ export class Settings extends Component {
       this.setState({ refreshRulesRunning: false });
     }
   };
-
   forceSyncSettings = async () => {
-    // Implementation for forcing sync of settings
+    try {
+      this.setState({ forceSyncRunning: true });
+      
+      const result = await diagnostics.forceSyncAllData();
+      
+      if (result.success) {
+        toaster.success(translate('forceSyncSuccess'), {
+          id: 'force-sync-success',
+          duration: 3
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      toaster.danger(translate('forceSyncError', { error: error.message }), {
+        id: 'force-sync-error',
+        duration: 5
+      });
+    } finally {
+      this.setState({ forceSyncRunning: false });
+    }
+  };
+
+  runSyncDiagnosis = async () => {
+    try {
+      this.setState({ diagnosisRunning: true });
+      
+      const results = await diagnostics.checkSyncStatus();
+      const problems = await diagnostics.diagnoseProblems();
+      
+      // Show results in a dialog or update state to show in UI
+      console.log('Sync Diagnosis Results:', { results, problems });
+      
+      toaster.success(`Sync diagnosis complete. Found ${problems.problemCount} issues.`, {
+        id: 'diagnosis-complete',
+        duration: 3
+      });
+      
+      // Update state with diagnosis results if needed
+      this.setState({ lastDiagnosisResults: { results, problems } });
+      
+    } catch (error) {
+      toaster.danger(`Diagnosis failed: ${error.message}`, {
+        id: 'diagnosis-error',
+        duration: 5
+      });
+    } finally {
+      this.setState({ diagnosisRunning: false });
+    }
+  };
+
+  testSyncFunctionality = async () => {
+    try {
+      this.setState({ syncTestRunning: true });
+      
+      const testResults = await diagnostics.testSync();
+      
+      if (testResults.success) {
+        toaster.success('Sync test completed successfully!', {
+          id: 'sync-test-success',
+          duration: 3
+        });
+      } else {
+        toaster.warning(`Sync test completed with issues: ${testResults.errors.join(', ')}`, {
+          id: 'sync-test-warning',
+          duration: 5
+        });
+      }
+      
+      console.log('Sync Test Results:', testResults);
+      this.setState({ lastSyncTestResults: testResults });
+      
+    } catch (error) {
+      toaster.danger(`Sync test failed: ${error.message}`, {
+        id: 'sync-test-error',
+        duration: 5
+      });
+    } finally {
+      this.setState({ syncTestRunning: false });
+    }
+  };
+
+  clearSyncStorage = async () => {
+    try {
+      const result = await diagnostics.clearSyncStorage();
+      
+      if (result.success) {
+        toaster.success(translate('clearSyncStorageSuccess'), {
+          id: 'clear-sync-success',
+          duration: 3
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      toaster.danger(translate('clearSyncStorageError', { error: error.message }), {
+        id: 'clear-sync-error',
+        duration: 5
+      });
+    }
   };
 
   renderBlockingTab = () => (
@@ -805,7 +909,7 @@ export class Settings extends Component {
       />      <SelectField
         label={translate('framesType')}
         tooltip={translate('framesTypeDescription')}
-        value={this.state.options.framesType?.join(',') || ''}
+        value={this.state.options.framesType ? this.state.options.framesType.join(',') : ''}
         onChange={(event) => this.setOptions('framesType', event.target.value.split(','))}
         disabled={!this.state.options.isEnabled}
         marginBottom={16}
@@ -1529,9 +1633,7 @@ export class Settings extends Component {
           isLoading={this.state.forceSyncRunning}
         >
           {translate('forceSyncSettings')}
-        </Button>
-
-        <Button 
+        </Button>        <Button 
           height={32} 
           iconBefore={ImportIcon} 
           intent="success" 
@@ -1539,6 +1641,16 @@ export class Settings extends Component {
           isLoading={this.state.refreshRulesRunning}
         >
           {translate('refreshRulesFromCloud') || "Refresh Rules from Cloud"}
+        </Button>
+
+        <Button 
+          height={32} 
+          iconBefore={PlayIcon} 
+          intent="primary" 
+          onClick={this.testSyncFunctionality}
+          isLoading={this.state.syncTestRunning}
+        >
+          {translate('testSync') || "Test Sync"}
         </Button>
       </Pane>
       
@@ -1602,7 +1714,92 @@ export class Settings extends Component {
           
           <Paragraph size={300} color="muted">
             {translate('syncSettingsNote')}
-          </Paragraph>
+          </Paragraph>        </Pane>
+      )}
+      
+      {this.state.lastSyncTestResults && (
+        <Pane 
+          elevation={1} 
+          background={this.state.lastSyncTestResults.success ? "greenTint" : "redTint"} 
+          padding={16} 
+          marginBottom={16}
+          borderRadius={3}
+        >
+          <Pane display="flex" alignItems="center" marginBottom={8}>
+            <PlayIcon color={this.state.lastSyncTestResults.success ? "success" : "danger"} marginRight={8} />
+            <Heading size={500}>Sync Test Results</Heading>
+          </Pane>
+          
+          <Pane marginBottom={8}>
+            <Text>
+              Status: {' '}
+              <Badge color={this.state.lastSyncTestResults.success ? "green" : "red"}>
+                {this.state.lastSyncTestResults.success ? 'Passed' : 'Failed'}
+              </Badge>
+            </Text>
+          </Pane>
+
+          <Pane marginBottom={8}>
+            <Text>Duration: {this.state.lastSyncTestResults.duration}ms</Text>
+          </Pane>
+
+          {this.state.lastSyncTestResults.details && (
+            <Pane marginBottom={8}>
+              <Text size={300} fontFamily="mono">
+                {this.state.lastSyncTestResults.details}
+              </Text>
+            </Pane>
+          )}
+
+          {this.state.lastSyncTestResults.error && (
+            <Pane marginBottom={8}>
+              <Text color="danger" size={300}>
+                Error: {this.state.lastSyncTestResults.error}
+              </Text>
+            </Pane>
+          )}
+        </Pane>
+      )}
+
+      {this.state.lastDiagnosisResults && (
+        <Pane 
+          elevation={1} 
+          background="tint1" 
+          padding={16} 
+          marginBottom={16}
+          borderRadius={3}
+        >
+          <Pane display="flex" alignItems="center" marginBottom={8}>            <WarningSignIcon color="info" marginRight={8} />
+            <Heading size={500}>Diagnosis Results</Heading>
+          </Pane>
+          
+          {this.state.lastDiagnosisResults.problems && this.state.lastDiagnosisResults.problems.length > 0 ? (
+            <div>
+              <Text marginBottom={8}>Problems Found:</Text>
+              {this.state.lastDiagnosisResults.problems.map((problem, index) => (
+                <Pane key={index} marginBottom={4}>
+                  <Badge color="red" marginRight={8}>!</Badge>
+                  <Text size={300}>{problem}</Text>
+                </Pane>
+              ))}
+            </div>
+          ) : (
+            <Pane marginBottom={8}>
+              <Badge color="green">No Problems Found</Badge>
+            </Pane>
+          )}
+
+          {this.state.lastDiagnosisResults.recommendations && this.state.lastDiagnosisResults.recommendations.length > 0 && (
+            <div>
+              <Text marginBottom={8} marginTop={12}>Recommendations:</Text>
+              {this.state.lastDiagnosisResults.recommendations.map((rec, index) => (
+                <Pane key={index} marginBottom={4}>
+                  <Badge color="blue" marginRight={8}>i</Badge>
+                  <Text size={300}>{rec}</Text>
+                </Pane>
+              ))}
+            </div>
+          )}
         </Pane>
       )}
       

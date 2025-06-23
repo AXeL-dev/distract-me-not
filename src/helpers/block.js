@@ -4,13 +4,14 @@ import { getHostname, isUrl } from './url';
 import { sendMessage, storage, getActiveTab, createWindow, indexUrl } from './webext';
 
 export const Mode = {
-  blacklist: 'denylist',
-  whitelist: 'allowlist',
+  // Primary mode constants - these match the service worker exactly
+  denylist: 'denylist',
+  allowlist: 'allowlist', 
   combined: 'combined',
   
-  // Legacy constants for backward compatibility
-  denylist: 'denylist',
-  allowlist: 'allowlist',
+  // Legacy constants for backward compatibility - maps to same values
+  blacklist: 'denylist',
+  whitelist: 'allowlist',
 };
 
 export const Action = {

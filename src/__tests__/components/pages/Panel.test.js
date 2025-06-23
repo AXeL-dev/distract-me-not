@@ -2,6 +2,35 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Panel } from 'components';
 
+// Mock Chrome storage with default values
+const mockStorageData = {
+  isEnabled: true,
+  mode: 'denylist',
+  denyList: [],
+  allowList: [],
+  unblock: {
+    isEnabled: false,
+  },
+  logs: {
+    isEnabled: false,
+  },
+  timer: {
+    isEnabled: false,
+  },
+  schedule: {
+    isEnabled: false,
+    days: {},
+  },
+  hideReportIssueButton: false,
+  showAddWebsitePrompt: false,
+};
+
+beforeEach(() => {
+  // Reset Chrome storage mocks
+  global.chrome.storage.local.get.mockResolvedValue(mockStorageData);
+  global.chrome.storage.sync.get.mockResolvedValue({});
+});
+
 it('renders panel correctly', () => {
   const { container, asFragment } = render(<Panel />);
   const status = screen.getByText(/status/i);
@@ -20,7 +49,7 @@ it('updates status when toggled', () => {
   expect(statusSwitch.checked).toBe(!oldStatus);
 });
 
-it('updates mode when changed to allowList', () => {
+it('updates mode when changed to allow list', () => {
   render(<Panel />);
   const allowListMode = screen.getByText(/allowList/i);
   fireEvent.click(allowListMode);
@@ -30,7 +59,7 @@ it('updates mode when changed to allowList', () => {
   expect(allowListButton.getAttribute('data-checked')).toEqual('true');
 });
 
-it('updates mode when changed to denyList', () => {
+it('updates mode when changed to deny list', () => {
   render(<Panel />);
   const denyListMode = screen.getByText(/denyList/i);
   fireEvent.click(denyListMode);

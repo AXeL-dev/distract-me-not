@@ -555,5 +555,56 @@
   },
   "youtubeDetectedDescription": {
     "message": "YouTube was found in your Deny List, which might be unintended. You can remove it manually if needed."
+  },
+  "testSync": {
+    "message": "Test Sync"
+  },
+  "syncDiagnosticsDescription": {
+    "message": "Use these tools to diagnose and fix sync issues. Test sync functionality, force sync all data, or clear sync storage if needed."
+  },
+  "runDiagnosis": {
+    "message": "Run Diagnosis"
+  },
+  "clearSyncStorage": {
+    "message": "Clear Sync Storage"
+  },
+  "forceSyncSettings": {
+    "message": "Force Sync All Data"
+  },
+  "refreshRulesFromCloud": {
+    "message": "Refresh Rules from Cloud"
+  },
+  "syncStatus": {
+    "message": "Sync Status"
+  },
+  "syncAvailable": {
+    "message": "Sync Available"
+  },
+  "browser": {
+    "message": "Browser"
+  },
+  "syncedItems": {
+    "message": "Synced Items"
+  },
+  "syncErrors": {
+    "message": "Sync Errors"
+  },
+  "syncSettingsNote": {
+    "message": "Note: Some settings are kept local only for privacy and performance reasons."
+  },
+  "syncableSettings": {
+    "message": "Syncable Settings"
+  },
+  "syncSettingsList": {
+    "message": "These settings are automatically synced across your devices:"
+  },
+  "localOnlySettings": {
+    "message": "Local Only Settings"
+  },
+  "localSettingsList": {
+    "message": "These settings are kept local to this device only:"
+  },
+  "unknown": {
+    "message": "Unknown"
   }
 }
