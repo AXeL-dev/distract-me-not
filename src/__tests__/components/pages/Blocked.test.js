@@ -8,7 +8,6 @@ it('renders blocked page when isBlank prop is true', () => {
   expect(container.firstChild).toBeTruthy();
   expect(container.textContent).toContain('defaultBlockingMessage');
 });
-});
 
 it('renders the provided text in the message prop', () => {
   render(<Blocked message="Hello world!" />);
@@ -30,5 +29,4 @@ it('renders blocked page when hasUnblockButton is enabled', () => {
   // Check that basic blocked page elements are present
   expect(screen.getByRole('textbox')).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'copy' })).toBeInTheDocument();
-});
 });
