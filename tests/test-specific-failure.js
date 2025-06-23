@@ -1,8 +1,14 @@
 // Test the specific failing case using the actual service worker functions
 const fs = require('fs');
+const path = require('path');
 
 // Load the service worker patterns
-eval(fs.readFileSync('./public/service-worker-patterns.js', 'utf8'));
+eval(
+  fs.readFileSync(
+    path.join(__dirname, '..', 'public', 'service-worker-patterns.js'),
+    'utf8'
+  )
+);
 
 console.log('=== TESTING THE SPECIFIC FAILING CASE ===');
 

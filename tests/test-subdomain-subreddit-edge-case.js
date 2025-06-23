@@ -9,9 +9,13 @@
 // Import the matcher functions (we'll use this as a standalone test)
 const fs = require('fs');
 const vm = require('vm');
+const path = require('path');
 
 // Read the service-worker-patterns.js file
-const patternCode = fs.readFileSync('./public/service-worker-patterns.js', 'utf8');
+const patternCode = fs.readFileSync(
+  path.join(__dirname, '..', 'public', 'service-worker-patterns.js'),
+  'utf8'
+);
 
 // Create a sandbox with console
 const sandbox = {

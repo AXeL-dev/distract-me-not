@@ -1,8 +1,9 @@
 // Test using the service worker functions instead of the comprehensive test's own implementation
 const fs = require('fs');
+const path = require('path');
 
 // Load the service worker patterns
-eval(fs.readFileSync('./public/service-worker-patterns.js', 'utf8'));
+eval(fs.readFileSync(path.join(__dirname, '..', 'public', 'service-worker-patterns.js'), 'utf8'));
 
 // Override the problematic function with the service worker version
 function testAllowDenyLogic(testName, url, allowList, denyList, expectedBlocked) {
