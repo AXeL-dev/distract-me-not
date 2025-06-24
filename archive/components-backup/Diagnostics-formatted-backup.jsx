@@ -1,3 +1,9 @@
+/**
+ * BACKUP: Original Diagnostics Component (2025-06-23)
+ * This is a manually reformatted version of the corrupted original file
+ * Following Clean Code principles with proper formatting
+ */
+
 import React, { Component } from 'react';
 import {
   Pane,
@@ -13,9 +19,7 @@ import {
   Alert,
   RefreshIcon,
   CleanIcon,
-  SettingsIcon,
-  UploadIcon,
-  DownloadIcon
+  SettingsIcon
 } from 'evergreen-ui';
 import { diagnostics } from 'helpers/syncDiagnostics';
 import { translate } from 'helpers/i18n';
@@ -80,11 +84,6 @@ export default class Diagnostics extends Component {
         toaster.success('Cleanup completed successfully');
         // Refresh diagnostics after cleanup
         setTimeout(() => this.runDiagnostics(), 1000);
-        
-        // Refresh rules if callback provided (Open/Closed Principle)
-        if (this.props.onRefreshRules) {
-          this.props.onRefreshRules();
-        }
       } else {
         toaster.warning('Cleanup completed with some issues');
       }
@@ -113,57 +112,6 @@ export default class Diagnostics extends Component {
     } catch (error) {
       console.error('Optimization analysis failed:', error);
       toaster.danger('Failed to analyze arrays: ' + error.message);
-      this.setState({ isLoading: false });
-    }
-  };
-
-  /**
-   * Force sync up (local to cloud)
-   * Follows Single Responsibility Principle - only handles sync up UI logic
-   */
-  forceSyncUp = async () => {
-    try {
-      this.setState({ isLoading: true });
-      const results = await diagnostics.forceSyncUp();
-      
-      if (results.success) {
-        toaster.success(results.message || 'Successfully synced settings to cloud');
-        this.runDiagnostics(); // Refresh diagnostics
-      } else {
-        toaster.danger(results.message || 'Failed to sync to cloud');
-      }
-    } catch (error) {
-      console.error('Force sync up failed:', error);
-      toaster.danger(`Failed to sync to cloud: ${error.message}`);
-    } finally {
-      this.setState({ isLoading: false });
-    }
-  };
-
-  /**
-   * Force sync down (cloud to local)
-   * Follows Single Responsibility Principle - only handles sync down UI logic
-   */
-  forceSyncDown = async () => {
-    try {
-      this.setState({ isLoading: true });
-      const results = await diagnostics.forceSyncDown();
-      
-      if (results.success) {
-        toaster.success(results.message || 'Successfully synced settings from cloud');
-        this.runDiagnostics(); // Refresh diagnostics
-        
-        // Notify parent component to refresh rules if callback is available
-        if (this.props.onRefreshRules) {
-          this.props.onRefreshRules();
-        }
-      } else {
-        toaster.danger(results.message || 'Failed to sync from cloud');
-      }
-    } catch (error) {
-      console.error('Force sync down failed:', error);
-      toaster.danger(`Failed to sync from cloud: ${error.message}`);
-    } finally {
       this.setState({ isLoading: false });
     }
   };
@@ -223,51 +171,6 @@ export default class Diagnostics extends Component {
               <Table.TextCell>Local Settings</Table.TextCell>
               <Table.TextCell>{diagnosticsData.localOnlySettingsFound?.length || 0} found</Table.TextCell>
             </Table.Row>
-            
-            {/* Enhanced rule counts - separated by type for clarity */}
-            <Table.Row>
-              <Table.TextCell><strong>Cloud Rules</strong></Table.TextCell>
-              <Table.TextCell>
-                Deny-List: {diagnosticsData.syncRuleCounts?.blacklist || 0}, 
-                Allow-List: {diagnosticsData.syncRuleCounts?.whitelist || 0}
-              </Table.TextCell>
-            </Table.Row>
-            <Table.Row>
-              <Table.TextCell><strong>Cloud Keywords</strong></Table.TextCell>
-              <Table.TextCell>
-                Deny Keywords: {diagnosticsData.syncRuleCounts?.blacklistKeywords || 0}, 
-                Allow Keywords: {diagnosticsData.syncRuleCounts?.whitelistKeywords || 0}
-              </Table.TextCell>
-            </Table.Row>
-            <Table.Row>
-              <Table.TextCell><strong>Local Rules</strong></Table.TextCell>
-              <Table.TextCell>
-                Deny-List: {diagnosticsData.localRuleCounts?.blacklist || 0}, 
-                Allow-List: {diagnosticsData.localRuleCounts?.whitelist || 0}
-              </Table.TextCell>
-            </Table.Row>
-            <Table.Row>
-              <Table.TextCell><strong>Local Keywords</strong></Table.TextCell>
-              <Table.TextCell>
-                Deny Keywords: {diagnosticsData.localRuleCounts?.blacklistKeywords || 0}, 
-                Allow Keywords: {diagnosticsData.localRuleCounts?.whitelistKeywords || 0}
-              </Table.TextCell>
-            </Table.Row>
-            
-            {/* Sync metadata */}
-            {(diagnosticsData.lastSyncInfo?.lastSyncUp || diagnosticsData.lastSyncInfo?.lastSyncDown) && (
-              <Table.Row>
-                <Table.TextCell><strong>Last Sync</strong></Table.TextCell>
-                <Table.TextCell>
-                  {diagnosticsData.lastSyncInfo.lastSyncUp && (
-                    <div>↑ Up: {new Date(diagnosticsData.lastSyncInfo.lastSyncUp).toLocaleString()}</div>
-                  )}
-                  {diagnosticsData.lastSyncInfo.lastSyncDown && (
-                    <div>↓ Down: {new Date(diagnosticsData.lastSyncInfo.lastSyncDown).toLocaleString()}</div>
-                  )}
-                </Table.TextCell>
-              </Table.Row>
-            )}
           </Table.Body>
         </Table>
       </Card>
@@ -349,7 +252,7 @@ export default class Diagnostics extends Component {
           </Paragraph>
         )}
 
-        <Pane display="flex" gap={8} marginBottom={16} flexWrap="wrap">
+        <Pane display="flex" gap={8} marginBottom={16}>
           <Button
             iconBefore={RefreshIcon}
             onClick={this.runDiagnostics}
@@ -374,24 +277,6 @@ export default class Diagnostics extends Component {
             disabled={isLoading}
           >
             Analyze Arrays
-          </Button>
-          
-          <Button
-            iconBefore={UploadIcon}
-            onClick={this.forceSyncUp}
-            disabled={isLoading}
-            intent="success"
-          >
-            Force Sync Up
-          </Button>
-          
-          <Button
-            iconBefore={DownloadIcon}
-            onClick={this.forceSyncDown}
-            disabled={isLoading}
-            intent="success"
-          >
-            Force Sync Down
           </Button>
         </Pane>
 

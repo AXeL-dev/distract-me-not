@@ -1,5 +1,5 @@
 import { syncStorage } from './syncStorage';
-import { debug, isDevEnv, logInfo } from './debug';
+import { logInfo } from './debug';
 
 /**
  * Settings that should sync between devices
@@ -47,7 +47,25 @@ export const diagnostics = {
       localOnlySettingsFound: [],
       missingSettings: [],
       browser: navigator.userAgent,
-      errors: []
+      errors: [],
+      // Enhanced status information
+      syncRuleCounts: {
+        blacklist: 0,
+        whitelist: 0,
+        blacklistKeywords: 0,
+        whitelistKeywords: 0
+      },
+      localRuleCounts: {
+        blacklist: 0,
+        whitelist: 0,
+        blacklistKeywords: 0,
+        whitelistKeywords: 0
+      },
+      lastSyncInfo: {
+        lastSyncUp: null,
+        lastSyncDown: null,
+        lastModified: null
+      }
     };
 
     try {
@@ -70,6 +88,21 @@ export const diagnostics = {
           // Get sync settings
           const syncSettings = await chrome.storage.sync.get(null);
           results.syncSettings = syncSettings;
+          
+          // Count rules in sync storage
+          ['blacklist', 'whitelist', 'blacklistKeywords', 'whitelistKeywords'].forEach(key => {
+            if (syncSettings[key] && Array.isArray(syncSettings[key])) {
+              results.syncRuleCounts[key] = syncSettings[key].length;
+            }
+          });
+          
+          // Check for sync metadata
+          if (syncSettings._lastSyncUp) {
+            results.lastSyncInfo.lastSyncUp = syncSettings._lastSyncUp;
+          }
+          if (syncSettings._lastSyncDown) {
+            results.lastSyncInfo.lastSyncDown = syncSettings._lastSyncDown;
+          }
           
           // Analyze what settings are present
           for (const key of syncableSettings) {
@@ -100,6 +133,21 @@ export const diagnostics = {
       try {
         const localSettings = await chrome.storage.local.get(null);
         results.localSettings = localSettings;
+        
+        // Count rules in local storage
+        ['blacklist', 'whitelist', 'blacklistKeywords', 'whitelistKeywords'].forEach(key => {
+          if (localSettings[key] && Array.isArray(localSettings[key])) {
+            results.localRuleCounts[key] = localSettings[key].length;
+          }
+        });
+        
+        // Check for local sync metadata
+        if (localSettings._lastSyncUp) {
+          results.lastSyncInfo.lastSyncUp = localSettings._lastSyncUp;
+        }
+        if (localSettings._lastSyncDown) {
+          results.lastSyncInfo.lastSyncDown = localSettings._lastSyncDown;
+        }
         
         // Check which local-only settings exist
         for (const key of localOnlySettings) {
@@ -234,9 +282,7 @@ export const diagnostics = {
 
       // Step 3: Verify data integrity
       results.steps.push('Verifying data integrity...');
-      const written = JSON.stringify(testData);
-      const read = JSON.stringify(readData[testId]);
-      if (written !== read) {
+      if (!this.isDataIntegrityValid(testData, readData[testId])) {
         throw new Error('Data integrity check failed - written and read data do not match');
       }
       results.steps.push('✓ Data integrity verified');
@@ -284,6 +330,52 @@ export const diagnostics = {
 
     results.endTime = new Date().toISOString();
     return results;
+  },
+
+  /**
+   * Validates data integrity between written and read objects
+   * Follows Single Responsibility Principle - only handles data comparison
+   * Uses deep comparison instead of JSON.stringify to avoid property ordering issues
+   * 
+   * @param {Object} original - The original data that was written
+   * @param {Object} retrieved - The data that was read back
+   * @returns {boolean} True if data integrity is maintained
+   */
+  isDataIntegrityValid(original, retrieved) {
+    return this.deepEquals(original, retrieved);
+  },
+
+  /**
+   * Performs deep equality comparison of two objects
+   * Follows Single Responsibility Principle - only handles deep comparison
+   * Handles nested objects, arrays, and primitive values properly
+   * 
+   * @param {*} a - First value to compare
+   * @param {*} b - Second value to compare
+   * @returns {boolean} True if values are deeply equal
+   */
+  deepEquals(a, b) {
+    if (a === b) return true;
+    
+    if (a == null || b == null) return a === b;
+    
+    if (typeof a !== typeof b) return false;
+    
+    if (typeof a !== 'object') return a === b;
+    
+    if (Array.isArray(a) !== Array.isArray(b)) return false;
+    
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
+    
+    if (keysA.length !== keysB.length) return false;
+    
+    for (const key of keysA) {
+      if (!keysB.includes(key)) return false;
+      if (!this.deepEquals(a[key], b[key])) return false;
+    }
+    
+    return true;
   },
 
   /**
@@ -431,112 +523,248 @@ export const diagnostics = {
   },
 
   /**
-   * Clean up duplicate settings found in both local and sync storage
-   * Follows Single Responsibility Principle - only handles cleanup coordination
-   * 
-   * @returns {Object} Results of the cleanup operation
+   * Clean up duplicate settings between local and sync storage
+   * Follows Single Responsibility Principle - only handles duplicate cleanup
    */
   async cleanupDuplicateSettings() {
+    const results = {
+      success: false,
+      duplicatesFound: 0,
+      itemsRemoved: 0,
+      cleanedUp: [],
+      errors: [],
+      details: []
+    };
+
     try {
-      logInfo('Starting duplicate settings cleanup...');
-      const results = await syncStorage.cleanupDuplicateSettings();
+      // Get data from both storages
+      const syncData = await chrome.storage.sync.get(null);
+      const localData = await chrome.storage.local.get(null);
       
-      if (results.success) {
-        logInfo('Duplicate settings cleanup completed successfully');
-      } else {
-        debug.error('Duplicate settings cleanup encountered errors:', results.errors);
+      const duplicateKeys = [];
+      
+      // Find settings that exist in both storages but shouldn't
+      Object.keys(syncData).forEach(key => {
+        if (localData.hasOwnProperty(key) && !localOnlySettings.includes(key)) {
+          // This is a syncable setting that exists in local storage too
+          duplicateKeys.push(key);
+        }
+      });
+      
+      // Also check for local-only settings that exist in sync storage
+      localOnlySettings.forEach(key => {
+        if (syncData.hasOwnProperty(key)) {
+          duplicateKeys.push(key);
+        }
+      });
+      
+      results.duplicatesFound = duplicateKeys.length;
+      
+      if (duplicateKeys.length === 0) {
+        results.success = true;
+        results.details.push('No duplicate settings found');
+        return results;
       }
       
-      return results;
+      // Remove duplicates
+      for (const key of duplicateKeys) {
+        try {
+          if (localOnlySettings.includes(key)) {
+            // Remove from sync storage if it's a local-only setting
+            await chrome.storage.sync.remove(key);
+            results.cleanedUp.push(`Removed ${key} from sync storage (local-only setting)`);
+          } else {
+            // Remove from local storage if it's a syncable setting
+            await chrome.storage.local.remove(key);
+            results.cleanedUp.push(`Removed ${key} from local storage (syncable setting)`);
+          }
+          results.itemsRemoved++;
+        } catch (error) {
+          results.errors.push(`Failed to remove ${key}: ${error.message}`);
+        }
+      }
+      
+      results.success = results.errors.length === 0;
+      results.details.push(`Processed ${duplicateKeys.length} duplicate settings`);
+      
     } catch (error) {
-      const errorMsg = `Failed to cleanup duplicate settings: ${error.message}`;
-      debug.error(errorMsg, error);
+      results.errors.push(error.message);
+      results.details.push(`Error during cleanup: ${error.message}`);
+    }
+    
+    return results;
+  },
+
+  /**
+   * Analyze large arrays and provide optimization recommendations
+   * Follows Single Responsibility Principle - only handles array analysis
+   */
+  async optimizeLargeArrays() {
+    const results = {
+      success: false,
+      arraysAnalyzed: 0,
+      totalSize: 0,
+      analyzed: [],
+      recommendations: [],
+      potentialSavings: 0,
+      details: []
+    };
+
+    try {
+      const syncData = await chrome.storage.sync.get(null);
+      const arrayKeys = ['blacklist', 'whitelist', 'blacklistKeywords', 'whitelistKeywords'];
+      
+      for (const key of arrayKeys) {
+        if (syncData[key] && Array.isArray(syncData[key])) {
+          const array = syncData[key];
+          const analysis = {
+            key: key,
+            count: array.length,
+            sizeBytes: JSON.stringify(array).length,
+            duplicates: 0,
+            emptyItems: 0,
+            recommendation: '',
+            priority: 'low'
+          };
+          
+          // Check for duplicates
+          const uniqueItems = new Set(array);
+          analysis.duplicates = array.length - uniqueItems.size;
+          
+          // Check for empty/invalid items
+          analysis.emptyItems = array.filter(item => !item || item.trim() === '').length;
+          
+          // Generate recommendations
+          if (analysis.count > 200) {
+            analysis.recommendation = `Very large ${key} (${analysis.count} items). Consider organizing into categories.`;
+            analysis.priority = 'high';
+          } else if (analysis.count > 100) {
+            analysis.recommendation = `Large ${key} (${analysis.count} items). Monitor for performance impact.`;
+            analysis.priority = 'medium';
+          } else if (analysis.duplicates > 0) {
+            analysis.recommendation = `Found ${analysis.duplicates} duplicate items in ${key}. Remove duplicates to save space.`;
+            analysis.priority = 'medium';
+          } else if (analysis.emptyItems > 0) {
+            analysis.recommendation = `Found ${analysis.emptyItems} empty items in ${key}. Clean up for better performance.`;
+            analysis.priority = 'low';
+          } else {
+            analysis.recommendation = `${key} looks optimized (${analysis.count} items).`;
+            analysis.priority = 'none';
+          }
+          
+          // Calculate potential savings
+          const duplicateSavings = analysis.duplicates * (JSON.stringify(array[0] || '').length);
+          const emptySavings = analysis.emptyItems * 10; // Rough estimate
+          analysis.potentialSavings = duplicateSavings + emptySavings;
+          
+          results.analyzed.push(analysis);
+          results.totalSize += analysis.sizeBytes;
+          results.potentialSavings += analysis.potentialSavings;
+          results.arraysAnalyzed++;
+        }
+      }
+      
+      // Generate overall recommendations
+      if (results.potentialSavings > 1000) {
+        results.recommendations.push(`Potential space savings: ${results.potentialSavings} bytes`);
+      }
+      
+      const highPriorityIssues = results.analyzed.filter(a => a.priority === 'high').length;
+      if (highPriorityIssues > 0) {
+        results.recommendations.push(`${highPriorityIssues} arrays need immediate attention`);
+      }
+      
+      results.success = true;
+      results.details.push(`Analyzed ${results.arraysAnalyzed} arrays, total size: ${results.totalSize} bytes`);
+      
+    } catch (error) {
+      results.errors = [error.message];
+      results.details.push(`Error during analysis: ${error.message}`);
+    }
+    
+    return results;
+  },
+
+  /**
+   * Force sync settings from local to cloud
+   * Follows Single Responsibility Principle - only handles upward sync
+   */
+  async forceSyncUp() {
+    try {
+      // Get all local data
+      const localData = await chrome.storage.local.get(null);
+      
+      // Filter to only syncable settings
+      const syncableData = {};
+      for (const key of syncableSettings) {
+        if (key.includes('.')) {
+          const [parent, child] = key.split('.');
+          if (localData[parent] && localData[parent][child] !== undefined) {
+            if (!syncableData[parent]) syncableData[parent] = {};
+            syncableData[parent][child] = localData[parent][child];
+          }
+        } else if (localData[key] !== undefined) {
+          syncableData[key] = localData[key];
+        }
+      }
+      
+      // Add sync metadata
+      syncableData._lastSyncUp = new Date().toISOString();
+      
+      // Write to sync storage
+      await chrome.storage.sync.set(syncableData);
+      
       return {
-        cleanedUp: [],
-        errors: [errorMsg],
-        success: false
+        success: true,
+        syncedKeys: Object.keys(syncableData),
+        timestamp: syncableData._lastSyncUp,
+        message: `Successfully synced ${Object.keys(syncableData).length} settings to cloud`
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        message: `Failed to sync to cloud: ${error.message}`
       };
     }
   },
 
   /**
-   * Optimize large arrays by providing recommendations
-   * Follows Single Responsibility Principle - only handles optimization analysis
-   * 
-   * @returns {Object} Analysis and recommendations for large arrays
+   * Force sync settings from cloud to local
+   * Follows Single Responsibility Principle - only handles downward sync
    */
-  async optimizeLargeArrays() {
-    const results = {
-      analyzed: [],
-      recommendations: [],
-      potentialSavings: 0
-    };
-
+  async forceSyncDown() {
     try {
-      const syncData = await chrome.storage.sync.get(['blacklist', 'whitelist', 'blacklistKeywords', 'whitelistKeywords']);
+      // Get all sync data
+      const syncData = await chrome.storage.sync.get(null);
       
-      const arraySettings = [
-        { key: 'blacklist', data: syncData.blacklist, type: 'websites' },
-        { key: 'whitelist', data: syncData.whitelist, type: 'websites' },
-        { key: 'blacklistKeywords', data: syncData.blacklistKeywords, type: 'keywords' },
-        { key: 'whitelistKeywords', data: syncData.whitelistKeywords, type: 'keywords' }
-      ];
-
-      for (const setting of arraySettings) {
-        if (Array.isArray(setting.data) && setting.data.length > 0) {
-          const size = JSON.stringify(setting.data).length;
-          const analysis = {
-            key: setting.key,
-            count: setting.data.length,
-            sizeBytes: size,
-            type: setting.type
-          };
-
-          // Identify potential optimizations
-          if (setting.data.length > 100) {
-            analysis.recommendation = 'Consider reviewing and removing unused entries';
-            analysis.priority = 'high';
-            results.potentialSavings += Math.floor(size * 0.3); // Estimate 30% reduction
-          } else if (setting.data.length > 50) {
-            analysis.recommendation = 'Monitor growth and organize entries';
-            analysis.priority = 'medium';
-            results.potentialSavings += Math.floor(size * 0.1); // Estimate 10% reduction
-          } else {
-            analysis.recommendation = 'Size is optimal';
-            analysis.priority = 'low';
-          }
-
-          // Check for duplicates
-          const duplicates = setting.data.filter((item, index) => 
-            setting.data.indexOf(item) !== index
-          );
-          if (duplicates.length > 0) {
-            analysis.duplicates = duplicates.length;
-            analysis.recommendation += '. Remove duplicate entries.';
-            results.potentialSavings += duplicates.length * 20; // Estimate bytes per duplicate
-          }
-
-          results.analyzed.push(analysis);
+      // Filter out metadata and local-only settings
+      const localUpdateData = {};
+      Object.keys(syncData).forEach(key => {
+        if (!key.startsWith('_') && !localOnlySettings.includes(key)) {
+          localUpdateData[key] = syncData[key];
         }
-      }
-
-      // Generate overall recommendations
-      if (results.potentialSavings > 1000) {
-        results.recommendations.push('Significant storage optimization possible');
-      }
-      if (results.analyzed.some(a => a.duplicates > 0)) {
-        results.recommendations.push('Remove duplicate entries to improve performance');
-      }
-      if (results.analyzed.some(a => a.count > 200)) {
-        results.recommendations.push('Consider splitting large lists into categories');
-      }
-
+      });
+      
+      // Add sync metadata
+      localUpdateData._lastSyncDown = new Date().toISOString();
+      
+      // Write to local storage
+      await chrome.storage.local.set(localUpdateData);
+      
+      return {
+        success: true,
+        syncedKeys: Object.keys(localUpdateData),
+        timestamp: localUpdateData._lastSyncDown,
+        message: `Successfully synced ${Object.keys(localUpdateData).length} settings from cloud`
+      };
     } catch (error) {
-      debug.error('Failed to analyze large arrays:', error);
-      results.error = error.message;
+      return {
+        success: false,
+        error: error.message,
+        message: `Failed to sync from cloud: ${error.message}`
+      };
     }
-
-    return results;
   }
 };
 

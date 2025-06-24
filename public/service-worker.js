@@ -61,7 +61,10 @@ const defaultFramesType = ['main_frame'];
 const defaultMode = 'combined'; // Use 'combined' mode to match UI default
 const defaultIsEnabled = false;
 
-// Add global flag for installation status
+// Add flag for debug logging control
+const ENABLE_DEEP_DEBUGGING = false; // Set to true only when debugging specific issues
+
+// Global flag for installation status
 let isInitialInstall = false; // Will be set to true on first install
 
 // Basic state
@@ -344,17 +347,26 @@ async function init() {
         whitelistKeywordsCount: whitelistKeywords.length,
         mode: mode
       });
+
+      // Set up blocking rules for URL checking
+      setupBlockingRules();
       
-      // Log some information about the deny list
-      logInfo(`Loaded deny list with ${blacklist.length} entries.`);
+      // Log essential information without dumping all rules
+      logInitializationSummary();
       
-      // Show sample data for debugging
-      if (blacklist.length > 0) {
-        logInfo('Sample blacklist items:', blacklist.slice(0, 3));
+      // Setup navigation listener for URL blocking
+      setupNavigationListener();
+      
+      // Check all open tabs against the current rules
+      if (isEnabled) {
+        logInfo('Checking all open tabs against blocking rules');
+        checkAllTabs();
       }
-      if (whitelist.length > 0) {
-        logInfo('Sample whitelist items:', whitelist.slice(0, 3));
-      }
+      
+      // Set up periodic sync checking
+      setupPeriodicSyncCheck();
+
+      logInfo('Service worker initialized successfully');
       
       // IMPORTANT: For a fresh install, ALWAYS save sync data to local storage
       // This ensures we have rules locally even if writing to sync fails later
@@ -410,7 +422,11 @@ async function init() {
         framesType = defaultFramesType;
       }
     }
-      // Always get local settings from local storage
+    
+    // Set up blocking rules
+    setupBlockingRules();
+    
+    // Always get local settings from local storage
     try {
       const localItems = await new Promise((resolve, reject) => {
         chrome.storage.local.get(localSettings, (result) => {
@@ -431,17 +447,8 @@ async function init() {
       logError('Error retrieving local settings, using defaults:', error);
     }
     
-    // Log details of blacklist and whitelist for debugging
-    logInfo('Blacklist items:', blacklist.slice(0, 10)); // Show first 10 items
-    logInfo('Blacklist keywords:', blacklistKeywords);
-    
-    // Log whitelist details too
-    logInfo('WHITELIST RULES:');
-    whitelist.forEach((item, index) => {
-      const pattern = typeof item === 'string' ? item : item.pattern || item.url;
-      logInfo(`Whitelist #${index}: ${pattern}`);
-    });
-    logInfo('Whitelist keywords:', whitelistKeywords);
+    // Log essential information without dumping all rules
+    logInitializationSummary();
     
     // Setup navigation listener for URL blocking
     setupNavigationListener();
@@ -458,6 +465,32 @@ async function init() {
     logInfo('Service worker initialized successfully');
   } catch (error) {
     logError('Error initializing service worker:', error);
+  }
+}
+
+/**
+ * Logs initialization summary without verbose rule dumping.
+ * Follows SRP and reduces console noise.
+ */
+function logInitializationSummary() {
+  const rulesSummary = {
+    denyPatterns: blacklist.length,
+    allowPatterns: whitelist.length, 
+    denyKeywords: blacklistKeywords.length,
+    allowKeywords: whitelistKeywords.length,
+    mode: mode,
+    enabled: isEnabled
+  };
+  
+  logInfo('Extension initialized with rules:', rulesSummary);
+  
+  // Only show sample data in deep debug mode
+  if (ENABLE_DEEP_DEBUGGING && (blacklist.length > 0 || whitelist.length > 0)) {
+    const SAMPLE_SIZE = 3;
+    logInfo('Sample deny patterns:', blacklist.slice(0, SAMPLE_SIZE));
+    logInfo('Sample allow patterns:', whitelist.slice(0, SAMPLE_SIZE));
+    logInfo('Deny keywords:', blacklistKeywords);
+    logInfo('Allow keywords:', whitelistKeywords);
   }
 }
 
@@ -562,64 +595,18 @@ function setupStorageChangeListener() {
   }
 }
 
-// Handler for storage changes
+// Cleaner storage changes handler with reduced logging
 function handleStorageChanges(changes, areaName) {
-  logInfo(`Storage changes detected in ${areaName}:`, changes);
-  
-  // Only process sync changes
   if (areaName !== 'sync') {
     return;
   }
-  
-  let shouldUpdateRules = false;
-  
-  // Process changes in deny list (blacklist)
-  if (changes.blacklist) {
-    logInfo('Deny list updated from sync storage:', changes.blacklist.newValue);
-    blacklist = changes.blacklist.newValue || [];
-    shouldUpdateRules = true;
-  }
-  
-  // Process changes in allow list (whitelist)
-  if (changes.whitelist) {
-    logInfo('Allow list updated from sync storage:', changes.whitelist.newValue);
-    whitelist = changes.whitelist.newValue || [];
-    shouldUpdateRules = true;
-  }
-  
-  // Process changes in deny list keywords
-  if (changes.blacklistKeywords) {
-    logInfo('Deny list keywords updated from sync storage:', changes.blacklistKeywords.newValue);
-    blacklistKeywords = changes.blacklistKeywords.newValue || [];
-    shouldUpdateRules = true;
-  }
-  
-  // Process changes in allow list keywords
-  if (changes.whitelistKeywords) {
-    logInfo('Allow list keywords updated from sync storage:', changes.whitelistKeywords.newValue);
-    whitelistKeywords = changes.whitelistKeywords.newValue || [];
-    shouldUpdateRules = true;
-  }
-  
-  // Process changes in mode
-  if (changes.mode) {
-    logInfo('Mode updated from sync storage:', changes.mode.newValue);
-    mode = changes.mode.newValue || defaultMode;
-    shouldUpdateRules = true;
-  }
-  
-  // Process changes in framesType
-  if (changes.framesType) {
-    logInfo('Frames type updated from sync storage:', changes.framesType.newValue);
-    framesType = changes.framesType.newValue || defaultFramesType;
-    shouldUpdateRules = true;
-  }
-    // Update the blocking rules if necessary
-  if (shouldUpdateRules) {
-    logInfo('Settings changed on another device, updating blocking rules');
-    setupBlockingRules();
+
+  const changesSummary = summarizeStorageChanges(changes);
+  if (changesSummary.hasChanges) {
+    logInfo(`Sync storage updated: ${changesSummary.description}`);
     
-    // Clear the blocked URLs cache
+    // Update rules and clear cache
+    setupBlockingRules();
     blockedUrls.clear();
     
     // Check all open tabs against the updated rules
@@ -628,6 +615,38 @@ function handleStorageChanges(changes, areaName) {
       checkAllTabs();
     }
   }
+}
+
+/**
+ * Summarizes storage changes without verbose logging.
+ * Follows SRP and DRY principles.
+ */
+function summarizeStorageChanges(changes) {
+  let shouldUpdateRules = false;
+  const changedItems = [];
+  
+  // Process each type of change
+  const changeTypes = {
+    blacklist: { name: 'deny patterns', handler: (value) => blacklist = value || [] },
+    whitelist: { name: 'allow patterns', handler: (value) => whitelist = value || [] },
+    blacklistKeywords: { name: 'deny keywords', handler: (value) => blacklistKeywords = value || [] },
+    whitelistKeywords: { name: 'allow keywords', handler: (value) => whitelistKeywords = value || [] },
+    mode: { name: 'mode', handler: (value) => mode = value || defaultMode },
+    framesType: { name: 'frame types', handler: (value) => framesType = value || defaultFramesType }
+  };
+  
+  Object.keys(changeTypes).forEach(key => {
+    if (changes[key]) {
+      changeTypes[key].handler(changes[key].newValue);
+      changedItems.push(changeTypes[key].name);
+      shouldUpdateRules = true;
+    }
+  });
+  
+  return {
+    hasChanges: shouldUpdateRules,
+    description: changedItems.join(', ')
+  };
 }
 
 // Handler for chrome.tabs.onUpdated events
@@ -732,8 +751,6 @@ function navigationHandler(details) {
 }
 // Add enhanced diagnostic functions to troubleshoot specific URL issues
 
-// Add enhanced debugging option
-let ENABLE_DEEP_DEBUGGING = false;
 function deepLog(message, data) {
   if (ENABLE_DEEP_DEBUGGING) {
     console.log(`[DMN DEBUG] ${message}`, data || '');
@@ -810,15 +827,12 @@ function checkKeywordsInUrl(url, denyKeywords = [], allowKeywords = []) {
     logInfo(`URL parsing failed for keyword check: ${e.message}`);
   }
   
-  logInfo(`Checking keywords in URL: ${normalizedUrl}, hostname: ${hostname}`);
-  
   // Check allow keywords first (higher priority)
   for (const keyword of allowKeywords) {
     const pattern = extractKeywordPattern(keyword);
     if (!pattern) continue;
     
     const normalizedPattern = pattern.toLowerCase();
-    logInfo(`Testing allow keyword: "${normalizedPattern}"`);
     
     if (urlContainsKeyword(normalizedUrl, hostname, normalizedPattern)) {
       logInfo(`✅ MATCHED allow keyword: ${pattern}`);
@@ -832,15 +846,12 @@ function checkKeywordsInUrl(url, denyKeywords = [], allowKeywords = []) {
     if (!pattern) continue;
     
     const normalizedPattern = pattern.toLowerCase();
-    logInfo(`Testing deny keyword: "${normalizedPattern}"`);
     
     if (urlContainsKeyword(normalizedUrl, hostname, normalizedPattern)) {
       logInfo(`❌ MATCHED deny keyword: ${pattern}`);
       return { allowKeyword: null, denyKeyword: pattern };
     }
   }
-  
-  logInfo(`No keyword matches found`);
   return { allowKeyword: null, denyKeyword: null };
 }
 
@@ -877,79 +888,142 @@ function urlContainsKeyword(normalizedUrl, hostname, normalizedPattern) {
          (hostname && hostname.includes(normalizedPattern));
 }
 
+/**
+ * Checks if a URL should be blocked based on current rules.
+ * Follows SRP by focusing solely on URL evaluation logic.
+ * Uses minimal logging to reduce console verbosity.
+ * 
+ * @param {string} url - The URL to check
+ * @returns {Object} Result object with blocked status and reason
+ */
 function checkUrlShouldBeBlockedLocal(url) {
-  // Always allow internal browser pages
-  if (url.startsWith('edge://') || url.startsWith('chrome://')) {
-    logInfo(`Allowing internal browser page: ${url}`);
-    return { blocked: false, reason: "Internal browser page" };
+  // Early returns for special cases
+  if (isInternalBrowserPage(url)) {
+    return createBlockResult(false, "Internal browser page");
   }
 
-  // If not enabled, don't block anything
   if (!isEnabled) {
-    return { blocked: false, reason: "Extension disabled" };
+    return createBlockResult(false, "Extension disabled");
   }
-    logInfo(`Checking URL against rules: ${url}`);
+
+  // Log only essential information - not all patterns
+  logUrlCheckStart(url);
   
-  // Prepare pattern and keyword arrays for comprehensive checking
-  const allowPatterns = whitelist.map(site => typeof site === 'string' ? site : site.pattern || site.url).filter(Boolean);
-  const denyPatterns = blacklist.map(site => typeof site === 'string' ? site : site.pattern || site.url).filter(Boolean);
-  
-  // Log comprehensive blocking information
-  logInfo(`Checking with ${denyPatterns.length} deny patterns, ${allowPatterns.length} allow patterns, ${blacklistKeywords.length} deny keywords, and ${whitelistKeywords.length} allow keywords`);
-  logInfo(`Deny patterns: ${JSON.stringify(denyPatterns)}`);
-  logInfo(`Allow patterns: ${JSON.stringify(allowPatterns)}`);
-  logInfo(`Deny keywords: ${JSON.stringify(blacklistKeywords)}`);
-  logInfo(`Allow keywords: ${JSON.stringify(whitelistKeywords)}`);
-  
-  // STEP 1: Check URL patterns using the new pattern matching function (if available)
-  let patternResult = null;
-  if (self.checkUrlShouldBeBlocked && typeof self.checkUrlShouldBeBlocked === 'function') {
-    patternResult = self.checkUrlShouldBeBlocked(url, allowPatterns, denyPatterns);
-    logInfo(`Pattern matching result: ${JSON.stringify(patternResult)}`);
-  }
-  
-  // STEP 2: Check keywords separately (always execute - this was the missing piece!)
+  const patterns = extractPatternsFromRules();
+  const patternResult = evaluateUrlAgainstPatterns(url, patterns);
   const keywordResult = checkKeywordsInUrl(url, blacklistKeywords, whitelistKeywords);
-  logInfo(`Keyword matching result: ${JSON.stringify(keywordResult)}`);
   
-  // STEP 3: Apply precedence rules to determine final result
-  // Priority order: Allow keywords > Allow patterns > Deny keywords > Deny patterns > Default allow
+  const finalResult = applyRulePrecedence(patternResult, keywordResult, url);
+  logUrlCheckResult(url, finalResult);
   
-  // Check for allow keyword override (highest priority)
+  return finalResult;
+}
+
+/**
+ * Creates a standardized block result object.
+ * Follows DRY principle by centralizing result creation.
+ */
+function createBlockResult(blocked, reason, matchedPattern = null) {
+  return { blocked, reason, matchedPattern };
+}
+
+/**
+ * Checks if URL is an internal browser page.
+ * Follows SRP by handling only browser page detection.
+ */
+function isInternalBrowserPage(url) {
+  return url.startsWith('edge://') || url.startsWith('chrome://');
+}
+
+/**
+ * Extracts patterns from rules without verbose logging.
+ * Follows SRP and reduces side effects.
+ */
+function extractPatternsFromRules() {
+  const allowPatterns = whitelist
+    .map(site => typeof site === 'string' ? site : site.pattern || site.url)
+    .filter(Boolean);
+  const denyPatterns = blacklist
+    .map(site => typeof site === 'string' ? site : site.pattern || site.url)
+    .filter(Boolean);
+  
+  return { allowPatterns, denyPatterns };
+}
+
+/**
+ * Evaluates URL against patterns without dumping all patterns to logs.
+ * Follows SRP by focusing only on pattern matching.
+ */
+function evaluateUrlAgainstPatterns(url, patterns) {
+  if (self.checkUrlShouldBeBlocked && typeof self.checkUrlShouldBeBlocked === 'function') {
+    return self.checkUrlShouldBeBlocked(url, patterns.allowPatterns, patterns.denyPatterns);
+  }
+  return null;
+}
+
+/**
+ * Applies rule precedence logic cleanly.
+ * Follows SRP and reduces nesting complexity.
+ */
+function applyRulePrecedence(patternResult, keywordResult, url) {
+  // Priority order: Allow keywords > Allow patterns > Deny keywords > Deny patterns > Default
+  
   if (keywordResult.allowKeyword) {
-    logInfo(`URL allowed by keyword: ${keywordResult.allowKeyword} (overrides all other rules)`);
-    return { blocked: false, reason: `Allow keyword: ${keywordResult.allowKeyword}`, matchedPattern: keywordResult.allowKeyword };
+    return createBlockResult(false, `Allow keyword: ${keywordResult.allowKeyword}`, keywordResult.allowKeyword);
   }
   
-  // Check for allow pattern override
   if (patternResult && !patternResult.blocked && patternResult.matchedPattern) {
-    logInfo(`URL allowed by pattern: ${patternResult.matchedPattern}`);
-    return { blocked: false, reason: patternResult.reason, matchedPattern: patternResult.matchedPattern };
+    return createBlockResult(false, patternResult.reason, patternResult.matchedPattern);
   }
   
-  // Check for deny keyword 
   if (keywordResult.denyKeyword) {
-    logInfo(`URL blocked by keyword: ${keywordResult.denyKeyword}`);
-    return { blocked: true, reason: `Deny keyword: ${keywordResult.denyKeyword}`, matchedPattern: keywordResult.denyKeyword };
+    return createBlockResult(true, `Deny keyword: ${keywordResult.denyKeyword}`, keywordResult.denyKeyword);
   }
   
-  // Check for deny pattern
   if (patternResult && patternResult.blocked) {
-    logInfo(`URL blocked by pattern: ${patternResult.matchedPattern}`);
-    return { blocked: true, reason: patternResult.reason, matchedPattern: patternResult.matchedPattern };
+    return createBlockResult(true, patternResult.reason, patternResult.matchedPattern);
   }
-    // STEP 4: Handle mode-based logic for unmatched URLs
-  // Normalize mode to lowercase for consistent checking
+  
+  return handleUnmatchedUrl(url);
+}
+
+/**
+ * Handles URLs that don't match any rules.
+ * Follows SRP by focusing only on mode-based logic.
+ */
+function handleUnmatchedUrl(url) {
   const normalizedMode = (mode || '').toLowerCase();
   
-  // In allow-list-only mode, block everything not explicitly allowed
   if (normalizedMode === 'whitelist' || normalizedMode === 'allowlist') {
-    logInfo(`URL not explicitly allowed in allow-list mode: ${url} - blocking access`);
-    return { blocked: true, reason: "URL not on Allow List (Allow List Mode)" };
-  }  
-  // Default allow if nothing matched and we're in deny-list or combined mode
-  logInfo(`URL allowed by default (no matching rules)`);
-  return { blocked: false, reason: "No matching rules" };
+    return createBlockResult(true, "URL not on Allow List (Allow List Mode)");
+  }
+  
+  return createBlockResult(false, "No matching rules");
+}
+
+/**
+ * Logs URL check start with minimal information.
+ * Follows SRP and reduces console verbosity.
+ */
+function logUrlCheckStart(url) {
+  // Only log for debugging - avoid dumping all rules
+  if (ENABLE_DEEP_DEBUGGING) {
+    const rulesCount = `${blacklist.length}D/${whitelist.length}A patterns, ${blacklistKeywords.length}D/${whitelistKeywords.length}A keywords`;
+    logInfo(`Checking URL: ${url} (${rulesCount})`);
+  }
+}
+
+/**
+ * Logs URL check result with essential information only.
+ * Follows SRP and avoids verbose output.
+ */
+function logUrlCheckResult(url, result) {
+  if (result.blocked) {
+    logInfo(`BLOCKED: ${url} - ${result.reason}`);
+  } else if (ENABLE_DEEP_DEBUGGING) {
+    // Only log allowed URLs in debug mode to reduce noise
+    logInfo(`ALLOWED: ${url} - ${result.reason}`);
+  }
 }
 
 function checkUrlAgainstRules(url) {
@@ -1007,16 +1081,17 @@ function testDomainMatching() {
   console.log("=== END TESTING ===");
 }
 
-// Replace the setupBlockingRules function with a simpler version that doesn't use declarativeNetRequest
+// Replace the setupBlockingRules function with a cleaner version
 async function setupBlockingRules() {
   // We're no longer using declarativeNetRequest rules at all
   // This function is kept for backward compatibility
   
-  // Just log the current configuration
-  logInfo('Setting up URL blocking with navigation listener only');
-  logInfo(`Mode: ${mode}, Enabled: ${isEnabled}`);
-  logInfo(`Blacklist entries: ${blacklist.length}, Whitelist entries: ${whitelist.length}`);
-  logInfo(`Blacklist keywords: ${blacklistKeywords.length}, Whitelist keywords: ${whitelistKeywords.length}`);
+  // Log essential configuration only
+  if (ENABLE_DEEP_DEBUGGING) {
+    logInfo('Setting up URL blocking with navigation listener only');
+    logInfo(`Mode: ${mode}, Enabled: ${isEnabled}`);
+    logInfo(`Rules: ${blacklist.length}D/${whitelist.length}A patterns, ${blacklistKeywords.length}D/${whitelistKeywords.length}A keywords`);
+  }
   
   // Clear any existing rules if they exist
   if (currentRules.length > 0) {
@@ -1026,63 +1101,91 @@ async function setupBlockingRules() {
       });
     } catch (e) {
       // Ignore errors if the API isn't available
-      logInfo('declarativeNetRequest API not used');
+      if (ENABLE_DEEP_DEBUGGING) {
+        logInfo('declarativeNetRequest API not used');
+      }
     }
     currentRules = [];
   }
 }
 
-// Fix checkAllTabs function to detect blocked tabs more reliably
+// Cleaner checkAllTabs function with reduced logging
 function checkAllTabs() {
   chrome.tabs.query({}).then((tabs) => {
-    if (tabs.length > 0) {
-      const indexUrl = chrome.runtime.getURL('index.html');
-      
-      for (const tab of tabs) {
-        if (isEnabled) {
-          // When extension is enabled, check if each tab should be blocked
-          if (tab.url && tab.url.startsWith('http')) {
+    if (tabs.length === 0) return;
+    
+    const indexUrl = chrome.runtime.getURL('index.html');
+    let processedCount = 0;
+    
+    for (const tab of tabs) {
+      if (isEnabled) {
+        // When extension is enabled, check if each tab should be blocked
+        if (tab.url && tab.url.startsWith('http')) {
+          if (ENABLE_DEEP_DEBUGGING) {
             logInfo(`Checking tab on enable: ${tab.url}`);
-            handleUrl(tab.url, tab.id, 'checkAllTabs');
           }
-        } else {
-          // When extension is disabled, unblock any blocked tabs
-          // More robust detection of blocked pages - match with or without the slash
-          if (tab.url && (
-              tab.url.includes(`${indexUrl}#blocked?url=`) || 
-              tab.url.includes(`${indexUrl}#/blocked?url=`)
-            )) {
-            try {
-              // Extract the original URL that was blocked - handle both formats
-              let hash = new URL(tab.url).hash;
-              if (hash.startsWith('#/')) {
-                hash = hash.substring(2); // Remove the #/ prefix
-              } else if (hash.startsWith('#')) {
-                hash = hash.substring(1); // Remove the # prefix
-              }
-              
-              const originalUrl = hash.split('url=')[1]?.split('&')[0];
-              
-              if (originalUrl) {
-                const decodedUrl = decodeURIComponent(originalUrl);
-                logInfo(`Unblocking tab: ${decodedUrl}`);
-                chrome.tabs.update(tab.id, { url: decodedUrl });
-              } else {
-                logError('Could not extract original URL from hash: ' + hash);
-                chrome.tabs.reload(tab.id);
-              }
-            } catch (e) {
-              logError('Error extracting URL from blocked page:', e);
-              // If we can't extract the URL, just reload the tab
-              chrome.tabs.reload(tab.id);
-            }
-          }
+          handleUrl(tab.url, tab.id, 'checkAllTabs');
+          processedCount++;
+        }
+      } else {
+        // When extension is disabled, unblock any blocked tabs
+        if (isBlockedPageUrl(tab.url, indexUrl)) {
+          unblockTab(tab, indexUrl);
+          processedCount++;
         }
       }
+    }
+    
+    if (processedCount > 0) {
+      logInfo(`Processed ${processedCount} tabs (enabled: ${isEnabled})`);
     }
   }).catch(error => {
     logError('Error querying tabs:', error);
   });
+}
+
+/**
+ * Checks if a URL is a blocked page URL.
+ * Follows SRP by handling only URL detection.
+ */
+function isBlockedPageUrl(url, indexUrl) {
+  return url && (
+    url.includes(`${indexUrl}#blocked?url=`) || 
+    url.includes(`${indexUrl}#/blocked?url=`)
+  );
+}
+
+/**
+ * Unblocks a tab by redirecting to original URL.
+ * Follows SRP by handling only tab unblocking.
+ */
+function unblockTab(tab, indexUrl) {
+  try {
+    // Extract the original URL that was blocked - handle both formats
+    let hash = new URL(tab.url).hash;
+    if (hash.startsWith('#/')) {
+      hash = hash.substring(2); // Remove the #/ prefix
+    } else if (hash.startsWith('#')) {
+      hash = hash.substring(1); // Remove the # prefix
+    }
+    
+    const originalUrl = hash.split('url=')[1]?.split('&')[0];
+    
+    if (originalUrl) {
+      const decodedUrl = decodeURIComponent(originalUrl);
+      if (ENABLE_DEEP_DEBUGGING) {
+        logInfo(`Unblocking tab: ${decodedUrl}`);
+      }
+      chrome.tabs.update(tab.id, { url: decodedUrl });
+    } else {
+      logError('Could not extract original URL from hash: ' + hash);
+      chrome.tabs.reload(tab.id);
+    }
+  } catch (e) {
+    logError('Error extracting URL from blocked page:', e);
+    // If we can't extract the URL, just reload the tab
+    chrome.tabs.reload(tab.id);
+  }
 }
 
 // Update the checkTab function to use handleUrl directly
@@ -1687,66 +1790,97 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   return true; // Keep the message channel open for async responses
 });
 
-// Add a debug function to test pattern matching
+/**
+ * Debug function to test pattern matching for a specific URL.
+ * Follows Clean Code principles: gated behind debug flag, concise output, single responsibility.
+ * Only logs matches to reduce console noise.
+ */
 function debugUrlMatching(url) {
+  if (!ENABLE_DEEP_DEBUGGING) {
+    // Provide minimal debug info when detailed debugging is disabled
+    const result = checkUrlShouldBeBlockedLocal(url);
+    logInfo(`Debug URL check: ${url} => ${result.blocked ? 'BLOCKED' : 'ALLOWED'} (${result.reason})`);
+    return result;
+  }
+  
   logInfo(`=== DEBUG MATCHING FOR URL: ${url} ===`);
   
-  logInfo('Whitelist pattern matches:');
+  const matches = {
+    allowPatterns: [],
+    allowKeywords: [],
+    denyPatterns: [],
+    denyKeywords: []
+  };
+  
+  // Check allow patterns - only log matches
   for (const site of whitelist) {
+    const pattern = extractPatternFromSite(site);
+    if (!pattern) continue;
+    
     try {
-      const pattern = typeof site === 'string' ? site : site.pattern || site.url;
-      if (!pattern) continue;
-      
       const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
-      const isMatch = regexPattern.test(url);
-      logInfo(`  Pattern: ${pattern} => ${isMatch ? 'MATCH' : 'no match'}`);
+      if (regexPattern.test(url)) {
+        matches.allowPatterns.push(pattern);
+      }
     } catch (e) {
-      logError('Error debugging whitelist pattern:', e);
+      logError('Error checking allow pattern:', e);
     }
   }
   
-  logInfo('Whitelist keyword matches:');
+  // Check allow keywords - only log matches
   for (const keyword of whitelistKeywords) {
-    try {
-      const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
-      if (!pattern) continue;
-      
-      const isMatch = url.toLowerCase().includes(pattern.toLowerCase());
-      logInfo(`  Keyword: ${pattern} => ${isMatch ? 'MATCH' : 'no match'}`);
-    } catch (e) {
-      logError('Error debugging whitelist keyword:', e);
+    const pattern = extractKeywordPattern(keyword);
+    if (!pattern) continue;
+    
+    if (url.toLowerCase().includes(pattern.toLowerCase())) {
+      matches.allowKeywords.push(pattern);
     }
   }
   
-  logInfo('Blacklist pattern matches:');
+  // Check deny patterns - only log matches
   for (const site of blacklist) {
+    const pattern = extractPatternFromSite(site);
+    if (!pattern) continue;
+    
     try {
-      const pattern = typeof site === 'string' ? site : site.pattern || site.url;
-      if (!pattern) continue;
-      
       const regexPattern = wildcardToRegExp(pattern.replace(/^\^|\$$/g, ''));
-      const isMatch = regexPattern.test(url);
-      logInfo(`  Pattern: ${pattern} => ${isMatch ? 'MATCH' : 'no match'}`);
+      if (regexPattern.test(url)) {
+        matches.denyPatterns.push(pattern);
+      }
     } catch (e) {
-      logError('Error debugging blacklist pattern:', e);
+      logError('Error checking deny pattern:', e);
     }
   }
   
-  logInfo('Blacklist keyword matches:');
+  // Check deny keywords - only log matches
   for (const keyword of blacklistKeywords) {
-    try {
-      const pattern = typeof keyword === 'string' ? keyword : keyword.pattern || keyword;
-      if (!pattern) continue;
-      
-      const isMatch = url.toLowerCase().includes(pattern.toLowerCase());
-      logInfo(`  Keyword: ${pattern} => ${isMatch ? 'MATCH' : 'no match'}`);
-    } catch (e) {
-      logError('Error debugging blacklist keyword:', e);
+    const pattern = extractKeywordPattern(keyword);
+    if (!pattern) continue;
+    
+    if (url.toLowerCase().includes(pattern.toLowerCase())) {
+      matches.denyKeywords.push(pattern);
     }
   }
-    const result = checkUrlShouldBeBlockedLocal(url);
-  logInfo(`Final result: ${result ? 'BLOCKED' : 'ALLOWED'}`);
+  
+  // Log summary of matches only
+  logInfo('Debug summary:', {
+    allowPatterns: matches.allowPatterns.length > 0 ? matches.allowPatterns : 'none',
+    allowKeywords: matches.allowKeywords.length > 0 ? matches.allowKeywords : 'none', 
+    denyPatterns: matches.denyPatterns.length > 0 ? matches.denyPatterns : 'none',
+    denyKeywords: matches.denyKeywords.length > 0 ? matches.denyKeywords : 'none'
+  });
+  
+  const result = checkUrlShouldBeBlockedLocal(url);
+  logInfo(`Final result: ${result.blocked ? 'BLOCKED' : 'ALLOWED'} - ${result.reason}`);
   return result;
+}
+
+/**
+ * Extracts pattern from site object or string.
+ * Follows DRY principle by centralizing pattern extraction.
+ */
+function extractPatternFromSite(site) {
+  return typeof site === 'string' ? site : site.pattern || site.url;
 }
 
 // Add a testing function for pattern matching

@@ -205,6 +205,9 @@
   "miscellaneous": {
     "message": "Miscellaneous"
   },
+  "diagnose": {
+    "message": "Diagnose"
+  },
   "password": {
     "message": "Password"
   },

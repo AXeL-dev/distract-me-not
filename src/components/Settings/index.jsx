@@ -18,13 +18,6 @@ import {
   Badge,  WarningSignIcon,
   ImportIcon,
   ExportIcon,
-  RefreshIcon,
-  TrashIcon,
-  InfoSignIcon,
-  UploadIcon,
-  PlayIcon,
-  Heading,
-  Text,
 } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv, logInfo } from 'helpers/debug';
@@ -62,6 +55,7 @@ import {
   Tooltip,
   TruncatedText,
   Button,
+  Diagnostics,
 } from 'components';
 import { defaultLogsSettings } from 'helpers/logger';
 import { defaultTimerSettings } from 'helpers/timer';
@@ -72,7 +66,6 @@ import { set, cloneDeep, debounce } from 'lodash';
 import { format } from 'date-fns';
 import './styles.scss';
 import { syncStorage } from 'helpers/syncStorage';
-import { syncStatusLog, diagnostics, syncableSettings, localOnlySettings } from 'helpers/syncDiagnostics';
 
 export class Settings extends Component {
   constructor(props) {
@@ -148,13 +141,7 @@ export class Settings extends Component {
         },
       },
       isSmallScreen: isSmallDevice(),      originalIsEnabled: defaultIsEnabled, // Add this line to track original status
-      syncDiagnostics: null,
-      diagnosisRunning: false,
-      forceSyncRunning: false,
-      syncTestRunning: false,
       refreshRulesRunning: false,
-      lastDiagnosisResults: null,
-      lastSyncTestResults: null,
     };
   }
   componentDidMount() {
@@ -422,10 +409,6 @@ export class Settings extends Component {
       });
       return;
     }
-
-    // Capture original enabled state to detect changes
-    const wasEnabled = this.state.originalIsEnabled;
-    const willBeEnabled = this.state.options.isEnabled;
 
     syncStorage
       .set({
@@ -785,108 +768,6 @@ export class Settings extends Component {
       });
     } finally {
       this.setState({ refreshRulesRunning: false });
-    }
-  };
-  forceSyncSettings = async () => {
-    try {
-      this.setState({ forceSyncRunning: true });
-      
-      const result = await diagnostics.forceSyncAllData();
-      
-      if (result.success) {
-        toaster.success(translate('forceSyncSuccess'), {
-          id: 'force-sync-success',
-          duration: 3
-        });
-      } else {
-        throw new Error(result.error);
-      }
-    } catch (error) {
-      toaster.danger(translate('forceSyncError', { error: error.message }), {
-        id: 'force-sync-error',
-        duration: 5
-      });
-    } finally {
-      this.setState({ forceSyncRunning: false });
-    }
-  };
-
-  runSyncDiagnosis = async () => {
-    try {
-      this.setState({ diagnosisRunning: true });
-      
-      const results = await diagnostics.checkSyncStatus();
-      const problems = await diagnostics.diagnoseProblems();
-      
-      // Show results in a dialog or update state to show in UI
-      console.log('Sync Diagnosis Results:', { results, problems });
-      
-      toaster.success(`Sync diagnosis complete. Found ${problems.problemCount} issues.`, {
-        id: 'diagnosis-complete',
-        duration: 3
-      });
-      
-      // Update state with diagnosis results if needed
-      this.setState({ lastDiagnosisResults: { results, problems } });
-      
-    } catch (error) {
-      toaster.danger(`Diagnosis failed: ${error.message}`, {
-        id: 'diagnosis-error',
-        duration: 5
-      });
-    } finally {
-      this.setState({ diagnosisRunning: false });
-    }
-  };
-
-  testSyncFunctionality = async () => {
-    try {
-      this.setState({ syncTestRunning: true });
-      
-      const testResults = await diagnostics.testSync();
-      
-      if (testResults.success) {
-        toaster.success('Sync test completed successfully!', {
-          id: 'sync-test-success',
-          duration: 3
-        });
-      } else {
-        toaster.warning(`Sync test completed with issues: ${testResults.errors.join(', ')}`, {
-          id: 'sync-test-warning',
-          duration: 5
-        });
-      }
-      
-      console.log('Sync Test Results:', testResults);
-      this.setState({ lastSyncTestResults: testResults });
-      
-    } catch (error) {
-      toaster.danger(`Sync test failed: ${error.message}`, {
-        id: 'sync-test-error',
-        duration: 5
-      });
-    } finally {
-      this.setState({ syncTestRunning: false });
-    }
-  };
-
-  clearSyncStorage = async () => {
-    try {
-      const result = await diagnostics.clearSyncStorage();
-      
-      if (result.success) {
-        toaster.success(translate('clearSyncStorageSuccess'), {
-          id: 'clear-sync-success',
-          duration: 3
-        });
-      } else {
-        throw new Error(result.error);
-      }
-    } catch (error) {
-      toaster.danger(translate('clearSyncStorageError', { error: error.message }), {
-        id: 'clear-sync-error',
-        duration: 5
-      });
     }
   };
 
@@ -1597,247 +1478,9 @@ export class Settings extends Component {
     </Fragment>
   );
 
+  // Clean Code: Single Responsibility - delegate diagnostics to dedicated component
   renderDiagnosticTab = () => (
-    <Fragment>
-      <Paragraph size={400} marginBottom={16}>
-        {translate('syncDiagnosticsDescription')}
-      </Paragraph>
-      
-      <Pane display="flex" marginBottom={24}>
-        <Button 
-          height={32} 
-          iconBefore={RefreshIcon} 
-          marginRight={10} 
-          onClick={this.runSyncDiagnosis}
-          isLoading={this.state.diagnosisRunning}
-        >
-          {translate('runDiagnosis')}
-        </Button>
-        
-        <Button 
-          height={32} 
-          iconBefore={TrashIcon} 
-          intent="danger" 
-          marginRight={10}
-          onClick={this.clearSyncStorage}
-        >
-          {translate('clearSyncStorage')}
-        </Button>
-
-        <Button 
-          height={32} 
-          iconBefore={UploadIcon} 
-          intent="success" 
-          marginRight={10}
-          onClick={this.forceSyncSettings}
-          isLoading={this.state.forceSyncRunning}
-        >
-          {translate('forceSyncSettings')}
-        </Button>        <Button 
-          height={32} 
-          iconBefore={ImportIcon} 
-          intent="success" 
-          onClick={this.refreshRulesFromCloud}
-          isLoading={this.state.refreshRulesRunning}
-        >
-          {translate('refreshRulesFromCloud') || "Refresh Rules from Cloud"}
-        </Button>
-
-        <Button 
-          height={32} 
-          iconBefore={PlayIcon} 
-          intent="primary" 
-          onClick={this.testSyncFunctionality}
-          isLoading={this.state.syncTestRunning}
-        >
-          {translate('testSync') || "Test Sync"}
-        </Button>
-      </Pane>
-      
-      {this.state.syncDiagnostics && (
-        <Pane 
-          elevation={1} 
-          background="tint1" 
-          padding={16} 
-          marginBottom={16}
-          borderRadius={3}
-        >
-          <Pane display="flex" alignItems="center" marginBottom={8}>
-            <InfoSignIcon color="info" marginRight={8} />
-            <Heading size={500}>{translate('syncStatus')}</Heading>
-          </Pane>
-          
-          <Pane marginBottom={8}>
-            <Text>
-              {translate('syncAvailable')}: {' '}
-              <Badge color={this.state.syncDiagnostics.syncAvailable ? "green" : "red"}>
-                {this.state.syncDiagnostics.syncAvailable ? 'Yes' : 'No'}
-              </Badge>
-            </Text>
-          </Pane>
-
-          <Pane marginBottom={8}>
-            <Text>
-              {translate('browser')}: {' '}
-              <Badge color="blue">
-                {this.state.syncDiagnostics.browser 
-                  ? this.state.syncDiagnostics.browser.split(' ').slice(0, 3).join(' ') 
-                  : translate('unknown')}
-              </Badge>
-            </Text>
-          </Pane>
-          
-          <Pane marginBottom={8}>
-            <Text>
-              {translate('storageUsed')}: {' '}
-              {this.state.syncDiagnostics.storageUsed !== null ? 
-                `${(this.state.syncDiagnostics.storageUsed / 1024).toFixed(2)} KB` : 
-                translate('unknown')}
-            </Text>
-          </Pane>
-          
-          <Pane marginBottom={8}>
-            <Text>
-              {translate('syncedItems')}: {this.state.syncDiagnostics.syncableSettingsFound.length} 
-              {this.state.syncDiagnostics.missingSettings.length > 0 && 
-                ` (${this.state.syncDiagnostics.missingSettings.length} missing)`}
-            </Text>
-          </Pane>
-
-          {this.state.syncDiagnostics.errors.length > 0 && (
-            <Pane marginBottom={8}>
-              <Text color="danger">
-                {translate('syncErrors')}: {this.state.syncDiagnostics.errors.length}
-              </Text>
-            </Pane>
-          )}
-          
-          <Paragraph size={300} color="muted">
-            {translate('syncSettingsNote')}
-          </Paragraph>        </Pane>
-      )}
-      
-      {this.state.lastSyncTestResults && (
-        <Pane 
-          elevation={1} 
-          background={this.state.lastSyncTestResults.success ? "greenTint" : "redTint"} 
-          padding={16} 
-          marginBottom={16}
-          borderRadius={3}
-        >
-          <Pane display="flex" alignItems="center" marginBottom={8}>
-            <PlayIcon color={this.state.lastSyncTestResults.success ? "success" : "danger"} marginRight={8} />
-            <Heading size={500}>Sync Test Results</Heading>
-          </Pane>
-          
-          <Pane marginBottom={8}>
-            <Text>
-              Status: {' '}
-              <Badge color={this.state.lastSyncTestResults.success ? "green" : "red"}>
-                {this.state.lastSyncTestResults.success ? 'Passed' : 'Failed'}
-              </Badge>
-            </Text>
-          </Pane>
-
-          <Pane marginBottom={8}>
-            <Text>Duration: {this.state.lastSyncTestResults.duration}ms</Text>
-          </Pane>
-
-          {this.state.lastSyncTestResults.details && (
-            <Pane marginBottom={8}>
-              <Text size={300} fontFamily="mono">
-                {this.state.lastSyncTestResults.details}
-              </Text>
-            </Pane>
-          )}
-
-          {this.state.lastSyncTestResults.error && (
-            <Pane marginBottom={8}>
-              <Text color="danger" size={300}>
-                Error: {this.state.lastSyncTestResults.error}
-              </Text>
-            </Pane>
-          )}
-        </Pane>
-      )}
-
-      {this.state.lastDiagnosisResults && (
-        <Pane 
-          elevation={1} 
-          background="tint1" 
-          padding={16} 
-          marginBottom={16}
-          borderRadius={3}
-        >
-          <Pane display="flex" alignItems="center" marginBottom={8}>            <WarningSignIcon color="info" marginRight={8} />
-            <Heading size={500}>Diagnosis Results</Heading>
-          </Pane>
-          
-          {this.state.lastDiagnosisResults.problems && this.state.lastDiagnosisResults.problems.length > 0 ? (
-            <div>
-              <Text marginBottom={8}>Problems Found:</Text>
-              {this.state.lastDiagnosisResults.problems.map((problem, index) => (
-                <Pane key={index} marginBottom={4}>
-                  <Badge color="red" marginRight={8}>!</Badge>
-                  <Text size={300}>{problem}</Text>
-                </Pane>
-              ))}
-            </div>
-          ) : (
-            <Pane marginBottom={8}>
-              <Badge color="green">No Problems Found</Badge>
-            </Pane>
-          )}
-
-          {this.state.lastDiagnosisResults.recommendations && this.state.lastDiagnosisResults.recommendations.length > 0 && (
-            <div>
-              <Text marginBottom={8} marginTop={12}>Recommendations:</Text>
-              {this.state.lastDiagnosisResults.recommendations.map((rec, index) => (
-                <Pane key={index} marginBottom={4}>
-                  <Badge color="blue" marginRight={8}>i</Badge>
-                  <Text size={300}>{rec}</Text>
-                </Pane>
-              ))}
-            </div>
-          )}
-        </Pane>
-      )}
-      
-      <Pane marginBottom={16}>
-        <Heading size={500} marginBottom={8}>{translate('syncableSettings')}</Heading>
-        <Text>{translate('syncSettingsList')}</Text>
-        <Pane display="flex" flexWrap="wrap" marginTop={8}>
-          {syncableSettings.map(setting => (
-            <Badge 
-              key={setting}
-              color="green" 
-              marginRight={8} 
-              marginBottom={8}
-              isSolid={this.state.syncDiagnostics?.syncableSettingsFound.includes(setting)}
-            >
-              {setting}
-            </Badge>
-          ))}
-        </Pane>
-      </Pane>
-      
-      <Pane>
-        <Heading size={500} marginBottom={8}>{translate('localOnlySettings')}</Heading>
-        <Text>{translate('localSettingsList')}</Text>
-        <Pane display="flex" flexWrap="wrap" marginTop={8}>
-          {localOnlySettings.map(setting => (
-            <Badge 
-              key={setting}
-              color="neutral" 
-              marginRight={8} 
-              marginBottom={8}
-            >
-              {setting}
-            </Badge>
-          ))}
-        </Pane>
-      </Pane>
-    </Fragment>
+    <Diagnostics onRefreshRules={this.refreshRulesFromCloud} />
   );
 
   renderAboutTab = () => (

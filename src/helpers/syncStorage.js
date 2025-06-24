@@ -3,7 +3,7 @@
  * with intelligent fallbacks to local storage when needed.
  */
 
-import { debug, isDevEnv, logInfo } from './debug';
+import { debug, logInfo } from './debug';
 
 // Settings that should be stored in local storage only (everything else syncs)
 const localOnlySettings = [
