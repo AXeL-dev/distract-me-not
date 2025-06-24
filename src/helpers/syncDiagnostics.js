@@ -1,5 +1,5 @@
 import { syncStorage } from './syncStorage';
-import { debug, isDevEnv, logInfo } from './debug';
+import { logInfo } from './debug';
 
 /**
  * Settings that should sync between devices
@@ -234,9 +234,7 @@ export const diagnostics = {
 
       // Step 3: Verify data integrity
       results.steps.push('Verifying data integrity...');
-      const written = JSON.stringify(testData);
-      const read = JSON.stringify(readData[testId]);
-      if (written !== read) {
+      if (!this.isDataIntegrityValid(testData, readData[testId])) {
         throw new Error('Data integrity check failed - written and read data do not match');
       }
       results.steps.push('✓ Data integrity verified');
@@ -284,6 +282,52 @@ export const diagnostics = {
 
     results.endTime = new Date().toISOString();
     return results;
+  },
+
+  /**
+   * Validates data integrity between written and read objects
+   * Follows Single Responsibility Principle - only handles data comparison
+   * Uses deep comparison instead of JSON.stringify to avoid property ordering issues
+   * 
+   * @param {Object} original - The original data that was written
+   * @param {Object} retrieved - The data that was read back
+   * @returns {boolean} True if data integrity is maintained
+   */
+  isDataIntegrityValid(original, retrieved) {
+    return this.deepEquals(original, retrieved);
+  },
+
+  /**
+   * Performs deep equality comparison of two objects
+   * Follows Single Responsibility Principle - only handles deep comparison
+   * Handles nested objects, arrays, and primitive values properly
+   * 
+   * @param {*} a - First value to compare
+   * @param {*} b - Second value to compare
+   * @returns {boolean} True if values are deeply equal
+   */
+  deepEquals(a, b) {
+    if (a === b) return true;
+    
+    if (a == null || b == null) return a === b;
+    
+    if (typeof a !== typeof b) return false;
+    
+    if (typeof a !== 'object') return a === b;
+    
+    if (Array.isArray(a) !== Array.isArray(b)) return false;
+    
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
+    
+    if (keysA.length !== keysB.length) return false;
+    
+    for (const key of keysA) {
+      if (!keysB.includes(key)) return false;
+      if (!this.deepEquals(a[key], b[key])) return false;
+    }
+    
+    return true;
   },
 
   /**
