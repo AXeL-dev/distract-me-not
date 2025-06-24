@@ -428,6 +428,115 @@ export const diagnostics = {
       suggestions: suggestions,
       overallHealth: problems.length === 0 ? 'good' : problems.length < 3 ? 'fair' : 'poor'
     };
+  },
+
+  /**
+   * Clean up duplicate settings found in both local and sync storage
+   * Follows Single Responsibility Principle - only handles cleanup coordination
+   * 
+   * @returns {Object} Results of the cleanup operation
+   */
+  async cleanupDuplicateSettings() {
+    try {
+      logInfo('Starting duplicate settings cleanup...');
+      const results = await syncStorage.cleanupDuplicateSettings();
+      
+      if (results.success) {
+        logInfo('Duplicate settings cleanup completed successfully');
+      } else {
+        debug.error('Duplicate settings cleanup encountered errors:', results.errors);
+      }
+      
+      return results;
+    } catch (error) {
+      const errorMsg = `Failed to cleanup duplicate settings: ${error.message}`;
+      debug.error(errorMsg, error);
+      return {
+        cleanedUp: [],
+        errors: [errorMsg],
+        success: false
+      };
+    }
+  },
+
+  /**
+   * Optimize large arrays by providing recommendations
+   * Follows Single Responsibility Principle - only handles optimization analysis
+   * 
+   * @returns {Object} Analysis and recommendations for large arrays
+   */
+  async optimizeLargeArrays() {
+    const results = {
+      analyzed: [],
+      recommendations: [],
+      potentialSavings: 0
+    };
+
+    try {
+      const syncData = await chrome.storage.sync.get(['blacklist', 'whitelist', 'blacklistKeywords', 'whitelistKeywords']);
+      
+      const arraySettings = [
+        { key: 'blacklist', data: syncData.blacklist, type: 'websites' },
+        { key: 'whitelist', data: syncData.whitelist, type: 'websites' },
+        { key: 'blacklistKeywords', data: syncData.blacklistKeywords, type: 'keywords' },
+        { key: 'whitelistKeywords', data: syncData.whitelistKeywords, type: 'keywords' }
+      ];
+
+      for (const setting of arraySettings) {
+        if (Array.isArray(setting.data) && setting.data.length > 0) {
+          const size = JSON.stringify(setting.data).length;
+          const analysis = {
+            key: setting.key,
+            count: setting.data.length,
+            sizeBytes: size,
+            type: setting.type
+          };
+
+          // Identify potential optimizations
+          if (setting.data.length > 100) {
+            analysis.recommendation = 'Consider reviewing and removing unused entries';
+            analysis.priority = 'high';
+            results.potentialSavings += Math.floor(size * 0.3); // Estimate 30% reduction
+          } else if (setting.data.length > 50) {
+            analysis.recommendation = 'Monitor growth and organize entries';
+            analysis.priority = 'medium';
+            results.potentialSavings += Math.floor(size * 0.1); // Estimate 10% reduction
+          } else {
+            analysis.recommendation = 'Size is optimal';
+            analysis.priority = 'low';
+          }
+
+          // Check for duplicates
+          const duplicates = setting.data.filter((item, index) => 
+            setting.data.indexOf(item) !== index
+          );
+          if (duplicates.length > 0) {
+            analysis.duplicates = duplicates.length;
+            analysis.recommendation += '. Remove duplicate entries.';
+            results.potentialSavings += duplicates.length * 20; // Estimate bytes per duplicate
+          }
+
+          results.analyzed.push(analysis);
+        }
+      }
+
+      // Generate overall recommendations
+      if (results.potentialSavings > 1000) {
+        results.recommendations.push('Significant storage optimization possible');
+      }
+      if (results.analyzed.some(a => a.duplicates > 0)) {
+        results.recommendations.push('Remove duplicate entries to improve performance');
+      }
+      if (results.analyzed.some(a => a.count > 200)) {
+        results.recommendations.push('Consider splitting large lists into categories');
+      }
+
+    } catch (error) {
+      debug.error('Failed to analyze large arrays:', error);
+      results.error = error.message;
+    }
+
+    return results;
   }
 };
 

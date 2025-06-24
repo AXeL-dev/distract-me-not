@@ -215,6 +215,118 @@ export const syncStorage = {
     }
     
     return success;
+  },
+
+  /**
+   * Clean up duplicate settings by removing them from inappropriate storage
+   * Follows Single Responsibility Principle - only handles duplicate cleanup
+   * Ensures each setting exists only in its designated storage location
+   * 
+   * @returns {Object} Results of the cleanup operation
+   */
+  async cleanupDuplicateSettings() {
+    const results = {
+      cleanedUp: [],
+      errors: [],
+      success: true
+    };
+
+    try {
+      // Get all settings from both storages
+      const [localData, syncData] = await Promise.all([
+        chrome.storage.local.get(null),
+        chrome.storage.sync.get(null)
+      ]);
+
+      // Find duplicates - settings that exist in both storages
+      const duplicates = Object.keys(localData).filter(key => 
+        syncData.hasOwnProperty(key)
+      );
+
+      for (const key of duplicates) {
+        try {
+          if (shouldUseLocalStorage(key)) {
+            // This should be local-only, remove from sync
+            await chrome.storage.sync.remove(key);
+            results.cleanedUp.push(`Removed '${key}' from sync storage (should be local-only)`);
+            logInfo(`Cleaned up: removed '${key}' from sync storage`);
+          } else {
+            // This should be synced, remove from local
+            await chrome.storage.local.remove(key);
+            results.cleanedUp.push(`Removed '${key}' from local storage (should be synced)`);
+            logInfo(`Cleaned up: removed '${key}' from local storage`);
+          }
+        } catch (error) {
+          const errorMsg = `Failed to clean up duplicate '${key}': ${error.message}`;
+          results.errors.push(errorMsg);
+          debug.error(errorMsg, error);
+          results.success = false;
+        }
+      }
+
+      if (results.cleanedUp.length === 0) {
+        results.cleanedUp.push('No duplicate settings found - storage is clean');
+      }
+
+    } catch (error) {
+      const errorMsg = `Failed to clean up duplicates: ${error.message}`;
+      results.errors.push(errorMsg);
+      debug.error(errorMsg, error);
+      results.success = false;
+    }
+
+    return results;
+  },
+
+  /**
+   * Migrate settings from one storage to another when storage strategy changes
+   * Follows Single Responsibility Principle - only handles storage migration
+   * 
+   * @param {Array} settingsToMigrate - Array of setting keys to migrate
+   * @param {string} direction - 'toSync' or 'toLocal'
+   * @returns {Object} Results of the migration
+   */
+  async migrateSettings(settingsToMigrate, direction) {
+    const results = {
+      migrated: [],
+      errors: [],
+      success: true
+    };
+
+    const isToSync = direction === 'toSync';
+    const sourceStorage = isToSync ? chrome.storage.local : chrome.storage.sync;
+    const targetStorage = isToSync ? chrome.storage.sync : chrome.storage.local;
+
+    try {
+      // Get settings from source storage
+      const sourceData = await sourceStorage.get(settingsToMigrate);
+      const settingsFound = Object.keys(sourceData);
+
+      if (settingsFound.length === 0) {
+        results.migrated.push('No settings found to migrate');
+        return results;
+      }
+
+      // Save to target storage
+      await targetStorage.set(sourceData);
+      
+      // Remove from source storage
+      await sourceStorage.remove(settingsFound);
+
+      results.migrated = settingsFound.map(key => 
+        `Migrated '${key}' ${isToSync ? 'to sync' : 'to local'} storage`
+      );
+
+      logInfo(`Successfully migrated ${settingsFound.length} settings ${direction}`);
+
+    } catch (error) {
+      const errorMsg = `Failed to migrate settings ${direction}: ${error.message}`;
+      results.errors.push(errorMsg);
+      debug.error(errorMsg, error);
+      results.success = false;
+    }
+
+    return results;
   }
 };
 
