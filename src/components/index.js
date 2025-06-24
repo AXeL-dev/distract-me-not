@@ -9,4 +9,5 @@ export * from './Settings';
 export * from './Timer';
 export * from './Logs';
 export * from './Main';
+export * from './Diagnostics';
 export * from './shared';

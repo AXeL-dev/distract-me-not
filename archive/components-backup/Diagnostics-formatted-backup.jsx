@@ -1,0 +1,302 @@
+/**
+ * BACKUP: Original Diagnostics Component (2025-06-23)
+ * This is a manually reformatted version of the corrupted original file
+ * Following Clean Code principles with proper formatting
+ */
+
+import React, { Component } from 'react';
+import {
+  Pane,
+  Button,
+  Paragraph,
+  toaster,
+  Card,
+  Heading,
+  Badge,
+  Table,
+  Text,
+  Spinner,
+  Alert,
+  RefreshIcon,
+  CleanIcon,
+  SettingsIcon
+} from 'evergreen-ui';
+import { diagnostics } from 'helpers/syncDiagnostics';
+import { translate } from 'helpers/i18n';
+
+/**
+ * Diagnostics component for sync and storage health monitoring
+ * Follows Single Responsibility Principle - only handles diagnostics UI
+ */
+export default class Diagnostics extends Component {
+  constructor(props) {
+    super(props);
+    
+    this.state = {
+      isLoading: false,
+      diagnosticsData: null,
+      lastUpdated: null,
+      cleanupResults: null,
+      optimizationResults: null
+    };
+  }
+
+  componentDidMount() {
+    this.runDiagnostics();
+  }
+
+  /**
+   * Run comprehensive diagnostics check
+   * Follows Single Responsibility Principle - only handles diagnostics execution
+   */
+  runDiagnostics = async () => {
+    this.setState({ isLoading: true });
+    
+    try {
+      const results = await diagnostics.checkSyncStatus();
+      this.setState({
+        diagnosticsData: results,
+        lastUpdated: new Date().toLocaleString(),
+        isLoading: false
+      });
+    } catch (error) {
+      console.error('Diagnostics failed:', error);
+      toaster.danger('Failed to run diagnostics: ' + error.message);
+      this.setState({ isLoading: false });
+    }
+  };
+
+  /**
+   * Clean up duplicate settings
+   * Follows Single Responsibility Principle - only handles cleanup UI coordination
+   */
+  cleanupDuplicates = async () => {
+    this.setState({ isLoading: true });
+    
+    try {
+      const results = await diagnostics.cleanupDuplicateSettings();
+      this.setState({
+        cleanupResults: results,
+        isLoading: false
+      });
+      
+      if (results.success) {
+        toaster.success('Cleanup completed successfully');
+        // Refresh diagnostics after cleanup
+        setTimeout(() => this.runDiagnostics(), 1000);
+      } else {
+        toaster.warning('Cleanup completed with some issues');
+      }
+    } catch (error) {
+      console.error('Cleanup failed:', error);
+      toaster.danger('Failed to cleanup duplicates: ' + error.message);
+      this.setState({ isLoading: false });
+    }
+  };
+
+  /**
+   * Analyze large arrays for optimization
+   * Follows Single Responsibility Principle - only handles optimization UI
+   */
+  optimizeArrays = async () => {
+    this.setState({ isLoading: true });
+    
+    try {
+      const results = await diagnostics.optimizeLargeArrays();
+      this.setState({
+        optimizationResults: results,
+        isLoading: false
+      });
+      
+      toaster.success('Array analysis completed');
+    } catch (error) {
+      console.error('Optimization analysis failed:', error);
+      toaster.danger('Failed to analyze arrays: ' + error.message);
+      this.setState({ isLoading: false });
+    }
+  };
+
+  /**
+   * Render status badge based on health
+   * Follows Single Responsibility Principle - only handles status visualization
+   */
+  renderStatusBadge = (status) => {
+    const { syncAvailable, errors } = status || {};
+    
+    if (!syncAvailable) {
+      return <Badge color="red">Sync Unavailable</Badge>;
+    }
+    
+    if (errors && errors.length > 0) {
+      return <Badge color="orange">Issues Found</Badge>;
+    }
+    
+    return <Badge color="green">Healthy</Badge>;
+  };
+
+  /**
+   * Render sync information table
+   * Follows Single Responsibility Principle - only handles sync info display
+   */
+  renderSyncInfo = () => {
+    const { diagnosticsData } = this.state;
+    
+    if (!diagnosticsData) return null;
+
+    return (
+      <Card elevation={1} padding={16} marginBottom={16}>
+        <Heading size={600} marginBottom={12}>Sync Status</Heading>
+        <Table>
+          <Table.Body>
+            <Table.Row>
+              <Table.TextCell>Sync Available</Table.TextCell>
+              <Table.TextCell>
+                {diagnosticsData.syncAvailable ? '✓ Yes' : '❌ No'}
+              </Table.TextCell>
+            </Table.Row>
+            <Table.Row>
+              <Table.TextCell>Storage Quota</Table.TextCell>
+              <Table.TextCell>
+                {diagnosticsData.storageQuota ? 
+                  `${diagnosticsData.storageUsed} / ${diagnosticsData.storageQuota} bytes` : 
+                  'Unknown'
+                }
+              </Table.TextCell>
+            </Table.Row>
+            <Table.Row>
+              <Table.TextCell>Sync Settings</Table.TextCell>
+              <Table.TextCell>{diagnosticsData.syncableSettingsFound?.length || 0} found</Table.TextCell>
+            </Table.Row>
+            <Table.Row>
+              <Table.TextCell>Local Settings</Table.TextCell>
+              <Table.TextCell>{diagnosticsData.localOnlySettingsFound?.length || 0} found</Table.TextCell>
+            </Table.Row>
+          </Table.Body>
+        </Table>
+      </Card>
+    );
+  };
+
+  /**
+   * Render cleanup results
+   * Follows Single Responsibility Principle - only handles cleanup results display
+   */
+  renderCleanupResults = () => {
+    const { cleanupResults } = this.state;
+    
+    if (!cleanupResults) return null;
+
+    return (
+      <Card elevation={1} padding={16} marginBottom={16}>
+        <Heading size={600} marginBottom={12}>Cleanup Results</Heading>
+        {cleanupResults.cleanedUp.map((item, index) => (
+          <Paragraph key={index} color={cleanupResults.success ? 'success' : 'warning'}>
+            ✓ {item}
+          </Paragraph>
+        ))}
+        {cleanupResults.errors.map((error, index) => (
+          <Paragraph key={index} color="danger">
+            ❌ {error}
+          </Paragraph>
+        ))}
+      </Card>
+    );
+  };
+
+  /**
+   * Render optimization results
+   * Follows Single Responsibility Principle - only handles optimization display
+   */
+  renderOptimizationResults = () => {
+    const { optimizationResults } = this.state;
+    
+    if (!optimizationResults) return null;
+
+    return (
+      <Card elevation={1} padding={16} marginBottom={16}>
+        <Heading size={600} marginBottom={12}>Array Optimization Analysis</Heading>
+        {optimizationResults.analyzed.map((analysis, index) => (
+          <Card key={index} elevation={0} border padding={12} marginBottom={8}>
+            <Text fontWeight={600}>{analysis.key}</Text>
+            <Paragraph>
+              Count: {analysis.count} | Size: {analysis.sizeBytes} bytes
+              {analysis.duplicates && ` | Duplicates: ${analysis.duplicates}`}
+            </Paragraph>
+            <Paragraph color={analysis.priority === 'high' ? 'danger' : analysis.priority === 'medium' ? 'warning' : 'muted'}>
+              {analysis.recommendation}
+            </Paragraph>
+          </Card>
+        ))}
+        {optimizationResults.potentialSavings > 0 && (
+          <Alert intent="success" title={`Potential space savings: ${optimizationResults.potentialSavings} bytes`} />
+        )}
+      </Card>
+    );
+  };
+
+  render() {
+    const { isLoading, diagnosticsData, lastUpdated } = this.state;
+
+    return (
+      <Pane>
+        <Pane display="flex" alignItems="center" marginBottom={16}>
+          <Heading size={700} marginRight={16}>
+            {translate('syncDiagnostics', 'Sync Diagnostics')}
+          </Heading>
+          {diagnosticsData && this.renderStatusBadge(diagnosticsData)}
+        </Pane>
+
+        {lastUpdated && (
+          <Paragraph color="muted" marginBottom={16}>
+            Last updated: {lastUpdated}
+          </Paragraph>
+        )}
+
+        <Pane display="flex" gap={8} marginBottom={16}>
+          <Button
+            iconBefore={RefreshIcon}
+            onClick={this.runDiagnostics}
+            isLoading={isLoading}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Running...' : 'Run Diagnostics'}
+          </Button>
+          
+          <Button
+            iconBefore={CleanIcon}
+            onClick={this.cleanupDuplicates}
+            disabled={isLoading}
+            intent="warning"
+          >
+            Cleanup Duplicates
+          </Button>
+          
+          <Button
+            iconBefore={SettingsIcon}
+            onClick={this.optimizeArrays}
+            disabled={isLoading}
+          >
+            Analyze Arrays
+          </Button>
+        </Pane>
+
+        {isLoading && <Spinner marginX="auto" marginY={24} />}
+
+        {this.renderSyncInfo()}
+        {this.renderCleanupResults()}
+        {this.renderOptimizationResults()}
+
+        {diagnosticsData?.errors && diagnosticsData.errors.length > 0 && (
+          <Card elevation={1} padding={16} background="redTint">
+            <Heading size={600} marginBottom={12}>Errors</Heading>
+            {diagnosticsData.errors.map((error, index) => (
+              <Paragraph key={index} color="danger">
+                ❌ {error.message || error}
+              </Paragraph>
+            ))}
+          </Card>
+        )}
+      </Pane>
+    );
+  }
+}
