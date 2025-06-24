@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Extension Communication Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 20px;
+      line-height: 1.6;
+    }
+    h1 { color: #333; }
+    button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    pre {
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      overflow: auto;
+      max-height: 300px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Extension Communication Test</h1>
+  
+  <div>
+    <button id="testButton">Test Service Worker Communication</button>
+  </div>
+  
+  <h2>Results:</h2>
+  <pre id="results">Click the button to test communication...</pre>
+  
+  <script>
+    document.getElementById('testButton').addEventListener('click', async function() {
+      const resultsElement = document.getElementById('results');
+      resultsElement.textContent = 'Testing communication...\n';
+      
+      try {
+        // Verify chrome API
+        if (!chrome || !chrome.runtime) {
+          resultsElement.textContent += 'ERROR: chrome.runtime API not available!\n';
+          return;
+        }
+        
+        resultsElement.textContent += `Extension ID: ${chrome.runtime.id}\n`;
+        
+        // Test 1: Basic ping
+        resultsElement.textContent += '\nTest 1: Basic ping\n';
+        try {
+          chrome.runtime.sendMessage({ message: 'ping' }, function(response) {
+            if (chrome.runtime.lastError) {
+              resultsElement.textContent += `ERROR: ${chrome.runtime.lastError.message}\n`;
+            } else {
+              resultsElement.textContent += `SUCCESS! Response: ${JSON.stringify(response)}\n`;
+            }
+          });
+        } catch (e) {
+          resultsElement.textContent += `Exception: ${e.message}\n`;
+        }
+        
+        // Test 2: Get current settings
+        setTimeout(() => {
+          resultsElement.textContent += '\nTest 2: Get current settings\n';
+          try {
+            chrome.runtime.sendMessage({ message: 'getCurrentSettings' }, function(response) {
+              if (chrome.runtime.lastError) {
+                resultsElement.textContent += `ERROR: ${chrome.runtime.lastError.message}\n`;
+              } else {
+                resultsElement.textContent += `SUCCESS! Response: ${JSON.stringify(response)}\n`;
+              }
+            });
+          } catch (e) {
+            resultsElement.textContent += `Exception: ${e.message}\n`;
+          }
+        }, 500);
+        
+        // Test 3: Simple string message
+        setTimeout(() => {
+          resultsElement.textContent += '\nTest 3: Simple string message\n';
+          try {
+            chrome.runtime.sendMessage('hello from test page', function(response) {
+              if (chrome.runtime.lastError) {
+                resultsElement.textContent += `ERROR: ${chrome.runtime.lastError.message}\n`;
+              } else {
+                resultsElement.textContent += `SUCCESS! Response: ${JSON.stringify(response)}\n`;
+              }
+            });
+          } catch (e) {
+            resultsElement.textContent += `Exception: ${e.message}\n`;
+          }
+        }, 1000);
+        
+      } catch (error) {
+        resultsElement.textContent += `Fatal error: ${error.message}\n`;
+      }
+    });
+  </script>
+</body>
+</html>

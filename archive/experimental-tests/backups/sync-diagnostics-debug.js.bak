@@ -1,0 +1,621 @@
+// Create a console log display
+const originalConsoleLog = console.log;
+const originalConsoleError = console.error;
+const originalConsoleWarn = console.warn;
+
+function addLogToDisplay(message, type = 'log') {
+  const logOutput = document.getElementById('logOutput');
+  
+  // Create log entry
+  const logEntry = document.createElement('div');
+  logEntry.style.borderBottom = '1px solid #333';
+  logEntry.style.padding = '2px 0';
+  
+  // Format timestamp
+  const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+  
+  // Format object or error
+  let formatted = '';
+  if (typeof message === 'object') {
+    try {
+      if (message instanceof Error) {
+        formatted = message.message + "\n" + message.stack;
+      } else {
+        formatted = JSON.stringify(message, null, 2);
+      }
+    } catch (e) {
+      formatted = '[Object that cannot be stringified]';
+    }
+  } else {
+    formatted = message;
+  }
+  
+  // Set color based on log type
+  let color = '#ccc';
+  switch (type) {
+    case 'error': color = '#f88'; break;
+    case 'warn': color = '#ff8'; break;
+    case 'success': color = '#8f8'; break;
+  }
+  
+  // Add content
+  logEntry.innerHTML = `<span style="color: #888">[${timestamp}]</span> <span style="color: ${color}">${formatted}</span>`;
+  
+  // Add to log output and scroll to bottom
+  logOutput.appendChild(logEntry);
+  logOutput.scrollTop = logOutput.scrollHeight;
+  
+  // Trim old logs if too many
+  while (logOutput.children.length > 100) {
+    logOutput.removeChild(logOutput.firstChild);
+  }
+}
+
+// Override console methods
+console.log = function() {
+  originalConsoleLog.apply(console, arguments);
+  addLogToDisplay(arguments[0]);
+};
+
+console.error = function() {
+  originalConsoleError.apply(console, arguments);
+  addLogToDisplay(arguments[0], 'error');
+};
+
+console.warn = function() {
+  originalConsoleWarn.apply(console, arguments);
+  addLogToDisplay(arguments[0], 'warn');
+};
+
+// Helper function to display data results
+function displayStorageData(elementId, data) {
+  const container = document.getElementById(elementId);
+  container.innerHTML = '';
+  
+  if (!data || Object.keys(data).length === 0) {
+    container.textContent = 'No data available';
+    return;
+  }
+  
+  const table = document.createElement('table');
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  
+  ['Key', 'Type', 'Size', 'Value'].forEach(header => {
+    const th = document.createElement('th');
+    th.textContent = header;
+    headerRow.appendChild(th);
+  });
+  
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+  
+  const tbody = document.createElement('tbody');
+  
+  for (const key of Object.keys(data).sort()) {
+    const value = data[key];
+    const type = Array.isArray(value) ? 'Array' : typeof value;
+    
+    // Calculate approximate size
+    let size;
+    try {
+      size = JSON.stringify(value).length;
+      size = size > 1024 ? Math.round(size / 1024) + ' KB' : size + ' bytes';
+    } catch (e) {
+      size = 'Unknown';
+    }
+    
+    const row = document.createElement('tr');
+    
+    // Key
+    const keyCell = document.createElement('td');
+    keyCell.textContent = key;
+    row.appendChild(keyCell);
+    
+    // Type
+    const typeCell = document.createElement('td');
+    typeCell.textContent = type;
+    row.appendChild(typeCell);
+    
+    // Size
+    const sizeCell = document.createElement('td');
+    sizeCell.textContent = size;
+    row.appendChild(sizeCell);
+    
+    // Value
+    const valueCell = document.createElement('td');
+    if (type === 'Array') {
+      valueCell.textContent = `Array (${value.length} items)`;
+      if (value.length > 0) {
+        const pre = document.createElement('pre');
+        pre.textContent = JSON.stringify(value.slice(0, 3), null, 2);
+        if (value.length > 3) {
+          pre.textContent += `\n...and ${value.length - 3} more items`;
+        }
+        valueCell.appendChild(pre);
+      }
+    } else if (type === 'object' && value !== null) {
+      const pre = document.createElement('pre');
+      pre.textContent = JSON.stringify(value, null, 2);
+      valueCell.appendChild(pre);
+    } else {
+      valueCell.textContent = JSON.stringify(value);
+    }
+    
+    row.appendChild(valueCell);
+    tbody.appendChild(row);
+  }
+  
+  table.appendChild(tbody);
+  container.appendChild(table);
+}
+
+// Set up event handlers for all buttons
+function setupEventHandlers() {
+  // Service Worker Communication
+  document.getElementById('pingServiceWorker')?.addEventListener('click', async () => {
+    console.log('Pinging service worker...');
+    try {
+      chrome.runtime.sendMessage(
+        { message: 'ping' },
+        function(response) {
+          if (chrome.runtime.lastError) {
+            console.error('Error from service worker:', chrome.runtime.lastError);
+            return;
+          }
+          
+          console.log('Service worker response:', response);
+          addLogToDisplay('Ping successful! Response: ' + JSON.stringify(response), 'success');
+        }
+      );
+    } catch (error) {
+      console.error('Error pinging service worker:', error);
+    }
+  });
+      await chrome.storage.sync.remove(testKey);
+    } catch (error) {
+      console.error('Sync API test error:', error);
+    }
+  });
+  
+  document.getElementById('testLocalApiBtn').addEventListener('click', async () => {
+    console.log('Testing local storage API...');
+    try {
+      const testKey = 'debug_test_local_' + Date.now();
+      console.log('Setting test key: ' + testKey);
+      await chrome.storage.local.set({ [testKey]: 'test_value' });
+      console.log('Getting test key...');
+      const data = await chrome.storage.local.get(testKey);
+      console.log('Result:', data);
+      if (data[testKey] === 'test_value') {
+        addLogToDisplay('Local API test successful!', 'success');
+      } else {
+        console.error('Unexpected result from local API test');
+      }
+      console.log('Removing test key...');
+      await chrome.storage.local.remove(testKey);
+    } catch (error) {
+      console.error('Local API test error:', error);
+    }
+  });
+  
+  document.getElementById('testMessageBtn').addEventListener('click', async () => {
+    console.log('Testing service worker message...');
+    try {
+      console.log('Sending getCurrentSettings message...');
+      chrome.runtime.sendMessage(
+        { message: 'getCurrentSettings' },
+        function(response) {
+          console.log('Response received:', response);
+          
+          if (chrome.runtime.lastError) {
+            console.error('Error from sendMessage:', chrome.runtime.lastError);
+            return;
+          }
+          
+          if (response && response.response) {
+            console.log('Service worker settings:', response.response);
+            addLogToDisplay('Message test successful!', 'success');
+            
+            // Display detailed settings
+            const debugInfo = document.createElement('div');
+            debugInfo.className = 'debug-info';
+            debugInfo.innerHTML = `
+              <h3>Service Worker Settings</h3>
+              <pre>${JSON.stringify(response.response, null, 2)}</pre>
+            `;
+            document.getElementById('debugResult').appendChild(debugInfo);
+          } else if (response && response.error) {
+            console.error('Service worker reported error:', response.error);
+          } else {
+            console.error('Unexpected response format:', response);
+          }
+        }
+      );
+    } catch (error) {
+      console.error('Message test error:', error);
+    }
+  });
+  
+  document.getElementById('checkPermsBtn').addEventListener('click', async () => {
+    console.log('Checking permissions...');
+    try {
+      // Check permissions if available
+      if (chrome.permissions && chrome.permissions.getAll) {
+        const perms = await chrome.permissions.getAll();
+        console.log('Current permissions:', perms);
+        
+        const debugInfo = document.createElement('div');
+        debugInfo.className = 'debug-info';
+        debugInfo.innerHTML = `
+          <h3>Extension Permissions</h3>
+          <pre>${JSON.stringify(perms, null, 2)}</pre>
+        `;
+        document.getElementById('debugResult').appendChild(debugInfo);
+      } else {
+        console.log('chrome.permissions API not available');
+      }
+      
+      // Get extension info
+      const manifest = chrome.runtime.getManifest();
+      console.log('Extension manifest:', manifest);
+      
+      const debugInfo = document.createElement('div');
+      debugInfo.className = 'debug-info';
+      debugInfo.innerHTML = `
+        <h3>Extension Information</h3>
+        <p>ID: ${chrome.runtime.id}</p>
+        <p>Version: ${manifest.version}</p>
+        <p>Manifest Version: ${manifest.manifest_version}</p>
+        <h4>Requested Permissions:</h4>
+        <pre>${JSON.stringify(manifest.permissions, null, 2)}</pre>
+      `;
+      document.getElementById('debugResult').appendChild(debugInfo);
+      
+      addLogToDisplay('Permission check completed', 'success');
+    } catch (error) {
+      console.error('Permission check error:', error);
+    }
+  });
+  
+  document.getElementById('reloadSwBtn').addEventListener('click', async () => {
+    console.log('Reloading service worker...');
+    try {
+      chrome.runtime.reload();
+      console.log('Reload requested. Extension should restart momentarily.');
+    } catch (error) {
+      console.error('Reload error:', error);
+    }
+  });
+  
+  document.getElementById('showSyncBtn').addEventListener('click', async () => {
+    try {
+      console.log('Loading sync storage data...');
+      const syncData = await chrome.storage.sync.get(null);
+      console.log('Sync storage data:', syncData);
+      displayStorageData('storageData', syncData);
+    } catch (error) {
+      console.error('Error loading sync storage:', error);
+    }
+  });
+  
+  document.getElementById('showLocalBtn').addEventListener('click', async () => {
+    try {
+      console.log('Loading local storage data...');
+      const localData = await chrome.storage.local.get(null);
+      console.log('Local storage data:', localData);
+      displayStorageData('storageData', localData);
+    } catch (error) {
+      console.error('Error loading local storage:', error);
+    }
+  });
+  
+  document.getElementById('checkSwStatusBtn').addEventListener('click', async () => {
+    try {
+      console.log('Checking service worker status...');
+      
+      chrome.runtime.sendMessage(
+        { message: 'getCurrentSettings' },
+        function(response) {
+          if (chrome.runtime.lastError) {
+            console.error('Error from service worker:', chrome.runtime.lastError);
+            document.getElementById('swStatus').innerHTML = `
+              <p class="error">Service worker is not responsive: ${chrome.runtime.lastError.message}</p>
+            `;
+            return;
+          }
+          
+          if (response && response.response) {
+            console.log('Service worker is active:', response);
+            document.getElementById('swStatus').innerHTML = `
+              <p class="success">Service worker is active and responding</p>
+              <div class="debug-info">
+                <h4>Current Service Worker State:</h4>
+                <pre>${JSON.stringify(response.response, null, 2)}</pre>
+              </div>
+            `;
+          } else {
+            console.error('Unexpected response:', response);
+            document.getElementById('swStatus').innerHTML = `
+              <p class="warning">Service worker response is not in expected format</p>
+              <pre>${JSON.stringify(response, null, 2)}</pre>
+            `;
+          }
+        }
+      );
+    } catch (error) {
+      console.error('Error checking service worker status:', error);
+      document.getElementById('swStatus').innerHTML = `
+        <p class="error">Error checking service worker: ${error.message}</p>
+      `;
+    }
+  });
+  
+  document.getElementById('pingSwBtn').addEventListener('click', async () => {
+    try {
+      console.log('Pinging service worker...');
+      
+      chrome.runtime.sendMessage(
+        { message: 'ping' },
+        function(response) {
+          if (chrome.runtime.lastError) {
+            console.error('Ping error:', chrome.runtime.lastError);
+            document.getElementById('swStatus').innerHTML = `
+              <p class="error">Ping failed: ${chrome.runtime.lastError.message}</p>
+            `;
+            return;
+          }
+          
+          console.log('Ping response:', response);
+          document.getElementById('swStatus').innerHTML = `
+            <p class="success">Ping successful!</p>
+            <div class="debug-info">
+              <pre>${JSON.stringify(response, null, 2)}</pre>
+              <p>Response time: ${Date.now() - performance.now().toFixed(0)} ms</p>
+            </div>
+          `;
+        }
+      );
+    } catch (error) {
+      console.error('Error pinging service worker:', error);
+    }
+  });
+  
+  document.getElementById('testFlow1Btn').addEventListener('click', async () => {
+    try {
+      console.log('Testing flow: Local → Sync...');
+      document.getElementById('flowTestResult').innerHTML = '<p>Testing Local → Sync flow...</p>';
+      
+      // Create a test item in local storage
+      const testKey = 'flow_test_' + Date.now();
+      const testValue = { test: true, timestamp: Date.now() };
+      
+      console.log('1. Setting value in local storage...');
+      await chrome.storage.local.set({ [testKey]: testValue });
+      
+      console.log('2. Reading from local storage...');
+      const localResult = await chrome.storage.local.get(testKey);
+      console.log('Local result:', localResult);
+      
+      console.log('3. Writing to sync storage...');
+      await chrome.storage.sync.set({ [testKey]: localResult[testKey] });
+      
+      console.log('4. Reading from sync storage...');
+      const syncResult = await chrome.storage.sync.get(testKey);
+      console.log('Sync result:', syncResult);
+      
+      // Verify the data matches
+      if (JSON.stringify(localResult[testKey]) === JSON.stringify(syncResult[testKey])) {
+        console.log('SUCCESS: Data successfully flowed from Local → Sync');
+        document.getElementById('flowTestResult').innerHTML = `
+          <p class="success">Local → Sync flow successful!</p>
+          <p>Test key: ${testKey}</p>
+          <pre>${JSON.stringify(syncResult[testKey], null, 2)}</pre>
+        `;
+      } else {
+        console.error('ERROR: Data mismatch between Local and Sync');
+        document.getElementById('flowTestResult').innerHTML = `
+          <p class="error">Local → Sync flow FAILED: Data mismatch</p>
+          <p>Local data: ${JSON.stringify(localResult[testKey])}</p>
+          <p>Sync data: ${JSON.stringify(syncResult[testKey])}</p>
+        `;
+      }
+      
+      // Clean up
+      console.log('5. Cleaning up test data...');
+      await chrome.storage.local.remove(testKey);
+      await chrome.storage.sync.remove(testKey);
+      
+    } catch (error) {
+      console.error('Flow test error:', error);
+      document.getElementById('flowTestResult').innerHTML = `
+        <p class="error">Flow test error: ${error.message}</p>
+        <pre>${error.stack}</pre>
+      `;
+    }
+  });
+  
+  document.getElementById('testFlow2Btn').addEventListener('click', async () => {
+    try {
+      console.log('Testing flow: Sync → Local...');
+      document.getElementById('flowTestResult').innerHTML = '<p>Testing Sync → Local flow...</p>';
+      
+      // Create a test item in sync storage
+      const testKey = 'flow_test_' + Date.now();
+      const testValue = { test: true, timestamp: Date.now() };
+      
+      console.log('1. Setting value in sync storage...');
+      await chrome.storage.sync.set({ [testKey]: testValue });
+      
+      console.log('2. Reading from sync storage...');
+      const syncResult = await chrome.storage.sync.get(testKey);
+      console.log('Sync result:', syncResult);
+      
+      console.log('3. Writing to local storage...');
+      await chrome.storage.local.set({ [testKey]: syncResult[testKey] });
+      
+      console.log('4. Reading from local storage...');
+      const localResult = await chrome.storage.local.get(testKey);
+      console.log('Local result:', localResult);
+      
+      // Verify the data matches
+      if (JSON.stringify(syncResult[testKey]) === JSON.stringify(localResult[testKey])) {
+        console.log('SUCCESS: Data successfully flowed from Sync → Local');
+        document.getElementById('flowTestResult').innerHTML = `
+          <p class="success">Sync → Local flow successful!</p>
+          <p>Test key: ${testKey}</p>
+          <pre>${JSON.stringify(localResult[testKey], null, 2)}</pre>
+        `;
+      } else {
+        console.error('ERROR: Data mismatch between Sync and Local');
+        document.getElementById('flowTestResult').innerHTML = `
+          <p class="error">Sync → Local flow FAILED: Data mismatch</p>
+          <p>Sync data: ${JSON.stringify(syncResult[testKey])}</p>
+          <p>Local data: ${JSON.stringify(localResult[testKey])}</p>
+        `;
+      }
+      
+      // Clean up
+      console.log('5. Cleaning up test data...');
+      await chrome.storage.sync.remove(testKey);
+      await chrome.storage.local.remove(testKey);
+      
+    } catch (error) {
+      console.error('Flow test error:', error);
+      document.getElementById('flowTestResult').innerHTML = `
+        <p class="error">Flow test error: ${error.message}</p>
+        <pre>${error.stack}</pre>
+      `;
+    }
+  });
+  
+  document.getElementById('testFlow3Btn').addEventListener('click', async () => {
+    try {
+      console.log('Testing flow: Local → Service Worker...');
+      document.getElementById('flowTestResult').innerHTML = '<p>Testing Local → Service Worker flow...</p>';
+      
+      // Create a test deny list item
+      const testSite = 'flow-test-' + Date.now() + '.example.com';
+      
+      console.log('1. Getting current deny list from local storage...');
+      const localData = await chrome.storage.local.get('blacklist');
+      const currentBlacklist = localData.blacklist || [];
+      console.log('Current deny list:', currentBlacklist);
+      
+      console.log('2. Adding test site to deny list...');
+      const newBlacklist = [...currentBlacklist, testSite];
+      await chrome.storage.local.set({ blacklist: newBlacklist });
+      console.log('Updated deny list in local storage');
+      
+      console.log('3. Notifying service worker to update rules...');
+      chrome.runtime.sendMessage(
+        { message: 'updateRules' },
+        function(response) {
+          if (chrome.runtime.lastError) {
+            console.error('Error updating rules:', chrome.runtime.lastError);
+            return;
+          }
+          
+          console.log('Rules update response:', response);
+        }
+      );
+      
+      // Wait a moment for the service worker to process
+      console.log('4. Waiting for service worker to process...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      console.log('5. Checking if service worker updated rules...');
+      chrome.runtime.sendMessage(
+        { message: 'getCurrentSettings' },
+        async function(response) {
+          if (chrome.runtime.lastError) {
+            console.error('Error getting current settings:', chrome.runtime.lastError);
+            document.getElementById('flowTestResult').innerHTML += `
+              <p class="error">Error getting current settings: ${chrome.runtime.lastError.message}</p>
+            `;
+            return;
+          }
+          
+          if (response && response.response && response.response.blacklist) {
+            const swBlacklist = response.response.blacklist;
+            console.log('Service worker deny list:', swBlacklist);
+            
+            // Check if test site is in service worker's deny list
+            if (swBlacklist.includes(testSite)) {
+              console.log('SUCCESS: Test site found in service worker deny list');
+              document.getElementById('flowTestResult').innerHTML = `
+                <p class="success">Local → Service Worker flow successful!</p>
+                <p>Test site "${testSite}" was properly added to the service worker's deny list</p>
+              `;
+            } else {
+              console.error('ERROR: Test site not found in service worker deny list');
+              document.getElementById('flowTestResult').innerHTML = `
+                <p class="error">Local → Service Worker flow FAILED</p>
+                <p>Test site "${testSite}" was not found in the service worker's deny list</p>
+                <p>This suggests the service worker is not properly picking up changes from local storage</p>
+              `;
+            }
+            
+            // Clean up
+            console.log('6. Cleaning up test data...');
+            try {
+              // Restore original blacklist
+              await chrome.storage.local.set({ blacklist: currentBlacklist });
+              // Update service worker
+              chrome.runtime.sendMessage({ message: 'updateRules' });
+            } catch (cleanupError) {
+              console.error('Cleanup error:', cleanupError);
+            }
+          } else {
+            console.error('Unexpected response format:', response);
+            document.getElementById('flowTestResult').innerHTML += `
+              <p class="error">Unexpected response from service worker</p>
+              <pre>${JSON.stringify(response, null, 2)}</pre>
+            `;
+          }
+        }
+      );
+      
+    } catch (error) {
+      console.error('Flow test error:', error);
+      document.getElementById('flowTestResult').innerHTML = `
+        <p class="error">Flow test error: ${error.message}</p>
+        <pre>${error.stack}</pre>
+      `;
+    }
+  });
+  
+  document.getElementById('viewDiagnostics').addEventListener('click', () => {
+    window.location.href = 'sync-diagnostics.html';
+  });
+}
+
+// Initialize with some diagnostics
+function initDiagnostics() {
+  console.log('Debug diagnostics page loaded at ' + new Date().toISOString());
+  console.log('Running in extension with ID: ' + chrome.runtime.id);
+  console.log('Starting initial diagnostics...');
+  
+  // Report browser info
+  const browserInfo = navigator.userAgent;
+  console.log('Browser: ' + browserInfo);
+  
+  // Try to detect service worker status
+  try {
+    chrome.runtime.sendMessage({ message: 'ping' }, function(response) {
+      if (chrome.runtime.lastError) {
+        console.error('Service worker unreachable:', chrome.runtime.lastError);
+      } else {
+        console.log('Service worker responsive:', response);
+      }
+    });
+  } catch (error) {
+    console.error('Error pinging service worker:', error);
+  }
+}
+
+// Setup all event handlers when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  setupEventHandlers();
+  initDiagnostics();
+});
