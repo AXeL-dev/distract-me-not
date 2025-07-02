@@ -15,9 +15,17 @@ import {
   HistoryIcon,
   Pill,
   TimeIcon,
-  Badge,  WarningSignIcon,
+  Badge,
+  WarningSignIcon,
   ImportIcon,
   ExportIcon,
+  RefreshIcon,
+  TrashIcon,
+  UploadIcon,
+  PlayIcon,
+  InfoSignIcon,
+  Heading,
+  Text,
 } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv, logInfo } from 'helpers/debug';
@@ -55,7 +63,6 @@ import {
   Tooltip,
   TruncatedText,
   Button,
-  Diagnostics,
 } from 'components';
 import { defaultLogsSettings } from 'helpers/logger';
 import { defaultTimerSettings } from 'helpers/timer';
@@ -66,7 +73,7 @@ import { set, cloneDeep, debounce } from 'lodash';
 import { format } from 'date-fns';
 import './styles.scss';
 import { syncStorage } from 'helpers/syncStorage';
-import { syncStatusLog, diagnostics, syncableSettings, localOnlySettings, syncStatusTracker } from 'helpers/syncDiagnostics';
+import { diagnostics, syncableSettings, localOnlySettings, syncStatusTracker } from 'helpers/syncDiagnostics';
 
 export class Settings extends Component {
   constructor(props) {

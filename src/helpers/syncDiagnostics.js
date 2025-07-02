@@ -1,5 +1,5 @@
 import { syncStorage } from './syncStorage';
-import { logInfo } from './debug';
+import { debug, logInfo } from './debug';
 
 /**
  * Settings that should sync between devices
