@@ -1,7 +1,20 @@
 import { isDevEnv, report } from './debug';
 
 const translations = isDevEnv ? require('../../public/_locales/en/messages') : {
-  // Diagnostic tab
+  // Sync tab (formerly Diagnostic tab)
+  sync: 'Sync',
+  syncDescription: 'Manage and monitor synchronization of your settings between devices.',
+  currentSyncStatus: 'Current Sync Status',
+  lastSuccessfulSync: 'Last Successful Sync',
+  syncHealth: 'Sync Health',
+  good: 'Good',
+  fair: 'Fair', 
+  poor: 'Poor',
+  recentSyncErrors: 'Recent Sync Errors',
+  consecutiveErrors: 'Consecutive Errors',
+  error: 'Error',
+  
+  // Legacy diagnostic tab translations (keep for compatibility)
   diagnose: 'Synchronization',
   syncDiagnosticsDescription: 'Use these tools to diagnose and fix synchronization issues between your devices.',
   runDiagnosis: 'Check Sync Status',
@@ -35,6 +48,12 @@ const translations = isDevEnv ? require('../../public/_locales/en/messages') : {
   syncErrors: 'Sync Errors',
   youtubeDetected: 'YouTube detected in blacklist',
   youtubeDetectedDescription: 'YouTube was found in your blacklist, which might be unintended. You can remove it manually if needed.',
+  testSync: 'Test Sync',
+  
+  // Additional sync status translations
+  clearSyncStorageSuccess: 'Sync storage cleared successfully',
+  clearSyncStorageError: 'Failed to clear sync storage: {error}',
+  never: 'Never',
 };
 
 export function translate(messageName, substitutions = null) {

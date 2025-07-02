@@ -76,8 +76,25 @@ export const syncStorage = {
         logInfo('Getting from sync storage:', Object.keys(syncItems));
         const syncResults = await chrome.storage.sync.get(syncItems);
         Object.assign(results, syncResults);
+        
+        // Record successful sync operation
+        try {
+          const { syncStatusTracker } = await import('./syncDiagnostics');
+          await syncStatusTracker.recordSyncSuccess('load');
+        } catch (error) {
+          debug.error('Failed to record sync success:', error);
+        }
       } catch (error) {
         debug.error('Failed to get from sync storage, falling back to local:', error);
+        
+        // Record sync error
+        try {
+          const { syncStatusTracker } = await import('./syncDiagnostics');
+          await syncStatusTracker.recordSyncError(error, 'load');
+        } catch (syncError) {
+          debug.error('Failed to record sync error:', syncError);
+        }
+        
         try {
           const localFallback = await chrome.storage.local.get(syncItems);
           Object.assign(results, localFallback);
@@ -144,9 +161,26 @@ export const syncStorage = {
         logInfo('Setting to sync storage:', Object.keys(syncItems));
         await chrome.storage.sync.set(syncItems);
         logInfo('Successfully saved to sync storage');
+        
+        // Record successful sync operation
+        try {
+          const { syncStatusTracker } = await import('./syncDiagnostics');
+          await syncStatusTracker.recordSyncSuccess('save');
+        } catch (error) {
+          debug.error('Failed to record sync success:', error);
+        }
       } catch (error) {
         syncSuccess = false;
         debug.error('Failed to save to sync storage, falling back to local:', error);
+        
+        // Record sync error
+        try {
+          const { syncStatusTracker } = await import('./syncDiagnostics');
+          await syncStatusTracker.recordSyncError(error, 'save');
+        } catch (syncError) {
+          debug.error('Failed to record sync error:', syncError);
+        }
+        
         try {
           await chrome.storage.local.set(syncItems);
           logInfo('Successfully saved to local storage (fallback)');

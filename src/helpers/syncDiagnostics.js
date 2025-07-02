@@ -32,8 +32,188 @@ export const localOnlySettings = [
   'logsLength',
   'enableLogs',
   'enableTimer',
-  'enableOnBrowserStartup'
+  'enableOnBrowserStartup',
+  'syncStatus'  // Track sync status locally
 ];
+
+/**
+ * Sync status tracking (stored locally only)
+ */
+export const syncStatusTracker = {
+  /**
+   * Record a successful sync operation
+   */
+  async recordSyncSuccess(operation = 'general') {
+    try {
+      // Check if chrome.storage.local is available
+      if (!chrome?.storage?.local?.set) {
+        debug.error('Chrome storage local API not available for recording sync success');
+        return {
+          lastSuccessfulSync: new Date().toISOString(),
+          lastSyncOperation: operation,
+          lastSyncAttempt: new Date().toISOString(),
+          consecutiveErrors: 0,
+          syncHealth: 'good'
+        };
+      }
+
+      const syncStatus = await this.getSyncStatus();
+      const now = new Date().toISOString();
+      
+      const updatedStatus = {
+        ...syncStatus,
+        lastSuccessfulSync: now,
+        lastSyncOperation: operation,
+        lastSyncAttempt: now,
+        consecutiveErrors: 0,  // Reset error count on success
+        syncHealth: 'good'
+      };
+      
+      await chrome.storage.local.set({ syncStatus: updatedStatus });
+      logInfo(`Sync success recorded: ${operation} at ${now}`);
+      return updatedStatus;
+    } catch (error) {
+      debug.error('Failed to record sync success:', error);
+      return {
+        lastSuccessfulSync: new Date().toISOString(),
+        lastSyncOperation: operation,
+        lastSyncAttempt: new Date().toISOString(),
+        consecutiveErrors: 0,
+        syncHealth: 'good'
+      };
+    }
+  },
+
+  /**
+   * Record a sync error
+   */
+  async recordSyncError(error, operation = 'general') {
+    try {
+      // Check if chrome.storage.local is available
+      if (!chrome?.storage?.local?.set) {
+        debug.error('Chrome storage local API not available for recording sync error');
+        return {
+          lastSyncAttempt: new Date().toISOString(),
+          consecutiveErrors: 1,
+          syncHealth: 'fair'
+        };
+      }
+
+      const syncStatus = await this.getSyncStatus();
+      const now = new Date().toISOString();
+      
+      // Handle different error types more robustly
+      let errorMessage = 'Unknown error';
+      let errorStack = undefined;
+      
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error && typeof error === 'object') {
+        if (error.message) {
+          errorMessage = error.message;
+        } else {
+          // Convert object to string for better error reporting
+          errorMessage = JSON.stringify(error);
+        }
+        errorStack = error.stack;
+      } else {
+        errorMessage = String(error);
+      }
+      
+      const errorEntry = {
+        timestamp: now,
+        operation,
+        message: errorMessage,
+        stack: errorStack
+      };
+
+      const recentErrors = (syncStatus.recentErrors || []).slice(-4); // Keep last 5 errors
+      recentErrors.push(errorEntry);
+
+      const consecutiveErrors = (syncStatus.consecutiveErrors || 0) + 1;
+      
+      const updatedStatus = {
+        ...syncStatus,
+        lastSyncAttempt: now,
+        lastSyncError: errorEntry,
+        recentErrors,
+        consecutiveErrors,
+        syncHealth: consecutiveErrors >= 3 ? 'poor' : consecutiveErrors >= 1 ? 'fair' : 'good'
+      };
+      
+      await chrome.storage.local.set({ syncStatus: updatedStatus });
+      debug.error(`Sync error recorded: ${operation}`, error);
+      return updatedStatus;
+    } catch (storageError) {
+      debug.error('Failed to record sync error:', storageError);
+      return {
+        lastSyncAttempt: new Date().toISOString(),
+        consecutiveErrors: 1,
+        syncHealth: 'fair'
+      };
+    }
+  },
+
+  /**
+   * Get current sync status
+   */
+  async getSyncStatus() {
+    try {
+      // Check if chrome.storage.local is available
+      if (!chrome?.storage?.local?.get) {
+        debug.error('Chrome storage local API not available');
+        return {
+          lastSuccessfulSync: null,
+          lastSyncAttempt: null,
+          lastSyncError: null,
+          lastSyncOperation: null,
+          recentErrors: [],
+          consecutiveErrors: 0,
+          syncHealth: 'unknown'
+        };
+      }
+
+      const result = await chrome.storage.local.get('syncStatus');
+      const syncStatus = result && result.syncStatus;
+      return syncStatus || {
+        lastSuccessfulSync: null,
+        lastSyncAttempt: null,
+        lastSyncError: null,
+        lastSyncOperation: null,
+        recentErrors: [],
+        consecutiveErrors: 0,
+        syncHealth: 'unknown'
+      };
+    } catch (error) {
+      debug.error('Failed to get sync status:', error);
+      return {
+        lastSuccessfulSync: null,
+        lastSyncAttempt: null,
+        lastSyncError: null,
+        lastSyncOperation: null,
+        recentErrors: [],
+        consecutiveErrors: 0,
+        syncHealth: 'unknown'
+      };
+    }
+  },
+
+  /**
+   * Clear sync status history
+   */
+  async clearSyncStatus() {
+    try {
+      if (chrome?.storage?.local?.remove) {
+        await chrome.storage.local.remove('syncStatus');
+        logInfo('Sync status history cleared');
+      } else {
+        debug.error('Chrome storage local API not available for clearing sync status');
+      }
+    } catch (error) {
+      debug.error('Failed to clear sync status:', error);
+    }
+  }
+};
 
 export const diagnostics = {
   async checkSyncStatus() {
@@ -48,24 +228,8 @@ export const diagnostics = {
       missingSettings: [],
       browser: navigator.userAgent,
       errors: [],
-      // Enhanced status information
-      syncRuleCounts: {
-        blacklist: 0,
-        whitelist: 0,
-        blacklistKeywords: 0,
-        whitelistKeywords: 0
-      },
-      localRuleCounts: {
-        blacklist: 0,
-        whitelist: 0,
-        blacklistKeywords: 0,
-        whitelistKeywords: 0
-      },
-      lastSyncInfo: {
-        lastSyncUp: null,
-        lastSyncDown: null,
-        lastModified: null
-      }
+      // New sync status tracking
+      syncStatusHistory: await syncStatusTracker.getSyncStatus()
     };
 
     try {
@@ -267,7 +431,7 @@ export const diagnostics = {
       // Step 1: Write to sync storage
       results.steps.push('Writing test data to sync storage...');
       await chrome.storage.sync.set({ [testId]: testData });
-      results.steps.push('✓ Successfully wrote to sync storage');
+      results.steps.push('✅ Successfully wrote to sync storage');
 
       // Wait a moment for potential replication
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -278,39 +442,44 @@ export const diagnostics = {
       if (!readData[testId]) {
         throw new Error('Test data not found in sync storage after write');
       }
-      results.steps.push('✓ Successfully read from sync storage');
+      results.steps.push('✅ Successfully read from sync storage');
 
       // Step 3: Verify data integrity
       results.steps.push('Verifying data integrity...');
       if (!this.isDataIntegrityValid(testData, readData[testId])) {
         throw new Error('Data integrity check failed - written and read data do not match');
       }
-      results.steps.push('✓ Data integrity verified');
+      results.steps.push('✅ Data integrity verified');
 
-      // Step 4: Test storage listener
+      // Step 4: Test storage listener (if available)
       results.steps.push('Testing storage change listener...');
       let listenerTriggered = false;
-      const testListener = (changes, areaName) => {
-        if (areaName === 'sync' && changes[testId]) {
-          listenerTriggered = true;
+      
+      if (chrome.storage && chrome.storage.onChanged) {
+        const testListener = (changes, areaName) => {
+          if (areaName === 'sync' && changes[testId]) {
+            listenerTriggered = true;
+          }
+        };
+        
+        chrome.storage.onChanged.addListener(testListener);
+        await chrome.storage.sync.set({ [testId]: { ...testData, updated: true } });
+        await new Promise(resolve => setTimeout(resolve, 100));
+        chrome.storage.onChanged.removeListener(testListener);
+        
+        if (listenerTriggered) {
+          results.steps.push('✅ Storage change listener working correctly');
+        } else {
+          results.steps.push('⚠️ Storage change listener may not be working');
         }
-      };
-      
-      chrome.storage.onChanged.addListener(testListener);
-      await chrome.storage.sync.set({ [testId]: { ...testData, updated: true } });
-      await new Promise(resolve => setTimeout(resolve, 100));
-      chrome.storage.onChanged.removeListener(testListener);
-      
-      if (listenerTriggered) {
-        results.steps.push('✓ Storage change listener working correctly');
       } else {
-        results.steps.push('⚠ Storage change listener may not be working');
+        results.steps.push('⚠️ Storage change listener API not available');
       }
 
       // Step 5: Clean up
       results.steps.push('Cleaning up test data...');
       await chrome.storage.sync.remove(testId);
-      results.steps.push('✓ Test data cleaned up');
+      results.steps.push('✅ Test data cleaned up');
 
       results.success = true;
       results.steps.push('🎉 Sync test completed successfully');
@@ -322,9 +491,10 @@ export const diagnostics = {
       // Try to clean up even if test failed
       try {
         await chrome.storage.sync.remove(testId);
-        results.steps.push('✓ Cleanup completed despite test failure');
+        results.steps.push('✅ Cleanup completed despite test failure');
       } catch (cleanupError) {
         results.errors.push(`Cleanup failed: ${cleanupError.message}`);
+        results.steps.push('❌ Cleanup failed');
       }
     }
 
@@ -465,60 +635,104 @@ export const diagnostics = {
     const suggestions = [];
     
     try {
-      // Check storage quota
-      const bytesUsed = await chrome.storage.sync.getBytesInUse(null);
-      if (bytesUsed > 90000) { // Close to 100KB limit
-        problems.push(`Sync storage is ${Math.round(bytesUsed/1024)}KB (near 100KB limit)`);
-        suggestions.push('Consider removing old data or reducing list sizes');
+      // Check sync status history first
+      const syncStatus = await syncStatusTracker.getSyncStatus();
+      
+      // Check for sync health issues
+      if (syncStatus.consecutiveErrors >= 3) {
+        problems.push(`${syncStatus.consecutiveErrors} consecutive sync errors detected`);
+        suggestions.push('Check network connectivity and browser sync settings');
       }
       
-      // Check for duplicate data
-      const syncData = await chrome.storage.sync.get(null);
-      const localData = await chrome.storage.local.get(null);
+      if (syncStatus.syncHealth === 'poor') {
+        problems.push('Sync health is poor due to repeated failures');
+        suggestions.push('Consider clearing sync storage and forcing a fresh sync');
+      }
       
-      let duplicates = 0;
-      Object.keys(syncData).forEach(key => {
-        if (localData.hasOwnProperty(key) && !localOnlySettings.includes(key)) {
-          duplicates++;
+      if (syncStatus.recentErrors && syncStatus.recentErrors.length >= 3) {
+        problems.push(`${syncStatus.recentErrors.length} recent sync errors`);
+        suggestions.push('Review recent error messages for patterns');
+      }
+      
+      // Check storage quota (only if chrome.storage.sync is available)
+      if (chrome?.storage?.sync?.getBytesInUse) {
+        try {
+          const bytesUsed = await chrome.storage.sync.getBytesInUse(null);
+          if (bytesUsed > 90000) { // Close to 100KB limit
+            problems.push(`Sync storage is ${Math.round(bytesUsed/1024)}KB (near 100KB limit)`);
+            suggestions.push('Consider removing old data or reducing list sizes');
+          }
+        } catch (quotaError) {
+          debug.error('Failed to check storage quota:', quotaError);
         }
-      });
-      
-      if (duplicates > 5) {
-        problems.push(`${duplicates} settings found in both local and sync storage`);
-        suggestions.push('Run storage cleanup to remove duplicates');
       }
       
-      // Check for missing timestamps
-      const timestampKeys = [
-        'blacklistLastModifiedDate',
-        'whitelistLastModifiedDate', 
-        'blacklistKeywordsLastModifiedDate',
-        'whitelistKeywordsLastModifiedDate'
-      ];
-      
-      const missingTimestamps = timestampKeys.filter(key => !syncData[key]);
-      if (missingTimestamps.length > 0) {
-        problems.push(`Missing timestamps: ${missingTimestamps.join(', ')}`);
-        suggestions.push('Timestamps help resolve sync conflicts between devices');
-      }
-      
-      // Check for very large arrays
-      ['blacklist', 'whitelist', 'blacklistKeywords', 'whitelistKeywords'].forEach(key => {
-        if (syncData[key] && Array.isArray(syncData[key]) && syncData[key].length > 100) {
-          problems.push(`Large ${key} (${syncData[key].length} items) may slow sync`);
-          suggestions.push(`Consider organizing ${key} into categories or removing unused items`);
+      // Check for duplicate data (only if chrome.storage is available)
+      if (chrome?.storage?.sync?.get && chrome?.storage?.local?.get) {
+        try {
+          const syncData = await chrome.storage.sync.get(null);
+          const localData = await chrome.storage.local.get(null);
+          
+          if (syncData && localData) {
+            let duplicates = 0;
+            Object.keys(syncData).forEach(key => {
+              if (localData.hasOwnProperty(key) && !localOnlySettings.includes(key)) {
+                duplicates++;
+              }
+            });
+            
+            if (duplicates > 5) {
+              problems.push(`${duplicates} settings found in both local and sync storage`);
+              suggestions.push('Run storage cleanup to remove duplicates');
+            }
+            
+            // Check for missing timestamps
+            const timestampKeys = [
+              'blacklistLastModifiedDate',
+              'whitelistLastModifiedDate', 
+              'blacklistKeywordsLastModifiedDate',
+              'whitelistKeywordsLastModifiedDate'
+            ];
+            
+            const missingTimestamps = timestampKeys.filter(key => !syncData[key]);
+            if (missingTimestamps.length > 0) {
+              problems.push(`Missing timestamps: ${missingTimestamps.join(', ')}`);
+              suggestions.push('Timestamps help resolve sync conflicts between devices');
+            }
+            
+            // Check for very large arrays
+            ['blacklist', 'whitelist', 'blacklistKeywords', 'whitelistKeywords'].forEach(key => {
+              if (syncData[key] && Array.isArray(syncData[key]) && syncData[key].length > 100) {
+                problems.push(`Large ${key} (${syncData[key].length} items) may slow sync`);
+                suggestions.push(`Consider organizing ${key} into categories or removing unused items`);
+              }
+            });
+          }
+        } catch (storageError) {
+          debug.error('Failed to check storage data:', storageError);
         }
-      });
+      }
       
     } catch (error) {
       problems.push(`Error during diagnosis: ${error.message}`);
+    }
+    
+    // Determine overall health based on sync status and problems
+    let overallHealth = 'good';
+    const syncStatus = await syncStatusTracker.getSyncStatus();
+    
+    if (syncStatus.syncHealth === 'poor' || problems.length >= 3) {
+      overallHealth = 'poor';
+    } else if (syncStatus.syncHealth === 'fair' || problems.length > 0) {
+      overallHealth = 'fair';
     }
     
     return {
       problemCount: problems.length,
       problems: problems,
       suggestions: suggestions,
-      overallHealth: problems.length === 0 ? 'good' : problems.length < 3 ? 'fair' : 'poor'
+      overallHealth: overallHealth,
+      syncHealth: syncStatus.syncHealth
     };
   },
 
