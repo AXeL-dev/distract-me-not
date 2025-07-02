@@ -18,9 +18,19 @@ export class NumberInput extends Component {
       });
     }
   }
-
   validateValue = (value) => {
+    // Handle undefined/null/empty values
+    if (value === undefined || value === null || value === '') {
+      return this.props.min !== undefined ? this.props.min : 0;
+    }
+    
     const intValue = parseInt(value);
+    
+    // Handle NaN values
+    if (isNaN(intValue)) {
+      return this.props.min !== undefined ? this.props.min : 0;
+    }
+    
     const min = this.props.min !== undefined ? this.props.min : null;
     const max = this.props.max !== undefined ? this.props.max : null;
     if (min !== null && intValue < min) {

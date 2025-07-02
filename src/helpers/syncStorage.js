@@ -3,7 +3,7 @@
  * with intelligent fallbacks to local storage when needed.
  */
 
-import { debug, isDevEnv, logInfo } from './debug';
+import { debug, logInfo } from './debug';
 
 // Settings that should be stored in local storage only (everything else syncs)
 const localOnlySettings = [
@@ -31,20 +31,18 @@ const shouldUseLocalStorage = (key) => {
 
 // Helper to check if this is likely a fresh install
 const checkIfFreshInstall = async () => {
-  try {
-    // Get the current blacklist and whitelist from local storage
+  try {    // Get the current blacklist and whitelist from local storage
     const data = await chrome.storage.local.get(['blacklist', 'whitelist', 'blacklistKeywords', 'whitelistKeywords']);
     
     // If all lists are empty or don't exist, this might be a fresh install
     const hasNoRules = 
-      (!data.blacklist || data.blacklist.length === 0) &&
-      (!data.whitelist || data.whitelist.length === 0) &&
-      (!data.blacklistKeywords || data.blacklistKeywords.length === 0) &&
-      (!data.whitelistKeywords || data.whitelistKeywords.length === 0);
-    
-    // Also check if this was recently installed (within last 5 minutes)
+      (!data?.blacklist || data.blacklist.length === 0) &&
+      (!data?.whitelist || data.whitelist.length === 0) &&
+      (!data?.blacklistKeywords || data.blacklistKeywords.length === 0) &&
+      (!data?.whitelistKeywords || data.whitelistKeywords.length === 0);
+      // Also check if this was recently installed (within last 5 minutes)
     const installTime = await chrome.storage.local.get(['installTime']);
-    const isRecentInstall = installTime.installTime && (Date.now() - installTime.installTime) < 5 * 60 * 1000;
+    const isRecentInstall = installTime?.installTime && (Date.now() - installTime.installTime) < 5 * 60 * 1000;
     
     return hasNoRules && isRecentInstall;
   } catch (error) {

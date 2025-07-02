@@ -185,6 +185,9 @@
   "miscellaneous": {
     "message": "Divers"
   },
+  "diagnose": {
+    "message": "Diagnostiquer"
+  },
   "password": {
     "message": "Mot de passe"
   },

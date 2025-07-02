@@ -18,13 +18,6 @@ import {
   Badge,  WarningSignIcon,
   ImportIcon,
   ExportIcon,
-  RefreshIcon,
-  TrashIcon,
-  InfoSignIcon,
-  UploadIcon,
-  PlayIcon,
-  Heading,
-  Text,
 } from 'evergreen-ui';
 import { translate } from 'helpers/i18n';
 import { debug, isDevEnv, logInfo } from 'helpers/debug';
@@ -62,6 +55,7 @@ import {
   Tooltip,
   TruncatedText,
   Button,
+  Diagnostics,
 } from 'components';
 import { defaultLogsSettings } from 'helpers/logger';
 import { defaultTimerSettings } from 'helpers/timer';
@@ -148,10 +142,6 @@ export class Settings extends Component {
         },
       },
       isSmallScreen: isSmallDevice(),      originalIsEnabled: defaultIsEnabled, // Add this line to track original status
-      syncDiagnostics: null,
-      diagnosisRunning: false,
-      forceSyncRunning: false,
-      syncTestRunning: false,
       refreshRulesRunning: false,
       lastDiagnosisResults: null,
       lastSyncTestResults: null,
@@ -436,10 +426,6 @@ export class Settings extends Component {
       });
       return;
     }
-
-    // Capture original enabled state to detect changes
-    const wasEnabled = this.state.originalIsEnabled;
-    const willBeEnabled = this.state.options.isEnabled;
 
     syncStorage
       .set({
