@@ -15,14 +15,15 @@ import {
   HistoryIcon,
   Pill,
   TimeIcon,
-  Badge,  WarningSignIcon,
+  Badge,
+  WarningSignIcon,
   ImportIcon,
   ExportIcon,
   RefreshIcon,
   TrashIcon,
-  InfoSignIcon,
   UploadIcon,
   PlayIcon,
+  InfoSignIcon,
   Heading,
   Text,
 } from 'evergreen-ui';
@@ -72,7 +73,7 @@ import { set, cloneDeep, debounce } from 'lodash';
 import { format } from 'date-fns';
 import './styles.scss';
 import { syncStorage } from 'helpers/syncStorage';
-import { syncStatusLog, diagnostics, syncableSettings, localOnlySettings, syncStatusTracker } from 'helpers/syncDiagnostics';
+import { diagnostics, syncableSettings, localOnlySettings, syncStatusTracker } from 'helpers/syncDiagnostics';
 
 export class Settings extends Component {
   constructor(props) {
@@ -148,10 +149,6 @@ export class Settings extends Component {
         },
       },
       isSmallScreen: isSmallDevice(),      originalIsEnabled: defaultIsEnabled, // Add this line to track original status
-      syncDiagnostics: null,
-      diagnosisRunning: false,
-      forceSyncRunning: false,
-      syncTestRunning: false,
       refreshRulesRunning: false,
       lastDiagnosisResults: null,
       lastSyncTestResults: null,
@@ -436,10 +433,6 @@ export class Settings extends Component {
       });
       return;
     }
-
-    // Capture original enabled state to detect changes
-    const wasEnabled = this.state.originalIsEnabled;
-    const willBeEnabled = this.state.options.isEnabled;
 
     syncStorage
       .set({

@@ -185,6 +185,9 @@
   "miscellaneous": {
     "message": "Overig"
   },
+  "diagnose": {
+    "message": "Diagnose"
+  },
   "password": {
     "message": "Wachtwoord"
   },
