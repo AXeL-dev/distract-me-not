@@ -72,7 +72,7 @@ import { set, cloneDeep, debounce } from 'lodash';
 import { format } from 'date-fns';
 import './styles.scss';
 import { syncStorage } from 'helpers/syncStorage';
-import { syncStatusLog, diagnostics, syncableSettings, localOnlySettings } from 'helpers/syncDiagnostics';
+import { syncStatusLog, diagnostics, syncableSettings, localOnlySettings, syncStatusTracker } from 'helpers/syncDiagnostics';
 
 export class Settings extends Component {
   constructor(props) {
@@ -91,7 +91,7 @@ export class Settings extends Component {
       { label: translate('timer'), id: 'timer' },
       { label: translate('logs'), id: 'logs' },
       { label: translate('miscellaneous'), id: 'misc' },
-      { label: translate('diagnose'), id: 'diagnose' },
+      { label: translate('sync'), id: 'sync' },
       { label: translate('about'), id: 'about' },
     ];    // prettier-ignore
     const blacklistTabs = [
@@ -155,6 +155,7 @@ export class Settings extends Component {
       refreshRulesRunning: false,
       lastDiagnosisResults: null,
       lastSyncTestResults: null,
+      currentSyncStatus: null, // Track current sync status with errors and last sync time
     };
   }
   componentDidMount() {
@@ -183,6 +184,9 @@ export class Settings extends Component {
     if (global.chrome && chrome.runtime && chrome.runtime.onMessage) {
       chrome.runtime.onMessage.addListener(this.handleBackgroundMessages);
     }
+    
+    // Load current sync status
+    this.loadCurrentSyncStatus();
     
     window.addEventListener('resize', this.handleResize);
   }
@@ -237,6 +241,16 @@ export class Settings extends Component {
   handleResize = debounce(() => {
     this.setState({ isSmallScreen: isSmallDevice() });
   }, 200);
+
+  // Load current sync status for display
+  loadCurrentSyncStatus = async () => {
+    try {
+      const syncStatus = await syncStatusTracker.getSyncStatus();
+      this.setState({ currentSyncStatus: syncStatus });
+    } catch (error) {
+      debug.error('Failed to load sync status:', error);
+    }
+  };
 
   getAllSettings = () => {
     return syncStorage.get({
@@ -829,6 +843,9 @@ export class Settings extends Component {
       // Update state with diagnosis results if needed
       this.setState({ lastDiagnosisResults: { results, problems } });
       
+      // Refresh sync status after diagnosis
+      this.loadCurrentSyncStatus();
+      
     } catch (error) {
       toaster.danger(`Diagnosis failed: ${error.message}`, {
         id: 'diagnosis-error',
@@ -875,10 +892,16 @@ export class Settings extends Component {
       const result = await diagnostics.clearSyncStorage();
       
       if (result.success) {
+        // Also clear sync status history
+        await syncStatusTracker.clearSyncStatus();
+        
         toaster.success(translate('clearSyncStorageSuccess'), {
           id: 'clear-sync-success',
           duration: 3
         });
+        
+        // Refresh sync status display
+        this.loadCurrentSyncStatus();
       } else {
         throw new Error(result.error);
       }
@@ -1597,7 +1620,7 @@ export class Settings extends Component {
     </Fragment>
   );
 
-  renderDiagnosticTab = () => (
+  renderSyncTab = () => (
     <Fragment>
       <Paragraph size={400} marginBottom={16}>
         {translate('syncDiagnosticsDescription')}
@@ -1932,7 +1955,7 @@ export class Settings extends Component {
                 {tab.id === 'timer' && this.renderTimerTab()}
                 {tab.id === 'logs' && this.renderLogsTab()}
                 {tab.id === 'misc' && this.renderMiscTab()}
-                {tab.id === 'diagnose' && this.renderDiagnosticTab()}
+                {tab.id === 'sync' && this.renderSyncTab()}
                 {tab.id === 'about' && this.renderAboutTab()}
               </Pane>
             ))}
